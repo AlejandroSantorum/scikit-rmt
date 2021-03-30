@@ -11,8 +11,12 @@ from rmtpy.ensemble import GOE, GUE, GSE
 
 
 def test_goe_init():
+    N = 3
+
     np.random.seed(1)
-    goe = GOE(3)
+    goe = GOE(n=N)
+
+    assert(goe.matrix.shape == (N,N))
 
     assert_almost_equal(goe.matrix, np.array([[ 1.62434536, -0.84236252, 0.60832001],
                                               [-0.84236252, 0.86540763, -1.5313728 ],
@@ -21,8 +25,12 @@ def test_goe_init():
 
 
 def test_gue_init():
+    N = 3
+
     np.random.seed(1)
-    gue = GUE(3)
+    gue = GUE(n=N)
+
+    assert(gue.matrix.shape == (N,N))
 
     assert_almost_equal(gue.matrix, np.array([[1.62434536-0.24937038j, -0.84236252+0.56984537j, 0.60832001-1.58001599j],
                                              [-0.84236252+0.56984537j, 0.86540763-0.38405435j, -1.5313728 +0.48067062j],
@@ -31,8 +39,11 @@ def test_gue_init():
 
 
 def test_gse_init():
+    N = 2 
     np.random.seed(1)
-    gse = GSE(2)
+    gse = GSE(n=N)
+
+    assert(gse.matrix.shape == (2*N,2*N))
 
     assert_almost_equal(gse.matrix, np.array([[1.62434536+0.86540763j, -0.56996408-0.27836347j, 0.-0.3224172j, -0.85573916+0.37485754j],
                                              [-0.56996408-0.27836347j, -1.07296862-0.7612069j, 0.85573916+0.37485754j, 0.-1.09989127j],
