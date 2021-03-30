@@ -43,6 +43,7 @@ def test_wishartComplex_init():
 def test_wishartQuatern_init():
     P = 2
     N = 5
+
     np.random.seed(1)
     wq = WishartQuaternion(p=2, n=5)
 

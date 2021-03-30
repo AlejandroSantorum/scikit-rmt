@@ -11,8 +11,15 @@ from .wishart_ensemble import WishartReal
 from .wishart_ensemble import WishartComplex
 from .wishart_ensemble import WishartQuaternion
 
-__all__ = ["GaussianEnsemble",
+from .manova_ensemble import ManovaEnsemble
+from .manova_ensemble import ManovaReal
+from .manova_ensemble import ManovaComplex
+from .manova_ensemble import ManovaQuaternion
+
+
+__all__ = ["GaussianEnsemble", 
            "GOE", "GUE", "GSE",
-           "WishartReal",
-           "WishartComplex",
-           "WishartQuaternion"]
+           "WishartEnsemble",
+           "WishartReal", "WishartComplex", "WishartQuaternion",
+           "ManovaEnsemble",
+           "ManovaReal", "ManovaComplex", "ManovaQuaternion"]
