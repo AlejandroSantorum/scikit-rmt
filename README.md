@@ -4,5 +4,5 @@ Random Matrix Theory library - package for Python3
 
 -----------------
 
-Author: Alejandro Santorum Varela - alejandro.santorum@gmail.com
+Author: Alejandro Santorum Varela - alejandro.santorum@gmail.com<br>
 Supervised: Alberto Suárez González - alberto.suares@uam.es
