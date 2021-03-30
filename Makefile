@@ -19,6 +19,7 @@ requirements:
 	@echo "===> NON-STANDARD LIBRARIES TO BE INSTALLED <==="	
 	@echo "\t numpy: library for efficient mathematical calculus for Python"
 	@echo "\t matplotlib: Python plotting library"
+	@echo "\t pytest: Python testing library"
 	@echo "==> You can install all requirements by executing 'make install_requirements'"
 
 
