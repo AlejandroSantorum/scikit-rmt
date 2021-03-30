@@ -40,7 +40,7 @@ class GOE(GaussianEnsemble):
 
 
 ##########################################
-### Gaussian UNITARY Ensemble = GUE
+### Gaussian Unitary Ensemble = GUE
 
 class GUE(GaussianEnsemble):
 
@@ -57,7 +57,7 @@ class GUE(GaussianEnsemble):
 
 
 ##########################################
-### Gaussian Orthogonal Ensemble = GOE
+### Gaussian Symplectic Ensemble = GSE
 
 class GSE(GaussianEnsemble):
 
