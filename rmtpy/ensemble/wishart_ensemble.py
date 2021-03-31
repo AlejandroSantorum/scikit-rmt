@@ -3,7 +3,7 @@
 This module contains the implementation of the Wishart Ensemble, also
 known as Laguerre Ensemble. This ensemble of random matrices contains
 mainly three sub-ensembles: Wishart Real Ensemble, Wishart Complex Ensemble
-and Wishart Quaternion Ensemble (GSE).
+and Wishart Quaternion Ensemble.
 
 """
 
