@@ -27,7 +27,8 @@ class GaussianEnsemble(_Ensemble):
         beta (int): descriptive integer of the gaussian ensemble type.
             For GOE beta=1, for GUE beta=2, for GSE beta=4.
         n (int): random matrix size. Gaussian ensemble matrices are
-            squared matrices of size n times n.
+            squared matrices. GOE and GUE are of size n times n,
+            and GSE are of size 2n times 2n.
 
     """
 
@@ -38,7 +39,8 @@ class GaussianEnsemble(_Ensemble):
 
         Args:
             n (int): random matrix size. Gaussian ensemble matrices are
-                squared matrices of size n times n.
+            squared matrices. GOE and GUE are of size n times n,
+            and GSE are of size 2n times 2n.
             beta (int, default=1): descriptive integer of the gaussian ensemble type.
                 For GOE beta=1, for GUE beta=2, for GSE beta=4.
 
@@ -79,8 +81,8 @@ class GOE(GaussianEnsemble):
         calling the parent class constructor and sampling a random instance.
 
         Args:
-            n (int): random matrix size. Gaussian ensemble matrices are
-                squared matrices of size n times n.
+            n (int): random matrix size. GOE matrices are squared matrices
+                of size n times n.
 
         """
         super().__init__(n=n, beta=1)
@@ -119,8 +121,8 @@ class GUE(GaussianEnsemble):
         calling the parent class constructor and sampling a random instance.
 
         Args:
-            n (int): random matrix size. Gaussian ensemble matrices are
-                squared matrices of size n times n.
+            n (int): random matrix size. GUE matrices are squared matrices
+                of size n times n.
 
         """
         super().__init__(n=n, beta=2)
@@ -145,12 +147,22 @@ class GSE(GaussianEnsemble):
     under conjugation by the symplectic group.
 
     Attributes:
-        matrix (numpy array): instance of the random matrix ensemble
-            of size n times n.
+        matrix (numpy array): instance of the GSE random matrix
+            ensemble of size 2n times 2n.
 
     """
 
     def __init__(self, n):
+        """Constructor for GSE class.
+
+        Initializes an instance of this class with the given parameters,
+        calling the parent class constructor and sampling a random instance.
+
+        Args:
+            n (int): random matrix size. GSE matrices are squared matrices
+                of size 2n times 2n.
+
+        """
         super().__init__(n=n, beta=4)
         self.matrix = self.sample()
 
