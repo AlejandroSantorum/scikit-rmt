@@ -189,7 +189,7 @@ class ManovaQuaternion(ManovaEnsemble):
 
     Attributes:
         matrix (numpy array): instance of the random matrix ensemble
-            of size m times m.
+            of size 2m times 2m.
 
     """
 

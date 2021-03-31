@@ -72,7 +72,7 @@ class WishartReal(WishartEnsemble):
 
     Attributes:
         matrix (numpy array): instance of the random matrix ensemble
-            of size p times n.
+            of size p times p.
 
     """
 
@@ -114,7 +114,7 @@ class WishartComplex(WishartEnsemble):
 
     Attributes:
         matrix (numpy array): instance of the random matrix ensemble
-            of size p times n.
+            of size p times p.
 
     """
 
@@ -158,7 +158,7 @@ class WishartQuaternion(WishartEnsemble):
 
     Attributes:
         matrix (numpy array): instance of the random matrix ensemble
-            of size p times n.
+            of size 2p times 2p.
 
     """
 
