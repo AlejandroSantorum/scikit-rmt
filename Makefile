@@ -1,12 +1,13 @@
 help:
 	@echo "Execute make with one of the next arguments:"
 	@echo "\tmake help - print makefile usage"
-	@echo "\tmake help_sphinx - print sphinx usage"
-	@echo "\tmake apidoc - executes sphinx docs generation"
-	@echo "\tmake activate - command to activate virtual environment"
-	@echo "\tmake deactivate - command to deactivate virtual environment"
 	@echo "\tmake requirements - list library requirements to be installed"
 	@echo "\tmake install_requirements - install library requirements (assert venv is activated)"
+	@echo "\tmake activate - command to activate virtual environment"
+	@echo "\tmake deactivate - command to deactivate virtual environment"
+	@echo "\tmake help_sphinx - print sphinx usage"
+	@echo "\tmake apidoc - executes sphinx docs generation"
+	@echo "\tmake pytest - executes pytest in the RMTpy library"
 
 
 activate:
@@ -29,6 +30,12 @@ requirements:
 .PHONY: install_requirements
 install_requirements:
 	pip3 install -r requirements.txt
+
+
+.PHONY: pytest
+pytest:
+	python3 -m pytest rmtpy
+
 
 
 ### Minimal makefile for Sphinx documentation ###
