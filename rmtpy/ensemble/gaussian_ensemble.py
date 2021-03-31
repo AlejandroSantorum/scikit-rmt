@@ -48,15 +48,6 @@ class GaussianEnsemble(_Ensemble):
 
     @abstractmethod
     def sample(self):
-        """Samples new random matrix.
-
-        The sampling algorithm depends on the inherited classes, so it should be
-        specified by them.
-
-        Returns:
-            numpy array containing new matrix sampled.
-
-        """
         pass
 
     @abstractmethod
