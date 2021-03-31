@@ -2,10 +2,9 @@
 
 This module contains the implementation of the Gaussian Ensemble, also
 known as Hermite Ensemble. This ensemble of random matrices contains
-mainly three sub-ensembles:
-    · Gaussian Orthogonal Ensemble (GOE)
-    · Gaussian Unitary Ensemble (GUE)
-    · Gaussian Symplectic Ensemble (GSE)
+mainly three sub-ensembles: Gaussian Orthogonal Ensemble (GOE),
+Gaussian Unitary Ensemble (GUE) and Gaussian Symplectic Ensemble (GSE).
+
 """
 
 from abc import abstractmethod
@@ -53,9 +52,6 @@ class GaussianEnsemble(_Ensemble):
 
         The sampling algorithm depends on the inherited classes, so it should be
         specified by them.
-
-        Note:
-            Do not include the `self` parameter in the ``Args`` section.
 
         Returns:
             numpy array containing new matrix sampled.

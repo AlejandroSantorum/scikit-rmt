@@ -1,3 +1,5 @@
 numpy
 matplotlib
 pytest
+sphinx
+sphinx-rtd-theme
