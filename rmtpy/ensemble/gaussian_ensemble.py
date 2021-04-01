@@ -9,6 +9,7 @@ Gaussian Unitary Ensemble (GUE) and Gaussian Symplectic Ensemble (GSE).
 
 from abc import abstractmethod
 import numpy as np
+import scipy as sp
 
 from ._base_ensemble import _Ensemble
 
@@ -48,6 +49,19 @@ class GaussianEnsemble(_Ensemble):
         self.n = n
         self.beta = beta
 
+    def set_size(self, n):
+        """Setter of matrix size.
+
+        Sets the matrix size. Useful if it has been initialized with a different value.
+
+        Args:
+            n (int): new random matrix size. Gaussian ensemble matrices are
+            squared matrices. GOE and GUE are of size n times n, and 
+            GSE are of size 2n times 2n.
+
+        """
+        self.n = n
+
     @abstractmethod
     def sample(self):
         pass
@@ -74,7 +88,7 @@ class GOE(GaussianEnsemble):
 
     """
 
-    def __init__(self, n):
+    def __init__(self, n, use_tridiagonal=False):
         """Constructor for GOE class.
 
         Initializes an instance of this class with the given parameters,
@@ -83,18 +97,44 @@ class GOE(GaussianEnsemble):
         Args:
             n (int): random matrix size. GOE matrices are squared matrices
                 of size n times n.
+            
+            use_tridiagonal (bool, default=False): if set to True, GOE matrices
+                are sampled in its tridiagonal form, which has the same
+                eigenvalues than its standard form.
 
         """
         super().__init__(n=n, beta=1)
+        self.use_tridiagonal = use_tridiagonal
         self.matrix = self.sample()
 
     def sample(self):
-        n = self.n
+        if self.use_tridiagonal:
+            return self._sample_goe_tridiagonal()
+        else:
+            return self._sample_goe_matrix()
+    
+    def _sample_goe_matrix(self):
         # n by n matrix of random Gaussians
-        A = np.random.randn(n,n)
+        A = np.random.randn(self.n,self.n)
         # symmetrize matrix
         self.matrix = (A + A.transpose())/2
         return self.matrix
+    
+    def _sample_goe_tridiagonal(self):
+        # sampling diagonal normals
+        normals = (1/np.sqrt(2)) * np.random.normal(loc=0, scale=np.sqrt(2), size=self.n)
+        # sampling chi-squares
+        dfs = np.arange(1, self.n)
+        chisqs = (1/np.sqrt(2)) * [np.sqrt(np.random.chisquare(df)) for df in dfs]
+        # inserting diagonals
+        diags = [chisqs, normals, chisqs]
+        M = sp.sparse.diags(diagonals, [-1, 0, 1])
+        # converting to numpy array
+        self.matrix = M.toarray()
+        return self.matrix
+
+
+
 
 
 ##########################################

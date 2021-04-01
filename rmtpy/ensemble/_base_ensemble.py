@@ -38,5 +38,9 @@ class _Ensemble:
         pass
 
     @abstractmethod
+    def set_size(self):
+        pass
+
+    @abstractmethod
     def eigval_pdf(self):
         pass

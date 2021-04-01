@@ -20,7 +20,8 @@ deactivate:
 
 requirements:
 	@echo "===> NON-STANDARD LIBRARIES TO BE INSTALLED <==="	
-	@echo "\t numpy: library for efficient mathematical calculus for Python"
+	@echo "\t numpy: Library for efficient mathematical calculus for Python"
+	@echo "\t scipy: Python-based library for mathematics, science, and engineering"
 	@echo "\t matplotlib: Python plotting library"
 	@echo "\t pytest: Python testing library"
 	@echo "\t sphinx: Python library for auto-generation of documentation"
