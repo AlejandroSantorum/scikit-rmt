@@ -7,7 +7,7 @@ and Circular Symplectic Ensemble (CSE).
 
 """
 
-from abc import abstractmethod
+from abc import ABCMeta, abstractmethod
 import numpy as np
 
 from ._base_ensemble import _Ensemble
@@ -16,7 +16,7 @@ from ._base_ensemble import _Ensemble
 #########################################################################
 ### Circular Ensemble
 
-class CircularEnsemble(_Ensemble):
+class CircularEnsemble(_Ensemble, metaclass=ABCMeta):
     """General Circular Ensemble class.
 
     This class contains common attributes and methods for all the
@@ -32,6 +32,7 @@ class CircularEnsemble(_Ensemble):
 
     """
 
+    @abstractmethod
     def __init__(self, n, beta=1):
         """Constructor for CircularEnsemble class.
 
@@ -39,21 +40,36 @@ class CircularEnsemble(_Ensemble):
 
         Args:
             n (int): random matrix size. Circular ensemble matrices are
-            squared matrices. COE and CUE are of size n times n,
-            and CSE are of size 2n times 2n.
+                squared matrices. COE and CUE are of size n times n,
+                and CSE are of size 2n times 2n.
             beta (int, default=1): descriptive integer of the Circular ensemble type.
                 For COE beta=1, for CUE beta=2, for CSE beta=4.
 
         """
         self.n = n
         self.beta = beta
+    
+    def set_size(self, n, resample_mtx=False):
+        """Setter of matrix size.
+
+        Sets the matrix size. Useful if it has been initialized with a different value.
+
+        Args:
+            n (int): random matrix size. Circular ensemble matrices are
+                squared matrices. COE and CUE are of size n times n,
+                and CSE are of size 2n times 2n.
+
+        """
+        self.n = n
+        if resample_mtx:
+            self.matrix = self.sample()
 
     @abstractmethod
     def sample(self):
         pass
 
-    @abstractmethod
     def eigval_pdf(self):
+        # To implement
         pass
 
 

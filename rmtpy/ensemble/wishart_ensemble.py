@@ -7,7 +7,7 @@ and Wishart Quaternion Ensemble.
 
 """
 
-from abc import abstractmethod
+from abc import ABCMeta, abstractmethod
 import numpy as np
 
 from ._base_ensemble import _Ensemble
@@ -16,7 +16,7 @@ from ._base_ensemble import _Ensemble
 #########################################################################
 ### Wishart Ensemble = Laguerre Ensemble
 
-class WishartEnsemble(_Ensemble):
+class WishartEnsemble(_Ensemble, metaclass=ABCMeta):
     """General Wishart Ensemble class.
 
     This class contains common attributes and methods for all the
@@ -33,6 +33,7 @@ class WishartEnsemble(_Ensemble):
 
     """
 
+    @abstractmethod
     def __init__(self, p, n, beta=1):
         """Constructor for WishartEnsemble class.
 
@@ -50,13 +51,32 @@ class WishartEnsemble(_Ensemble):
         self.p = p
         self.n = n
         self.beta = beta
+    
+    def set_size(self, p, n, resample_mtx=False):
+        """Setter of matrix size.
+
+        Sets the matrix size. Useful if it has been initialized with a different value.
+
+        Args:
+            p (int): number of rows of the guassian matrix that generates
+                the matrix of the corresponding ensemble.
+            n (int): number of columns of the guassian matrix that generates
+                the matrix of the corresponding ensemble.
+            resample_mtx (bool, default=False): If set to True, the ensemble matrix is
+                resampled with the new dimensions.
+
+        """
+        self.p = p
+        self.n = n
+        if resample_mtx:
+            self.matrix = self.sample()
 
     @abstractmethod
     def sample(self):
         pass
 
-    @abstractmethod
     def eigval_pdf(self):
+        # To implement
         pass
     
 

@@ -7,7 +7,7 @@ Gaussian Unitary Ensemble (GUE) and Gaussian Symplectic Ensemble (GSE).
 
 """
 
-from abc import abstractmethod
+from abc import ABCMeta, abstractmethod
 import numpy as np
 import scipy as sp
 
@@ -17,7 +17,7 @@ from ._base_ensemble import _Ensemble
 #########################################################################
 ### Gaussian Ensemble = Hermite Ensemble
 
-class GaussianEnsemble(_Ensemble):
+class GaussianEnsemble(_Ensemble, metaclass=ABCMeta):
     """General Gaussian Ensemble class.
 
     This class contains common attributes and methods for all the
@@ -33,6 +33,7 @@ class GaussianEnsemble(_Ensemble):
 
     """
 
+    @abstractmethod
     def __init__(self, n, beta=1):
         """Constructor for GaussianEnsemble class.
 
@@ -40,8 +41,8 @@ class GaussianEnsemble(_Ensemble):
 
         Args:
             n (int): random matrix size. Gaussian ensemble matrices are
-            squared matrices. GOE and GUE are of size n times n,
-            and GSE are of size 2n times 2n.
+                squared matrices. GOE and GUE are of size n times n,
+                and GSE are of size 2n times 2n.
             beta (int, default=1): descriptive integer of the gaussian ensemble type.
                 For GOE beta=1, for GUE beta=2, for GSE beta=4.
 
@@ -49,25 +50,29 @@ class GaussianEnsemble(_Ensemble):
         self.n = n
         self.beta = beta
 
-    def set_size(self, n):
+    def set_size(self, n, resample_mtx=False):
         """Setter of matrix size.
 
         Sets the matrix size. Useful if it has been initialized with a different value.
 
         Args:
             n (int): new random matrix size. Gaussian ensemble matrices are
-            squared matrices. GOE and GUE are of size n times n, and 
-            GSE are of size 2n times 2n.
+                squared matrices. GOE and GUE are of size n times n, and 
+                GSE are of size 2n times 2n.    
+            resample_mtx (bool, default=False): If set to True, the ensemble matrix is
+                resampled with the new dimensions.
 
         """
         self.n = n
+        if resample_mtx:
+            self.matrix = self.sample()
 
     @abstractmethod
     def sample(self):
         pass
 
-    @abstractmethod
     def eigval_pdf(self):
+        # To implement
         pass
     
 
@@ -144,6 +149,8 @@ class GOE(GaussianEnsemble):
         # converting to numpy array
         self.matrix = M.toarray()
         return self.matrix
+    
+
 
 
 

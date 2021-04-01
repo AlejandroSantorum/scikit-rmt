@@ -10,6 +10,9 @@ from numpy.testing import (
 from rmtpy.ensemble import COE, CUE, CSE
 
 
+##########################################
+### Circular Orthogonal Ensemble = COE
+
 def test_coe_init():
     N = 3
 
@@ -22,7 +25,27 @@ def test_coe_init():
                                              [-0.4274577+0.09781321j, -0.80810768+0.1559807j, 0.36012685+0.02555646j],
                                              [-0.05592612-0.36105573j, 0.36012685+0.02555646j, 0.8408391-0.17075173j]]),
                         decimal=4)
+                
 
+def test_coe_set_size():
+    N1 = 3
+    N2 = 5
+
+    coe = COE(n=N1)
+    assert(coe.n == N1)
+    assert(coe.matrix.shape == (N1,N1))
+
+    coe.set_size(N2, resample_mtx=False)
+    assert(coe.n == N2)
+    assert(coe.matrix.shape == (N1,N1))
+
+    coe.set_size(N2, resample_mtx=True)
+    assert(coe.n == N2)
+    assert(coe.matrix.shape == (N2,N2))
+
+
+##########################################
+### Circular Unitary Ensemble = CUE
 
 def test_cue_init():
     N = 3
@@ -36,7 +59,27 @@ def test_cue_init():
                                              [0.37446802+0.1125242j, -0.23983754+0.18549333j, -0.86852536-0.02908408j],
                                              [-0.60894251+0.38386407j, 0.1958485 +0.65328713j, -0.12797213+0.01788349j]]),
                         decimal=4)
+                    
 
+def test_cue_set_size():
+    N1 = 5
+    N2 = 10
+
+    cue = CUE(n=N1)
+    assert(cue.n == N1)
+    assert(cue.matrix.shape == (N1,N1))
+
+    cue.set_size(N2, resample_mtx=False)
+    assert(cue.n == N2)
+    assert(cue.matrix.shape == (N1,N1))
+
+    cue.set_size(N2, resample_mtx=True)
+    assert(cue.n == N2)
+    assert(cue.matrix.shape == (N2,N2))
+
+
+##########################################
+### Circular Symplectic Ensemble = CSE
 
 def test_cse_init():
     N = 2 
@@ -50,3 +93,20 @@ def test_cse_init():
                                              [-9.56297276e-01+7.17094554e-01j, -3.43966100e-01+3.01198149e-02j, 6.11735400e-01-6.90830132e-02j, -3.43966100e-01+3.01198149e-02j],
                                              [-4.56225923e-01-3.23872465e-02j, 9.66935997e-02+7.40605433e-01j, 1.94983679e-17+3.89651615e-18j, 7.08429000e-01+6.71522420e-01j]]),
                         decimal=4)
+
+
+def test_cse_set_size():
+    N1 = 4
+    N2 = 9
+
+    cse = CSE(n=N1)
+    assert(cse.n == N1)
+    assert(cse.matrix.shape == (2*N1,2*N1))
+
+    cse.set_size(N2, resample_mtx=False)
+    assert(cse.n == N2)
+    assert(cse.matrix.shape == (2*N1,2*N1))
+
+    cse.set_size(N2, resample_mtx=True)
+    assert(cse.n == N2)
+    assert(cse.matrix.shape == (2*N2,2*N2))

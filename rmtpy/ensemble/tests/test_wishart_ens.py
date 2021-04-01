@@ -10,6 +10,9 @@ from numpy.testing import (
 from rmtpy.ensemble import WishartReal, WishartComplex, WishartQuaternion
 
 
+##########################################
+### Wishart Real Ensemble = WRE
+
 def test_wishartReal_init():
     P = 3
     N = 5
@@ -24,6 +27,29 @@ def test_wishartReal_init():
                                             [5.1988152, -7.11948641, 7.91882311]]),
                         decimal=4)
 
+
+def test_wre_set_size():
+    P1, N1 = 3, 5
+    P2, N2 = 4, 6
+
+    ens = WishartReal(p=P1, n=N1)
+    assert(ens.p == P1)
+    assert(ens.n == N1)
+    assert(ens.matrix.shape == (P1,P1))
+
+    ens.set_size(p=P2, n=N2, resample_mtx=False)
+    assert(ens.p == P2)
+    assert(ens.n == N2)
+    assert(ens.matrix.shape == (P1,P1))
+
+    ens.set_size(p=P2, n=N2, resample_mtx=True)
+    assert(ens.p == P2)
+    assert(ens.n == N2)
+    assert(ens.matrix.shape == (P2,P2))
+
+
+##########################################
+### Wishart Complex Ensemble = WCE
 
 def test_wishartComplex_init():
     P = 3
@@ -40,6 +66,30 @@ def test_wishartComplex_init():
                         decimal=4)
 
 
+def test_wce_set_size():
+    P1, N1 = 5, 10
+    P2, N2 = 7, 14
+
+    ens = WishartComplex(p=P1, n=N1)
+    assert(ens.p == P1)
+    assert(ens.n == N1)
+    assert(ens.matrix.shape == (P1,P1))
+
+    ens.set_size(p=P2, n=N2, resample_mtx=False)
+    assert(ens.p == P2)
+    assert(ens.n == N2)
+    assert(ens.matrix.shape == (P1,P1))
+
+    ens.set_size(p=P2, n=N2, resample_mtx=True)
+    assert(ens.p == P2)
+    assert(ens.n == N2)
+    assert(ens.matrix.shape == (P2,P2))
+
+
+
+##########################################
+### Wishart Quaternion Ensemble = WQE
+
 def test_wishartQuatern_init():
     P = 2
     N = 5
@@ -54,3 +104,23 @@ def test_wishartQuatern_init():
                                              [8.10811919e-17+6.4759398j, -2.16853073e+00-0.3065013j, -6.01217359e-01-7.71388293j, -2.91531515e+00+6.39395501j],
                                              [2.16853073e+00-0.3065013j, -1.30942157e-16-7.29353772j, -2.91531515e+00+6.39395501j, 3.83549752e+00-5.28492599j]]),
                         decimal=4)
+                    
+
+def test_wqe_set_size():
+    P1, N1 = 2, 3
+    P2, N2 = 4, 5
+
+    ens = WishartQuaternion(p=P1, n=N1)
+    assert(ens.p == P1)
+    assert(ens.n == N1)
+    assert(ens.matrix.shape == (2*P1,2*P1))
+
+    ens.set_size(p=P2, n=N2, resample_mtx=False)
+    assert(ens.p == P2)
+    assert(ens.n == N2)
+    assert(ens.matrix.shape == (2*P1,2*P1))
+
+    ens.set_size(p=P2, n=N2, resample_mtx=True)
+    assert(ens.p == P2)
+    assert(ens.n == N2)
+    assert(ens.matrix.shape == (2*P2,2*P2))

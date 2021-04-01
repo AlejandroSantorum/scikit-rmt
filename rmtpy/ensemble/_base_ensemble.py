@@ -16,7 +16,7 @@ import matplotlib.pyplot as plt
 #########################################################################
 ### ABSTRACT CLASS: ENSEMBLE
 
-class _Ensemble:
+class _Ensemble(metaclass=ABCMeta):
     """General abstract ensemble class.
 
     This class contains common attributes and methods for all the
@@ -29,8 +29,9 @@ class _Ensemble:
 
     """
 
-    # abstract class
-    __metaclass__ = ABCMeta
+    @abstractmethod
+    def __init__(self):
+        self.matrix = None
 
     @abstractmethod
     def sample(self):

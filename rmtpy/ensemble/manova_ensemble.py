@@ -7,7 +7,7 @@ and Manova Quaternion Ensemble.
 
 """
 
-from abc import abstractmethod
+from abc import ABCMeta, abstractmethod
 import numpy as np
 
 from ._base_ensemble import _Ensemble
@@ -16,7 +16,7 @@ from ._base_ensemble import _Ensemble
 #########################################################################
 ### Manova Ensemble = Jacobi Ensemble
 
-class ManovaEnsemble(_Ensemble):
+class ManovaEnsemble(_Ensemble, metaclass=ABCMeta):
     """General Manova Ensemble class.
 
     This class contains common attributes and methods for all the
@@ -35,6 +35,7 @@ class ManovaEnsemble(_Ensemble):
 
     """
 
+    @abstractmethod
     def __init__(self, m, n1, n2, beta=1):
         """Constructor for ManovaEnsemble class.
 
@@ -55,13 +56,35 @@ class ManovaEnsemble(_Ensemble):
         self.n1 = n1
         self.n2 = n2
         self.beta = beta
+    
+    def set_size(self, m, n1, n2, resample_mtx=False):
+        """Setter of matrix size.
+
+        Sets the matrix size. Useful if it has been initialized with a different value.
+
+        Args:
+            m (int): number of rows of the random guassian matrices that
+                generates the matrix of the corresponding ensemble.
+            n1 (int): number of columns of the first random guassian matrix
+                that generates the matrix of the corresponding ensemble.
+            n2 (int): number of columns of the second random guassian matrix
+                that generates the matrix of the corresponding ensemble.
+            resample_mtx (bool, default=False): If set to True, the ensemble matrix is
+                resampled with the new dimensions.
+
+        """
+        self.m = m
+        self.n1 = n1
+        self.n2 = n2
+        if resample_mtx:
+            self.matrix = self.sample()
 
     @abstractmethod
     def sample(self):
         pass
 
-    @abstractmethod
     def eigval_pdf(self):
+        # To implement
         pass
     
 
