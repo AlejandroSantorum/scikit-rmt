@@ -109,18 +109,30 @@ class GOE(GaussianEnsemble):
 
     def sample(self):
         if self.use_tridiagonal:
-            return self._sample_goe_tridiagonal()
+            return self.sample_goe_tridiagonal()
         else:
-            return self._sample_goe_matrix()
-    
-    def _sample_goe_matrix(self):
+            return self.sample_goe_matrix()
+
+    def sample_goe_matrix(self):
         # n by n matrix of random Gaussians
         A = np.random.randn(self.n,self.n)
         # symmetrize matrix
         self.matrix = (A + A.transpose())/2
         return self.matrix
     
-    def _sample_goe_tridiagonal(self):
+    def sample_goe_tridiagonal(self):
+        '''Samples a GOE random matrix in its tridiagonal form.
+
+        Returns:
+            numpy array containing new matrix sampled.
+
+        References:
+            Albrecht, J. and Chan, C.P. and Edelman, A. "Sturm sequences and random eigenvalue distributions".
+                Foundations of Computational Mathematics. 9.4 (2008): 461-483.
+            Dumitriu, I. and Edelman, A. "Matrix Models for Beta Ensembles".
+                Journal of Mathematical Physics. 43.11 (2002): 5830-5847.
+            
+        '''
         # sampling diagonal normals
         normals = (1/np.sqrt(2)) * np.random.normal(loc=0, scale=np.sqrt(2), size=self.n)
         # sampling chi-squares
