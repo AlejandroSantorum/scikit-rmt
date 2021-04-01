@@ -76,8 +76,41 @@ class WishartEnsemble(_Ensemble, metaclass=ABCMeta):
         pass
 
     def eigval_pdf(self):
-        # To implement
-        pass
+        '''Calculates joint eigenvalue pdf.
+
+        Calculates joint eigenvalue probability density function given the current 
+            random matrix (so its eigenvalues). This function depends on beta, i.e.,
+            in the sub-Wishart ensemble.
+
+        Returns:
+            real number. Value of the joint pdf of the current eigenvalues.
+
+        References:
+            Dumitriu, I. and Edelman, A. "Matrix Models for Beta Ensembles".
+                Journal of Mathematical Physics. 43.11 (2002): 5830-5847.
+            
+        '''
+        a = self.beta*self.n/2
+        p = 1 + self.beta/2*(self.p - 1)
+        # calculating Laguerre eigval pdf constant depeding on beta
+        const_beta = 2**(-self.p*a)
+        for j in range(self.p):
+            const_beta *= sp.special.gamma(1 + self.beta/2)/ \
+                          (sp.special.gamma(1 + self.beta*j/2)*sp.special.gamma(a - self.beta/2*(self.p - j)))
+        # calculating eigenvalues
+        eigvals = np.linalg.eigvals(self.matrix)
+        n_eigvals = len(eigvals)
+        # calculating first prod
+        prod1 = 1
+        for j in range(n_eigvals):
+            for i in range(j):
+                prod1 *= np.abs(eigvals[i] - eigvals[j])**self.beta
+        # calculating second prod
+        prod2 = np.prod(eigvals**(a - p))
+        # calculating exponential term
+        exp_val = np.exp(-np.sum((eigvals**2)/2))
+        # calculating Laguerre eigval pdf
+        return const_beta * prod1 * prod2 * exp_val
     
 
 ##########################################

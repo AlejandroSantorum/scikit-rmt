@@ -69,8 +69,32 @@ class CircularEnsemble(_Ensemble, metaclass=ABCMeta):
         pass
 
     def eigval_pdf(self):
-        # To implement
-        pass
+        '''Calculates joint eigenvalue pdf.
+
+        Calculates joint eigenvalue probability density function given the current 
+            random matrix (so its eigenvalues). This function depends on beta, i.e.,
+            in the sub-Circular ensemble.
+
+        Returns:
+            real number. Value of the joint pdf of the current eigenvalues.
+
+        References:
+            Wikipedia. "Circular ensemble".
+            en.wikipedia.org/wiki/Circular_ensemble 
+            
+        '''
+        # calculating Circular eigval pdf constant depeding on beta        
+        const_beta = (2*np.pi)**self.n * sp.special.gamma(1 + self.n*self.beta/2)/(sp.special.gamma(1 + self.beta/2)**self.n)
+        # calculating eigenvalues
+        eigvals = np.linalg.eigvals(self.matrix)
+        n_eigvals = len(eigvals)
+        # calculating prod
+        pdf = 1
+        for k in range(n_eigvals):
+            for i in range(k):
+                pdf *= np.abs(0+np.exp(eigvals[i])j - 0+np.exp(eigvals[k])j)**self.beta
+        # calculating Circular eigval pdf
+        return (1/const_beta) * pdf
 
 
 def sample_Haar_mtx(n):

@@ -72,8 +72,36 @@ class GaussianEnsemble(_Ensemble, metaclass=ABCMeta):
         pass
 
     def eigval_pdf(self):
-        # To implement
-        pass
+        '''Calculates joint eigenvalue pdf.
+
+        Calculates joint eigenvalue probability density function given the current 
+            random matrix (so its eigenvalues). This function depends on beta, i.e.,
+            in the sub-Gaussian ensemble.
+
+        Returns:
+            real number. Value of the joint pdf of the current eigenvalues.
+
+        References:
+            Dumitriu, I. and Edelman, A. "Matrix Models for Beta Ensembles".
+                Journal of Mathematical Physics. 43.11 (2002): 5830-5847.
+            
+        '''
+        # calculating Hermite eigval pdf constant depeding on beta        
+        const_beta = (2*np.pi)**(-self.n/2)
+        for j in range(self.n):
+            const_beta *= sp.special.gamma(1 + self.beta/2)/sp.special.gamma(1 + self.beta*j/2)
+        # calculating eigenvalues
+        eigvals = np.linalg.eigvals(self.matrix)
+        n_eigvals = len(eigvals)
+        # calculating prod
+        pdf = 1
+        for j in range(n_eigvals):
+            for i in range(j):
+                pdf *= np.abs(eigvals[i] - eigvals[j])**self.beta
+        # calculating exponential term
+        exp_val = np.exp(-np.sum((eigvals**2)/2))
+        # calculating Hermite eigval pdf
+        return const_beta * pdf * exp_val
     
 
 ##########################################

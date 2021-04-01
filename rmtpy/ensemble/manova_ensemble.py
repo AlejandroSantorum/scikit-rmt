@@ -84,8 +84,43 @@ class ManovaEnsemble(_Ensemble, metaclass=ABCMeta):
         pass
 
     def eigval_pdf(self):
-        # To implement
-        pass
+        '''Calculates joint eigenvalue pdf.
+
+        Calculates joint eigenvalue probability density function given the current 
+            random matrix (so its eigenvalues). This function depends on beta, i.e.,
+            in the sub-Manova ensemble.
+
+        Returns:
+            real number. Value of the joint pdf of the current eigenvalues.
+
+        References:
+            Dumitriu, I. and Edelman, A. "Matrix Models for Beta Ensembles".
+                Journal of Mathematical Physics. 43.11 (2002): 5830-5847.
+            
+        '''
+        a1 = self.beta*self.n1/2
+        a2 = self.beta*self.n2/2
+        p = 1 + self.beta/2*(self.m - 1)
+
+        # calculating Jacobi eigval pdf constant depeding on beta
+        const_beta = 1
+        for j in range(self.m):
+            const_beta *= (sp.special.gamma(1 + self.beta/2) * sp.special.gamma(a1 + a2 -self.beta/2*(self.m - j)))/ \
+                          (sp.special.gamma(1 + self.beta*j/2)*sp.special.gamma(a1 - self.beta/2*(self.m - j))*sp.special.gamma(a2 - self.beta/2*(self.m - j)))
+        # calculating eigenvalues
+        eigvals = np.linalg.eigvals(self.matrix)
+        n_eigvals = len(eigvals)
+        # calculating first prod
+        prod1 = 1
+        for j in range(n_eigvals):
+            for i in range(j):
+                prod1 *= np.abs(eigvals[i] - eigvals[j])**self.beta
+        # calculating second prod
+        prod2 = 1
+        for j in range(n_eigvals):
+            prod2 *= eigvals[j]**(a1-p) * (1 - eigvals[j])**(a2-p)
+        # calculating Jacobi eigval pdf
+        return const_beta * prod1 * prod2
     
 
 ##########################################
