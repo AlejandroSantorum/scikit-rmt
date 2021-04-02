@@ -9,7 +9,8 @@ Gaussian Unitary Ensemble (GUE) and Gaussian Symplectic Ensemble (GSE).
 
 from abc import ABCMeta, abstractmethod
 import numpy as np
-import scipy as sp
+from scipy import sparse
+from scipy import special
 
 from ._base_ensemble import _Ensemble
 
@@ -70,6 +71,9 @@ class GaussianEnsemble(_Ensemble, metaclass=ABCMeta):
     @abstractmethod
     def sample(self):
         pass
+    
+    def eigvals(self):
+        return np.linalg.eigvalsh(self.matrix)
 
     def eigval_pdf(self):
         '''Calculates joint eigenvalue pdf.
@@ -89,9 +93,9 @@ class GaussianEnsemble(_Ensemble, metaclass=ABCMeta):
         # calculating Hermite eigval pdf constant depeding on beta        
         const_beta = (2*np.pi)**(-self.n/2)
         for j in range(self.n):
-            const_beta *= sp.special.gamma(1 + self.beta/2)/sp.special.gamma(1 + self.beta*j/2)
+            const_beta *= special.gamma(1 + self.beta/2)/special.gamma(1 + self.beta*j/2)
         # calculating eigenvalues
-        eigvals = np.linalg.eigvals(self.matrix)
+        eigvals = self.eigvals()
         n_eigvals = len(eigvals)
         # calculating prod
         pdf = 1
@@ -173,7 +177,7 @@ class GOE(GaussianEnsemble):
         chisqs = (1/np.sqrt(2)) * [np.sqrt(np.random.chisquare(df)) for df in dfs]
         # inserting diagonals
         diags = [chisqs, normals, chisqs]
-        M = sp.sparse.diags(diagonals, [-1, 0, 1])
+        M = sparse.diags(diagonals, [-1, 0, 1])
         # converting to numpy array
         self.matrix = M.toarray()
         return self.matrix

@@ -44,6 +44,21 @@ def test_goe_set_size():
     assert(goe.matrix.shape == (N2,N2))
 
 
+def test_beta1_eigval_pdf():
+    N = 3
+    goe = GOE(n=N)
+
+    goe.matrix = np.zeros((N,N))
+    assert(goe.eigval_pdf() == 0.0)
+
+    goe.matrix = np.eye(N)
+    assert(goe.eigval_pdf() == 0.0)
+
+    goe.matrix = 10*np.eye(N)
+    assert(goe.eigval_pdf() == 0.0)
+
+
+
 ##########################################
 ### Gaussian Unitary Ensemble = GUE
 

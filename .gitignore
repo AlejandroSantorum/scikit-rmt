@@ -1,6 +1,12 @@
 .ipynb_checkpoints
 *.DS_Store
 __pycache__/
+
+# pytest & pytest-cov
 *.pytest_cache
+.coverage
+htmlcov
+
+# sphinx
 _build
 docs
