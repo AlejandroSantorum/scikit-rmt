@@ -68,6 +68,18 @@ class CircularEnsemble(_Ensemble, metaclass=ABCMeta):
     @abstractmethod
     def sample(self):
         pass
+    
+    def eigvals(self):
+        """Calculates the random matrix eigenvalues.
+
+        Calculates the random matrix eigenvalues using numpy standard procedure.
+        If the matrix ensemble is symmetric, a faster algorithm is used.
+
+        Returns:
+            numpy array with the calculated eigenvalues.
+
+        """
+        return np.linalg.eigvals(self.matrix)
 
     def eigval_pdf(self):
         '''Calculates joint eigenvalue pdf.
@@ -158,6 +170,18 @@ class COE(CircularEnsemble):
         # mapping to Circular Orthogonal Ensemble
         self.matrix = np.matmul(U.transpose(), U)
         return self.matrix
+    
+    def eigvals(self):
+        """Calculates the random matrix eigenvalues.
+
+        Calculates the random matrix eigenvalues using numpy standard procedure.
+        If the matrix ensemble is symmetric, a faster algorithm is used.
+
+        Returns:
+            numpy array with the calculated eigenvalues.
+
+        """
+        return np.linalg.eigvalsh(self.matrix)
 
 
 ##########################################

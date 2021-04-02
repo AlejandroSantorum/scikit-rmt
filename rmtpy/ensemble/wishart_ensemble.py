@@ -75,6 +75,18 @@ class WishartEnsemble(_Ensemble, metaclass=ABCMeta):
     def sample(self):
         pass
 
+    def eigvals(self):
+        """Calculates the random matrix eigenvalues.
+
+        Calculates the random matrix eigenvalues using numpy standard procedure.
+        If the matrix ensemble is symmetric, a faster algorithm is used.
+
+        Returns:
+            numpy array with the calculated eigenvalues.
+
+        """
+        return np.linalg.eigvalsh(self.matrix)
+
     def eigval_pdf(self):
         '''Calculates joint eigenvalue pdf.
 
