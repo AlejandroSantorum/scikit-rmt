@@ -8,6 +8,7 @@ and Circular Symplectic Ensemble (CSE).
 """
 
 from abc import ABCMeta, abstractmethod
+import cmath
 import numpy as np
 
 from ._base_ensemble import _Ensemble
@@ -92,7 +93,7 @@ class CircularEnsemble(_Ensemble, metaclass=ABCMeta):
         pdf = 1
         for k in range(n_eigvals):
             for i in range(k):
-                pdf *= np.abs(0+np.exp(eigvals[i])j - 0+np.exp(eigvals[k])j)**self.beta
+                pdf *= np.abs(complex(0, np.exp(eigvals[i])) - complex(0,np.exp(eigvals[k])))**self.beta
         # calculating Circular eigval pdf
         return (1/const_beta) * pdf
 
