@@ -75,6 +75,40 @@ class WishartEnsemble(_Ensemble, metaclass=ABCMeta):
     def sample(self):
         pass
 
+    def sample_tridiagonal(self):
+        '''Samples a Wishart Ensemble random matrix in its tridiagonal form.
+
+        Samples a random matrix of the specified Wishart Ensemble (remember,
+        beta=1 is Real, beta=2 is Complex and beta=4 is Quaternion) in its
+        tridiagonal form.
+
+        Returns:
+            numpy array containing new matrix sampled.
+
+        References:
+            Albrecht, J. and Chan, C.P. and Edelman, A. "Sturm sequences and random eigenvalue distributions".
+                Foundations of Computational Mathematics. 9.4 (2008): 461-483.
+            Dumitriu, I. and Edelman, A. "Matrix Models for Beta Ensembles".
+                Journal of Mathematical Physics. 43.11 (2002): 5830-5847.
+            
+        '''
+        a = self.n*self.beta/ 2
+        # sampling chi-squares
+        dfs = np.arange(self.p)
+        chisqs_diag = [np.sqrt(np.random.chisquare(2*a - self.beta*df)) for df in dfs]
+        dfs = np.flip(dfs)
+        chisqs_offdiag = [np.sqrt(np.random.chisquare(self.beta*df)) for df in dfs[:-1]]
+        # calculating tridiagonal diagonals
+        diag = chisqs_diag**2
+        offdiag = np.multiply(chisqs_offdiag, chisqs_diag[:-1])
+        # inserting diagonals
+        diagonals = [offdiag, diag, offdiag]
+        M = sparse.diags(diagonals, [-1, 0, 1])
+        # converting to numpy array
+        self.matrix = M.toarray()
+        return self.matrix
+        
+
     def eigvals(self):
         """Calculates the random matrix eigenvalues.
 
@@ -138,10 +172,13 @@ class WishartReal(WishartEnsemble):
     Attributes:
         matrix (numpy array): instance of the random matrix ensemble
             of size p times p.
+        use_tridiagonal (bool): if set to True, WishartReal matrices
+            are sampled in its tridiagonal form, which has the same
+            eigenvalues than its standard form.
 
     """
 
-    def __init__(self, p, n):
+    def __init__(self, p, n, use_tridiagonal=False):
         """Constructor for WishartReal class.
 
         Initializes an instance of this class with the given parameters,
@@ -152,12 +189,22 @@ class WishartReal(WishartEnsemble):
                 the matrix of the corresponding ensemble.
             n (int): number of columns of the guassian matrix that generates
                 the matrix of the corresponding ensemble.
+            use_tridiagonal (bool, default=False): if set to True, WishartReal
+                matrices are sampled in its tridiagonal form, which has the
+                same eigenvalues than its standard form.
 
         """
         super().__init__(p=p, n=n, beta=1)
+        self.use_tridiagonal = use_tridiagonal
         self.matrix = self.sample()
 
     def sample(self):
+        if self.use_tridiagonal:
+            return self.sample_tridiagonal()
+        else:
+            return self.sample_WisReal_matrix()
+
+    def sample_WisReal_matrix(self):
         p = self.p
         n = self.n
         # p by n matrix of random Gaussians
@@ -180,10 +227,13 @@ class WishartComplex(WishartEnsemble):
     Attributes:
         matrix (numpy array): instance of the random matrix ensemble
             of size p times p.
+        use_tridiagonal (bool): if set to True, WishartComplex matrices
+            are sampled in its tridiagonal form, which has the same
+            eigenvalues than its standard form.
 
     """
 
-    def __init__(self, p, n):
+    def __init__(self, p, n, use_tridiagonal=False):
         """Constructor for WishartComplex class.
 
         Initializes an instance of this class with the given parameters,
@@ -194,12 +244,22 @@ class WishartComplex(WishartEnsemble):
                 the matrix of the corresponding ensemble.
             n (int): number of columns of the guassian matrix that generates
                 the matrix of the corresponding ensemble.
+            use_tridiagonal (bool, default=False): if set to True, WishartComplex
+                matrices are sampled in its tridiagonal form, which has the
+                same eigenvalues than its standard form.
 
         """
         super().__init__(p=p, n=n, beta=2)
+        self.use_tridiagonal = use_tridiagonal
         self.matrix = self.sample()
-
+    
     def sample(self):
+        if self.use_tridiagonal:
+            return self.sample_tridiagonal()
+        else:
+            return self.sample_WisComplex_matrix()
+
+    def sample_WisComplex_matrix(self):
         p = self.p
         n = self.n
         # p by n random complex matrix of random Gaussians
@@ -224,10 +284,13 @@ class WishartQuaternion(WishartEnsemble):
     Attributes:
         matrix (numpy array): instance of the random matrix ensemble
             of size 2p times 2p.
+        use_tridiagonal (bool): if set to True, WishartQuaternion matrices
+            are sampled in its tridiagonal form, which has the same
+            eigenvalues than its standard form.
 
     """
 
-    def __init__(self, p, n):
+    def __init__(self, p, n, use_tridiagonal=False):
         """Constructor for WishartQuaternion class.
 
         Initializes an instance of this class with the given parameters,
@@ -238,12 +301,22 @@ class WishartQuaternion(WishartEnsemble):
                 the matrix of the corresponding ensemble.
             n (int): number of columns of the guassian matrix that generates
                 the matrix of the corresponding ensemble.
+            use_tridiagonal (bool, default=False): if set to True, WishartQuaternion
+                matrices are sampled in its tridiagonal form, which has the
+                same eigenvalues than its standard form.
 
         """
         super().__init__(p=p, n=n, beta=4)
+        self.use_tridiagonal = use_tridiagonal
         self.matrix = self.sample()
-
+    
     def sample(self):
+        if self.use_tridiagonal:
+            return self.sample_tridiagonal()
+        else:
+            return self.sample_WisQuatern_matrix()
+
+    def sample_WisQuatern_matrix(self):
         p = self.p
         n = self.n
         # p by n random complex matrix of random Gaussians

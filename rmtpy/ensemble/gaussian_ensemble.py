@@ -92,7 +92,7 @@ class GaussianEnsemble(_Ensemble, metaclass=ABCMeta):
         # sampling diagonal normals
         normals = (1/np.sqrt(2)) * np.random.normal(loc=0, scale=np.sqrt(2), size=self.n)
         # sampling chi-squares
-        dfs = np.arange(1, self.n)
+        dfs = np.flip(np.arange(1, self.n))
         chisqs = (1/np.sqrt(2)) * [np.sqrt(np.random.chisquare(df*self.beta)) for df in dfs]
         # inserting diagonals
         diags = [chisqs, normals, chisqs]
@@ -160,6 +160,9 @@ class GOE(GaussianEnsemble):
     Attributes:
         matrix (numpy array): instance of the random matrix ensemble
             of size n times n.
+        use_tridiagonal (bool): if set to True, GOE matrices
+            are sampled in its tridiagonal form, which has the same
+            eigenvalues than its standard form.
 
     """
 
