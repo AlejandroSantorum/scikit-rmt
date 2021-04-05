@@ -9,6 +9,7 @@ and Wishart Quaternion Ensemble.
 
 from abc import ABCMeta, abstractmethod
 import numpy as np
+from scipy import sparse
 
 from ._base_ensemble import _Ensemble
 
@@ -95,11 +96,11 @@ class WishartEnsemble(_Ensemble, metaclass=ABCMeta):
         a = self.n*self.beta/ 2
         # sampling chi-squares
         dfs = np.arange(self.p)
-        chisqs_diag = [np.sqrt(np.random.chisquare(2*a - self.beta*df)) for df in dfs]
+        chisqs_diag = np.array([np.sqrt(np.random.chisquare(2*a - self.beta*df)) for df in dfs])
         dfs = np.flip(dfs)
-        chisqs_offdiag = [np.sqrt(np.random.chisquare(self.beta*df)) for df in dfs[:-1]]
+        chisqs_offdiag = np.array([np.sqrt(np.random.chisquare(self.beta*df)) for df in dfs[:-1]])
         # calculating tridiagonal diagonals
-        diag = chisqs_diag**2
+        diag = np.array([chisqs_diag[0]**2]+[chisqs_diag[i+1]**2 + chisqs_offdiag[i]**2 for i in range(self.p-1)])
         offdiag = np.multiply(chisqs_offdiag, chisqs_diag[:-1])
         # inserting diagonals
         diagonals = [offdiag, diag, offdiag]

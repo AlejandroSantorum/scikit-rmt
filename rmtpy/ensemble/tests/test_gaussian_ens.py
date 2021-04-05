@@ -53,6 +53,25 @@ def test_goe_set_size():
     assert(goe.matrix.shape == (N2,N2))
 
 
+def test_goe_tridiagonal():
+    N = 5
+    beta = 1
+
+    np.random.seed(1)
+    goe = GOE(n=N, use_tridiagonal=True)
+
+    np.random.seed(1)
+    normals = (1/np.sqrt(2)) * np.random.normal(loc=0, scale=np.sqrt(2), size=N)
+    dfs = np.flip(np.arange(1, N))
+    chisqs = (1/np.sqrt(2)) * np.array([np.sqrt(np.random.chisquare(df*beta)) for df in dfs])
+
+    for i in range(N):
+        assert(normals[i] == goe.matrix[i][i])
+    for i in range(N-1):
+        assert(chisqs[i] == goe.matrix[i][i+1])
+        assert(chisqs[i] == goe.matrix[i+1][i])
+
+
 def test_beta1_eigval_pdf():
     N = 3
     goe = GOE(n=N)
@@ -65,7 +84,6 @@ def test_beta1_eigval_pdf():
 
     goe.matrix = 10*np.eye(N)
     assert(goe.eigval_pdf() == 0.0)
-
 
 
 ##########################################
@@ -110,6 +128,25 @@ def test_gue_set_size():
     assert(gue.matrix.shape == (N2,N2))
 
 
+def test_gue_tridiagonal():
+    N = 5
+    beta = 2
+
+    np.random.seed(1)
+    gue = GUE(n=N, use_tridiagonal=True)
+
+    np.random.seed(1)
+    normals = (1/np.sqrt(2)) * np.random.normal(loc=0, scale=np.sqrt(2), size=N)
+    dfs = np.flip(np.arange(1, N))
+    chisqs = (1/np.sqrt(2)) * np.array([np.sqrt(np.random.chisquare(df*beta)) for df in dfs])
+
+    for i in range(N):
+        assert(normals[i] == gue.matrix[i][i])
+    for i in range(N-1):
+        assert(chisqs[i] == gue.matrix[i][i+1])
+        assert(chisqs[i] == gue.matrix[i+1][i])
+
+
 ##########################################
 ### Gaussian Symplectic Ensemble = GSE
 
@@ -150,3 +187,22 @@ def test_gse_set_size():
     gse.set_size(N2, resample_mtx=True)
     assert(gse.n == N2)
     assert(gse.matrix.shape == (2*N2,2*N2))
+
+
+def test_goe_tridiagonal():
+    N = 5
+    beta = 4
+
+    np.random.seed(1)
+    gse = GSE(n=N, use_tridiagonal=True)
+
+    np.random.seed(1)
+    normals = (1/np.sqrt(2)) * np.random.normal(loc=0, scale=np.sqrt(2), size=N)
+    dfs = np.flip(np.arange(1, N))
+    chisqs = (1/np.sqrt(2)) * np.array([np.sqrt(np.random.chisquare(df*beta)) for df in dfs])
+
+    for i in range(N):
+        assert(normals[i] == gse.matrix[i][i])
+    for i in range(N-1):
+        assert(chisqs[i] == gse.matrix[i][i+1])
+        assert(chisqs[i] == gse.matrix[i+1][i])

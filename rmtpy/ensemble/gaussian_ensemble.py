@@ -93,9 +93,9 @@ class GaussianEnsemble(_Ensemble, metaclass=ABCMeta):
         normals = (1/np.sqrt(2)) * np.random.normal(loc=0, scale=np.sqrt(2), size=self.n)
         # sampling chi-squares
         dfs = np.flip(np.arange(1, self.n))
-        chisqs = (1/np.sqrt(2)) * [np.sqrt(np.random.chisquare(df*self.beta)) for df in dfs]
+        chisqs = (1/np.sqrt(2)) * np.array([np.sqrt(np.random.chisquare(df*self.beta)) for df in dfs])
         # inserting diagonals
-        diags = [chisqs, normals, chisqs]
+        diagonals = [chisqs, normals, chisqs]
         M = sparse.diags(diagonals, [-1, 0, 1])
         # converting to numpy array
         self.matrix = M.toarray()
