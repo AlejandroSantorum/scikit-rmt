@@ -28,6 +28,15 @@ def test_wishartReal_init():
                         decimal=4)
 
 
+def test_wre_symmetric():
+    P = 3
+    N = 5
+    wr = WishartReal(p=P, n=N)
+
+    M = wr.matrix
+    assert((M.transpose() == M).all() == True)
+
+
 def test_wre_set_size():
     P1, N1 = 3, 5
     P2, N2 = 4, 6
@@ -64,6 +73,15 @@ def test_wishartComplex_init():
                                             [6.49496169+2.33465966j, 3.04633885+0.74413531j, -3.62175065-2.09216231j],
                                             [-0.41256652-0.97218795j, -3.62175065-2.09216231j, -4.3742556 +4.41905659j]]),
                         decimal=4)
+
+
+def test_wce_symmetric():
+    P = 3
+    N = 5
+    wc = WishartComplex(p=P, n=N)
+
+    M = wc.matrix
+    assert((M.transpose() == M).all() == True)
 
 
 def test_wce_set_size():
@@ -104,6 +122,15 @@ def test_wishartQuatern_init():
                                              [8.10811919e-17+6.4759398j, -2.16853073e+00-0.3065013j, -6.01217359e-01-7.71388293j, -2.91531515e+00+6.39395501j],
                                              [2.16853073e+00-0.3065013j, -1.30942157e-16-7.29353772j, -2.91531515e+00+6.39395501j, 3.83549752e+00-5.28492599j]]),
                         decimal=4)
+
+                
+def test_wqe_symmetric():
+    P = 3
+    N = 5
+    wq = WishartQuaternion(p=P, n=N)
+
+    M = wq.matrix
+    assert((M.transpose() == M).all() == True)
                     
 
 def test_wqe_set_size():

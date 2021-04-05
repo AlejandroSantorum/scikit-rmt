@@ -25,6 +25,14 @@ def test_coe_init():
                                              [-0.4274577+0.09781321j, -0.80810768+0.1559807j, 0.36012685+0.02555646j],
                                              [-0.05592612-0.36105573j, 0.36012685+0.02555646j, 0.8408391-0.17075173j]]),
                         decimal=4)
+
+
+def test_coe_symmetric():
+    N = 5
+    coe = COE(n=N)
+
+    M = coe.matrix
+    assert((M.transpose() == M).all() == True)
                 
 
 def test_coe_set_size():

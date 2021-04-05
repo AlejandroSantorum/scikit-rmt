@@ -27,6 +27,15 @@ def test_goe_init():
                         decimal=4)
 
 
+def test_goe_symmetric():
+    N = 5
+    goe = GOE(n=N)
+
+    M = goe.matrix
+    assert((M.transpose() == M).all() == True)
+
+
+
 def test_goe_set_size():
     N1 = 3
     N2 = 5
@@ -76,6 +85,14 @@ def test_gue_init():
                         decimal=4)
 
 
+def test_gue_symmetric():
+    N = 5
+    gue = GUE(n=N)
+
+    M = gue.matrix
+    assert((M.transpose() == M).all() == True)
+
+
 def test_gue_set_size():
     N1 = 5
     N2 = 8
@@ -108,6 +125,14 @@ def test_gse_init():
                                              [0.-0.3224172j, 0.85573916+0.37485754j, 1.62434536-0.86540763j, -0.56996408+0.27836347j],
                                              [-0.85573916+0.37485754j, 0.-1.09989127j, -0.56996408+0.27836347j, -1.07296862+0.7612069j ]]),
                         decimal=4)
+
+
+def test_gse_symmetric():
+    N = 5
+    gse = GSE(n=N)
+
+    M = gse.matrix
+    assert((M.transpose() == M).all() == True)
 
 
 def test_gse_set_size():
