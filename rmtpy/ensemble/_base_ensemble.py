@@ -53,14 +53,18 @@ class _Ensemble(metaclass=ABCMeta):
     def eigval_pdf(self):
         pass
 
-    def eigval_hist(self, nbins, interval, normed_hist=True):
+    def eigval_hist(self, bins, interval=None, normed_hist=True):
         '''Calculates the histogram of the matrix eigenvalues
 
         Calculates the histogram of the current sampled matrix eigenvalues.
 
         Args:
-            nbins (int): Number of bins to divide the interval of the histogram.
+            bins (int or sequence): If bins is an integer, it defines the number of
+                equal-width bins in the range. If bins is a sequence, it defines the
+                bin edges, including the left edge of the first bin and the right
+                edge of the last bin; in this case, bins may be unequally spaced.
             interval (tuple): Delimiters (xmin, xmax) of the histogram.
+                The lower and upper range of the bins. Lower and upper outliers are ignored.
             normed_hist (bool, default=True): If True, draw and return a probability
                 density: each bin will display the bin's raw count divided by the total
                 number of counts and the bin width, so that the area under the histogram
@@ -82,6 +86,8 @@ class _Ensemble(metaclass=ABCMeta):
 
         # calculating eigenvalues using standard algorithm
         eigvals = np.linalg.eigvals(self.matrix)
+
         # using matplotlib to obtain histogram in the given interval and with the specified no. of bins
-        observed, bins, _ = plt.hist(eigvals, bins=nbins, range=interval, density=normed_hist)
+        observed, bins = np.histogram(eigvals, bins=bins, range=interval, density=normed_hist)
+        #plt.clf()
         return observed, bins

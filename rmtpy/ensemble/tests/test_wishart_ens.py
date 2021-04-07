@@ -59,7 +59,7 @@ def test_wre_set_size():
     assert(ens.matrix.shape == (P2,P2))
 
 
-def test_wre_tridiagonal():
+def test_wre_build_tridiagonal():
     P, N = 3, 5
     beta = 1
 
@@ -88,6 +88,34 @@ def test_wre_tridiagonal():
         assert(offdiag[i] == wr.matrix[i+1][i])
 
     assert_almost_equal(wr.matrix, np.dot(M, M.transpose()), decimal=7)
+
+
+def test_wre_tridiag_hist():
+    P, N = 50, 100
+    wre1 = WishartReal(p=P, n=N, use_tridiagonal=False)
+    wre2 = WishartReal(p=P, n=N, use_tridiagonal=True)
+
+    wre1.matrix = wre2.matrix
+
+    BINS = 20
+    interval = (0,400)
+    to_norm = False # without normalization
+    # calculating histogram using standard naive procedure
+    hist_nottridiag, bins_nottridiag = wre1.eigval_hist(bins=BINS, interval=interval, normed_hist=to_norm)
+    # calculating histogram using tridiagonal procedure
+    hist_tridiag, bins_tridiag = wre2.eigval_hist(bins=BINS, interval=interval, normed_hist=to_norm)
+
+    assert_array_equal(bins_nottridiag, bins_tridiag)
+    assert_array_equal(hist_nottridiag, hist_tridiag)
+
+    to_norm = True # normalization
+    # calculating histogram using standard naive procedure
+    hist_nottridiag, bins_nottridiag = wre1.eigval_hist(bins=BINS, interval=interval, normed_hist=to_norm)
+    # calculating histogram using tridiagonal procedure
+    hist_tridiag, bins_tridiag = wre2.eigval_hist(bins=BINS, interval=interval, normed_hist=to_norm)
+
+    assert_array_equal(bins_nottridiag, bins_tridiag)
+    assert_almost_equal(hist_nottridiag, hist_tridiag, decimal=7)
 
 
 ##########################################
@@ -137,6 +165,65 @@ def test_wce_set_size():
     assert(ens.matrix.shape == (P2,P2))
 
 
+def test_wce_build_tridiagonal():
+    P, N = 3, 5
+    beta = 2
+
+    # sampling WishartComplex tridiagonal
+    np.random.seed(1)
+    wc = WishartComplex(p=P, n=N, use_tridiagonal=True)
+
+    # sampling chi-squares and finding tridiagonal matrix in two ways
+    np.random.seed(1)
+    a = N*beta/ 2
+    dfs = np.arange(P)
+    chisqs_diag = np.array([np.sqrt(np.random.chisquare(2*a - beta*df)) for df in dfs])
+    dfs = np.flip(dfs)
+    chisqs_offdiag = np.array([np.sqrt(np.random.chisquare(beta*df)) for df in dfs[:-1]])
+    diagonals = [chisqs_offdiag, chisqs_diag]
+    M = sparse.diags(diagonals, [-1, 0])
+    M = M.toarray()
+
+    diag = np.array([chisqs_diag[0]**2]+[chisqs_diag[i+1]**2 + chisqs_offdiag[i]**2 for i in range(P-1)])
+    offdiag = np.multiply(chisqs_offdiag, chisqs_diag[:-1])
+
+    for i in range(P):
+        assert(diag[i] == wc.matrix[i][i])
+    for i in range(P-1):
+        assert(offdiag[i] == wc.matrix[i][i+1])
+        assert(offdiag[i] == wc.matrix[i+1][i])
+
+    assert_almost_equal(wc.matrix, np.dot(M, M.transpose()), decimal=7)
+
+
+def test_wce_tridiag_hist():
+    P, N = 50, 100
+    wce1 = WishartComplex(p=P, n=N, use_tridiagonal=False)
+    wce2 = WishartComplex(p=P, n=N, use_tridiagonal=True)
+
+    wce1.matrix = wce2.matrix
+
+    BINS = 20
+    interval = (0,400)
+    to_norm = False # without normalization
+    # calculating histogram using standard naive procedure
+    hist_nottridiag, bins_nottridiag = wce1.eigval_hist(bins=BINS, interval=interval, normed_hist=to_norm)
+    # calculating histogram using tridiagonal procedure
+    hist_tridiag, bins_tridiag = wce2.eigval_hist(bins=BINS, interval=interval, normed_hist=to_norm)
+
+    assert_array_equal(bins_nottridiag, bins_tridiag)
+    assert_array_equal(hist_nottridiag, hist_tridiag)
+
+    to_norm = True # normalization
+    # calculating histogram using standard naive procedure
+    hist_nottridiag, bins_nottridiag = wce1.eigval_hist(bins=BINS, interval=interval, normed_hist=to_norm)
+    # calculating histogram using tridiagonal procedure
+    hist_tridiag, bins_tridiag = wce2.eigval_hist(bins=BINS, interval=interval, normed_hist=to_norm)
+
+    assert_array_equal(bins_nottridiag, bins_tridiag)
+    assert_almost_equal(hist_nottridiag, hist_tridiag, decimal=7)
+
+
 
 ##########################################
 ### Wishart Quaternion Ensemble = WQE
@@ -184,3 +271,62 @@ def test_wqe_set_size():
     assert(ens.p == P2)
     assert(ens.n == N2)
     assert(ens.matrix.shape == (2*P2,2*P2))
+
+
+def test_wqe_build_tridiagonal():
+    P, N = 3, 5
+    beta = 4
+
+    # sampling WishartQuaternion tridiagonal
+    np.random.seed(1)
+    wq = WishartQuaternion(p=P, n=N, use_tridiagonal=True)
+
+    # sampling chi-squares and finding tridiagonal matrix in two ways
+    np.random.seed(1)
+    a = N*beta/ 2
+    dfs = np.arange(P)
+    chisqs_diag = np.array([np.sqrt(np.random.chisquare(2*a - beta*df)) for df in dfs])
+    dfs = np.flip(dfs)
+    chisqs_offdiag = np.array([np.sqrt(np.random.chisquare(beta*df)) for df in dfs[:-1]])
+    diagonals = [chisqs_offdiag, chisqs_diag]
+    M = sparse.diags(diagonals, [-1, 0])
+    M = M.toarray()
+
+    diag = np.array([chisqs_diag[0]**2]+[chisqs_diag[i+1]**2 + chisqs_offdiag[i]**2 for i in range(P-1)])
+    offdiag = np.multiply(chisqs_offdiag, chisqs_diag[:-1])
+
+    for i in range(P):
+        assert(diag[i] == wq.matrix[i][i])
+    for i in range(P-1):
+        assert(offdiag[i] == wq.matrix[i][i+1])
+        assert(offdiag[i] == wq.matrix[i+1][i])
+
+    assert_almost_equal(wq.matrix, np.dot(M, M.transpose()), decimal=7)
+
+
+def test_wre_tridiag_hist():
+    P, N = 50, 100
+    wqe1 = WishartQuaternion(p=P, n=N, use_tridiagonal=False)
+    wqe2 = WishartQuaternion(p=P, n=N, use_tridiagonal=True)
+
+    wqe1.matrix = wqe2.matrix
+
+    BINS = 20
+    interval = (0,400)
+    to_norm = False # without normalization
+    # calculating histogram using standard naive procedure
+    hist_nottridiag, bins_nottridiag = wqe1.eigval_hist(bins=BINS, interval=interval, normed_hist=to_norm)
+    # calculating histogram using tridiagonal procedure
+    hist_tridiag, bins_tridiag = wqe2.eigval_hist(bins=BINS, interval=interval, normed_hist=to_norm)
+
+    assert_array_equal(bins_nottridiag, bins_tridiag)
+    assert_array_equal(hist_nottridiag, hist_tridiag)
+
+    to_norm = True # normalization
+    # calculating histogram using standard naive procedure
+    hist_nottridiag, bins_nottridiag = wqe1.eigval_hist(bins=BINS, interval=interval, normed_hist=to_norm)
+    # calculating histogram using tridiagonal procedure
+    hist_tridiag, bins_tridiag = wqe2.eigval_hist(bins=BINS, interval=interval, normed_hist=to_norm)
+
+    assert_array_equal(bins_nottridiag, bins_tridiag)
+    assert_almost_equal(hist_nottridiag, hist_tridiag, decimal=7)

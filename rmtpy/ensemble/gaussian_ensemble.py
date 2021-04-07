@@ -13,7 +13,7 @@ from scipy import sparse
 from scipy import special
 
 from ._base_ensemble import _Ensemble
-
+from .tridiagonal_utils import tridiag_eigval_hist
 
 #########################################################################
 ### Gaussian Ensemble = Hermite Ensemble
@@ -112,6 +112,12 @@ class GaussianEnsemble(_Ensemble, metaclass=ABCMeta):
 
         """
         return np.linalg.eigvalsh(self.matrix)
+    
+    def eigval_hist(self, bins, interval=None, normed_hist=True):
+        if self.use_tridiagonal:
+            return tridiag_eigval_hist(self.matrix, bins=bins, interval=interval, norm=normed_hist)
+        else:
+            return super().eigval_hist(bins, interval, normed_hist)
 
     def eigval_pdf(self):
         '''Calculates joint eigenvalue pdf.
