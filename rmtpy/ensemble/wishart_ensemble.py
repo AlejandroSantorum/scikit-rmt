@@ -122,7 +122,7 @@ class WishartEnsemble(_Ensemble, metaclass=ABCMeta):
 
         """
         return np.linalg.eigvalsh(self.matrix)
-    
+
     def eigval_hist(self, bins, interval=None, normed_hist=True):
         if self.use_tridiagonal:
             return tridiag_eigval_hist(self.matrix, bins=bins, interval=interval, norm=normed_hist)

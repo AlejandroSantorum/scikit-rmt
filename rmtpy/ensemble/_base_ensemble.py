@@ -54,9 +54,12 @@ class _Ensemble(metaclass=ABCMeta):
         pass
 
     def eigval_hist(self, bins, interval=None, normed_hist=True):
-        '''Calculates the histogram of the matrix eigenvalues
+        """Calculates the histogram of the matrix eigenvalues
 
-        Calculates the histogram of the current sampled matrix eigenvalues.
+        Calculates the histogram of the current sampled matrix eigenvalues. Some ensembles
+        like Gaussian (Hermite) ensemble or Wishart (Laguerre) ensemble might have
+        improved routines to avoid calculating the eigenvalues, so instead the histogram
+        is built using certain techniques to boost efficiency.
 
         Args:
             bins (int or sequence): If bins is an integer, it defines the number of
@@ -70,17 +73,18 @@ class _Ensemble(metaclass=ABCMeta):
                 number of counts and the bin width, so that the area under the histogram
                 integrates to 1. If set to False, the absolute frequencies of the eigenvalues
                 are returned.
-            
+        
         Returns:
-            observed (array): List of eigenvalues frequencies per bin. If normed_hist=True
+            (tuple) tuple containing:
+                observed (array): List of eigenvalues frequencies per bin. If normed_hist=True
                 these values are the relative frequencies in order to get an area under the histogram
                 equal to 1. Otherwise, this list contains the absolute frequencies of the eigenvalues.
-            bins (array): The edges of the bins. Length nbins + 1 (nbins left edges and right edge of last bin)
+                bins (array): The edges of the bins. Length nbins + 1 (nbins left edges and right edge of last bin)
         
         Raises:
             ValueError if interval is not a tuple.
 
-        '''
+        """
         if not isinstance(interval, tuple):
             raise ValueError("interval argument must be a tuple")
 

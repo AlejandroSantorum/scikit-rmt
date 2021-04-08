@@ -113,7 +113,6 @@ def test_goe_tridiag_hist():
     assert_array_equal(hist_nottridiag, hist_tridiag)
 
 
-
 ##########################################
 ### Gaussian Unitary Ensemble = GUE
 
@@ -175,7 +174,7 @@ def test_gue_build_tridiagonal():
         assert(chisqs[i] == gue.matrix[i+1][i])
 
 
-def test_goe_tridiag_hist():
+def test_gue_tridiag_hist():
     N = 50
     gue1 = GUE(n=N, use_tridiagonal=False)
     gue2 = GUE(n=N, use_tridiagonal=True)
@@ -262,7 +261,7 @@ def test_gse_build_tridiagonal():
         assert(chisqs[i] == gse.matrix[i+1][i])
 
 
-def test_goe_tridiag_hist():
+def test_gse_tridiag_hist():
     N = 50
     gse1 = GSE(n=N, use_tridiagonal=False)
     gse2 = GSE(n=N, use_tridiagonal=True)

@@ -304,7 +304,7 @@ def test_wqe_build_tridiagonal():
     assert_almost_equal(wq.matrix, np.dot(M, M.transpose()), decimal=7)
 
 
-def test_wre_tridiag_hist():
+def test_wqe_tridiag_hist():
     P, N = 50, 100
     wqe1 = WishartQuaternion(p=P, n=N, use_tridiagonal=False)
     wqe2 = WishartQuaternion(p=P, n=N, use_tridiagonal=True)

@@ -123,8 +123,8 @@ class GaussianEnsemble(_Ensemble, metaclass=ABCMeta):
         '''Calculates joint eigenvalue pdf.
 
         Calculates joint eigenvalue probability density function given the current 
-            random matrix (so its eigenvalues). This function depends on beta, i.e.,
-            in the sub-Gaussian ensemble.
+        random matrix (so its eigenvalues). This function depends on beta, i.e.,
+        in the sub-Gaussian ensemble.
 
         Returns:
             real number. Value of the joint pdf of the current eigenvalues.
