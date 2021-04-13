@@ -7,7 +7,7 @@ from numpy.testing import (
     assert_allclose,
 )
 
-from rmtpy.ensemble import GOE, GUE, GSE
+from skrmt.ensemble import GOE, GUE, GSE
 
 
 ##########################################

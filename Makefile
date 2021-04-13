@@ -7,9 +7,9 @@ help:
 	@echo "\tmake deactivate - command to deactivate virtual environment"
 	@echo "\tmake help_sphinx - print sphinx usage"
 	@echo "\tmake apidoc - executes sphinx docs generation"
-	@echo "\tmake pytest - executes pytest in the RMTpy library"
-	@echo "\tmake coverage - executes pytest-cov in the RMTpy library"
-	@echo "\tmake cov_html - executes pytest-cov in the RMTpy library and generates html report files"
+	@echo "\tmake pytest - executes pytest in the scikit-rmt library"
+	@echo "\tmake coverage - executes pytest-cov in the scikit-rmt library"
+	@echo "\tmake cov_html - executes pytest-cov in the scikit-rmt library and generates html report files"
 
 
 activate:
@@ -39,15 +39,15 @@ install_requirements:
 ### pytest & coverage ###
 .PHONY: pytest
 pytest:
-	python3 -m pytest rmtpy
+	python3 -m pytest skrmt
 
 .PHONY: coverage
 coverage:
-	pytest --cov=rmtpy
+	pytest --cov=skrmt
 
 .PHONY: cov_html
 cov_html:
-	pytest --cov-report html --cov=rmtpy
+	pytest --cov-report html --cov=skrmt
 
 ####################################
 
@@ -55,7 +55,7 @@ cov_html:
 ### Minimal makefile for Sphinx documentation ###
 .PHONY: apidoc
 apidoc:
-	sphinx-apidoc -o docs rmtpy
+	sphinx-apidoc -o docs skrmt
 
 # You can set these variables from the command line, and also
 # from the environment for the first two.
@@ -64,7 +64,8 @@ SPHINXBUILD   ?= sphinx-build
 SOURCEDIR     = .
 BUILDDIR      = _build
 
-# Put it first so that "make" without argument is like "make help".
+
+.PHONY: help_sphinx
 help_sphinx:
 	@$(SPHINXBUILD) -M help "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
 

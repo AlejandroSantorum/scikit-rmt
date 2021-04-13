@@ -7,7 +7,7 @@ from numpy.testing import (
     assert_allclose,
 )
 
-from rmtpy.ensemble import COE, CUE, CSE
+from skrmt.ensemble import COE, CUE, CSE
 
 
 ##########################################

@@ -7,7 +7,7 @@ from numpy.testing import (
     assert_allclose,
 )
 
-from rmtpy.ensemble import ManovaReal, ManovaComplex, ManovaQuaternion
+from skrmt.ensemble import ManovaReal, ManovaComplex, ManovaQuaternion
 
 
 ##########################################

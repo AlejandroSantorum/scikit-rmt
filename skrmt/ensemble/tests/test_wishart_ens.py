@@ -9,7 +9,7 @@ from numpy.testing import (
     assert_allclose,
 )
 
-from rmtpy.ensemble import WishartReal, WishartComplex, WishartQuaternion
+from skrmt.ensemble import WishartReal, WishartComplex, WishartQuaternion
 
 
 ##########################################

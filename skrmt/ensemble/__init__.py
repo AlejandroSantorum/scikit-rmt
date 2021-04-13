@@ -1,5 +1,5 @@
 """
-The :mod:`rmtpy.ensemble` module includes models based on
+The :mod:`skrmt.ensemble` module includes models based on
 random matrix ensembles.
 """
 
