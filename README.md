@@ -1,4 +1,4 @@
-# RMTpy
+# scikit-rmt: Random Matrix Theory in Python
 Random Matrix Theory library - package for Python3
 
 
