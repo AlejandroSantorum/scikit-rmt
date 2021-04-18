@@ -4,6 +4,7 @@ to estimate covariance matrices.
 """
 
 from .analytical_shrinkage import AnalyticalShrinkage
+from .estimator import SampleEstimator
 
 
-__all__ = ["AnalyticalShrinkage",]
+__all__ = ["AnalyticalShrinkage", "SampleEstimator",]

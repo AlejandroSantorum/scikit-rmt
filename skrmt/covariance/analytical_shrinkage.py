@@ -40,8 +40,8 @@ class AnalyticalShrinkage:
         d_tilde = np.divide(eigvals, denom)
 
         # compute analytical nonlinear shrinkage estimator
-        sigma_tilde = np.matmul(np.matmul(eigvects, np.diag(d_tilde).T), eigvects.T)
-        return sigma_tilde
+        self.sigma_tilde = np.matmul(np.matmul(eigvects, np.diag(d_tilde)), eigvects.T)
+        return self.sigma_tilde
 
 
 
