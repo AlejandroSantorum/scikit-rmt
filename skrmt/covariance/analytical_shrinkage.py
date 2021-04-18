@@ -23,7 +23,7 @@ class AnalyticalShrinkage:
         eigvects = eigvects[:,order]
 
         # compute analytical nonlinear shrinkage kernel formula
-        eigvals = eigvals[max(0,p-n):p]
+        #eigvals = eigvals[max(0,p-n):p]
         L = repmat(eigvals, min(p,n), 1).T
         h=n**(-1/3)
         H=h*L.T
@@ -46,9 +46,7 @@ class AnalyticalShrinkage:
 
 
 
-
-
-def test1():
+def my_test1():
     X = np.array([[2, 0, 0], [2, 0, 0], [2, 0, 0], [1, 0, 0], [1, 0, 0],
               [0, 1, 0], [0, 1, 0], [0, 1, 0], [0, 1, 0], [0, 1, 0],
               [0, 0, 1], [0, 0, 1], [0, 0, 1], [0, 0, 1], [0, 0, 2]])
@@ -56,31 +54,44 @@ def test1():
     analsh = AnalyticalShrinkage()
     sigma_tilde = analsh.estimate(X)
 
+    sol = np.array([[0.551752555904758, -0.176171945854672, -0.127673277267705],
+                    [-0.176171945854672, 0.317339265808824, -0.236795281588382],
+                    [-0.127673277267705, -0.236795281588382, 0.474063174598454]])
+
+    print("======== My solution ========")
     print(sigma_tilde)
+    print("======== Official solution ========")
+    print(sol)
 
 
 
+def my_test2():
+    X = np.array([[5, 0, 0], [4, 0, 0], [3, 0, 0], [2, 0, 0], [1, 0, 0],
+                  [0, 0, 1], [0, 0, 2], [0, 0, 3], [0, 0, 4], [0, 0, 5],
+                  [0, 3, 0], [0, 4, 0], [0, 5, 0], [0, 1, 0], [0, 10, 0]])
 
+    analsh = AnalyticalShrinkage()
+    sigma_tilde = analsh.estimate(X)
+
+    sol = np.array([[3.84630121492766, -1.3927903545004, -1.42093779975966],
+                    [-1.3927903545004, 7.91982043683479, -1.3927903545004],
+                    [-1.42093779975966, -1.3927903545004, 3.84630121492766]])
+    
+    print("======== My solution ========")
+    print(sigma_tilde)
+    print("======== Official solution ========")
+    print(sol)
 
 
         
 if __name__ == "__main__":
-    '''
-    import pandas as pd
-
-    df = pd.read_csv('wdbc.data')
-
-    print("Values shape", df.values[:,:-1].shape)
-
-    X = np.array(df.values[:,:-1])
-    print(X.shape)
-    Y = np.array(df.values[:,-1])
-
-    analsh = AnalyticalShrinkage()
-    analsh.estimate_vec(X)
-    '''
-
-    test1()
+    import sys
+    if sys.argv[1] == '1':
+        my_test1()
+    elif sys.argv[1] == '2':
+        my_test2()
+    else:
+        my_test2()
 
 
 
