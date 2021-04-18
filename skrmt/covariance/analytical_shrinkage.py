@@ -1,5 +1,4 @@
 import numpy as np
-from numpy.matlib import repmat
 
 class AnalyticalShrinkage:
 
@@ -24,7 +23,7 @@ class AnalyticalShrinkage:
 
         # compute analytical nonlinear shrinkage kernel formula
         #eigvals = eigvals[max(0,p-n):p]
-        L = repmat(eigvals, min(p,n), 1).T
+        L = np.tile(eigvals, (min(p,n), 1)).T
         h=n**(-1/3)
         H=h*L.T
 
@@ -86,7 +85,9 @@ def my_test2():
         
 if __name__ == "__main__":
     import sys
-    if sys.argv[1] == '1':
+    if len(sys.argv) == 1:
+        my_test2()
+    elif sys.argv[1] == '1':
         my_test1()
     elif sys.argv[1] == '2':
         my_test2()
