@@ -31,11 +31,14 @@ class GaussianEnsemble(_Ensemble, metaclass=ABCMeta):
         n (int): random matrix size. Gaussian ensemble matrices are
             squared matrices. GOE and GUE are of size n times n,
             and GSE are of size 2n times 2n.
+        use_tridiagonal (bool, default=False): if set to True, Gaussian Ensemble
+            matrices are sampled in its tridiagonal form, which has the same
+            eigenvalues than its standard form.
 
     """
 
     @abstractmethod
-    def __init__(self, n, beta=1):
+    def __init__(self, n, beta=1, use_tridiagonal=False):
         """Constructor for GaussianEnsemble class.
 
         Initializes an instance of this class with the given parameters.
@@ -50,6 +53,7 @@ class GaussianEnsemble(_Ensemble, metaclass=ABCMeta):
         """
         self.n = n
         self.beta = beta
+        self.use_tridiagonal = use_tridiagonal
 
     def set_size(self, n, resample_mtx=False):
         """Setter of matrix size.
@@ -187,8 +191,7 @@ class GOE(GaussianEnsemble):
                 eigenvalues than its standard form.
 
         """
-        super().__init__(n=n, beta=1)
-        self.use_tridiagonal = use_tridiagonal
+        super().__init__(n=n, beta=1, use_tridiagonal=use_tridiagonal)
         self.matrix = self.sample()
 
     def sample(self):
@@ -244,8 +247,7 @@ class GUE(GaussianEnsemble):
                 eigenvalues than its standard form.
 
         """
-        super().__init__(n=n, beta=2)
-        self.use_tridiagonal = use_tridiagonal
+        super().__init__(n=n, beta=2, use_tridiagonal=use_tridiagonal)
         self.matrix = self.sample()
 
     def sample(self):
@@ -295,8 +297,7 @@ class GSE(GaussianEnsemble):
                 eigenvalues than its standard form.
 
         """
-        super().__init__(n=n, beta=4)
-        self.use_tridiagonal = use_tridiagonal
+        super().__init__(n=n, beta=4, use_tridiagonal=use_tridiagonal)
         self.matrix = self.sample()
     
     def sample(self):
