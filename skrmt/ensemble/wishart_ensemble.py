@@ -32,11 +32,14 @@ class WishartEnsemble(_Ensemble, metaclass=ABCMeta):
             the matrix of the corresponding ensemble.
         n (int): number of columns of the guassian matrix that generates
             the matrix of the corresponding ensemble.
+        use_tridiagonal (bool, default=False): if set to True, Wishart Ensemble
+            matrices are sampled in its tridiagonal form, which has the same
+            eigenvalues than its standard form.
 
     """
 
     @abstractmethod
-    def __init__(self, p, n, beta=1):
+    def __init__(self, p, n, beta=1, use_tridiagonal=False):
         """Constructor for WishartEnsemble class.
 
         Initializes an instance of this class with the given parameters.
@@ -53,6 +56,7 @@ class WishartEnsemble(_Ensemble, metaclass=ABCMeta):
         self.p = p
         self.n = n
         self.beta = beta
+        self.use_tridiagonal = use_tridiagonal
     
     def set_size(self, p, n, resample_mtx=False):
         """Setter of matrix size.
@@ -202,8 +206,7 @@ class WishartReal(WishartEnsemble):
                 same eigenvalues than its standard form.
 
         """
-        super().__init__(p=p, n=n, beta=1)
-        self.use_tridiagonal = use_tridiagonal
+        super().__init__(p=p, n=n, beta=1, use_tridiagonal=use_tridiagonal)
         self.matrix = self.sample()
 
     def sample(self):
@@ -257,8 +260,7 @@ class WishartComplex(WishartEnsemble):
                 same eigenvalues than its standard form.
 
         """
-        super().__init__(p=p, n=n, beta=2)
-        self.use_tridiagonal = use_tridiagonal
+        super().__init__(p=p, n=n, beta=2, use_tridiagonal=use_tridiagonal)
         self.matrix = self.sample()
     
     def sample(self):
@@ -314,8 +316,7 @@ class WishartQuaternion(WishartEnsemble):
                 same eigenvalues than its standard form.
 
         """
-        super().__init__(p=p, n=n, beta=4)
-        self.use_tridiagonal = use_tridiagonal
+        super().__init__(p=p, n=n, beta=4, use_tridiagonal=use_tridiagonal)
         self.matrix = self.sample()
     
     def sample(self):
