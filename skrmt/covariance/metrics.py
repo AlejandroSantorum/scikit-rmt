@@ -18,7 +18,7 @@ def loss_mv(Sigma_tilde, Sigma):
     
 
     M = np.matmul(np.matmul(Sigma_tilde_inv, Sigma), Sigma_tilde_inv)
-    loss = np.trace(M)/p/(np.trace(Sigma_tilde_inv)/p)**2 - 1/np.trace(Sigma_inv)/p
+    loss = np.trace(M)/p/(np.trace(Sigma_tilde_inv)/p)**2 - p/np.trace(Sigma_inv)
 
     return loss
 
