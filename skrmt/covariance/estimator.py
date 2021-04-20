@@ -23,6 +23,9 @@ class FSOptEstimator:
     def __init__(self, Sigma):
         self.Sigma = Sigma
         self.sample_est = SampleEstimator()
+
+    def set_Sigma(self, Sigma):
+        self.Sigma = Sigma
     
     def estimate(self, X):
         n, p = X.shape
