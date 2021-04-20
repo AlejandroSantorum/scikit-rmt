@@ -31,6 +31,11 @@ def loss_frobenius(Sigma_tilde, Sigma):
 
 
 # Percentage relative improvement in average loss
+def PRIAL_mv(E_Sn, E_Sigma_tilde, E_Sstar):
+    return (E_Sn - E_Sigma_tilde)/(E_Sn - E_Sstar)
+
+# Percentage relative improvement in average loss
+'''
 def PRIAL_mv(Sigma_tilde, Sigma, X):
     sample_est = SampleEstimator()
     S = sample_est.estimate(X)
@@ -42,4 +47,6 @@ def PRIAL_mv(Sigma_tilde, Sigma, X):
     prial = (loss_S_Sigma - loss_mv(Sigma_tilde, Sigma))/(loss_S_Sigma - loss_mv(S_star, Sigma))
 
     return prial
+'''
+
 
