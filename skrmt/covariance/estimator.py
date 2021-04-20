@@ -42,6 +42,25 @@ class FSOptEstimator:
 
 
 
+class EmpiricalBayesianEstimator:
+
+    def __init__(self):
+        self.sample_est = SampleEstimator()
+
+    def estimate(self, X):
+        n, p = X.shape
+
+        sample = self.sample_est.estimate(X)
+
+        # we consider n >= p
+        d = np.linalg.det(sample)
+        m_eb = d**(1/p)
+        
+        prior = m_eb * np.identity(p)
+        self.sigma_tilde = ((p*n - 2*n -2)/(p*n**2))*prior + n/(n+1)*sample 
+
+
+
 
 
 
