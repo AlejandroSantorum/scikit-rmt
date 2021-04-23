@@ -9,7 +9,8 @@ from numpy.testing import (
     assert_allclose,
 )
 
-from skrmt.ensemble import WishartReal, WishartComplex, WishartQuaternion
+from skrmt.ensemble import WishartEnsemble
+#from skrmt.ensemble import WishartReal, WishartComplex, WishartQuaternion
 
 
 ##########################################
@@ -20,7 +21,7 @@ def test_wishartReal_init():
     N = 5
 
     np.random.seed(1)
-    wr = WishartReal(p=P, n=N)
+    wr = WishartEnsemble(beta=1, p=P, n=N)
 
     assert(wr.matrix.shape == (P,P))
 
@@ -33,7 +34,7 @@ def test_wishartReal_init():
 def test_wre_symmetric():
     P = 3
     N = 5
-    wr = WishartReal(p=P, n=N)
+    wr = WishartEnsemble(beta=1, p=P, n=N)
 
     M = wr.matrix
     assert((M.transpose() == M).all() == True)
@@ -43,7 +44,7 @@ def test_wre_set_size():
     P1, N1 = 3, 5
     P2, N2 = 4, 6
 
-    ens = WishartReal(p=P1, n=N1)
+    ens = WishartEnsemble(beta=1, p=P1, n=N1)
     assert(ens.p == P1)
     assert(ens.n == N1)
     assert(ens.matrix.shape == (P1,P1))
@@ -65,7 +66,7 @@ def test_wre_build_tridiagonal():
 
     # sampling WishartReal tridiagonal
     np.random.seed(1)
-    wr = WishartReal(p=P, n=N, use_tridiagonal=True)
+    wr = WishartEnsemble(beta=1, p=P, n=N, use_tridiagonal=True)
 
     # sampling chi-squares and finding tridiagonal matrix in two ways
     np.random.seed(1)
@@ -92,8 +93,8 @@ def test_wre_build_tridiagonal():
 
 def test_wre_tridiag_hist():
     P, N = 50, 100
-    wre1 = WishartReal(p=P, n=N, use_tridiagonal=False)
-    wre2 = WishartReal(p=P, n=N, use_tridiagonal=True)
+    wre1 = WishartEnsemble(beta=1, p=P, n=N, use_tridiagonal=False)
+    wre2 = WishartEnsemble(beta=1, p=P, n=N, use_tridiagonal=True)
 
     wre1.matrix = wre2.matrix
 
@@ -126,7 +127,7 @@ def test_wishartComplex_init():
     N = 8
 
     np.random.seed(1)
-    wc = WishartComplex(p=P, n=N)
+    wc = WishartEnsemble(beta=2, p=P, n=N)
 
     assert(wc.matrix.shape == (P,P))
 
@@ -139,7 +140,7 @@ def test_wishartComplex_init():
 def test_wce_symmetric():
     P = 3
     N = 5
-    wc = WishartComplex(p=P, n=N)
+    wc = WishartEnsemble(beta=2, p=P, n=N)
 
     M = wc.matrix
     assert((M.transpose() == M).all() == True)
@@ -149,7 +150,7 @@ def test_wce_set_size():
     P1, N1 = 5, 10
     P2, N2 = 7, 14
 
-    ens = WishartComplex(p=P1, n=N1)
+    ens = WishartEnsemble(beta=2, p=P1, n=N1)
     assert(ens.p == P1)
     assert(ens.n == N1)
     assert(ens.matrix.shape == (P1,P1))
@@ -171,7 +172,7 @@ def test_wce_build_tridiagonal():
 
     # sampling WishartComplex tridiagonal
     np.random.seed(1)
-    wc = WishartComplex(p=P, n=N, use_tridiagonal=True)
+    wc = WishartEnsemble(beta=2, p=P, n=N, use_tridiagonal=True)
 
     # sampling chi-squares and finding tridiagonal matrix in two ways
     np.random.seed(1)
@@ -198,8 +199,8 @@ def test_wce_build_tridiagonal():
 
 def test_wce_tridiag_hist():
     P, N = 50, 100
-    wce1 = WishartComplex(p=P, n=N, use_tridiagonal=False)
-    wce2 = WishartComplex(p=P, n=N, use_tridiagonal=True)
+    wce1 = WishartEnsemble(beta=2, p=P, n=N, use_tridiagonal=False)
+    wce2 = WishartEnsemble(beta=2, p=P, n=N, use_tridiagonal=True)
 
     wce1.matrix = wce2.matrix
 
@@ -233,7 +234,7 @@ def test_wishartQuatern_init():
     N = 5
 
     np.random.seed(1)
-    wq = WishartQuaternion(p=2, n=5)
+    wq = WishartEnsemble(beta=4, p=P, n=N)
 
     assert(wq.matrix.shape == (2*P,2*P))
 
@@ -247,7 +248,7 @@ def test_wishartQuatern_init():
 def test_wqe_symmetric():
     P = 3
     N = 5
-    wq = WishartQuaternion(p=P, n=N)
+    wq = WishartEnsemble(beta=4, p=P, n=N)
 
     M = wq.matrix
     assert((M.transpose() == M).all() == True)
@@ -257,7 +258,7 @@ def test_wqe_set_size():
     P1, N1 = 2, 3
     P2, N2 = 4, 5
 
-    ens = WishartQuaternion(p=P1, n=N1)
+    ens = WishartEnsemble(beta=4, p=P1, n=N1)
     assert(ens.p == P1)
     assert(ens.n == N1)
     assert(ens.matrix.shape == (2*P1,2*P1))
@@ -279,7 +280,7 @@ def test_wqe_build_tridiagonal():
 
     # sampling WishartQuaternion tridiagonal
     np.random.seed(1)
-    wq = WishartQuaternion(p=P, n=N, use_tridiagonal=True)
+    wq = WishartEnsemble(beta=4, p=P, n=N, use_tridiagonal=True)
 
     # sampling chi-squares and finding tridiagonal matrix in two ways
     np.random.seed(1)
@@ -306,8 +307,8 @@ def test_wqe_build_tridiagonal():
 
 def test_wqe_tridiag_hist():
     P, N = 50, 100
-    wqe1 = WishartQuaternion(p=P, n=N, use_tridiagonal=False)
-    wqe2 = WishartQuaternion(p=P, n=N, use_tridiagonal=True)
+    wqe1 = WishartEnsemble(beta=4, p=P, n=N, use_tridiagonal=False)
+    wqe2 = WishartEnsemble(beta=4, p=P, n=N, use_tridiagonal=True)
 
     wqe1.matrix = wqe2.matrix
 

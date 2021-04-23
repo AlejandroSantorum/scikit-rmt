@@ -43,9 +43,10 @@ class GaussianEnsemble(_Ensemble):
         n (int): random matrix size. Gaussian ensemble matrices are
             squared matrices. GOE and GUE are of size n times n,
             and GSE are of size 2n times 2n.
-        use_tridiagonal (bool, default=False): if set to True, Gaussian Ensemble
+        use_tridiagonal (bool): if set to True, Gaussian Ensemble
             matrices are sampled in its tridiagonal form, which has the same
-            eigenvalues than its standard form.
+            eigenvalues than its standard form. Otherwise, it is sampled using
+            its standard form.
 
     """
 
@@ -60,6 +61,10 @@ class GaussianEnsemble(_Ensemble):
                 and GSE are of size 2n times 2n.
             beta (int, default=1): descriptive integer of the gaussian ensemble type.
                 For GOE beta=1, for GUE beta=2, for GSE beta=4.
+            use_tridiagonal (bool, default=False): if set to True, Gaussian Ensemble
+            matrices are sampled in its tridiagonal form, which has the same
+            eigenvalues than its standard form. Otherwise, it is sampled using
+            its standard form.
 
         """
         self.n = n
@@ -88,7 +93,7 @@ class GaussianEnsemble(_Ensemble):
         """Samples new Gaussian Ensemble random matrix.
 
         The sampling algorithm depends on the specification of 
-        use_tridiagonal paramter. If use_tridiagonal is set to True,
+        use_tridiagonal parameter. If use_tridiagonal is set to True,
         a Gaussian Ensemble random matrix in its tridiagonal form
         is sampled. Otherwise, it is sampled using the standard
         form.

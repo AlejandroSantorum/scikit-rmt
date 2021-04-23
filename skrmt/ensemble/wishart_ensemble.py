@@ -7,7 +7,6 @@ and Wishart Quaternion Ensemble.
 
 """
 
-from abc import ABCMeta, abstractmethod
 import numpy as np
 from scipy import sparse
 
@@ -18,7 +17,7 @@ from .tridiagonal_utils import tridiag_eigval_hist
 #########################################################################
 ### Wishart Ensemble = Laguerre Ensemble
 
-class WishartEnsemble(_Ensemble, metaclass=ABCMeta):
+class WishartEnsemble(_Ensemble):
     """General Wishart Ensemble class.
 
     This class contains common attributes and methods for all the
@@ -26,37 +25,46 @@ class WishartEnsemble(_Ensemble, metaclass=ABCMeta):
     supported by inherited classes.
 
     Attributes:
+        matrix (numpy array): instance of the WishartReal, WishartComplex
+            or WishartQuaternion random ensembles. If it is an instance
+            of WishartReal or WishartComplex, the random matrix is of
+            size n times n. If it is a WishartQuaternion, the random matrix
+            is of size 2n times 2n.
         beta (int): descriptive integer of the Wishart ensemble type.
             For Real beta=1, for Complex beta=2, for Quaternion beta=4.
         p (int): number of rows of the guassian matrix that generates
             the matrix of the corresponding ensemble.
         n (int): number of columns of the guassian matrix that generates
             the matrix of the corresponding ensemble.
-        use_tridiagonal (bool, default=False): if set to True, Wishart Ensemble
+        use_tridiagonal (bool): if set to True, Gaussian Ensemble
             matrices are sampled in its tridiagonal form, which has the same
-            eigenvalues than its standard form.
+            eigenvalues than its standard form. Otherwise, it is sampled using
+            its standard form.
 
     """
 
-    @abstractmethod
-    def __init__(self, p, n, beta=1, use_tridiagonal=False):
+    def __init__(self, beta, p, n, use_tridiagonal=False):
         """Constructor for WishartEnsemble class.
 
         Initializes an instance of this class with the given parameters.
 
         Args:
+            beta (int): descriptive integer of the Wishart ensemble type.
+                For Real beta=1, for Complex beta=2, for Quaternion beta=4
             p (int): number of rows of the guassian matrix that generates
                 the matrix of the corresponding ensemble.
             n (int): number of columns of the guassian matrix that generates
                 the matrix of the corresponding ensemble.
-            beta (int, default=1): descriptive integer of the Wishart ensemble type.
-                For Real beta=1, for Complex beta=2, for Quaternion beta=4.
+            use_tridiagonal (bool, default=False): if set to True, Wishart Ensemble
+            matrices are sampled in its tridiagonal form, which has the same
+            eigenvalues than its standard form.
 
         """
         self.p = p
         self.n = n
         self.beta = beta
         self.use_tridiagonal = use_tridiagonal
+        self.matrix = self.sample()
     
     def set_size(self, p, n, resample_mtx=False):
         """Setter of matrix size.
@@ -77,9 +85,66 @@ class WishartEnsemble(_Ensemble, metaclass=ABCMeta):
         if resample_mtx:
             self.matrix = self.sample()
 
-    @abstractmethod
     def sample(self):
-        pass
+        """Samples new Wishart Ensemble random matrix.
+
+        The sampling algorithm depends on the specification of 
+        use_tridiagonal parameter. If use_tridiagonal is set to True,
+        a Wishart Ensemble random matrix in its tridiagonal form
+        is sampled. Otherwise, it is sampled using the standard
+        form.
+
+        Returns:
+            numpy array containing new matrix sampled.
+
+        References:
+            Dumitriu, I. and Edelman, A. "Matrix Models for Beta Ensembles".
+                Journal of Mathematical Physics. 43.11 (2002): 5830-5847.
+        """
+        if self.use_tridiagonal:
+            return self.sample_tridiagonal()
+        else:
+            if self.beta == 1:
+                return self._sample_wre()
+            elif self.beta == 2:
+                return self._sample_wce()
+            elif self.beta == 4:
+                return self._sample_wqe()
+
+    def _sample_wre(self):
+        p = self.p
+        n = self.n
+        # p by n matrix of random Gaussians
+        A = np.random.randn(p,n)
+        # symmetrize matrix
+        self.matrix = np.matmul(A, A.transpose())
+        return self.matrix
+
+    def _sample_wce(self):
+        p = self.p
+        n = self.n
+        # p by n random complex matrix of random Gaussians
+        A = np.random.randn(p,n) + (0+1j)*np.random.randn(p,n)
+        # hermitian matrix
+        self.matrix = np.matmul(A, A.transpose())
+        return self.matrix
+
+    def _sample_wqe(self):
+        p = self.p
+        n = self.n
+        # p by n random complex matrix of random Gaussians
+        X = np.random.randn(p,n) + (0+1j)*np.random.randn(p,n)
+        # p by n random complex matrix of random Gaussians
+        Y = np.random.randn(p,n) + (0+1j)*np.random.randn(p,n)
+        # [X Y; -conj(Y) conj(X)] 
+        A = np.block([
+                        [X               , Y],
+                        [-np.conjugate(Y), np.conjugate(X)]
+                    ])
+        # hermitian matrix
+        self.matrix = np.matmul(A, A.transpose())
+        return self.matrix
+        return self.matrix
 
     def sample_tridiagonal(self):
         '''Samples a Wishart Ensemble random matrix in its tridiagonal form.
