@@ -43,6 +43,11 @@ class ManovaEnsemble(_Ensemble):
     the Manova Quaternion Ensemble.
 
     Attributes:
+        matrix (numpy array): instance of the ManovaReal, ManovaComplex
+            or ManovaQuaternion random ensembles. If it is an instance
+            of ManovaReal or ManovaComplex, the random matrix is of
+            size n times n. If it is a ManovaQuaternion, the random matrix
+            is of size 2n times 2n.
         beta (int): descriptive integer of the Manova ensemble type.
             For Real beta=1, for Complex beta=2, for Quaternion beta=4.
         m (int): number of rows of the random guassian matrices that
@@ -51,6 +56,10 @@ class ManovaEnsemble(_Ensemble):
             that generates the matrix of the corresponding ensemble.
         n2 (int): number of columns of the second random guassian matrix
             that generates the matrix of the corresponding ensemble.
+    
+    References:
+        Dumitriu, I. and Edelman, A. "Matrix Models for Beta Ensembles".
+            Journal of Mathematical Physics. 43.11 (2002): 5830-5847.
 
     """
 

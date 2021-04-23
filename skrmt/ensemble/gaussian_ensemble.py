@@ -47,6 +47,12 @@ class GaussianEnsemble(_Ensemble):
             matrices are sampled in its tridiagonal form, which has the same
             eigenvalues than its standard form. Otherwise, it is sampled using
             its standard form.
+        
+    References:
+        Albrecht, J. and Chan, C.P. and Edelman, A. "Sturm sequences and random eigenvalue distributions".
+            Foundations of Computational Mathematics. 9.4 (2008): 461-483.
+        Dumitriu, I. and Edelman, A. "Matrix Models for Beta Ensembles".
+            Journal of Mathematical Physics. 43.11 (2002): 5830-5847.
 
     """
 

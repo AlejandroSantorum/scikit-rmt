@@ -7,7 +7,7 @@ from numpy.testing import (
     assert_allclose,
 )
 
-from skrmt.ensemble import COE, CUE, CSE
+from skrmt.ensemble import CircularEnsemble
 
 
 ##########################################
@@ -17,7 +17,7 @@ def test_coe_init():
     N = 3
 
     np.random.seed(1)
-    coe = COE(n=N)
+    coe = CircularEnsemble(beta=1, n=N)
 
     assert(coe.matrix.shape == (N,N))
 
@@ -29,7 +29,7 @@ def test_coe_init():
 
 def test_coe_symmetric():
     N = 5
-    coe = COE(n=N)
+    coe = CircularEnsemble(beta=1, n=N)
 
     M = coe.matrix
     assert((M.transpose() == M).all() == True)
@@ -39,7 +39,7 @@ def test_coe_set_size():
     N1 = 3
     N2 = 5
 
-    coe = COE(n=N1)
+    coe = CircularEnsemble(beta=1, n=N1)
     assert(coe.n == N1)
     assert(coe.matrix.shape == (N1,N1))
 
@@ -59,7 +59,7 @@ def test_cue_init():
     N = 3
 
     np.random.seed(1)
-    cue = CUE(n=N)
+    cue = CircularEnsemble(beta=2, n=N)
 
     assert(cue.matrix.shape == (N,N))
 
@@ -73,7 +73,7 @@ def test_cue_set_size():
     N1 = 5
     N2 = 10
 
-    cue = CUE(n=N1)
+    cue = CircularEnsemble(beta=2, n=N1)
     assert(cue.n == N1)
     assert(cue.matrix.shape == (N1,N1))
 
@@ -92,7 +92,7 @@ def test_cue_set_size():
 def test_cse_init():
     N = 2 
     np.random.seed(1)
-    cse = CSE(n=N)
+    cse = CircularEnsemble(beta=4, n=N)
 
     assert(cse.matrix.shape == (2*N,2*N))
 
@@ -107,7 +107,7 @@ def test_cse_set_size():
     N1 = 4
     N2 = 9
 
-    cse = CSE(n=N1)
+    cse = CircularEnsemble(beta=4, n=N1)
     assert(cse.n == N1)
     assert(cse.matrix.shape == (2*N1,2*N1))
 
