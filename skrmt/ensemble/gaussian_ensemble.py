@@ -7,7 +7,6 @@ Gaussian Unitary Ensemble (GUE) and Gaussian Symplectic Ensemble (GSE).
 
 """
 
-from abc import ABCMeta, abstractmethod
 import numpy as np
 from scipy import sparse
 from scipy import special
@@ -18,12 +17,11 @@ from .tridiagonal_utils import tridiag_eigval_hist
 #########################################################################
 ### Gaussian Ensemble = Hermite Ensemble
 
-class GaussianEnsemble(_Ensemble, metaclass=ABCMeta):
+class GaussianEnsemble(_Ensemble):
     """General Gaussian Ensemble class.
 
     This class contains common attributes and methods for all the
-    gaussian ensembles. It also defines the basic interface to be
-    supported by inherited classes.
+    gaussian ensembles.
 
     Attributes:
         beta (int): descriptive integer of the gaussian ensemble type.
@@ -37,8 +35,7 @@ class GaussianEnsemble(_Ensemble, metaclass=ABCMeta):
 
     """
 
-    @abstractmethod
-    def __init__(self, n, beta=1, use_tridiagonal=False):
+    def __init__(self, beta, n, use_tridiagonal=False):
         """Constructor for GaussianEnsemble class.
 
         Initializes an instance of this class with the given parameters.
@@ -54,6 +51,7 @@ class GaussianEnsemble(_Ensemble, metaclass=ABCMeta):
         self.n = n
         self.beta = beta
         self.use_tridiagonal = use_tridiagonal
+        self.matrix = self.sample()
 
     def set_size(self, n, resample_mtx=False):
         """Setter of matrix size.
@@ -72,9 +70,46 @@ class GaussianEnsemble(_Ensemble, metaclass=ABCMeta):
         if resample_mtx:
             self.matrix = self.sample()
 
-    @abstractmethod
     def sample(self):
-        pass
+        if self.use_tridiagonal:
+            return self.sample_tridiagonal()
+        else:
+            if self.beta == 1:
+                return self._sample_goe()
+            elif self.beta == 2:
+                return self._sample_gue()
+            elif self.beta == 4:
+                return self._sample_gse()
+
+    def _sample_goe(self):
+        # n by n matrix of random Gaussians
+        A = np.random.randn(self.n,self.n)
+        # symmetrize matrix
+        self.matrix = (A + A.transpose())/2
+        return self.matrix
+
+    def _sample_gue(self):
+        n = self.n
+        # n by n random complex matrix
+        A = np.random.randn(n,n) + (0+1j)*np.random.randn(n,n)
+        # hermitian matrix
+        self.matrix = (A + A.transpose())/2
+        return self.matrix
+
+    def _sample_gse(self):
+        n = self.n
+        # n by n random complex matrix
+        X = np.random.randn(n,n) + (0+1j)*np.random.randn(n,n)
+        # another n by n random complex matrix
+        Y = np.random.randn(n,n) + (0+1j)*np.random.randn(n,n)
+        # [X Y; -conj(Y) conj(X)] 
+        A = np.block([
+                        [X               , Y],
+                        [-np.conjugate(Y), np.conjugate(X)]
+                        ])
+        # hermitian matrix
+        self.matrix = (A + A.transpose())/2
+        return self.matrix
 
     def sample_tridiagonal(self):
         '''Samples a Gaussian Ensemble random matrix in its tridiagonal form.

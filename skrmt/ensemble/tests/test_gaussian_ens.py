@@ -7,7 +7,8 @@ from numpy.testing import (
     assert_allclose,
 )
 
-from skrmt.ensemble import GOE, GUE, GSE
+#from skrmt.ensemble import GOE, GUE, GSE
+from skrmt.ensemble import GaussianEnsemble
 
 
 ##########################################
@@ -17,7 +18,7 @@ def test_goe_init():
     N = 3
 
     np.random.seed(1)
-    goe = GOE(n=N)
+    goe = GaussianEnsemble(beta=1, n=N)
 
     assert(goe.matrix.shape == (N,N))
 
@@ -29,7 +30,7 @@ def test_goe_init():
 
 def test_goe_symmetric():
     N = 5
-    goe = GOE(n=N)
+    goe = GaussianEnsemble(beta=1, n=N)
 
     M = goe.matrix
     assert((M.transpose() == M).all() == True)
@@ -40,7 +41,7 @@ def test_goe_set_size():
     N1 = 3
     N2 = 5
 
-    goe = GOE(n=N1)
+    goe = GaussianEnsemble(beta=1, n=N1)
     assert(goe.n == N1)
     assert(goe.matrix.shape == (N1,N1))
 
@@ -58,7 +59,7 @@ def test_goe_build_tridiagonal():
     beta = 1
 
     np.random.seed(1)
-    goe = GOE(n=N, use_tridiagonal=True)
+    goe = GaussianEnsemble(beta=1, n=N, use_tridiagonal=True)
 
     np.random.seed(1)
     normals = (1/np.sqrt(2)) * np.random.normal(loc=0, scale=np.sqrt(2), size=N)
@@ -74,7 +75,7 @@ def test_goe_build_tridiagonal():
 
 def test_beta1_eigval_pdf():
     N = 3
-    goe = GOE(n=N)
+    goe = GaussianEnsemble(beta=1, n=N)
 
     goe.matrix = np.zeros((N,N))
     assert(goe.eigval_pdf() == 0.0)
@@ -88,8 +89,8 @@ def test_beta1_eigval_pdf():
 
 def test_goe_tridiag_hist():
     N = 50
-    goe1 = GOE(n=N, use_tridiagonal=False)
-    goe2 = GOE(n=N, use_tridiagonal=True)
+    goe1 = GaussianEnsemble(beta=1, n=N, use_tridiagonal=False)
+    goe2 = GaussianEnsemble(beta=1, n=N, use_tridiagonal=True)
 
     goe1.matrix = goe2.matrix
 
@@ -120,7 +121,7 @@ def test_gue_init():
     N = 3
 
     np.random.seed(1)
-    gue = GUE(n=N)
+    gue = GaussianEnsemble(beta=2, n=N)
 
     assert(gue.matrix.shape == (N,N))
 
@@ -132,7 +133,7 @@ def test_gue_init():
 
 def test_gue_symmetric():
     N = 5
-    gue = GUE(n=N)
+    gue = GaussianEnsemble(beta=2, n=N)
 
     M = gue.matrix
     assert((M.transpose() == M).all() == True)
@@ -142,7 +143,7 @@ def test_gue_set_size():
     N1 = 5
     N2 = 8
 
-    gue = GUE(n=N1)
+    gue = GaussianEnsemble(beta=2, n=N1)
     assert(gue.n == N1)
     assert(gue.matrix.shape == (N1,N1))
 
@@ -160,7 +161,7 @@ def test_gue_build_tridiagonal():
     beta = 2
 
     np.random.seed(1)
-    gue = GUE(n=N, use_tridiagonal=True)
+    gue = GaussianEnsemble(beta=2, n=N, use_tridiagonal=True)
 
     np.random.seed(1)
     normals = (1/np.sqrt(2)) * np.random.normal(loc=0, scale=np.sqrt(2), size=N)
@@ -176,8 +177,8 @@ def test_gue_build_tridiagonal():
 
 def test_gue_tridiag_hist():
     N = 50
-    gue1 = GUE(n=N, use_tridiagonal=False)
-    gue2 = GUE(n=N, use_tridiagonal=True)
+    gue1 = GaussianEnsemble(beta=2, n=N, use_tridiagonal=False)
+    gue2 = GaussianEnsemble(beta=2, n=N, use_tridiagonal=True)
 
     gue1.matrix = gue2.matrix
 
@@ -206,7 +207,7 @@ def test_gue_tridiag_hist():
 def test_gse_init():
     N = 2 
     np.random.seed(1)
-    gse = GSE(n=N)
+    gse = GaussianEnsemble(beta=4, n=N)
 
     assert(gse.matrix.shape == (2*N,2*N))
 
@@ -219,7 +220,7 @@ def test_gse_init():
 
 def test_gse_symmetric():
     N = 5
-    gse = GSE(n=N)
+    gse = GaussianEnsemble(beta=4, n=N)
 
     M = gse.matrix
     assert((M.transpose() == M).all() == True)
@@ -229,7 +230,7 @@ def test_gse_set_size():
     N1 = 4
     N2 = 9
 
-    gse = GSE(n=N1)
+    gse = GaussianEnsemble(beta=4, n=N1)
     assert(gse.n == N1)
     assert(gse.matrix.shape == (2*N1,2*N1))
 
@@ -247,7 +248,7 @@ def test_gse_build_tridiagonal():
     beta = 4
 
     np.random.seed(1)
-    gse = GSE(n=N, use_tridiagonal=True)
+    gse = GaussianEnsemble(beta=4, n=N, use_tridiagonal=True)
 
     np.random.seed(1)
     normals = (1/np.sqrt(2)) * np.random.normal(loc=0, scale=np.sqrt(2), size=N)
@@ -263,8 +264,8 @@ def test_gse_build_tridiagonal():
 
 def test_gse_tridiag_hist():
     N = 50
-    gse1 = GSE(n=N, use_tridiagonal=False)
-    gse2 = GSE(n=N, use_tridiagonal=True)
+    gse1 = GaussianEnsemble(beta=4, n=N, use_tridiagonal=False)
+    gse2 = GaussianEnsemble(beta=4, n=N, use_tridiagonal=True)
 
     gse1.matrix = gse2.matrix
 
