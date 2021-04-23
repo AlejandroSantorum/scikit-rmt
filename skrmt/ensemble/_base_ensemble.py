@@ -84,6 +84,12 @@ class _Ensemble(metaclass=ABCMeta):
         Raises:
             ValueError if interval is not a tuple.
 
+        References:
+            Albrecht, J. and Chan, C.P. and Edelman, A. "Sturm sequences and random eigenvalue distributions".
+                Foundations of Computational Mathematics. 9.4 (2008): 461-483.
+            Dumitriu, I. and Edelman, A. "Matrix Models for Beta Ensembles".
+                Journal of Mathematical Physics. 43.11 (2002): 5830-5847.
+
         """
         if not isinstance(interval, tuple):
             raise ValueError("interval argument must be a tuple")

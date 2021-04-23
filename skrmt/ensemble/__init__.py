@@ -4,7 +4,6 @@ random matrix ensembles.
 """
 
 from .gaussian_ensemble import GaussianEnsemble
-from .gaussian_ensemble import GOE, GUE, GSE
 
 from .wishart_ensemble import WishartEnsemble
 from .wishart_ensemble import WishartReal
@@ -20,8 +19,7 @@ from .circular_ensemble import CircularEnsemble
 from .circular_ensemble import COE, CUE, CSE
 
 
-__all__ = ["GaussianEnsemble", 
-           "GOE", "GUE", "GSE",
+__all__ = ["GaussianEnsemble",
            "WishartEnsemble",
            "WishartReal", "WishartComplex", "WishartQuaternion",
            "ManovaEnsemble",

@@ -21,9 +21,23 @@ class GaussianEnsemble(_Ensemble):
     """General Gaussian Ensemble class.
 
     This class contains common attributes and methods for all the
-    gaussian ensembles.
+    gaussian ensembles. Gaussian Ensembles are divided in:
+    - Gaussian Orthogonal Ensemble (GOE, beta=1): the distribution of the
+    matrices of this ensemble are invariant under orthogonal conjugation,
+    i.e., if X is in GOE(n) and O is an orthogonal matrix, then
+    O*X*O^T is equally distributed as X.
+    - Gaussian Unitary Ensemble (GUE, beta=2): the distribution of
+    the matrices of this ensemble are invariant under unitary conjugation,
+    i.e., if X is in GUE(n) and O is an unitary matrix, then O*X*O^T
+    is equally distributed as X.
+    - Gaussian Symplectic Ensemble (GSE, beta=4): the distribution of
+    the matrices of this ensemble are invariant under conjugation
+    by the symplectic group.
 
     Attributes:
+        matrix (numpy array): instance of the GOE, GUE or GSE random
+            matrix ensemble of size n times n if it is GOE or GUE, or
+            of size 2n times 2n if it is GSE.
         beta (int): descriptive integer of the gaussian ensemble type.
             For GOE beta=1, for GUE beta=2, for GSE beta=4.
         n (int): random matrix size. Gaussian ensemble matrices are
@@ -71,6 +85,21 @@ class GaussianEnsemble(_Ensemble):
             self.matrix = self.sample()
 
     def sample(self):
+        """Samples new Gaussian Ensemble random matrix.
+
+        The sampling algorithm depends on the specification of 
+        use_tridiagonal paramter. If use_tridiagonal is set to True,
+        a Gaussian Ensemble random matrix in its tridiagonal form
+        is sampled. Otherwise, it is sampled using the standard
+        form.
+
+        Returns:
+            numpy array containing new matrix sampled.
+
+        References:
+            Dumitriu, I. and Edelman, A. "Matrix Models for Beta Ensembles".
+                Journal of Mathematical Physics. 43.11 (2002): 5830-5847.
+        """
         if self.use_tridiagonal:
             return self.sample_tridiagonal()
         else:
@@ -126,7 +155,7 @@ class GaussianEnsemble(_Ensemble):
                 Foundations of Computational Mathematics. 9.4 (2008): 461-483.
             Dumitriu, I. and Edelman, A. "Matrix Models for Beta Ensembles".
                 Journal of Mathematical Physics. 43.11 (2002): 5830-5847.
-            
+
         '''
         # sampling diagonal normals
         normals = (1/np.sqrt(2)) * np.random.normal(loc=0, scale=np.sqrt(2), size=self.n)
@@ -189,169 +218,3 @@ class GaussianEnsemble(_Ensemble):
         exp_val = np.exp(-np.sum((eigvals**2)/2))
         # calculating Hermite eigval pdf
         return const_beta * pdf * exp_val
-    
-
-##########################################
-### Gaussian Orthogonal Ensemble = GOE
-
-class GOE(GaussianEnsemble):
-    """Gaussian Orthogonal Ensemble class.
-
-    The distribution of the matrices of this ensemble are invariant
-    under orthogonal conjugation, i.e., if X is in GOE(n) and O
-    is an orthogonal matrix, then O*X*O^T is equally distributed
-    as X.
-
-    Attributes:
-        matrix (numpy array): instance of the random matrix ensemble
-            of size n times n.
-        use_tridiagonal (bool): if set to True, GOE matrices
-            are sampled in its tridiagonal form, which has the same
-            eigenvalues than its standard form.
-
-    """
-
-    def __init__(self, n, use_tridiagonal=False):
-        """Constructor for GOE class.
-
-        Initializes an instance of this class with the given parameters,
-        calling the parent class constructor and sampling a random instance.
-
-        Args:
-            n (int): random matrix size. GOE matrices are squared matrices
-                of size n times n.
-            
-            use_tridiagonal (bool, default=False): if set to True, GOE matrices
-                are sampled in its tridiagonal form, which has the same
-                eigenvalues than its standard form.
-
-        """
-        super().__init__(n=n, beta=1, use_tridiagonal=use_tridiagonal)
-        self.matrix = self.sample()
-
-    def sample(self):
-        if self.use_tridiagonal:
-            return self.sample_tridiagonal()
-        else:
-            return self.sample_goe_matrix()
-
-    def sample_goe_matrix(self):
-        # n by n matrix of random Gaussians
-        A = np.random.randn(self.n,self.n)
-        # symmetrize matrix
-        self.matrix = (A + A.transpose())/2
-        return self.matrix
-    
-
-
-
-
-
-
-##########################################
-### Gaussian Unitary Ensemble = GUE
-
-class GUE(GaussianEnsemble):
-    """Gaussian Unitary Ensemble class.
-
-    The distribution of the matrices of this ensemble are invariant
-    under unitary conjugation, i.e., if X is in GUE(n) and O
-    is an unitary matrix, then O*X*O^T is equally distributed
-    as X.
-
-    Attributes:
-        matrix (numpy array): instance of the random matrix ensemble
-            of size n times n.
-        use_tridiagonal (bool): if set to True, GUE matrices
-            are sampled in its tridiagonal form, which has the same
-            eigenvalues than its standard form.
-
-    """
-
-    def __init__(self, n, use_tridiagonal=False):
-        """Constructor for GUE class.
-
-        Initializes an instance of this class with the given parameters,
-        calling the parent class constructor and sampling a random instance.
-
-        Args:
-            n (int): random matrix size. GUE matrices are squared matrices
-                of size n times n.
-            use_tridiagonal (bool, default=False): if set to True, GUE matrices
-                are sampled in its tridiagonal form, which has the same
-                eigenvalues than its standard form.
-
-        """
-        super().__init__(n=n, beta=2, use_tridiagonal=use_tridiagonal)
-        self.matrix = self.sample()
-
-    def sample(self):
-        if self.use_tridiagonal:
-            return self.sample_tridiagonal()
-        else:
-            return self.sample_gue_matrix()
-
-    def sample_gue_matrix(self):
-        n = self.n
-        # n by n random complex matrix
-        A = np.random.randn(n,n) + (0+1j)*np.random.randn(n,n)
-        # hermitian matrix
-        self.matrix = (A + A.transpose())/2
-        return self.matrix
-
-
-##########################################
-### Gaussian Symplectic Ensemble = GSE
-
-class GSE(GaussianEnsemble):
-    """Gaussian Symplectic Ensemble class.
-
-    The distribution of the matrices of this ensemble are invariant
-    under conjugation by the symplectic group.
-
-    Attributes:
-        matrix (numpy array): instance of the GSE random matrix
-            ensemble of size 2n times 2n.
-        use_tridiagonal (bool): if set to True, GSE matrices
-            are sampled in its tridiagonal form, which has the same
-            eigenvalues than its standard form.
-
-    """
-
-    def __init__(self, n, use_tridiagonal=False):
-        """Constructor for GSE class.
-
-        Initializes an instance of this class with the given parameters,
-        calling the parent class constructor and sampling a random instance.
-
-        Args:
-            n (int): random matrix size. GSE matrices are squared matrices
-                of size 2n times 2n.
-            use_tridiagonal (bool, default=False): if set to True, GSE matrices
-                are sampled in its tridiagonal form, which has the same
-                eigenvalues than its standard form.
-
-        """
-        super().__init__(n=n, beta=4, use_tridiagonal=use_tridiagonal)
-        self.matrix = self.sample()
-    
-    def sample(self):
-        if self.use_tridiagonal:
-            return self.sample_tridiagonal()
-        else:
-            return self.sample_gse_matrix()
-
-    def sample_gse_matrix(self):
-        n = self.n
-        # n by n random complex matrix
-        X = np.random.randn(n,n) + (0+1j)*np.random.randn(n,n)
-        # another n by n random complex matrix
-        Y = np.random.randn(n,n) + (0+1j)*np.random.randn(n,n)
-        # [X Y; -conj(Y) conj(X)] 
-        A = np.block([
-                        [X               , Y],
-                        [-np.conjugate(Y), np.conjugate(X)]
-                        ])
-        # hermitian matrix
-        self.matrix = (A + A.transpose())/2
-        return self.matrix
