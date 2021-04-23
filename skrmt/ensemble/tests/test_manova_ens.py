@@ -7,7 +7,7 @@ from numpy.testing import (
     assert_allclose,
 )
 
-from skrmt.ensemble import ManovaReal, ManovaComplex, ManovaQuaternion
+from skrmt.ensemble import ManovaEnsemble
 
 
 ##########################################
@@ -19,7 +19,7 @@ def test_manovaReal_init():
     N2 = 10
 
     np.random.seed(1)
-    mr = ManovaReal(m=M, n1=N1, n2=N2)
+    mr = ManovaEnsemble(beta=1, m=M, n1=N1, n2=N2)
 
     assert(mr.matrix.shape == (M,M))
 
@@ -33,7 +33,7 @@ def test_mre_set_size():
     M1, N11, N12 = 3, 5, 8
     M2, N21, N22 = 2, 4, 6
 
-    mr = ManovaReal(m=M1, n1=N11, n2=N12)
+    mr = ManovaEnsemble(beta=1, m=M1, n1=N11, n2=N12)
     assert(mr.m == M1)
     assert(mr.n1 == N11)
     assert(mr.n2 == N12)
@@ -61,7 +61,7 @@ def test_manovaComplex_init():
     N2 = 10
 
     np.random.seed(1)
-    mc = ManovaComplex(m=M, n1=N1, n2=N2)
+    mc = ManovaEnsemble(beta=2, m=M, n1=N1, n2=N2)
 
     assert(mc.matrix.shape == (M,M))
 
@@ -74,7 +74,7 @@ def test_mce_set_size():
     M1, N11, N12 = 4, 6, 8
     M2, N21, N22 = 3, 9, 12
 
-    mc = ManovaComplex(m=M1, n1=N11, n2=N12)
+    mc = ManovaEnsemble(beta=2, m=M1, n1=N11, n2=N12)
     assert(mc.m == M1)
     assert(mc.n1 == N11)
     assert(mc.n2 == N12)
@@ -102,7 +102,7 @@ def test_manovaQuatern_init():
     N2 = 20
 
     np.random.seed(1)
-    mq = ManovaQuaternion(m=M, n1=N1, n2=N2)
+    mq = ManovaEnsemble(beta=4, m=M, n1=N1, n2=N2)
 
     assert(mq.matrix.shape == (2*M,2*M))
 
@@ -117,7 +117,7 @@ def test_mqe_set_size():
     M1, N11, N12 = 2, 5, 7
     M2, N21, N22 = 4, 5, 6
 
-    mq = ManovaQuaternion(m=M1, n1=N11, n2=N12)
+    mq = ManovaEnsemble(beta=4, m=M1, n1=N11, n2=N12)
     assert(mq.m == M1)
     assert(mq.n1 == N11)
     assert(mq.n2 == N12)
