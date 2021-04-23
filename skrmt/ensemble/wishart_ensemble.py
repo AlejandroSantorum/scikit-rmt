@@ -21,8 +21,19 @@ class WishartEnsemble(_Ensemble):
     """General Wishart Ensemble class.
 
     This class contains common attributes and methods for all the
-    Wishart ensembles. It also defines the basic interface to be
-    supported by inherited classes.
+    Wishart ensembles. Wishart Ensembles are divided in:
+    - Wishart Real Ensemble (WRE, beta=1): the random matrices of
+    this ensemble are formed by multiplying a random real standard
+    gaussian matrix of size p times n by its transpose.
+    - Wishart Complex Ensemble (WCE, beta=2): the random matrices
+    of this ensemble are formed by multiplying a random complex
+    standard gaussian matrix of size p times n by its transpose.
+    - Wishart Quaternion Ensemble (WQE, beta=4): the random matrices
+    of this ensemble are formed by: sampling two random complex
+    standard guassian matrices (X and Y), stacking them to create
+    matrix A = [X  Y; -conj(Y)  conj(X)]. Finally matrix A is
+    multiplied by its transpose in order to generate a matrix of
+    the Wishart Quaternion Ensemble.
 
     Attributes:
         matrix (numpy array): instance of the WishartReal, WishartComplex
@@ -234,174 +245,3 @@ class WishartEnsemble(_Ensemble):
         exp_val = np.exp(-np.sum((eigvals**2)/2))
         # calculating Laguerre eigval pdf
         return const_beta * prod1 * prod2 * exp_val
-    
-
-##########################################
-### Wishart real
-
-class WishartReal(WishartEnsemble):
-    """Wishart Real Ensemble class.
-
-    The random matrices of this ensemble are formed by multiplying
-    a random real standard gaussian matrix of size p times n by its
-    transpose.
-
-    Attributes:
-        matrix (numpy array): instance of the random matrix ensemble
-            of size p times p.
-        use_tridiagonal (bool): if set to True, WishartReal matrices
-            are sampled in its tridiagonal form, which has the same
-            eigenvalues than its standard form.
-
-    """
-
-    def __init__(self, p, n, use_tridiagonal=False):
-        """Constructor for WishartReal class.
-
-        Initializes an instance of this class with the given parameters,
-        calling the parent class constructor and sampling a random instance.
-
-        Args:
-            p (int): number of rows of the guassian matrix that generates
-                the matrix of the corresponding ensemble.
-            n (int): number of columns of the guassian matrix that generates
-                the matrix of the corresponding ensemble.
-            use_tridiagonal (bool, default=False): if set to True, WishartReal
-                matrices are sampled in its tridiagonal form, which has the
-                same eigenvalues than its standard form.
-
-        """
-        super().__init__(p=p, n=n, beta=1, use_tridiagonal=use_tridiagonal)
-        self.matrix = self.sample()
-
-    def sample(self):
-        if self.use_tridiagonal:
-            return self.sample_tridiagonal()
-        else:
-            return self.sample_WisReal_matrix()
-
-    def sample_WisReal_matrix(self):
-        p = self.p
-        n = self.n
-        # p by n matrix of random Gaussians
-        A = np.random.randn(p,n)
-        # symmetrize matrix
-        self.matrix = np.matmul(A, A.transpose())
-        return self.matrix
-
-
-##########################################
-### Wishart complex
-
-class WishartComplex(WishartEnsemble):
-    """Wishart Complex Ensemble class.
-
-    The random matrices of this ensemble are formed by multiplying
-    a random complex standard gaussian matrix of size p times n by its
-    transpose.
-
-    Attributes:
-        matrix (numpy array): instance of the random matrix ensemble
-            of size p times p.
-        use_tridiagonal (bool): if set to True, WishartComplex matrices
-            are sampled in its tridiagonal form, which has the same
-            eigenvalues than its standard form.
-
-    """
-
-    def __init__(self, p, n, use_tridiagonal=False):
-        """Constructor for WishartComplex class.
-
-        Initializes an instance of this class with the given parameters,
-        calling the parent class constructor and sampling a random instance.
-
-        Args:
-            p (int): number of rows of the guassian matrix that generates
-                the matrix of the corresponding ensemble.
-            n (int): number of columns of the guassian matrix that generates
-                the matrix of the corresponding ensemble.
-            use_tridiagonal (bool, default=False): if set to True, WishartComplex
-                matrices are sampled in its tridiagonal form, which has the
-                same eigenvalues than its standard form.
-
-        """
-        super().__init__(p=p, n=n, beta=2, use_tridiagonal=use_tridiagonal)
-        self.matrix = self.sample()
-    
-    def sample(self):
-        if self.use_tridiagonal:
-            return self.sample_tridiagonal()
-        else:
-            return self.sample_WisComplex_matrix()
-
-    def sample_WisComplex_matrix(self):
-        p = self.p
-        n = self.n
-        # p by n random complex matrix of random Gaussians
-        A = np.random.randn(p,n) + (0+1j)*np.random.randn(p,n)
-        # hermitian matrix
-        self.matrix = np.matmul(A, A.transpose())
-        return self.matrix
-
-
-##########################################
-### Wishart quaternion
-
-class WishartQuaternion(WishartEnsemble):
-    """Wishart Quaternion Ensemble class.
-
-    The random matrices of this ensemble are formed by: sampling two
-    random complex standard guassian matrices (X and Y), stacking them
-    to create matrix A = [X  Y; -conj(Y)  conj(X)]. Finally matrix
-    A is multiplied by its transpose in order to generate a matrix of
-    the Wishart Quaternion Ensemble.
-
-    Attributes:
-        matrix (numpy array): instance of the random matrix ensemble
-            of size 2p times 2p.
-        use_tridiagonal (bool): if set to True, WishartQuaternion matrices
-            are sampled in its tridiagonal form, which has the same
-            eigenvalues than its standard form.
-
-    """
-
-    def __init__(self, p, n, use_tridiagonal=False):
-        """Constructor for WishartQuaternion class.
-
-        Initializes an instance of this class with the given parameters,
-        calling the parent class constructor and sampling a random instance.
-
-        Args:
-            p (int): number of rows of the guassian matrix that generates
-                the matrix of the corresponding ensemble.
-            n (int): number of columns of the guassian matrix that generates
-                the matrix of the corresponding ensemble.
-            use_tridiagonal (bool, default=False): if set to True, WishartQuaternion
-                matrices are sampled in its tridiagonal form, which has the
-                same eigenvalues than its standard form.
-
-        """
-        super().__init__(p=p, n=n, beta=4, use_tridiagonal=use_tridiagonal)
-        self.matrix = self.sample()
-    
-    def sample(self):
-        if self.use_tridiagonal:
-            return self.sample_tridiagonal()
-        else:
-            return self.sample_WisQuatern_matrix()
-
-    def sample_WisQuatern_matrix(self):
-        p = self.p
-        n = self.n
-        # p by n random complex matrix of random Gaussians
-        X = np.random.randn(p,n) + (0+1j)*np.random.randn(p,n)
-        # p by n random complex matrix of random Gaussians
-        Y = np.random.randn(p,n) + (0+1j)*np.random.randn(p,n)
-        # [X Y; -conj(Y) conj(X)] 
-        A = np.block([
-                        [X               , Y],
-                        [-np.conjugate(Y), np.conjugate(X)]
-                    ])
-        # hermitian matrix
-        self.matrix = np.matmul(A, A.transpose())
-        return self.matrix

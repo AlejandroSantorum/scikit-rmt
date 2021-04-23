@@ -10,7 +10,6 @@ from numpy.testing import (
 )
 
 from skrmt.ensemble import WishartEnsemble
-#from skrmt.ensemble import WishartReal, WishartComplex, WishartQuaternion
 
 
 ##########################################
