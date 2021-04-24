@@ -8,9 +8,11 @@ from numpy.testing import (
 )
 
 from skrmt.covariance import sample_estimator
+from skrmt.covariance import FSOpt_estimator
 from skrmt.covariance import linear_shrinkage_estimator
 from skrmt.covariance import analytical_shrinkage_estimator
-
+from skrmt.covariance import empirical_bayesian_estimator
+from skrmt.covariance import minimax_estimator
 
 ################################################################
 # SAMPLE ESTIMATOR 
@@ -100,3 +102,55 @@ def test_analyticalEstimator2():
     sigma_tilde = analytical_shrinkage_estimator(X)
 
     assert_almost_equal(sigma_tilde, sol, decimal=7)
+
+
+################################################################
+# FSOPT ESTIMATOR 
+
+def test_FSOptEstimator_shape_symm():
+    # population covariance matrix
+    Sigma = np.array([[3.00407916, -1.46190757, 1.50140806, 1.50933526, 0.27036442],
+                      [-1.46190757, 5.61441061, -0.51939653, -2.76492235, 1.38225566],
+                      [1.50140806, -0.51939653, 2.3068582, 1.41248896, 0.84740175],
+                      [1.50933526, -2.76492235, 1.41248896, 6.57182938, 0.73407095],
+                      [0.27036442, 1.38225566, 0.84740175, 0.73407095, 9.50282265]])
+    
+    p = Sigma.shape[0]
+    n = 12
+    # input data matrix
+    X = np.random.multivariate_normal(np.random.randn(p), Sigma, size=n)
+    
+    sigma_tilde = FSOpt_estimator(X, Sigma)
+
+    assert(sigma_tilde.shape == (X.shape[1], X.shape[1]))
+    assert((sigma_tilde.all() == sigma_tilde.all()) == True)
+
+
+################################################################
+# EMPIRICAL BAYESIAN ESTIMATOR 
+
+def test_EBEstimator_shape_symm():
+    # input data matrix
+    X = np.array([[5, 0, 0], [4, 0, 0], [3, 0, 0], [2, 0, 0], [1, 0, 0],
+                  [0, 0, 1], [0, 0, 2], [0, 0, 3], [0, 0, 4], [0, 0, 5],
+                  [0, 3, 0], [0, 4, 0], [0, 5, 0], [0, 1, 0], [0, 10, 0]])
+    
+    sigma_tilde = empirical_bayesian_estimator(X)
+
+    assert(sigma_tilde.shape == (X.shape[1], X.shape[1]))
+    assert((sigma_tilde.all() == sigma_tilde.all()) == True)
+
+
+################################################################
+# MINIMAX ESTIMATOR 
+
+def test_minimaxEstimator_shape_symm():
+    # input data matrix
+    X = np.array([[5, 0, 0], [4, 0, 0], [3, 0, 0], [2, 0, 0], [1, 0, 0],
+                  [0, 0, 1], [0, 0, 2], [0, 0, 3], [0, 0, 4], [0, 0, 5],
+                  [0, 3, 0], [0, 4, 0], [0, 5, 0], [0, 1, 0], [0, 10, 0]])
+    
+    sigma_tilde = minimax_estimator(X)
+
+    assert(sigma_tilde.shape == (X.shape[1], X.shape[1]))
+    assert((sigma_tilde.all() == sigma_tilde.all()) == True)

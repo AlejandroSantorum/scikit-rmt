@@ -32,7 +32,7 @@ def FSOpt_estimator(X, Sigma):
 
     # compute finite-sample optimal (FSOpt) nonlinear shrinkage estimator
     sigma_tilde = np.matmul(np.matmul(eigvects, np.diag(d_star)), eigvects.T)
-    sigma_tilde
+    return sigma_tilde
 
 
 
@@ -124,6 +124,24 @@ def empirical_bayesian_estimator(X):
     return sigma_tilde
 
 
+
+def minimax_estimator(X):
+    n, p = X.shape
+
+    # get sample eigenvalues and eigenvectors, and sort them in descending order
+    sample = sample_estimator(X)
+    eigvals, eigvects = np.linalg.eig(sample)
+    order = np.argsort(eigvals) # ascending order
+    order = order[::-1] # descending order (reversing it)
+    eigvals = eigvals[order]
+    eigvects = eigvects[:,order]
+
+    # calculating new eigenvalues
+    new_eigvals = [n*val/(n+p+1-2*i) for (i, val) in enumerate(eigvals)]
+
+    # compute minimax estimator by replacing eigenvalues
+    sigma_tilde = np.matmul(np.matmul(eigvects, np.diag(new_eigvals)), eigvects.T)
+    return sigma_tilde
 
 
 
