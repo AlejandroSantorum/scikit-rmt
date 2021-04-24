@@ -30,7 +30,7 @@ def loss_frobenius(Sigma_tilde, Sigma):
 
 
 # Percentage relative improvement in average loss
-def PRIAL_mv(E_Sn, E_Sigma_tilde, E_Sstar):
+def prial_mv(E_Sn, E_Sigma_tilde, E_Sstar):
     return (E_Sn - E_Sigma_tilde)/(E_Sn - E_Sstar)
 
 # Percentage relative improvement in average loss

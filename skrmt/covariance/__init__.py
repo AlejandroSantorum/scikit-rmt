@@ -11,6 +11,7 @@ from .estimator import empirical_bayesian_estimator
 from .estimator import minimax_estimator
 
 from .metrics import loss_mv, loss_frobenius
+from .metrics import prial_mv
 
 
 __all__ = ["sample_estimator", "FSOpt_estimator",
@@ -18,4 +19,5 @@ __all__ = ["sample_estimator", "FSOpt_estimator",
            "analytical_shrinkage_estimator",
            "empirical_bayesian_estimator",
            "minimax_estimator",
-           "loss_mv", "loss_frobenius"]
+           "loss_mv", "loss_frobenius",
+           "prial_mv"]
