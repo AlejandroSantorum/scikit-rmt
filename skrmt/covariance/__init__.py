@@ -3,13 +3,17 @@ The :mod:`skrmt.covariance` module implements different methods
 to estimate covariance matrices.
 """
 
-from .analytical_shrinkage import AnalyticalShrinkage
-from .linear_shrinkage import LinearShrinkage
-from .estimator import SampleEstimator, FSOptEstimator
+from .estimator import sample_estimator
+from .estimator import FSOpt_estimator
+from .estimator import linear_shrinkage_estimator
+from .estimator import analytical_shrinkage_estimator
+from .estimator import empirical_bayesian_estimator
 
 from .metrics import loss_mv, loss_frobenius
 
 
-__all__ = ["AnalyticalShrinkage", "LinearShrinkage",
-           "SampleEstimator", "FSOptEstimator",
+__all__ = ["sample_estimator", "FSOpt_estimator",
+           "linear_shrinkage_estimator",
+           "analytical_shrinkage_estimator",
+           "empirical_bayesian_estimator",
            "loss_mv", "loss_frobenius"]

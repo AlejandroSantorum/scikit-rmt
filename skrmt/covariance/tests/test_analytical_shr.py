@@ -6,7 +6,7 @@ from numpy.testing import (
     assert_array_equal,
 )
 
-from skrmt.covariance import AnalyticalShrinkage
+from skrmt.covariance import analytical_shrinkage_estimator
 
 
 def test_estimate_1():
@@ -20,8 +20,9 @@ def test_estimate_1():
                     [-0.176171945854672, 0.317339265808824, -0.236795281588382],
                     [-0.127673277267705, -0.236795281588382, 0.474063174598454]])
 
-    analsh = AnalyticalShrinkage()
-    sigma_tilde = analsh.estimate(X)
+    # analsh = AnalyticalShrinkage()
+    # sigma_tilde = analsh.estimate(X)
+    sigma_tilde = analytical_shrinkage_estimator(X)
 
     assert_almost_equal(sigma_tilde, sol, decimal=7)
 
@@ -37,7 +38,8 @@ def test_estimate_2():
                     [-1.3927903545004, 7.91982043683479, -1.3927903545004],
                     [-1.42093779975966, -1.3927903545004, 3.84630121492766]])
 
-    analsh = AnalyticalShrinkage()
-    sigma_tilde = analsh.estimate(X)
+    # analsh = AnalyticalShrinkage()
+    # sigma_tilde = analsh.estimate(X)
+    sigma_tilde = analytical_shrinkage_estimator(X)
 
     assert_almost_equal(sigma_tilde, sol, decimal=7)

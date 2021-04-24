@@ -6,7 +6,7 @@ from numpy.testing import (
     assert_array_equal,
 )
 
-from skrmt.covariance import LinearShrinkage
+from skrmt.covariance import linear_shrinkage_estimator
 
 
 def test_estimate_1():
@@ -20,8 +20,9 @@ def test_estimate_1():
                     [-0.119074762494837, 0.285817155445408, -0.089306071871128],
                     [-0.142889714993804, -0.089306071871128, 0.387030703566020]])
 
-    linsh = LinearShrinkage()
-    sigma_tilde = linsh.estimate(X)
+    # linsh = LinearShrinkage()
+    # sigma_tilde = linsh.estimate(X)
+    sigma_tilde = linear_shrinkage_estimator(X)
 
     assert_almost_equal(sigma_tilde, sol, decimal=10)
 
@@ -37,7 +38,8 @@ def test_estimate_2():
                     [-0.175394418448355, 4.734650034184860, -0.175394418448355],
                     [-0.114387664205449, -0.175394418448355, 4.157119427352015]])
 
-    linsh = LinearShrinkage()
-    sigma_tilde = linsh.estimate(X)
+    # linsh = LinearShrinkage()
+    # sigma_tilde = linsh.estimate(X)
+    sigma_tilde = linear_shrinkage_estimator(X)
 
     assert_almost_equal(sigma_tilde, sol, decimal=10)

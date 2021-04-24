@@ -1,7 +1,6 @@
 import numpy as np
 
-from .estimator import SampleEstimator, FSOptEstimator
-
+# from .estimator import sample_estimator, FSOpt_estimator
 
 def loss_mv(Sigma_tilde, Sigma):
     p = len(Sigma)
