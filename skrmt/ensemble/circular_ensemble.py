@@ -49,7 +49,7 @@ class CircularEnsemble(_Ensemble):
             Classical Ensembles of Random Unitary Matrices.
             Communications in Mathematical Physics. 349 (2017): 991-1027.
         "Circular ensemble". Wikipedia.
-        en.wikipedia.org/wiki/Circular_ensemble
+            en.wikipedia.org/wiki/Circular_ensemble
 
     """
 
@@ -102,7 +102,7 @@ class CircularEnsemble(_Ensemble):
                 Classical Ensembles of Random Unitary Matrices.
                 Communications in Mathematical Physics. 349 (2017): 991-1027.
             "Circular ensemble". Wikipedia.
-            en.wikipedia.org/wiki/Circular_ensemble 
+                en.wikipedia.org/wiki/Circular_ensemble 
 
         """
         if self.beta == 1:
@@ -177,7 +177,7 @@ class CircularEnsemble(_Ensemble):
                 Classical Ensembles of Random Unitary Matrices.
                 Communications in Mathematical Physics. 349 (2017): 991-1027.
             "Circular ensemble". Wikipedia.
-            en.wikipedia.org/wiki/Circular_ensemble
+                en.wikipedia.org/wiki/Circular_ensemble
         """
         J = np.zeros((size,size))
         # selecting indices
@@ -216,7 +216,7 @@ class CircularEnsemble(_Ensemble):
                 Classical Ensembles of Random Unitary Matrices.
                 Communications in Mathematical Physics. 349 (2017): 991-1027.
             "Circular ensemble". Wikipedia.
-            en.wikipedia.org/wiki/Circular_ensemble 
+                en.wikipedia.org/wiki/Circular_ensemble 
             
         '''
         # calculating Circular eigval pdf constant depeding on beta        
