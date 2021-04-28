@@ -7,10 +7,31 @@ and Circular Symplectic Ensemble (CSE).
 
 """
 
-import cmath
 import numpy as np
+from scipy import special
 
 from ._base_ensemble import _Ensemble
+
+
+
+def _sample_haar_mtx(size):
+    """Samples Haar-distributed matrices.
+
+    Samples Haar-distributed matrices that are useful to generate
+    random matrices for COE, CUE and CSE ensembles.
+
+    Args:
+        n (int): matrix size.
+
+    Returns:
+        numpy array containing Haar-distributed random matrix.
+    """
+    # n by n random complex matrix
+    x_mtx = np.random.randn(size,size) + (0+1j)*np.random.randn(size,size)
+    # orthonormalizing matrix using QR algorithm
+    q_mtx, _ = np.linalg.qr(x_mtx)
+    # the resulting Q is Haar-distributed
+    return q_mtx
 
 
 #########################################################################
@@ -66,11 +87,14 @@ class CircularEnsemble(_Ensemble):
                 and CSE are of size 2n times 2n.
 
         """
+        super().__init__()
+        # pylint: disable=invalid-name
         self.n = n
         self.beta = beta
         self.matrix = self.sample()
-    
+
     def set_size(self, n, resample_mtx=False):
+        # pylint: disable=arguments-differ
         """Setter of matrix size.
 
         Sets the matrix size. Useful if it has been initialized with a different value.
@@ -85,12 +109,13 @@ class CircularEnsemble(_Ensemble):
         if resample_mtx:
             self.matrix = self.sample()
 
+    # pylint: disable=inconsistent-return-statements
     def sample(self):
         """Samples new Circular Ensemble random matrix.
 
-        The sampling algorithm depends on the specification of 
+        The sampling algorithm depends on the specification of
         beta parameter. If beta=1, COE matrix is sampled; if
-        beta=2 CUE matrix is sampled and if beta=4 
+        beta=2 CUE matrix is sampled and if beta=4
         CSE matrix is sampled.
 
         Returns:
@@ -102,63 +127,41 @@ class CircularEnsemble(_Ensemble):
                 Classical Ensembles of Random Unitary Matrices.
                 Communications in Mathematical Physics. 349 (2017): 991-1027.
             "Circular ensemble". Wikipedia.
-                en.wikipedia.org/wiki/Circular_ensemble 
+                en.wikipedia.org/wiki/Circular_ensemble
 
         """
         if self.beta == 1:
             return self._sample_coe()
-        elif self.beta == 2:
+        if self.beta == 2:
             return self._sample_cue()
-        elif self.beta == 4:
+        if self.beta == 4:
             return self._sample_cse()
-        
-    def _sample_Haar_mtx(self, size):
-        """Samples Haar-distributed matrices.
-
-        Samples Haar-distributed matrices that are useful to generate
-        random matrices for COE, CUE and CSE ensembles.
-
-        Args:
-            n (int): matrix size. 
-
-        Returns:
-            numpy array containing Haar-distributed random matrix.
-        """
-        # n by n random complex matrix
-        X = np.random.randn(size,size) + (0+1j)*np.random.randn(size,size)
-        # orthonormalizing matrix using QR algorithm
-        Q,R = np.linalg.qr(X)
-        # the resulting Q is Haar-distributed
-        return Q
 
     def _sample_coe(self):
-        n = self.n
         # sampling unitary Haar-distributed matrix
-        U = self._sample_Haar_mtx(self.n)
+        u_mtx = _sample_haar_mtx(self.n)
         # mapping to Circular Orthogonal Ensemble
-        self.matrix = np.matmul(U.transpose(), U)
+        self.matrix = np.matmul(u_mtx.transpose(), u_mtx)
         return self.matrix
 
     def _sample_cue(self):
-        n = self.n
         # sampling unitary Haar-distributed matrix
-        self.matrix = self._sample_Haar_mtx(self.n)
+        self.matrix = _sample_haar_mtx(self.n)
         return self.matrix
 
     def _sample_cse(self):
-        n = self.n
         # sampling unitary Haar-distributed matrix of size 2n
-        U = self._sample_Haar_mtx(2*self.n)
+        u_mtx = _sample_haar_mtx(2*self.n)
         # mapping to Circular Symplectic Ensemble
-        J = self._build_J_mtx(2*self.n)
+        j_mtx = self._build_j_mtx()
         # U_R = J * U^T * J^T
-        U_R_1 = np.matmul(J, U.transpose())
-        U_R = np.matmul(U_R_1, J.transpose())
+        u_r_aux = np.matmul(j_mtx, u_mtx.transpose())
+        u_r_mtx = np.matmul(u_r_aux, j_mtx.transpose())
         # A = U^R * U
-        self.matrix = np.matmul(U_R, U)
+        self.matrix = np.matmul(u_r_mtx, u_mtx)
         return self.matrix
 
-    def _build_J_mtx(self, size):
+    def _build_j_mtx(self):
         """Creates an useful matrix to sample CSE matrices.
 
         Creates matrix J of zeros but with the upper-diagonal
@@ -166,11 +169,11 @@ class CircularEnsemble(_Ensemble):
         is useful in the sampling algorithm of CSE matrices.
 
         Args:
-            n (int): matrix size. 
+            n (int): matrix size.
 
         Returns:
             numpy array containing J matrix.
-        
+
         References:
             Killip, R. and Zozhan, R.
                 Matrix Models AND Eigenvalue Statistics for Truncations of
@@ -179,15 +182,16 @@ class CircularEnsemble(_Ensemble):
             "Circular ensemble". Wikipedia.
                 en.wikipedia.org/wiki/Circular_ensemble
         """
-        J = np.zeros((size,size))
+        size = 2*self.n
+        j_mtx = np.zeros((size,size))
         # selecting indices
         inds = np.arange(size-1)
         # selecting upper-diagonal indices
-        J[inds, inds+1] = -1
+        j_mtx[inds, inds+1] = -1
         # selecting lower-diagonal indices
-        J[inds+1, inds] = 1
-        return J
-    
+        j_mtx[inds+1, inds] = 1
+        return j_mtx
+
     def eigvals(self):
         """Calculates the random matrix eigenvalues.
 
@@ -203,9 +207,9 @@ class CircularEnsemble(_Ensemble):
     def eigval_pdf(self):
         '''Calculates joint eigenvalue pdf.
 
-        Calculates joint eigenvalue probability density function given the current 
-            random matrix (so its eigenvalues). This function depends on beta, i.e.,
-            in the sub-Circular ensemble.
+        Calculates joint eigenvalue probability density function given the
+            current random matrix (so its eigenvalues). This function depends
+            on beta, i.e., in the sub-Circular ensemble.
 
         Returns:
             real number. Value of the joint pdf of the current eigenvalues.
@@ -216,11 +220,12 @@ class CircularEnsemble(_Ensemble):
                 Classical Ensembles of Random Unitary Matrices.
                 Communications in Mathematical Physics. 349 (2017): 991-1027.
             "Circular ensemble". Wikipedia.
-                en.wikipedia.org/wiki/Circular_ensemble 
-            
+                en.wikipedia.org/wiki/Circular_ensemble
+
         '''
-        # calculating Circular eigval pdf constant depeding on beta        
-        const_beta = (2*np.pi)**self.n * sp.special.gamma(1 + self.n*self.beta/2)/(sp.special.gamma(1 + self.beta/2)**self.n)
+        # calculating Circular eigval pdf constant depeding on beta
+        const_beta = (2*np.pi)**self.n * \
+                     special.gamma(1 + self.n*self.beta/2)/(special.gamma(1 + self.beta/2)**self.n)
         # calculating eigenvalues
         eigvals = np.linalg.eigvals(self.matrix)
         n_eigvals = len(eigvals)
@@ -228,6 +233,7 @@ class CircularEnsemble(_Ensemble):
         pdf = 1
         for k in range(n_eigvals):
             for i in range(k):
-                pdf *= np.abs(complex(0, np.exp(eigvals[i])) - complex(0,np.exp(eigvals[k])))**self.beta
+                complex_num = complex(0, np.exp(eigvals[i])) - complex(0,np.exp(eigvals[k]))
+                pdf *= np.abs(complex_num)**self.beta
         # calculating Circular eigval pdf
         return (1/const_beta) * pdf
