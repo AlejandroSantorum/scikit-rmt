@@ -186,11 +186,10 @@ class WishartEnsemble(_Ensemble):
                 Journal of Mathematical Physics. 43.11 (2002): 5830-5847.
 
         '''
-        # pylint: disable=invalid-name
-        a = self.n*self.beta/ 2
+        a_val = self.n*self.beta/ 2
         # sampling chi-squares
         dfs = np.arange(self.p)
-        chisqs_diag = np.array([np.sqrt(np.random.chisquare(2*a - self.beta*df)) for df in dfs])
+        chisqs_diag = np.array([np.sqrt(np.random.chisquare(2*a_val - self.beta*df)) for df in dfs])
         dfs = np.flip(dfs)
         chisqs_offdiag = np.array([np.sqrt(np.random.chisquare(self.beta*df)) for df in dfs[:-1]])
         # calculating tridiagonal diagonals
@@ -238,15 +237,14 @@ class WishartEnsemble(_Ensemble):
                 Journal of Mathematical Physics. 43.11 (2002): 5830-5847.
 
         '''
-        # pylint: disable=invalid-name
-        a = self.beta*self.n/2
-        p = 1 + self.beta/2*(self.p - 1)
+        a_val = self.beta*self.n/2
+        p_aux = 1 + self.beta/2*(self.p - 1)
         # calculating Laguerre eigval pdf constant depeding on beta
-        const_beta = 2**(-self.p*a)
+        const_beta = 2**(-self.p*a_val)
         for j in range(self.p):
             const_beta *= special.gamma(1 + self.beta/2)/ \
                           (special.gamma(1 + self.beta*j/2)*\
-                            special.gamma(a - self.beta/2*(self.p - j)))
+                            special.gamma(a_val - self.beta/2*(self.p - j)))
         # calculating eigenvalues
         eigvals = np.linalg.eigvals(self.matrix)
         n_eigvals = len(eigvals)
@@ -256,7 +254,7 @@ class WishartEnsemble(_Ensemble):
             for i in range(j):
                 prod1 *= np.abs(eigvals[i] - eigvals[j])**self.beta
         # calculating second prod
-        prod2 = np.prod(eigvals**(a - p))
+        prod2 = np.prod(eigvals**(a_val - p_aux))
         # calculating exponential term
         exp_val = np.exp(-np.sum((eigvals**2)/2))
         # calculating Laguerre eigval pdf
