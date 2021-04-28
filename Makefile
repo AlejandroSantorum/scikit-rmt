@@ -28,6 +28,7 @@ requirements:
 	@echo "\t pytest: Python testing library"
 	@echo "\t pytest-cov: Python testing coverage library"
 	@echo "\t sphinx: Python library for auto-generation of documentation"
+	@echo "\t pylint: Python code style linter"
 	@echo "==> You can install all requirements by executing 'make install_requirements'"
 
 

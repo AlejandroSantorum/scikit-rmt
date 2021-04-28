@@ -8,6 +8,7 @@ and Wishart Quaternion Ensemble.
 """
 
 import numpy as np
+from scipy import special
 from scipy import sparse
 
 from ._base_ensemble import _Ensemble
@@ -51,9 +52,10 @@ class WishartEnsemble(_Ensemble):
             matrices are sampled in its tridiagonal form, which has the same
             eigenvalues than its standard form. Otherwise, it is sampled using
             its standard form.
-        
+
     References:
-        Albrecht, J. and Chan, C.P. and Edelman, A. "Sturm sequences and random eigenvalue distributions".
+        Albrecht, J. and Chan, C.P. and Edelman, A.
+            "Sturm sequences and random eigenvalue distributions".
             Foundations of Computational Mathematics. 9.4 (2008): 461-483.
         Dumitriu, I. and Edelman, A. "Matrix Models for Beta Ensembles".
             Journal of Mathematical Physics. 43.11 (2002): 5830-5847.
@@ -77,13 +79,16 @@ class WishartEnsemble(_Ensemble):
             eigenvalues than its standard form.
 
         """
+        super().__init__()
+        # pylint: disable=invalid-name
         self.p = p
         self.n = n
         self.beta = beta
         self.use_tridiagonal = use_tridiagonal
         self.matrix = self.sample()
-    
+
     def set_size(self, p, n, resample_mtx=False):
+        # pylint: disable=arguments-differ
         """Setter of matrix size.
 
         Sets the matrix size. Useful if it has been initialized with a different value.
@@ -102,10 +107,11 @@ class WishartEnsemble(_Ensemble):
         if resample_mtx:
             self.matrix = self.sample()
 
+    # pylint: disable=inconsistent-return-statements
     def sample(self):
         """Samples new Wishart Ensemble random matrix.
 
-        The sampling algorithm depends on the specification of 
+        The sampling algorithm depends on the specification of
         use_tridiagonal parameter. If use_tridiagonal is set to True,
         a Wishart Ensemble random matrix in its tridiagonal form
         is sampled. Otherwise, it is sampled using the standard
@@ -120,47 +126,46 @@ class WishartEnsemble(_Ensemble):
         """
         if self.use_tridiagonal:
             return self.sample_tridiagonal()
-        else:
-            if self.beta == 1:
-                return self._sample_wre()
-            elif self.beta == 2:
-                return self._sample_wce()
-            elif self.beta == 4:
-                return self._sample_wqe()
+
+        if self.beta == 1:
+            return self._sample_wre()
+        if self.beta == 2:
+            return self._sample_wce()
+        if self.beta == 4:
+            return self._sample_wqe()
 
     def _sample_wre(self):
-        p = self.p
-        n = self.n
+        p_size = self.p
+        n_size = self.n
         # p by n matrix of random Gaussians
-        A = np.random.randn(p,n)
+        mtx = np.random.randn(p_size,n_size)
         # symmetrize matrix
-        self.matrix = np.matmul(A, A.transpose())
+        self.matrix = np.matmul(mtx, mtx.transpose())
         return self.matrix
 
     def _sample_wce(self):
-        p = self.p
-        n = self.n
+        p_size = self.p
+        n_size = self.n
         # p by n random complex matrix of random Gaussians
-        A = np.random.randn(p,n) + (0+1j)*np.random.randn(p,n)
+        mtx = np.random.randn(p_size,n_size) + (0+1j)*np.random.randn(p_size,n_size)
         # hermitian matrix
-        self.matrix = np.matmul(A, A.transpose())
+        self.matrix = np.matmul(mtx, mtx.transpose())
         return self.matrix
 
     def _sample_wqe(self):
-        p = self.p
-        n = self.n
+        p_size = self.p
+        n_size = self.n
         # p by n random complex matrix of random Gaussians
-        X = np.random.randn(p,n) + (0+1j)*np.random.randn(p,n)
+        x_mtx = np.random.randn(p_size,n_size) + (0+1j)*np.random.randn(p_size,n_size)
         # p by n random complex matrix of random Gaussians
-        Y = np.random.randn(p,n) + (0+1j)*np.random.randn(p,n)
-        # [X Y; -conj(Y) conj(X)] 
-        A = np.block([
-                        [X               , Y],
-                        [-np.conjugate(Y), np.conjugate(X)]
+        y_mtx = np.random.randn(p_size,n_size) + (0+1j)*np.random.randn(p_size,n_size)
+        # [X Y; -conj(Y) conj(X)]
+        mtx = np.block([
+                        [x_mtx              , y_mtx],
+                        [-np.conjugate(y_mtx), np.conjugate(x_mtx)]
                     ])
         # hermitian matrix
-        self.matrix = np.matmul(A, A.transpose())
-        return self.matrix
+        self.matrix = np.matmul(mtx, mtx.transpose())
         return self.matrix
 
     def sample_tridiagonal(self):
@@ -174,12 +179,14 @@ class WishartEnsemble(_Ensemble):
             numpy array containing new matrix sampled.
 
         References:
-            Albrecht, J. and Chan, C.P. and Edelman, A. "Sturm sequences and random eigenvalue distributions".
+            Albrecht, J. and Chan, C.P. and Edelman, A.
+                "Sturm sequences and random eigenvalue distributions".
                 Foundations of Computational Mathematics. 9.4 (2008): 461-483.
             Dumitriu, I. and Edelman, A. "Matrix Models for Beta Ensembles".
                 Journal of Mathematical Physics. 43.11 (2002): 5830-5847.
-            
+
         '''
+        # pylint: disable=invalid-name
         a = self.n*self.beta/ 2
         # sampling chi-squares
         dfs = np.arange(self.p)
@@ -187,15 +194,16 @@ class WishartEnsemble(_Ensemble):
         dfs = np.flip(dfs)
         chisqs_offdiag = np.array([np.sqrt(np.random.chisquare(self.beta*df)) for df in dfs[:-1]])
         # calculating tridiagonal diagonals
-        diag = np.array([chisqs_diag[0]**2]+[chisqs_diag[i+1]**2 + chisqs_offdiag[i]**2 for i in range(self.p-1)])
+        diag = np.array([chisqs_diag[0]**2]+[chisqs_diag[i+1]**2 + \
+                         chisqs_offdiag[i]**2 for i in range(self.p-1)])
         offdiag = np.multiply(chisqs_offdiag, chisqs_diag[:-1])
         # inserting diagonals
         diagonals = [offdiag, diag, offdiag]
-        M = sparse.diags(diagonals, [-1, 0, 1])
+        mtx = sparse.diags(diagonals, [-1, 0, 1])
         # converting to numpy array
-        self.matrix = M.toarray()
+        self.matrix = mtx.toarray()
         return self.matrix
-        
+
 
     def eigvals(self):
         """Calculates the random matrix eigenvalues.
@@ -212,13 +220,13 @@ class WishartEnsemble(_Ensemble):
     def eigval_hist(self, bins, interval=None, normed_hist=True):
         if self.use_tridiagonal:
             return tridiag_eigval_hist(self.matrix, bins=bins, interval=interval, norm=normed_hist)
-        else:
-            return super().eigval_hist(bins, interval, normed_hist)
+
+        return super().eigval_hist(bins, interval, normed_hist)
 
     def eigval_pdf(self):
         '''Calculates joint eigenvalue pdf.
 
-        Calculates joint eigenvalue probability density function given the current 
+        Calculates joint eigenvalue probability density function given the current
             random matrix (so its eigenvalues). This function depends on beta, i.e.,
             in the sub-Wishart ensemble.
 
@@ -228,15 +236,17 @@ class WishartEnsemble(_Ensemble):
         References:
             Dumitriu, I. and Edelman, A. "Matrix Models for Beta Ensembles".
                 Journal of Mathematical Physics. 43.11 (2002): 5830-5847.
-            
+
         '''
+        # pylint: disable=invalid-name
         a = self.beta*self.n/2
         p = 1 + self.beta/2*(self.p - 1)
         # calculating Laguerre eigval pdf constant depeding on beta
         const_beta = 2**(-self.p*a)
         for j in range(self.p):
-            const_beta *= sp.special.gamma(1 + self.beta/2)/ \
-                          (sp.special.gamma(1 + self.beta*j/2)*sp.special.gamma(a - self.beta/2*(self.p - j)))
+            const_beta *= special.gamma(1 + self.beta/2)/ \
+                          (special.gamma(1 + self.beta*j/2)*\
+                            special.gamma(a - self.beta/2*(self.p - j)))
         # calculating eigenvalues
         eigvals = np.linalg.eigvals(self.matrix)
         n_eigvals = len(eigvals)
