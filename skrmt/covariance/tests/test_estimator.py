@@ -8,7 +8,7 @@ from numpy.testing import (
 )
 
 from skrmt.covariance import sample_estimator
-from skrmt.covariance import FSOpt_estimator
+from skrmt.covariance import fsopt_estimator
 from skrmt.covariance import linear_shrinkage_estimator
 from skrmt.covariance import analytical_shrinkage_estimator
 from skrmt.covariance import empirical_bayesian_estimator
@@ -107,7 +107,7 @@ def test_analyticalEstimator2():
 ################################################################
 # FSOPT ESTIMATOR 
 
-def test_FSOptEstimator_shape_symm():
+def test_fsoptEstimator_shape_symm():
     # population covariance matrix
     Sigma = np.array([[3.00407916, -1.46190757, 1.50140806, 1.50933526, 0.27036442],
                       [-1.46190757, 5.61441061, -0.51939653, -2.76492235, 1.38225566],
@@ -120,7 +120,7 @@ def test_FSOptEstimator_shape_symm():
     # input data matrix
     X = np.random.multivariate_normal(np.random.randn(p), Sigma, size=n)
     
-    sigma_tilde = FSOpt_estimator(X, Sigma)
+    sigma_tilde = fsopt_estimator(X, Sigma)
 
     assert(sigma_tilde.shape == (X.shape[1], X.shape[1]))
     assert((sigma_tilde.all() == sigma_tilde.all()) == True)

@@ -8,7 +8,7 @@ from numpy.testing import (
 )
 
 from skrmt.covariance import sample_estimator
-from skrmt.covariance import FSOpt_estimator
+from skrmt.covariance import fsopt_estimator
 from skrmt.covariance import loss_mv, prial_mv
 
 
@@ -26,7 +26,7 @@ def test_prial_sample():
     X = np.random.multivariate_normal(np.random.randn(p), Sigma, size=n)
 
     sigma_sample = sample_estimator(X)
-    sigma_fsopt = FSOpt_estimator(X, Sigma)
+    sigma_fsopt = fsopt_estimator(X, Sigma)
 
     E_Sn = loss_mv(Sigma_tilde=sigma_sample, Sigma=Sigma)
     E_Sigma_tilde = loss_mv(Sigma_tilde=sigma_sample, Sigma=Sigma)
@@ -50,7 +50,7 @@ def test_prial_fsopt():
     X = np.random.multivariate_normal(np.random.randn(p), Sigma, size=n)
 
     sigma_sample = sample_estimator(X)
-    sigma_fsopt = FSOpt_estimator(X, Sigma)
+    sigma_fsopt = fsopt_estimator(X, Sigma)
 
     E_Sn = loss_mv(Sigma_tilde=sigma_sample, Sigma=Sigma)
     E_Sigma_tilde = loss_mv(Sigma_tilde=sigma_fsopt, Sigma=Sigma)

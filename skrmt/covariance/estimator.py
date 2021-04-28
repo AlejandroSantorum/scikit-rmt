@@ -7,16 +7,16 @@ estimators given n observations of size p.
 import numpy as np
 
 
-def sample_estimator(X, k=None):
+def sample_estimator(data_mtx, shrink=None):
     """Estimates sample covariance matrix.
 
-    Estimates sample covariance matrix given data matrix X of size nxp.
+    Estimates sample covariance matrix given data matrix of size nxp.
 
     Args:
-        X: data matrix containing n observations of size p, i.e.,
-            X is a n times p matrix.
-        k: number of degrees of freedom to substract.
-    
+        data_mtx: data matrix containing n observations of size p, i.e.,
+            data_mtx is a n times p matrix.
+        shrink: number of degrees of freedom to substract.
+
     Returns:
         numpy array representing sample covariance matrix.
 
@@ -27,22 +27,22 @@ def sample_estimator(X, k=None):
         Numpy API documentation. numpy.cov
             https://numpy.org/doc/stable/reference/generated/numpy.cov.html
     """
-    n, p = X.shape
+    n_size = data_mtx.shape[0]
 
-    if k is None:
+    if shrink is None:
         # demean data matrix
-        X = X - X.mean(axis=0)
-        # subtract one degree of freedom 
-        k=1
+        data_mtx = data_mtx - data_mtx.mean(axis=0)
+        # subtract one degree of freedom
+        shrink=1
     # effective sample size
-    n=n-k
+    n_eff=n_size-shrink
     # get sample covariance estimator
-    sigma_tilde = np.matmul(X.T, X)/n
+    sigma_tilde = np.matmul(data_mtx.T, data_mtx)/n_eff
     return sigma_tilde
 
 
 
-def FSOpt_estimator(X, Sigma):
+def fsopt_estimator(data_mtx, sigma):
     """Estimates FSOpt estimator.
 
     Estimates finite-sample optimal estimator (FSOpt estimator), also
@@ -52,10 +52,10 @@ def FSOpt_estimator(X, Sigma):
     Carlo simulations.
 
     Args:
-        X: data matrix containing n observations of size p, i.e.,
-            X is a n times p matrix.
-        Sigma: population covariance matrix.
-    
+        data_mtx: data matrix containing n observations of size p, i.e.,
+            data_mtx is a n times p matrix.
+        sigma: population covariance matrix.
+
     Returns:
         numpy array representing sample covariance matrix.
 
@@ -64,16 +64,16 @@ def FSOpt_estimator(X, Sigma):
             "Analytical nonlinear shrinkage of large-dimensional covariance matrices".
             Annals of Statistics. 48.5 (2020): 3043-3065
     """
-    n, p = X.shape
+    #n, p = data_mtx.shape
 
-    sample = sample_estimator(X)
+    sample = sample_estimator(data_mtx)
 
     eigvals, eigvects = np.linalg.eig(sample)
     order = np.argsort(eigvals)
     eigvals = eigvals[order]
     eigvects = eigvects[:,order]
 
-    d_star = np.array([np.matmul(np.matmul(vec, Sigma), vec.T) for vec in eigvects.T])
+    d_star = np.array([np.matmul(np.matmul(vec, sigma), vec.T) for vec in eigvects.T])
 
     # compute finite-sample optimal (FSOpt) nonlinear shrinkage estimator
     sigma_tilde = np.matmul(np.matmul(eigvects, np.diag(d_star)), eigvects.T)
@@ -81,25 +81,25 @@ def FSOpt_estimator(X, Sigma):
 
 
 
-def linear_shrinkage_estimator(X, shrink=None):
+def linear_shrinkage_estimator(data_mtx, shrink=None):
     """Estimates linear shrinkage estimator.
 
     When the dimension p is greater than the number of observations n,
     sample covariance matrix S is not even invertible. When the ratio p/n
     is smaller than one but not negligible, then S is invertible but it
     is not well-conditoned, i.e., inverting it amplifies estimation error.
-    To get a structured well-conditioned estimator is to force the 
+    To get a structured well-conditioned estimator is to force the
     condition that variances are equal and covariances zero.
     Linear shrinkage estimator is a weighted average of this structured
     estimator and the sample covariance matrix.
 
     Args:
-        X: data matrix containing n observations of size p, i.e.,
-            X is a n times p matrix.
+        data_mtx: data matrix containing n observations of size p, i.e.,
+            data_mtx is a n times p matrix.
         shrink: shrinkage value. If it is not provided, this routine
             calculates the shrinkage value selected by Ledoit and Wolf
             (see reference).
-    
+
     Returns:
         numpy array representing sample covariance matrix.
 
@@ -108,30 +108,30 @@ def linear_shrinkage_estimator(X, shrink=None):
             "A well-conditioned estimator for large-dimensional covariance matrices".
             Journal of Multivariate Analysis. 88 (2004): 365-411
     """
-    n, p = X.shape
+    n_size, p_size = data_mtx.shape
 
     # demean data matrix
-    X = X - X.mean(axis=0)
+    data_mtx = data_mtx - data_mtx.mean(axis=0)
     # compute sample covariance matrix
-    sample = np.matmul(X.T, X)/n # WATCH OUT: it is not the 'effective size'
+    sample = np.matmul(data_mtx.T, data_mtx)/n_size # WATCH OUT: it is not the 'effective size'
 
     # compute prior
     meanvar = np.mean(np.diag(sample)) # = trace/p = sum(eigvals)/p
-    prior = meanvar * np.identity(p)
-    
+    prior = meanvar * np.identity(p_size)
+
     # use specified shrinkage value
     if shrink:
-        shrinkage = shrink;
+        shrinkage = shrink
     # compute shrinkage parameters
     else:
-        Y = X**2
-        phiMat = np.matmul(Y.T, Y)/n - sample**2
-        phi = np.sum(phiMat)
+        aux_mtx = data_mtx**2
+        phi_mat = np.matmul(aux_mtx.T, aux_mtx)/n_size - sample**2
+        phi = np.sum(phi_mat)
         # np norm by default calculates frobenius norm for matrices and L2-norm for vects
-        gamma = np.linalg.norm(sample-prior)**2;
+        gamma = np.linalg.norm(sample-prior)**2
         # compute shrinkage constant
         kappa= phi/gamma
-        shrinkage=max(0, min(1, kappa/n))
+        shrinkage=max(0, min(1, kappa/n_size))
 
     # compute shrinkage estimator
     sigma_tilde = shrinkage*prior + (1-shrinkage)*sample
@@ -139,40 +139,37 @@ def linear_shrinkage_estimator(X, shrink=None):
 
 
 
-def analytical_shrinkage_estimator(X, k=None):
+def analytical_shrinkage_estimator(data_mtx, shrink=None):
     """Estimates analytical shrinkage estimator.
-
     This estimator combines the best qualities of three different estimators:
     the speed of linear shrinkage, the accuracy of the well-known QuEST function
     and the transparency of the routine NERCOME. This estimator achieves this
-    goal through nonparametric kernel estimation of the limiting spectral 
+    goal through nonparametric kernel estimation of the limiting spectral
     density of the sample eigenvalues and its Hilbert transform.
-
     Args:
-        X: data matrix containing n observations of size p, i.e.,
-            X is a n times p matrix.
-        k: number of degrees of freedom to substract.
-    
+        data_mtx (numpy array): data matrix containing n observations of size p, i.e.,
+            data_mtx is a n times p matrix.
+        shrink (integer): number of degrees of freedom to substract.
+
     Returns:
         numpy array representing sample covariance matrix.
-
     References:
         Ledoit, O. and Wolf, M.
             "Analytical nonlinear shrinkage of large-dimensional covariance matrices".
             Annals of Statistics. 48.5 (2020): 3043-3065
     """
-    n, p = X.shape
+    n_size, p_size = data_mtx.shape
 
-    if k is None:
+    if shrink is None:
         # demean data matrix
-        X = X - X.mean(axis=0)
-        # subtract one degree of freedom 
-        k=1
+        data_mtx = data_mtx - data_mtx.mean(axis=0)
+        # subtract one degree of freedom
+        shrink=1
     # effective sample size
-    n=n-k
+    n_size=n_size-shrink
 
     # get sample eigenvalues and eigenvectors, and sort them in ascending order
-    sample = np.matmul(X.T, X)/n
+    sample = np.matmul(data_mtx.T, data_mtx)/n_size
     eigvals, eigvects = np.linalg.eig(sample)
     order = np.argsort(eigvals)
     eigvals = eigvals[order]
@@ -180,29 +177,31 @@ def analytical_shrinkage_estimator(X, k=None):
 
     # compute analytical nonlinear shrinkage kernel formula
     #eigvals = eigvals[max(0,p-n):p]
-    L = np.tile(eigvals, (min(p,n), 1)).T
-    h=n**(-1/3)
-    H=h*L.T
+    repmat_eigs = np.tile(eigvals, (min(p_size,n_size), 1)).T
+    h_list = n_size**(-1/3) * repmat_eigs.T
 
-    x = np.divide((L-L.T), H)
+    eigs_div = np.divide((repmat_eigs-repmat_eigs.T), h_list)
 
-    f_tilde=(3/4/np.sqrt(5))*np.mean(np.divide(np.maximum(1-x**2/5, 0), H), axis=1)
+    f_tilde=(3/4/np.sqrt(5))*np.mean(np.divide(np.maximum(1-eigs_div**2/5, 0), h_list), axis=1)
 
-    hilbert_temp = (-3/10/np.pi)*x + (3/4/np.sqrt(5)/np.pi)*(1-x**2/5)*np.log(abs((np.sqrt(5)-x)/(np.sqrt(5)+x)))
-    hilbert_temp[abs(x)==np.sqrt(5)] = (-3/10/np.pi) * x[abs(x)==np.sqrt(5)]
-    hilbert = np.mean(np.divide(hilbert_temp, H), axis=1)
+    hilbert_temp = (-3/10/np.pi)*eigs_div + \
+                    (3/4/np.sqrt(5)/np.pi)*(1-eigs_div**2/5)*\
+                        np.log(abs((np.sqrt(5)-eigs_div)/(np.sqrt(5)+eigs_div)))
+    hilbert_temp[abs(eigs_div)==np.sqrt(5)] = (-3/10/np.pi) * eigs_div[abs(eigs_div)==np.sqrt(5)]
+    hilbert = np.mean(np.divide(hilbert_temp, h_list), axis=1)
 
     # if p <= n: (we could improve it to support p>n case)
-    denom = (np.pi*(p/n)*eigvals*f_tilde)**2 + (1-(p/n)-np.pi*(p/n)*eigvals*hilbert)**2
-    d_tilde = np.divide(eigvals, denom)
+    d_tilde = np.divide(eigvals,
+                        (np.pi*(p_size/n_size)*eigvals*f_tilde)**2 + \
+                            (1-(p_size/n_size)-np.pi*(p_size/n_size)*eigvals*hilbert)**2
+                       )
 
-    # compute analytical nonlinear shrinkage estimator
-    sigma_tilde = np.matmul(np.matmul(eigvects, np.diag(d_tilde)), eigvects.T)
-    return sigma_tilde
+    # compute analytical nonlinear shrinkage estimator (sigma_tilde)
+    return np.matmul(np.matmul(eigvects, np.diag(d_tilde)), eigvects.T)
 
 
 
-def empirical_bayesian_estimator(X):
+def empirical_bayesian_estimator(data_mtx):
     """Estimates empirical bayesian estimator.
 
     The empirical bayesian estimator is a linear combination of sample
@@ -211,9 +210,9 @@ def empirical_bayesian_estimator(X):
     should be used when the criterion is the mean squared error.
 
     Args:
-        X: data matrix containing n observations of size p, i.e.,
-            X is a n times p matrix.
-    
+        data_mtx: data matrix containing n observations of size p, i.e.,
+            data_mtx is a n times p matrix.
+
     Returns:
         numpy array representing sample covariance matrix.
 
@@ -225,21 +224,22 @@ def empirical_bayesian_estimator(X):
             "A well-conditioned estimator for large-dimensional covariance matrices".
             Journal of Multivariate Analysis. 88 (2004): 365-411
     """
-    n, p = X.shape
+    n_size, p_size = data_mtx.shape
 
-    sample = sample_estimator(X)
+    sample = sample_estimator(data_mtx)
 
     # we consider n >= p
-    d = np.linalg.det(sample)
-    m_eb = d**(1/p)
-    
-    prior = m_eb * np.identity(p)
-    sigma_tilde = ((p*n - 2*n -2)/(p*n**2))*prior + n/(n+1)*sample
+    det = np.linalg.det(sample)
+    m_eb = det**(1/p_size)
+
+    prior = m_eb * np.identity(p_size)
+    sigma_tilde = ((p_size*n_size - 2*n_size -2)/(p_size*n_size**2))*prior + \
+                    n_size/(n_size+1)*sample
     return sigma_tilde
 
 
 
-def minimax_estimator(X):
+def minimax_estimator(data_mtx):
     """Estimates minimax estimator.
 
     Minimax estimator has the lowest worst-case error. The minimax
@@ -250,9 +250,9 @@ def minimax_estimator(X):
     descending order.
 
     Args:
-        X: data matrix containing n observations of size p, i.e.,
-            X is a n times p matrix.
-    
+        data_mtx: data matrix containing n observations of size p, i.e.,
+            data_mtx is a n times p matrix.
+
     Returns:
         numpy array representing sample covariance matrix.
 
@@ -264,10 +264,10 @@ def minimax_estimator(X):
             "A well-conditioned estimator for large-dimensional covariance matrices".
             Journal of Multivariate Analysis. 88 (2004): 365-411
     """
-    n, p = X.shape
+    n_size, p_size = data_mtx.shape
 
     # get sample eigenvalues and eigenvectors, and sort them in descending order
-    sample = sample_estimator(X)
+    sample = sample_estimator(data_mtx)
     eigvals, eigvects = np.linalg.eig(sample)
     order = np.argsort(eigvals) # ascending order
     order = order[::-1] # descending order (reversing it)
@@ -275,12 +275,8 @@ def minimax_estimator(X):
     eigvects = eigvects[:,order]
 
     # calculating new eigenvalues
-    new_eigvals = [n*val/(n+p+1-2*i) for (i, val) in enumerate(eigvals)]
+    new_eigvals = [n_size*val/(n_size+p_size+1-2*i) for (i, val) in enumerate(eigvals)]
 
     # compute minimax estimator by replacing eigenvalues
     sigma_tilde = np.matmul(np.matmul(eigvects, np.diag(new_eigvals)), eigvects.T)
     return sigma_tilde
-
-
-
-
