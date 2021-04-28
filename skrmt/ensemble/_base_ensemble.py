@@ -59,7 +59,7 @@ class _Ensemble(metaclass=ABCMeta):
         # this will be commented at inherited classes
         pass
 
-    def eigval_hist(self, bins, interval=None, normed_hist=True):
+    def eigval_hist(self, bins, interval=None, normed_hist=False):
         """Calculates the histogram of the matrix eigenvalues
 
         Calculates the histogram of the current sampled matrix eigenvalues. Some ensembles
@@ -74,7 +74,7 @@ class _Ensemble(metaclass=ABCMeta):
                 edge of the last bin; in this case, bins may be unequally spaced.
             interval (tuple): Delimiters (xmin, xmax) of the histogram.
                 The lower and upper range of the bins. Lower and upper outliers are ignored.
-            normed_hist (bool, default=True): If True, draw and return a probability
+            normed_hist (bool, default=False): If True, draw and return a probability
                 density: each bin will display the bin's raw count divided by the total
                 number of counts and the bin width, so that the area under the histogram
                 integrates to 1. If set to False, the absolute frequencies of the eigenvalues
@@ -86,7 +86,7 @@ class _Ensemble(metaclass=ABCMeta):
                 True these values are the relative frequencies in order to get an area under
                 the histogram equal to 1. Otherwise, this list contains the absolute
                 frequencies of the eigenvalues.
-            bins (array): The edges of the bins. Length nbins + 1 (nbins left edges and
+                bins (array): The edges of the bins. Length nbins + 1 (nbins left edges and
                 right edge of last bin)
 
         Raises:
