@@ -1,51 +1,97 @@
+"""Metrics Module
+
+This module contains the implementation of several metrics to
+measure estimators quality.
+"""
+
 import numpy as np
 
-# from .estimator import sample_estimator, FSOpt_estimator
 
-def loss_mv(Sigma_tilde, Sigma):
-    p = len(Sigma)
+def loss_mv(sigma_tilde, sigma):
+    """Computes minimum variance loss function.
 
+    Computes minimum variance loss function between estimated covariance
+    matrix (Sigma tilde) and population covariance matrix (Sigma).
+
+    Args:
+        sigma_tilde (numpy array): estimated covariance matrix.
+        sigma (numpy array): population covariance matrix.
+
+    Returns:
+        loss (double): calculated minimum variance loss.
+
+    References:
+        Ledoit, O. and Wolf, M.
+            "Analytical nonlinear shrinkage of large-dimensional covariance matrices".
+            Annals of Statistics. 48.5 (2020): 3043-3065
+
+    """
+    p_size = len(sigma)
+
+    # pylint: disable=raise-missing-from
     try:
-        Sigma_tilde_inv = np.linalg.inv(Sigma_tilde)
+        sigma_tilde_inv = np.linalg.inv(sigma_tilde)
     except np.linalg.LinAlgError:
         raise ValueError("Unable to invert estimated covariance matrix")
-    
+
     try:
-        Sigma_inv = np.linalg.inv(Sigma)
+        sigma_inv = np.linalg.inv(sigma)
     except np.linalg.LinAlgError:
         raise ValueError("Unable to invert population covariance matrix")
-    
 
-    M = np.matmul(np.matmul(Sigma_tilde_inv, Sigma), Sigma_tilde_inv)
-    loss = np.trace(M)/p/(np.trace(Sigma_tilde_inv)/p)**2 - p/np.trace(Sigma_inv)
 
+    mtx = np.matmul(np.matmul(sigma_tilde_inv, sigma), sigma_tilde_inv)
+    loss = np.trace(mtx)/p_size/(np.trace(sigma_tilde_inv)/p_size)**2 - p_size/np.trace(sigma_inv)
     return loss
 
 
-def loss_frobenius(Sigma_tilde, Sigma):
-    p = len(Sigma)
-    loss = np.trace(Sigma_tilde - Sigma)**2/p
+def loss_frobenius(sigma_tilde, sigma):
+    """Computes Fröbenius loss function.
 
+    Computes Fröbenius loss function between estimated covariance
+    matrix (Sigma tilde) and population covariance matrix (Sigma).
+
+    Args:
+        sigma_tilde (numpy array): estimated covariance matrix.
+        sigma (numpy array): population covariance matrix.
+
+    Returns:
+        loss (double): calculated Fröbenius loss.
+
+    References:
+        Ledoit, O. and Wolf, M.
+            "Analytical nonlinear shrinkage of large-dimensional covariance matrices".
+            Annals of Statistics. 48.5 (2020): 3043-3065
+
+    """
+    p_size = len(sigma)
+    loss = np.trace(sigma_tilde - sigma)**2/p_size
     return loss
 
 
-# Percentage relative improvement in average loss
-def prial_mv(E_Sn, E_Sigma_tilde, E_Sstar):
-    return (E_Sn - E_Sigma_tilde)/(E_Sn - E_Sstar)
+def prial_mv(exp_sample, exp_sigma_tilde, exp_fsopt):
+    """Computes percentage relative improvement in average loss.
 
-# Percentage relative improvement in average loss
-'''
-def PRIAL_mv(Sigma_tilde, Sigma, X):
-    sample_est = SampleEstimator()
-    S = sample_est.estimate(X)
+    Computes percentage relative improvement in average loss using
+    minimum variance losses. The given expectations must have been
+    calculated using Monte Carlo simulations.
 
-    fsopt = FSOptEstimator(Sigma)
-    S_star = fsopt.estimate(X)
+    Args:
+        exp_sample (double): expected MV loss between sample covariance
+            matrix and population matrix.
+        exp_sigma_tilde (double): expected MV loss between estimated covariance
+            matrix and population matrix.
+        exp_fsopt (double): expected MV loss between S^* covariance
+            matrix (i.e., finite-sample optimal covariance matrix)
+            and population matrix.
 
-    loss_S_Sigma = loss_mv(S, Sigma)
-    prial = (loss_S_Sigma - loss_mv(Sigma_tilde, Sigma))/(loss_S_Sigma - loss_mv(S_star, Sigma))
+    Returns:
+        prial (double): calculated percentage relative improvement in average loss.
 
-    return prial
-'''
+    References:
+        Ledoit, O. and Wolf, M.
+            "Analytical nonlinear shrinkage of large-dimensional covariance matrices".
+            Annals of Statistics. 48.5 (2020): 3043-3065
 
-
+    """
+    return (exp_sample - exp_sigma_tilde)/(exp_sample - exp_fsopt)

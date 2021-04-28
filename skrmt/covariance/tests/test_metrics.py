@@ -28,11 +28,11 @@ def test_prial_sample():
     sigma_sample = sample_estimator(X)
     sigma_fsopt = fsopt_estimator(X, Sigma)
 
-    E_Sn = loss_mv(Sigma_tilde=sigma_sample, Sigma=Sigma)
-    E_Sigma_tilde = loss_mv(Sigma_tilde=sigma_sample, Sigma=Sigma)
-    E_Sstar = loss_mv(Sigma_tilde=sigma_fsopt, Sigma=Sigma)
+    E_Sn = loss_mv(sigma_tilde=sigma_sample, sigma=Sigma)
+    E_Sigma_tilde = loss_mv(sigma_tilde=sigma_sample, sigma=Sigma)
+    E_Sstar = loss_mv(sigma_tilde=sigma_fsopt, sigma=Sigma)
 
-    prial = prial_mv(E_Sn=E_Sn, E_Sigma_tilde=E_Sigma_tilde, E_Sstar=E_Sstar)
+    prial = prial_mv(exp_sample=E_Sn, exp_sigma_tilde=E_Sigma_tilde, exp_fsopt=E_Sstar)
 
     assert(prial == 0.0)
 
@@ -52,10 +52,10 @@ def test_prial_fsopt():
     sigma_sample = sample_estimator(X)
     sigma_fsopt = fsopt_estimator(X, Sigma)
 
-    E_Sn = loss_mv(Sigma_tilde=sigma_sample, Sigma=Sigma)
-    E_Sigma_tilde = loss_mv(Sigma_tilde=sigma_fsopt, Sigma=Sigma)
-    E_Sstar = loss_mv(Sigma_tilde=sigma_fsopt, Sigma=Sigma)
+    E_Sn = loss_mv(sigma_tilde=sigma_sample, sigma=Sigma)
+    E_Sigma_tilde = loss_mv(sigma_tilde=sigma_fsopt, sigma=Sigma)
+    E_Sstar = loss_mv(sigma_tilde=sigma_fsopt, sigma=Sigma)
 
-    prial = prial_mv(E_Sn=E_Sn, E_Sigma_tilde=E_Sigma_tilde, E_Sstar=E_Sstar)
+    prial = prial_mv(exp_sample=E_Sn, exp_sigma_tilde=E_Sigma_tilde, exp_fsopt=E_Sstar)
 
     assert(prial == 1.0)
