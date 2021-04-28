@@ -10,7 +10,6 @@ supported by inherited classes.
 from abc import ABCMeta, abstractmethod
 
 import numpy as np
-import matplotlib.pyplot as plt
 
 
 #########################################################################
@@ -21,7 +20,7 @@ class _Ensemble(metaclass=ABCMeta):
 
     This class contains common attributes and methods for all the
     ensembles. It also defines the basic interface to be
-    supported by inherited classes. 
+    supported by inherited classes.
 
     Attributes:
         matrix (numpy array): instance of the random matrix ensemble
@@ -43,14 +42,21 @@ class _Ensemble(metaclass=ABCMeta):
         Returns:
             numpy array containing new matrix sampled.
         """
+        # pylint: disable=unnecessary-pass
         pass
 
     @abstractmethod
     def set_size(self):
+        # pylint: disable=unnecessary-pass
+        # pylint: disable=missing-function-docstring
+        # this will be commented at inherited classes
         pass
 
     @abstractmethod
     def eigval_pdf(self):
+        # pylint: disable=unnecessary-pass
+        # pylint: disable=missing-function-docstring
+        # this will be commented at inherited classes
         pass
 
     def eigval_hist(self, bins, interval=None, normed_hist=True):
@@ -73,21 +79,25 @@ class _Ensemble(metaclass=ABCMeta):
                 number of counts and the bin width, so that the area under the histogram
                 integrates to 1. If set to False, the absolute frequencies of the eigenvalues
                 are returned.
-        
+
         Returns:
             (tuple) tuple containing:
-                observed (array): List of eigenvalues frequencies per bin. If normed_hist=True
-                these values are the relative frequencies in order to get an area under the histogram
-                equal to 1. Otherwise, this list contains the absolute frequencies of the eigenvalues.
-                bins (array): The edges of the bins. Length nbins + 1 (nbins left edges and right edge of last bin)
-        
+                observed (array): List of eigenvalues frequencies per bin. If normed_hist is
+                True these values are the relative frequencies in order to get an area under
+                the histogram equal to 1. Otherwise, this list contains the absolute
+                frequencies of the eigenvalues.
+            bins (array): The edges of the bins. Length nbins + 1 (nbins left edges and
+                right edge of last bin)
+
         Raises:
             ValueError if interval is not a tuple.
 
         References:
-            Albrecht, J. and Chan, C.P. and Edelman, A. "Sturm sequences and random eigenvalue distributions".
+            Albrecht, J. and Chan, C.P. and Edelman, A.
+                "Sturm sequences and random eigenvalue distributions".
                 Foundations of Computational Mathematics. 9.4 (2008): 461-483.
-            Dumitriu, I. and Edelman, A. "Matrix Models for Beta Ensembles".
+            Dumitriu, I. and Edelman, A.
+                "Matrix Models for Beta Ensembles".
                 Journal of Mathematical Physics. 43.11 (2002): 5830-5847.
 
         """
@@ -97,7 +107,7 @@ class _Ensemble(metaclass=ABCMeta):
         # calculating eigenvalues using standard algorithm
         eigvals = np.linalg.eigvals(self.matrix)
 
-        # using matplotlib to obtain histogram in the given interval and with the specified no. of bins
+        # using numpy to obtain histogram in the given interval and no. of bins
         observed, bins = np.histogram(eigvals, bins=bins, range=interval, density=normed_hist)
         #plt.clf()
         return observed, bins
