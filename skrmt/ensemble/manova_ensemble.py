@@ -8,6 +8,7 @@ and Manova Quaternion Ensemble.
 """
 
 import numpy as np
+from scipy import special
 
 from ._base_ensemble import _Ensemble
 
@@ -56,7 +57,7 @@ class ManovaEnsemble(_Ensemble):
             that generates the matrix of the corresponding ensemble.
         n2 (int): number of columns of the second random guassian matrix
             that generates the matrix of the corresponding ensemble.
-    
+
     References:
         Dumitriu, I. and Edelman, A. "Matrix Models for Beta Ensembles".
             Journal of Mathematical Physics. 43.11 (2002): 5830-5847.
@@ -79,13 +80,16 @@ class ManovaEnsemble(_Ensemble):
                 that generates the matrix of the corresponding ensemble.
 
         """
+        super().__init__()
+        # pylint: disable=invalid-name
         self.m = m
         self.n1 = n1
         self.n2 = n2
         self.beta = beta
         self.matrix = self.sample()
-    
+
     def set_size(self, m, n1, n2, resample_mtx=False):
+        # pylint: disable=arguments-differ
         """Setter of matrix size.
 
         Sets the matrix size. Useful if it has been initialized with a different value.
@@ -107,12 +111,13 @@ class ManovaEnsemble(_Ensemble):
         if resample_mtx:
             self.matrix = self.sample()
 
+    # pylint: disable=inconsistent-return-statements
     def sample(self):
         """Samples new Manova Ensemble random matrix.
 
-        The sampling algorithm depends on the specification of 
+        The sampling algorithm depends on the specification of
         beta parameter. If beta=1, Manova Real is sampled; if
-        beta=2 Manova Complex is sampled and if beta=4 
+        beta=2 Manova Complex is sampled and if beta=4
         Manova Quaternion is sampled.
 
         Returns:
@@ -125,71 +130,71 @@ class ManovaEnsemble(_Ensemble):
         """
         if self.beta == 1:
             return self._sample_mre()
-        elif self.beta == 2:
+        if self.beta == 2:
             return self._sample_mce()
-        elif self.beta == 4:
+        if self.beta == 4:
             return self._sample_mqe()
 
     def _sample_mre(self):
-        m = self.m
-        n1 = self.n1
-        n2 = self.n2
+        m_size = self.m
+        n1_size = self.n1
+        n2_size = self.n2
         # m by n1 random real matrix of random Gaussians
-        X = np.random.randn(m,n1)
+        x_mtx = np.random.randn(m_size,n1_size)
         # m by n2 random real matrix of random Gaussians
-        Y = np.random.randn(m,n2)
+        y_mtx = np.random.randn(m_size,n2_size)
         # A1 = X * X'
-        A1 = np.matmul(X, X.transpose())
+        a1_mtx = np.matmul(x_mtx, x_mtx.transpose())
         # A2 = X * X' + Y * Y'
-        A2 = A1 + np.matmul(Y, Y.transpose())
+        a2_mtx = a1_mtx + np.matmul(y_mtx, y_mtx.transpose())
         # A = (X * X') / (X * X' + Y * Y') = (X * X') * (X * X' + Y * Y')^(-1)
-        self.matrix = np.matmul(A1, np.linalg.inv(A2))
+        self.matrix = np.matmul(a1_mtx, np.linalg.inv(a2_mtx))
         return self.matrix
 
     def _sample_mce(self):
-        m = self.m
-        n1 = self.n1
-        n2 = self.n2
+        m_size = self.m
+        n1_size = self.n1
+        n2_size = self.n2
         # m by n1 random complex matrix of random Gaussians
-        X = np.random.randn(m,n1) + (0+1j)*np.random.randn(m,n1)
+        x_mtx = np.random.randn(m_size,n1_size) + (0+1j)*np.random.randn(m_size,n1_size)
         # m by n2 random complex matrix of random Gaussians
-        Y = np.random.randn(m,n2) + (0+1j)*np.random.randn(m,n2)
+        y_mtx = np.random.randn(m_size,n2_size) + (0+1j)*np.random.randn(m_size,n2_size)
         # A1 = X * X'
-        A1 = np.matmul(X, X.transpose())
+        a1_mtx = np.matmul(x_mtx, x_mtx.transpose())
         # A2 = X * X' + Y * Y'
-        A2 = A1 + np.matmul(Y, Y.transpose())
+        a2_mtx = a1_mtx + np.matmul(y_mtx, y_mtx.transpose())
         # A = (X * X') / (X * X' + Y * Y') = (X * X') * (X * X' + Y * Y')^(-1)
-        self.matrix = np.matmul(A1, np.linalg.inv(A2))
+        self.matrix = np.matmul(a1_mtx, np.linalg.inv(a2_mtx))
         return self.matrix
 
     def _sample_mqe(self):
-        m = self.m
-        n1 = self.n1
-        n2 = self.n2
+        m_size = self.m
+        n1_size = self.n1
+        n2_size = self.n2
         # m by n1 random complex matrix of random Gaussians
-        X1 = np.random.randn(m,n1) + (0+1j)*np.random.randn(m,n1)
+        x1_mtx = np.random.randn(m_size,n1_size) + (0+1j)*np.random.randn(m_size,n1_size)
         # m by n1 random complex matrix of random Gaussians
-        X2 = np.random.randn(m,n1) + (0+1j)*np.random.randn(m,n1)
+        x2_mtx = np.random.randn(m_size,n1_size) + (0+1j)*np.random.randn(m_size,n1_size)
         # m by n2 random complex matrix of random Gaussians
-        Y1 = np.random.randn(m,n2) + (0+1j)*np.random.randn(m,n2)
+        y1_mtx = np.random.randn(m_size,n2_size) + (0+1j)*np.random.randn(m_size,n2_size)
         # m by n2 random complex matrix of random Gaussians
-        Y2 = np.random.randn(m,n2) + (0+1j)*np.random.randn(m,n2)
-        # X = [X1 X2; -conj(X2) conj(X1)] 
-        X = np.block([
-                        [X1               , X2],
-                        [-np.conjugate(X2), np.conjugate(X1)]
-                    ])
-        # Y = [Y1 Y2; -conj(Y2) conj(Y1)] 
-        Y = np.block([
-                        [Y1               , Y2],
-                        [-np.conjugate(Y2), np.conjugate(Y1)]
-                    ])
+        y2_mtx = np.random.randn(m_size,n2_size) + (0+1j)*np.random.randn(m_size,n2_size)
+        # X = [X1 X2; -conj(X2) conj(X1)]
+        x_mtx = np.block([
+                        [x1_mtx               , x2_mtx],
+                        [-np.conjugate(x2_mtx), np.conjugate(x1_mtx)]
+                        ])
+        # Y = [Y1 Y2; -conj(Y2) conj(Y1)]
+        y_mtx = np.block([
+                         [y1_mtx               , y2_mtx],
+                         [-np.conjugate(y2_mtx), np.conjugate(y1_mtx)]
+                        ])
         # A1 = X * X'
-        A1 = np.matmul(X, X.transpose())
+        a1_mtx = np.matmul(x_mtx, x_mtx.transpose())
         # A2 = X * X' + Y * Y'
-        A2 = A1 + np.matmul(Y, Y.transpose())
+        a2_mtx = a1_mtx + np.matmul(y_mtx, y_mtx.transpose())
         # A = (X * X') / (X * X' + Y * Y') = (X * X') * (X * X' + Y * Y')^(-1)
-        self.matrix = np.matmul(A1, np.linalg.inv(A2))
+        self.matrix = np.matmul(a1_mtx, np.linalg.inv(a2_mtx))
         return self.matrix
 
     def eigvals(self):
@@ -207,7 +212,7 @@ class ManovaEnsemble(_Ensemble):
     def eigval_pdf(self):
         '''Calculates joint eigenvalue pdf.
 
-        Calculates joint eigenvalue probability density function given the current 
+        Calculates joint eigenvalue probability density function given the current
             random matrix (so its eigenvalues). This function depends on beta, i.e.,
             in the sub-Manova ensemble.
 
@@ -217,8 +222,9 @@ class ManovaEnsemble(_Ensemble):
         References:
             Dumitriu, I. and Edelman, A. "Matrix Models for Beta Ensembles".
                 Journal of Mathematical Physics. 43.11 (2002): 5830-5847.
-            
+
         '''
+        # pylint: disable=invalid-name
         a1 = self.beta*self.n1/2
         a2 = self.beta*self.n2/2
         p = 1 + self.beta/2*(self.m - 1)
@@ -226,8 +232,11 @@ class ManovaEnsemble(_Ensemble):
         # calculating Jacobi eigval pdf constant depeding on beta
         const_beta = 1
         for j in range(self.m):
-            const_beta *= (sp.special.gamma(1 + self.beta/2) * sp.special.gamma(a1 + a2 -self.beta/2*(self.m - j)))/ \
-                          (sp.special.gamma(1 + self.beta*j/2)*sp.special.gamma(a1 - self.beta/2*(self.m - j))*sp.special.gamma(a2 - self.beta/2*(self.m - j)))
+            const_beta *= (special.gamma(1 + self.beta/2) * \
+                            special.gamma(a1 + a2 -self.beta/2*(self.m - j)))/ \
+                          (special.gamma(1 + self.beta*j/2) * \
+                            special.gamma(a1 - self.beta/2*(self.m - j)) * \
+                              special.gamma(a2 - self.beta/2*(self.m - j)))
         # calculating eigenvalues
         eigvals = np.linalg.eigvals(self.matrix)
         n_eigvals = len(eigvals)
