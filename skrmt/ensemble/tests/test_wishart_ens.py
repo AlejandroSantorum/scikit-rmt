@@ -155,8 +155,7 @@ def test_wishart_complex_init():
                [-0.41256652-0.97218795j, -3.62175065-2.09216231j, \
                 -4.3742556 +4.41905659j]]
 
-    assert_almost_equal(wce.matrix, np.array(mtx_sol),
-                        decimal=7)
+    assert_almost_equal(wce.matrix, np.array(mtx_sol), decimal=7)
 
 
 def test_wce_symmetric():
@@ -284,8 +283,7 @@ def test_wishart_quatern_init():
                [2.16853073e+00-0.3065013j, -1.30942157e-16-7.29353772j,\
                 -2.91531515e+00+6.39395501j, 3.83549752e+00-5.28492599j]]
 
-    assert_almost_equal(wqe.matrix, np.array(mtx_sol),
-                        decimal=7)
+    assert_almost_equal(wqe.matrix, np.array(mtx_sol), decimal=7)
 
 
 def test_wqe_symmetric():
