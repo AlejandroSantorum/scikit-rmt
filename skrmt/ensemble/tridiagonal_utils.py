@@ -32,7 +32,7 @@ def tridiag_eigval_neg(tridiag_mtx):
     return (sturm_seq<0).sum()
 
 
-def tridiag_eigval_hist(tridiag_mtx, bins=100, interval=(-2,2), norm=False):
+def tridiag_eigval_hist(tridiag_mtx, bins=100, interval=(-2,2), density=False):
     """Computes efficiently eigenvalue histogram.
 
     Computes the eigenvalue histogram of the given matrix, using the
@@ -48,7 +48,7 @@ def tridiag_eigval_hist(tridiag_mtx, bins=100, interval=(-2,2), norm=False):
             edge of the last bin; in this case, bins may be unequally spaced.
         interval (tuple, default=(-2,2)): Delimiters (xmin, xmax) of the histogram.
             The lower and upper range of the bins. Lower and upper outliers are ignored.
-        normed_hist (bool, default=False): If True, draw and return a probability
+        density (bool, default=False): If True, draw and return a probability
             density: each bin will display the bin's raw count divided by the total
             number of counts and the bin width, so that the area under the histogram
             integrates to 1. If set to False, the absolute frequencies of the eigenvalues
@@ -56,7 +56,7 @@ def tridiag_eigval_hist(tridiag_mtx, bins=100, interval=(-2,2), norm=False):
 
     Returns:
         (tuple) tuple containing:
-            observed (array): List of eigenvalues frequencies per bin. If normed_hist is
+            observed (array): List of eigenvalues frequencies per bin. If density is
             True these values are the relative frequencies in order to get an area under
             the histogram equal to 1. Otherwise, this list contains the absolute
             frequencies of the eigenvalues.
@@ -93,7 +93,7 @@ def tridiag_eigval_hist(tridiag_mtx, bins=100, interval=(-2,2), norm=False):
         histogram[i] = current - prev
         prev = current
 
-    if norm:
+    if density:
         # dont need (-inf, interval[0]) interval
         histogram[1:] = histogram[1:] / (sum(histogram[1:]) * np.diff(bin_delimiters))
 

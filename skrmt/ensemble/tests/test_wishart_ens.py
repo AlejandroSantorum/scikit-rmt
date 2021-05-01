@@ -114,10 +114,10 @@ def test_wre_tridiag_hist():
     to_norm = False # without normalization
     # calculating histogram using standard naive procedure
     hist_nottridiag, bins_nottridiag = wre1.eigval_hist(bins=nbins, interval=interval,
-                                                        normed_hist=to_norm)
+                                                        density=to_norm)
     # calculating histogram using tridiagonal procedure
     hist_tridiag, bins_tridiag = wre2.eigval_hist(bins=nbins, interval=interval,
-                                                  normed_hist=to_norm)
+                                                  density=to_norm)
 
     assert_array_equal(bins_nottridiag, bins_tridiag)
     assert_array_equal(hist_nottridiag, hist_tridiag)
@@ -125,10 +125,10 @@ def test_wre_tridiag_hist():
     to_norm = True # normalization
     # calculating histogram using standard naive procedure
     hist_nottridiag, bins_nottridiag = wre1.eigval_hist(bins=nbins, interval=interval,
-                                                        normed_hist=to_norm)
+                                                        density=to_norm)
     # calculating histogram using tridiagonal procedure
     hist_tridiag, bins_tridiag = wre2.eigval_hist(bins=nbins, interval=interval,
-                                                  normed_hist=to_norm)
+                                                  density=to_norm)
 
     assert_array_equal(bins_nottridiag, bins_tridiag)
     assert_almost_equal(hist_nottridiag, hist_tridiag, decimal=7)
@@ -239,10 +239,10 @@ def test_wce_tridiag_hist():
     to_norm = False # without normalization
     # calculating histogram using standard naive procedure
     hist_nottridiag, bins_nottridiag = wce1.eigval_hist(bins=nbins, interval=interval,
-                                                        normed_hist=to_norm)
+                                                        density=to_norm)
     # calculating histogram using tridiagonal procedure
     hist_tridiag, bins_tridiag = wce2.eigval_hist(bins=nbins, interval=interval,
-                                                  normed_hist=to_norm)
+                                                  density=to_norm)
 
     assert_array_equal(bins_nottridiag, bins_tridiag)
     assert_array_equal(hist_nottridiag, hist_tridiag)
@@ -250,10 +250,10 @@ def test_wce_tridiag_hist():
     to_norm = True # normalization
     # calculating histogram using standard naive procedure
     hist_nottridiag, bins_nottridiag = wce1.eigval_hist(bins=nbins, interval=interval,
-                                                        normed_hist=to_norm)
+                                                        density=to_norm)
     # calculating histogram using tridiagonal procedure
     hist_tridiag, bins_tridiag = wce2.eigval_hist(bins=nbins, interval=interval,
-                                                  normed_hist=to_norm)
+                                                  density=to_norm)
 
     assert_array_equal(bins_nottridiag, bins_tridiag)
     assert_almost_equal(hist_nottridiag, hist_tridiag, decimal=7)
@@ -367,10 +367,10 @@ def test_wqe_tridiag_hist():
     to_norm = False # without normalization
     # calculating histogram using standard naive procedure
     hist_nottridiag, bins_nottridiag = wqe1.eigval_hist(bins=nbins, interval=interval,
-                                                        normed_hist=to_norm)
+                                                        density=to_norm)
     # calculating histogram using tridiagonal procedure
     hist_tridiag, bins_tridiag = wqe2.eigval_hist(bins=nbins, interval=interval,
-                                                  normed_hist=to_norm)
+                                                  density=to_norm)
 
     assert_array_equal(bins_nottridiag, bins_tridiag)
     assert_array_equal(hist_nottridiag, hist_tridiag)
@@ -378,10 +378,10 @@ def test_wqe_tridiag_hist():
     to_norm = True # normalization
     # calculating histogram using standard naive procedure
     hist_nottridiag, bins_nottridiag = wqe1.eigval_hist(bins=nbins, interval=interval,
-                                                        normed_hist=to_norm)
+                                                        density=to_norm)
     # calculating histogram using tridiagonal procedure
     hist_tridiag, bins_tridiag = wqe2.eigval_hist(bins=nbins, interval=interval,
-                                                  normed_hist=to_norm)
+                                                  density=to_norm)
 
     assert_array_equal(bins_nottridiag, bins_tridiag)
     assert_almost_equal(hist_nottridiag, hist_tridiag, decimal=7)

@@ -111,20 +111,20 @@ def test_goe_tridiag_hist():
     to_norm = False # without normalization
     # calculating histogram using standard naive procedure
     hist_nottridiag, bins_nottridiag = goe1.eigval_hist(bins=nbins, interval=interval,
-                                                        normed_hist=to_norm)
+                                                        density=to_norm)
     # calculating histogram using tridiagonal procedure
     hist_tridiag, bins_tridiag = goe2.eigval_hist(bins=nbins, interval=interval,
-                                                  normed_hist=to_norm)
+                                                  density=to_norm)
     assert_array_equal(bins_nottridiag, bins_tridiag)
     assert_array_equal(hist_nottridiag, hist_tridiag)
 
     to_norm = True # normalization
     # calculating histogram using standard naive procedure
     hist_nottridiag, bins_nottridiag = goe1.eigval_hist(bins=nbins, interval=interval,
-                                                        normed_hist=to_norm)
+                                                        density=to_norm)
     # calculating histogram using tridiagonal procedure
     hist_tridiag, bins_tridiag = goe2.eigval_hist(bins=nbins, interval=interval,
-                                                  normed_hist=to_norm)
+                                                  density=to_norm)
 
     assert_array_equal(bins_nottridiag, bins_tridiag)
     assert_array_equal(hist_nottridiag, hist_tridiag)
@@ -218,20 +218,20 @@ def test_gue_tridiag_hist():
     to_norm = False # without normalization
     # calculating histogram using standard naive procedure
     hist_nottridiag, bins_nottridiag = gue1.eigval_hist(bins=nbins, interval=interval,
-                                                        normed_hist=to_norm)
+                                                        density=to_norm)
     # calculating histogram using tridiagonal procedure
     hist_tridiag, bins_tridiag = gue2.eigval_hist(bins=nbins, interval=interval,
-                                                  normed_hist=to_norm)
+                                                  density=to_norm)
     assert_array_equal(bins_nottridiag, bins_tridiag)
     assert_array_equal(hist_nottridiag, hist_tridiag)
 
     to_norm = True # normalization
     # calculating histogram using standard naive procedure
     hist_nottridiag, bins_nottridiag = gue1.eigval_hist(bins=nbins, interval=interval,
-                                                        normed_hist=to_norm)
+                                                        density=to_norm)
     # calculating histogram using tridiagonal procedure
     hist_tridiag, bins_tridiag = gue2.eigval_hist(bins=nbins, interval=interval,
-                                                  normed_hist=to_norm)
+                                                  density=to_norm)
     assert_array_equal(bins_nottridiag, bins_tridiag)
     assert_array_equal(hist_nottridiag, hist_tridiag)
 
@@ -325,19 +325,19 @@ def test_gse_tridiag_hist():
     to_norm = False # without normalization
     # calculating histogram using standard naive procedure
     hist_nottridiag, bins_nottridiag = gse1.eigval_hist(bins=nbins, interval=interval,
-                                                        normed_hist=to_norm)
+                                                        density=to_norm)
     # calculating histogram using tridiagonal procedure
     hist_tridiag, bins_tridiag = gse2.eigval_hist(bins=nbins, interval=interval,
-                                                  normed_hist=to_norm)
+                                                  density=to_norm)
     assert_array_equal(bins_nottridiag, bins_tridiag)
     assert_array_equal(hist_nottridiag, hist_tridiag)
 
     to_norm = True # normalization
     # calculating histogram using standard naive procedure
     hist_nottridiag, bins_nottridiag = gse1.eigval_hist(bins=nbins, interval=interval,
-                                                        normed_hist=to_norm)
+                                                        density=to_norm)
     # calculating histogram using tridiagonal procedure
     hist_tridiag, bins_tridiag = gse2.eigval_hist(bins=nbins, interval=interval,
-                                                  normed_hist=to_norm)
+                                                  density=to_norm)
     assert_array_equal(bins_nottridiag, bins_tridiag)
     assert_array_equal(hist_nottridiag, hist_tridiag)

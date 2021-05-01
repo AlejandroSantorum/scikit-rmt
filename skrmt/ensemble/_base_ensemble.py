@@ -53,13 +53,20 @@ class _Ensemble(metaclass=ABCMeta):
         pass
 
     @abstractmethod
+    def eigvals(self):
+        # pylint: disable=unnecessary-pass
+        # pylint: disable=missing-function-docstring
+        # this will be commented at inherited classes
+        pass
+
+    @abstractmethod
     def eigval_pdf(self):
         # pylint: disable=unnecessary-pass
         # pylint: disable=missing-function-docstring
         # this will be commented at inherited classes
         pass
 
-    def eigval_hist(self, bins, interval=None, normed_hist=False):
+    def eigval_hist(self, bins, interval=None, density=False):
         """Calculates the histogram of the matrix eigenvalues
 
         Calculates the histogram of the current sampled matrix eigenvalues. Some ensembles
@@ -74,7 +81,7 @@ class _Ensemble(metaclass=ABCMeta):
                 edge of the last bin; in this case, bins may be unequally spaced.
             interval (tuple): Delimiters (xmin, xmax) of the histogram.
                 The lower and upper range of the bins. Lower and upper outliers are ignored.
-            normed_hist (bool, default=False): If True, draw and return a probability
+            density (bool, default=False): If True, draw and return a probability
                 density: each bin will display the bin's raw count divided by the total
                 number of counts and the bin width, so that the area under the histogram
                 integrates to 1. If set to False, the absolute frequencies of the eigenvalues
@@ -82,7 +89,7 @@ class _Ensemble(metaclass=ABCMeta):
 
         Returns:
             (tuple) tuple containing:
-                observed (array): List of eigenvalues frequencies per bin. If normed_hist is
+                observed (array): List of eigenvalues frequencies per bin. If density is
                 True these values are the relative frequencies in order to get an area under
                 the histogram equal to 1. Otherwise, this list contains the absolute
                 frequencies of the eigenvalues.
@@ -108,6 +115,6 @@ class _Ensemble(metaclass=ABCMeta):
         eigvals = np.linalg.eigvals(self.matrix)
 
         # using numpy to obtain histogram in the given interval and no. of bins
-        observed, bins = np.histogram(eigvals, bins=bins, range=interval, density=normed_hist)
+        observed, bins = np.histogram(eigvals, bins=bins, range=interval, density=density)
         #plt.clf()
         return observed, bins

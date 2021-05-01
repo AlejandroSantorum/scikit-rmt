@@ -200,11 +200,11 @@ class GaussianEnsemble(_Ensemble):
         """
         return np.linalg.eigvalsh(self.matrix)
 
-    def eigval_hist(self, bins, interval=None, normed_hist=True):
+    def eigval_hist(self, bins, interval=None, density=False):
         if self.use_tridiagonal:
-            return tridiag_eigval_hist(self.matrix, bins=bins, interval=interval, norm=normed_hist)
+            return tridiag_eigval_hist(self.matrix, bins=bins, interval=interval, density=density)
 
-        return super().eigval_hist(bins, interval, normed_hist)
+        return super().eigval_hist(bins, interval, density)
 
     def eigval_pdf(self):
         '''Calculates joint eigenvalue pdf.
