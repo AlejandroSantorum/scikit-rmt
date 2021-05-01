@@ -216,8 +216,11 @@ class WishartEnsemble(_Ensemble):
         """
         return np.linalg.eigvalsh(self.matrix)
 
-    def eigval_hist(self, bins, interval=None, density=False):
+    def eigval_hist(self, bins, interval=None, density=False, norm_const=None):
         if self.use_tridiagonal:
+            if norm_const:
+                return tridiag_eigval_hist(self.matrix*norm_const, bins=bins,
+                                           interval=interval, density=density)
             return tridiag_eigval_hist(self.matrix, bins=bins, interval=interval, density=density)
 
         return super().eigval_hist(bins, interval, density)

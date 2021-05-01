@@ -66,7 +66,7 @@ class _Ensemble(metaclass=ABCMeta):
         # this will be commented at inherited classes
         pass
 
-    def eigval_hist(self, bins, interval=None, density=False):
+    def eigval_hist(self, bins, interval=None, density=False, norm_const=None):
         """Calculates the histogram of the matrix eigenvalues
 
         Calculates the histogram of the current sampled matrix eigenvalues. Some ensembles
@@ -86,6 +86,10 @@ class _Ensemble(metaclass=ABCMeta):
                 number of counts and the bin width, so that the area under the histogram
                 integrates to 1. If set to False, the absolute frequencies of the eigenvalues
                 are returned.
+            norm_const (float, default=None): Eigenvalue normalization constant. By default,
+                it is set to None, so eigenvalues are not normalized. However, it is advisable
+                to specify a normalization constant to observe eigenvalue spectrum, e.g.
+                1/sqrt(n/2) if you want to analyze Wigner's Semicircular Law.
 
         Returns:
             (tuple) tuple containing:
@@ -112,7 +116,10 @@ class _Ensemble(metaclass=ABCMeta):
             raise ValueError("interval argument must be a tuple")
 
         # calculating eigenvalues using standard algorithm
-        eigvals = np.linalg.eigvals(self.matrix)
+        if norm_const:
+            eigvals = np.linalg.eigvals(self.matrix * norm_const)
+        else:
+            eigvals = np.linalg.eigvals(self.matrix)
 
         # using numpy to obtain histogram in the given interval and no. of bins
         observed, bins = np.histogram(eigvals, bins=bins, range=interval, density=density)
