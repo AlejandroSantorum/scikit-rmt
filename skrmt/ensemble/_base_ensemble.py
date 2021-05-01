@@ -10,6 +10,7 @@ supported by inherited classes.
 from abc import ABCMeta, abstractmethod
 
 import numpy as np
+import matplotlib.pyplot as plt
 
 
 #########################################################################
@@ -73,6 +74,8 @@ class _Ensemble(metaclass=ABCMeta):
         like Gaussian (Hermite) ensemble or Wishart (Laguerre) ensemble might have
         improved routines to avoid calculating the eigenvalues, so instead the histogram
         is built using certain techniques to boost efficiency.
+        It is important to underline that this function works with real eigenvalues,
+        if the matrix eigenvalues are complex, they are casted to its real part.
 
         Args:
             bins (int or sequence): If bins is an integer, it defines the number of
@@ -125,3 +128,20 @@ class _Ensemble(metaclass=ABCMeta):
         observed, bins = np.histogram(eigvals, bins=bins, range=interval, density=density)
         #plt.clf()
         return observed, bins
+
+
+    def plot_eigval_hist(self, bins, interval=None, density=False, norm_const=None, savefig_path=None):
+
+        observed, bins = self.eigval_hist(bins=bins, interval=interval, density=density, norm_const=norm_const)
+        width = bins[1]-bins[0]
+        plt.bar(bins[:-1], observed, width=width, align='edge')
+
+        plt.title("Eigenvalue density histogram")
+        plt.xlabel("x")
+        plt.ylabel("density")
+
+        # Saving plot or showing it
+        if savefig_path:
+            plt.savefig(savefig_path)
+        else:
+            plt.show()

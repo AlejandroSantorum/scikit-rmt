@@ -8,6 +8,7 @@ and Wishart Quaternion Ensemble.
 """
 
 import numpy as np
+import matplotlib.pyplot as plt
 from scipy import special
 from scipy import sparse
 
@@ -223,7 +224,35 @@ class WishartEnsemble(_Ensemble):
                                            interval=interval, density=density)
             return tridiag_eigval_hist(self.matrix, bins=bins, interval=interval, density=density)
 
-        return super().eigval_hist(bins, interval, density)
+        return super().eigval_hist(bins, interval, density, norm_const)
+    
+    def plot_eigval_hist(self, bins, interval=None, density=False, norm_const=None, savefig_path=None):
+        if norm_const is None:
+            norm_const = 1/self.n
+        if interval is None:
+            ratio = self.p/self.n
+            lambda_plus = (1 + np.sqrt(ratio))**2
+            lambda_minus = (1 - np.sqrt(ratio))**2
+            xmin = lambda_minus
+            xmax = lambda_plus
+            interval = (xmin, xmax)
+
+        if self.use_tridiagonal:
+            observed, bins = tridiag_eigval_hist(self.matrix*norm_const, bins=bins,
+                                                 interval=interval, density=density)
+            width = bins[1]-bins[0]
+            plt.bar(bins[:-1], observed, width=width, align='edge')
+            plt.title("Eigenvalue density histogram")
+            plt.xlabel("x")
+            plt.ylabel("density")
+            # Saving plot or showing it
+            if savefig_path:
+                plt.savefig(savefig_path)
+            else:
+                plt.show()
+
+        else:
+            super().plot_eigval_hist(bins, interval, density, norm_const, savefig_path)
 
     def eigval_pdf(self):
         '''Calculates joint eigenvalue pdf.

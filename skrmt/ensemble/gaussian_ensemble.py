@@ -10,6 +10,7 @@ Gaussian Unitary Ensemble (GUE) and Gaussian Symplectic Ensemble (GSE).
 import numpy as np
 from scipy import sparse
 from scipy import special
+import matplotlib.pyplot as plt
 
 from ._base_ensemble import _Ensemble
 from .tridiagonal_utils import tridiag_eigval_hist
@@ -207,7 +208,28 @@ class GaussianEnsemble(_Ensemble):
                                            interval=interval, density=density)
             return tridiag_eigval_hist(self.matrix, bins=bins, interval=interval, density=density)
 
-        return super().eigval_hist(bins, interval, density)
+        return super().eigval_hist(bins, interval, density, norm_const)
+    
+    def plot_eigval_hist(self, bins, interval=None, density=False, norm_const=None, savefig_path=None):
+        if norm_const is None:
+            norm_const = 1/np.sqrt(self.n/2)
+
+        if self.use_tridiagonal:
+            observed, bins = tridiag_eigval_hist(self.matrix*norm_const, bins=bins,
+                                                 interval=interval, density=density)
+            width = bins[1]-bins[0]
+            plt.bar(bins[:-1], observed, width=width, align='edge')
+            plt.title("Eigenvalue density histogram")
+            plt.xlabel("x")
+            plt.ylabel("density")
+            # Saving plot or showing it
+            if savefig_path:
+                plt.savefig(savefig_path)
+            else:
+                plt.show()
+
+        else:
+            super().plot_eigval_hist(bins, interval, density, norm_const, savefig_path)
 
     def eigval_pdf(self):
         '''Calculates joint eigenvalue pdf.

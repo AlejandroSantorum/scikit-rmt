@@ -8,6 +8,13 @@ from .wishart_ensemble import WishartEnsemble
 from .manova_ensemble import ManovaEnsemble
 from .circular_ensemble import CircularEnsemble
 
+from .plot_law import wigner_semicircular_law
+from .plot_law import marchenko_pastur_law
+from .plot_law import tracy_widom_law
+
 
 __all__ = ["GaussianEnsemble", "WishartEnsemble",
-           "ManovaEnsemble", "CircularEnsemble"]
+           "ManovaEnsemble", "CircularEnsemble",
+           "wigner_semicircular_law",
+           "marchenko_pastur_law",
+           "tracy_widom_law"]

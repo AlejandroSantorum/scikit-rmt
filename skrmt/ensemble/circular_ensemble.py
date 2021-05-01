@@ -202,6 +202,8 @@ class CircularEnsemble(_Ensemble):
             numpy array with the calculated eigenvalues.
 
         """
+        if self.beta == 1:
+            return np.linalg.eigvalsh(self.matrix)
         return np.linalg.eigvals(self.matrix)
 
     def eigval_pdf(self):
