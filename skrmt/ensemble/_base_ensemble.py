@@ -130,8 +130,10 @@ class _Ensemble(metaclass=ABCMeta):
         return observed, bins
 
 
-    def plot_eigval_hist(self, bins, interval=None, density=False, norm_const=None, savefig_path=None):
-        observed, bins = self.eigval_hist(bins=bins, interval=interval, density=density, norm_const=norm_const)
+    def plot_eigval_hist(self, bins, interval=None, density=False, norm_const=None, fig_path=None):
+        # pylint: disable=too-many-arguments
+        observed, bins = self.eigval_hist(bins=bins, interval=interval,
+                                          density=density, norm_const=norm_const)
         width = bins[1]-bins[0]
         plt.bar(bins[:-1], observed, width=width, align='edge')
 
@@ -140,7 +142,7 @@ class _Ensemble(metaclass=ABCMeta):
         plt.ylabel("density")
 
         # Saving plot or showing it
-        if savefig_path:
-            plt.savefig(savefig_path)
+        if fig_path:
+            plt.savefig(fig_path)
         else:
             plt.show()

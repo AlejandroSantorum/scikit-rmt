@@ -225,8 +225,9 @@ class WishartEnsemble(_Ensemble):
             return tridiag_eigval_hist(self.matrix, bins=bins, interval=interval, density=density)
 
         return super().eigval_hist(bins, interval, density, norm_const)
-    
-    def plot_eigval_hist(self, bins, interval=None, density=False, norm_const=None, savefig_path=None):
+
+    def plot_eigval_hist(self, bins, interval=None, density=False, norm_const=None, fig_path=None):
+        # pylint: disable=too-many-arguments
         if norm_const is None:
             norm_const = 1/self.n
         if interval is None:
@@ -246,13 +247,13 @@ class WishartEnsemble(_Ensemble):
             plt.xlabel("x")
             plt.ylabel("density")
             # Saving plot or showing it
-            if savefig_path:
-                plt.savefig(savefig_path)
+            if fig_path:
+                plt.savefig(fig_path)
             else:
                 plt.show()
 
         else:
-            super().plot_eigval_hist(bins, interval, density, norm_const, savefig_path)
+            super().plot_eigval_hist(bins, interval, density, norm_const, fig_path)
 
     def eigval_pdf(self):
         '''Calculates joint eigenvalue pdf.

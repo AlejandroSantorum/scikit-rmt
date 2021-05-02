@@ -207,23 +207,24 @@ class CircularEnsemble(_Ensemble):
             return np.linalg.eigvalsh(self.matrix)
         return np.linalg.eigvals(self.matrix)
 
-    def plot_eigval_hist(self, bins, interval=None, density=False, norm_const=None, savefig_path=None):
+    def plot_eigval_hist(self, bins, interval=None, density=False, norm_const=None, fig_path=None):
+        # pylint: disable=too-many-arguments
         if self.beta == 1:
-            return super().plot_eigval_hist(bins, interval, density, norm_const, savefig_path)
+            return super().plot_eigval_hist(bins, interval, density, norm_const, fig_path)
 
         eigvals = self.eigvals()
-        x = eigvals.real
-        y = eigvals.imag
+        xvals = eigvals.real
+        yvals = eigvals.imag
 
-        plt.plot(x, y, 'o')
+        plt.plot(xvals, yvals, 'o')
 
         plt.title("Eigenvalue plot")
         plt.xlabel("real")
         plt.ylabel("imaginary")
 
         # Saving plot or showing it
-        if savefig_path:
-            plt.savefig(savefig_path)
+        if fig_path:
+            plt.savefig(fig_path)
         else:
             plt.show()
 
