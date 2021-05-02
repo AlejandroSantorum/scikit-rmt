@@ -5,4 +5,7 @@ exclude_lines =
     pragma: no cover
 
     # Don't complain if tests don't hit defensive assertion code:
+    # pass statement is used in abstract methods
     pass
+    # this method generates a figure, not an output
+    plot_eigval_hist
