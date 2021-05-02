@@ -8,6 +8,7 @@ and Circular Symplectic Ensemble (CSE).
 """
 
 import numpy as np
+import matplotlib.pyplot as plt
 from scipy import special
 
 from ._base_ensemble import _Ensemble
@@ -205,6 +206,26 @@ class CircularEnsemble(_Ensemble):
         if self.beta == 1:
             return np.linalg.eigvalsh(self.matrix)
         return np.linalg.eigvals(self.matrix)
+
+    def plot_eigval_hist(self, bins, interval=None, density=False, norm_const=None, savefig_path=None):
+        if self.beta == 1:
+            return super().plot_eigval_hist(bins, interval, density, norm_const, savefig_path)
+
+        eigvals = self.eigvals()
+        x = eigvals.real
+        y = eigvals.imag
+
+        plt.plot(x, y, 'o')
+
+        plt.title("Eigenvalue plot")
+        plt.xlabel("real")
+        plt.ylabel("imaginary")
+
+        # Saving plot or showing it
+        if savefig_path:
+            plt.savefig(savefig_path)
+        else:
+            plt.show()
 
     def eigval_pdf(self):
         '''Calculates joint eigenvalue pdf.

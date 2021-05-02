@@ -129,6 +129,18 @@ def test_goe_tridiag_hist():
     assert_array_equal(bins_nottridiag, bins_tridiag)
     assert_array_equal(hist_nottridiag, hist_tridiag)
 
+    const = 1/np.sqrt(n_size/2)
+    # calculating histogram using standard naive procedure
+    hist_nottridiag, bins_nottridiag = goe1.eigval_hist(bins=nbins, interval=interval,
+                                                        density=to_norm, norm_const=const)
+    # calculating histogram using tridiagonal procedure
+    hist_tridiag, bins_tridiag = goe2.eigval_hist(bins=nbins, interval=interval,
+                                                  density=to_norm, norm_const=const)
+
+    assert_array_equal(bins_nottridiag, bins_tridiag)
+    assert_array_equal(hist_nottridiag, hist_tridiag)
+
+
 
 ##########################################
 ### Gaussian Unitary Ensemble = GUE

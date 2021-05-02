@@ -100,6 +100,22 @@ def test_wre_build_tridiagonal():
     assert_almost_equal(wre.matrix, np.dot(mtx, mtx.transpose()), decimal=7)
 
 
+def test_beta1_eigval_pdf():
+    '''Testing joint eigenvalue pdf
+    '''
+    p_size, n_size = 3, 5
+    wre = WishartEnsemble(beta=1, p=p_size, n=n_size)
+
+    wre.matrix = np.zeros((p_size,p_size))
+    assert wre.eigval_pdf() == 0.0
+
+    wre.matrix = np.eye(p_size)
+    assert wre.eigval_pdf() == 0.0
+
+    wre.matrix = 10*np.eye(p_size)
+    assert wre.eigval_pdf() == 0.0
+
+
 def test_wre_tridiag_hist():
     '''Testing tridiagonal histogram of WRE
     '''
@@ -132,6 +148,17 @@ def test_wre_tridiag_hist():
 
     assert_array_equal(bins_nottridiag, bins_tridiag)
     assert_almost_equal(hist_nottridiag, hist_tridiag, decimal=7)
+
+    const = 1/n_size
+    # calculating histogram using standard naive procedure
+    hist_nottridiag, bins_nottridiag = wre1.eigval_hist(bins=nbins, interval=interval,
+                                                        density=to_norm, norm_const=const)
+    # calculating histogram using tridiagonal procedure
+    hist_tridiag, bins_tridiag = wre2.eigval_hist(bins=nbins, interval=interval,
+                                                  density=to_norm, norm_const=const)
+
+    assert_array_equal(bins_nottridiag, bins_tridiag)
+    assert_array_equal(hist_nottridiag, hist_tridiag)
 
 
 ##########################################

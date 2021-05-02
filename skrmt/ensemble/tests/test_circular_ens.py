@@ -6,6 +6,7 @@ Testing CircularEnsemble module
 import numpy as np
 from numpy.testing import (
     assert_almost_equal,
+    assert_array_equal,
 )
 
 from skrmt.ensemble import CircularEnsemble
@@ -60,6 +61,34 @@ def test_coe_set_size():
     assert coe.matrix.shape == (n2_size,n2_size)
 
 
+def test_coe_eigvals():
+    '''Testing all eigenvalues of a COE matrix are real
+    '''
+    n_size = 5
+    coe = CircularEnsemble(beta=1, n=n_size)
+
+    vals = coe.eigvals()
+
+    assert_array_equal(vals.imag, 0.0)
+
+
+
+def test_beta1_eigval_pdf():
+    '''Testing joint eigenvalue pdf
+    '''
+    n_size = 3
+    coe = CircularEnsemble(beta=1, n=n_size)
+
+    coe.matrix = np.zeros((n_size,n_size))
+    assert coe.eigval_pdf() == 0.0
+
+    coe.matrix = np.eye(n_size)
+    assert coe.eigval_pdf() == 0.0
+
+    coe.matrix = 10*np.eye(n_size)
+    assert coe.eigval_pdf() == 0.0
+
+
 ##########################################
 ### Circular Unitary Ensemble = CUE
 
@@ -97,6 +126,18 @@ def test_cue_set_size():
     cue.set_size(n2_size, resample_mtx=True)
     assert cue.n == n2_size
     assert cue.matrix.shape == (n2_size,n2_size)
+
+
+def test_cue_eigvals():
+    '''Testing all eigenvalues of a CUE matrix have module 1
+    '''
+    n_size = 5
+    cue = CircularEnsemble(beta=2, n=n_size)
+
+    vals = cue.eigvals()
+
+    mods = np.absolute(vals)
+    assert_almost_equal(mods, 1.0, decimal=12)
 
 
 ##########################################

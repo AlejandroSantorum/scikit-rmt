@@ -57,6 +57,19 @@ def test_mre_set_size():
     assert mre.matrix.shape == (m2_size,m2_size)
 
 
+def test_beta1_eigval_pdf():
+    '''Testing joint eigenvalue pdf
+    '''
+    m_size, n1_size, n2_size = 4, 6, 8
+    mre = ManovaEnsemble(beta=1, m=m_size, n1=n1_size, n2=n2_size)
+
+    mre.matrix = np.zeros((m_size,m_size))
+    assert mre.eigval_pdf() == 0.0
+
+    mre.matrix = np.eye(m_size)
+    assert mre.eigval_pdf() == 0.0
+
+
 ##########################################
 ### Manova Complex Ensemble = MCE
 

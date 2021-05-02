@@ -99,3 +99,56 @@ def tridiag_eigval_hist(tridiag_mtx, bins=100, interval=(-2,2), density=False):
 
     # dont want (-inf, interval[0]) interval
     return histogram[1:], bin_delimiters
+
+
+def householder_reduction(mtx, ret_iterations=False):
+    """Householder reduction method for tridiagonalization.
+
+    Computes Householder reduction method for tridiagonalization. It
+    transforms a given symmetric matrix in its tridiagonal form, keeping the
+    same eigenvalues as the original.
+
+    Args:
+        mtx (numpy array): symmetric matrix to be tridiagonalized.
+        ret_iterations (bool, default=False): If set to True, it returns
+            rotation matrices used to perform the tridiagonalization.
+
+    Returns:
+        (tuple) tuple containing:
+            mtx (nparray): tridiagonalized matrix.
+            mtx_list (nparray): list of matrices representing the evolution of the given matrix
+            after each rotation. Only returned if ret_iterations is set to True.
+            rot_list (nparray): list of applied rotation matrices. Only returned if
+            ret_iterations is set to True.
+    
+    References:   
+        R. Hildebrand. “Householder numerically with mathematica.” 2007.
+            http://buzzard.ups.edu/courses/2007spring/projects/hildebrand-paper-revised.pdf
+    """
+    n = len(mtx)
+
+    mtx_list = [mtx]
+    rot_list = []
+
+    for j in range(n-2):
+        if mtx[j+1, j] >= 0:
+            alpha = -np.sqrt((mtx[j+1:n,j]**2).sum())
+        else:
+            alpha = np.sqrt((mtx[j+1:n,j]**2).sum())
+
+        r = np.sqrt(alpha**2/2 - alpha/2 * mtx[j+1,j])
+
+        x = np.zeros((n,1))
+        x[j+1] = (mtx[j+1,j] - alpha)/(2*r)
+        for k in range(j+2, n):
+            x[k] = mtx[k,j]/(2*r)
+
+        rot = np.identity(n) - 2*np.matmul(x, x.transpose())
+        mtx = np.matmul(rot, np.matmul(mtx, rot))
+
+        mtx_list.append(mtx)
+        rot_list.append(rot)
+    
+    if ret_iterations:
+        return mtx, mtx_list, rot_list
+    return mtx

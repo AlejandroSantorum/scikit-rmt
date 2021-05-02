@@ -115,23 +115,22 @@ class _Ensemble(metaclass=ABCMeta):
                 Journal of Mathematical Physics. 43.11 (2002): 5830-5847.
 
         """
-        if not isinstance(interval, tuple):
-            raise ValueError("interval argument must be a tuple")
+        if interval is not None:
+            if not isinstance(interval, tuple):
+                raise ValueError("interval argument must be a tuple")
 
         # calculating eigenvalues using standard algorithm
+        eigvals = self.eigvals()
+
         if norm_const:
-            eigvals = np.linalg.eigvals(self.matrix * norm_const)
-        else:
-            eigvals = np.linalg.eigvals(self.matrix)
+            eigvals = norm_const*eigvals
 
         # using numpy to obtain histogram in the given interval and no. of bins
         observed, bins = np.histogram(eigvals, bins=bins, range=interval, density=density)
-        #plt.clf()
         return observed, bins
 
 
     def plot_eigval_hist(self, bins, interval=None, density=False, norm_const=None, savefig_path=None):
-
         observed, bins = self.eigval_hist(bins=bins, interval=interval, density=density, norm_const=norm_const)
         width = bins[1]-bins[0]
         plt.bar(bins[:-1], observed, width=width, align='edge')
