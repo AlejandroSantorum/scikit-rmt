@@ -208,6 +208,39 @@ class CircularEnsemble(_Ensemble):
         return np.linalg.eigvals(self.matrix)
 
     def plot_eigval_hist(self, bins, interval=None, density=False, norm_const=None, fig_path=None):
+        """Calculates and plots the histogram of the matrix eigenvalues
+
+        Calculates and plots the histogram of the current sampled matrix eigenvalues.
+        It is important to underline that this function works with real and complex
+        eigenvalues: if the matrix eigenvalues are complex, they are plotted in the
+        complex plane next to a heap map to study eigenvalue density.
+
+        Args:
+            bins (int or sequence): If bins is an integer, it defines the number of
+                equal-width bins in the range. If bins is a sequence, it defines the
+                bin edges, including the left edge of the first bin and the right
+                edge of the last bin; in this case, bins may be unequally spaced.
+            interval (tuple, default=None): Delimiters (xmin, xmax) of the histogram.
+                The lower and upper range of the bins. Lower and upper outliers are ignored.
+            density (bool, default=False): If True, draw and return a probability
+                density: each bin will display the bin's raw count divided by the total
+                number of counts and the bin width, so that the area under the histogram
+                integrates to 1. If set to False, the absolute frequencies of the eigenvalues
+                are returned.
+            norm_const (float, default=None): Eigenvalue normalization constant. By default,
+                it is set to None, so eigenvalues are not normalized. However, it is advisable
+                to specify a normalization constant to observe eigenvalue spectrum, e.g.
+                1/sqrt(n/2) if you want to analyze Wigner's Semicircular Law.
+            fig_path (string, default=None): path to save the created figure. If it is not
+                provided, the plot is shown are the end of the routine.
+
+        References:
+            Killip, R. and Zozhan, R.
+                Matrix Models AND Eigenvalue Statistics for Truncations of
+                Classical Ensembles of Random Unitary Matrices.
+                Communications in Mathematical Physics. 349 (2017): 991-1027.
+
+        """
         # pylint: disable=too-many-arguments
         if self.beta == 1:
             return super().plot_eigval_hist(bins, interval, density, norm_const, fig_path)
@@ -226,7 +259,7 @@ class CircularEnsemble(_Ensemble):
         axes[0].set_xlabel('real')
         axes[0].set_ylabel('imaginary')
 
-        _,_,_,img = axes[1].hist2d(xvals, yvals, cmap=plt.cm.nipy_spectral)
+        _,_,_,img = axes[1].hist2d(xvals, yvals, cmap=plt.cm.get_cmap('nipy_spectral'))
         fig.colorbar(img, ax=axes[1])
         axes[1].set_title('Heatmap eigenvalue plot')
         axes[1].set_xlabel('real')

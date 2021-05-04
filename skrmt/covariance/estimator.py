@@ -146,6 +146,7 @@ def analytical_shrinkage_estimator(data_mtx, shrink=None):
     and the transparency of the routine NERCOME. This estimator achieves this
     goal through nonparametric kernel estimation of the limiting spectral
     density of the sample eigenvalues and its Hilbert transform.
+
     Args:
         data_mtx (numpy array): data matrix containing n observations of size p, i.e.,
             data_mtx is a n times p matrix.
