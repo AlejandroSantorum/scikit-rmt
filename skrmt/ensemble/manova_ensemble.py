@@ -8,6 +8,7 @@ and Manova Quaternion Ensemble.
 """
 
 import numpy as np
+import matplotlib.pyplot as plt
 from scipy import special
 
 from ._base_ensemble import _Ensemble
@@ -208,6 +209,37 @@ class ManovaEnsemble(_Ensemble):
 
         """
         return np.linalg.eigvals(self.matrix)
+
+    def plot_eigval_hist(self, bins, interval=None, density=False, norm_const=None, fig_path=None):
+        # pylint: disable=too-many-arguments
+        if self.beta == 1:
+            return super().plot_eigval_hist(bins, interval, density, norm_const, fig_path)
+
+        eigvals = self.eigvals()
+        xvals = eigvals.real
+        yvals = eigvals.imag
+
+        fig, axes = plt.subplots(nrows=1, ncols=2)
+        fig.set_figheight(5)
+        fig.set_figwidth(13)
+        fig.subplots_adjust(hspace=.5)
+
+        axes[0].plot(xvals, yvals, 'o')
+        axes[0].set_title('Eigenvalue plot')
+        axes[0].set_xlabel('real')
+        axes[0].set_ylabel('imaginary')
+
+        _,_,_,img = axes[1].hist2d(xvals, yvals, cmap=plt.cm.nipy_spectral)
+        fig.colorbar(img, ax=axes[1])
+        axes[1].set_title('Heatmap eigenvalue plot')
+        axes[1].set_xlabel('real')
+        axes[1].set_ylabel('imaginary')
+
+        # Saving plot or showing it
+        if fig_path:
+            plt.savefig(fig_path)
+        else:
+            plt.show()
 
     def eigval_pdf(self):
         '''Calculates joint eigenvalue pdf.

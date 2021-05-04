@@ -216,17 +216,28 @@ class CircularEnsemble(_Ensemble):
         xvals = eigvals.real
         yvals = eigvals.imag
 
-        plt.plot(xvals, yvals, 'o')
+        fig, axes = plt.subplots(nrows=1, ncols=2)
+        fig.set_figheight(5)
+        fig.set_figwidth(13)
+        fig.subplots_adjust(hspace=.5)
 
-        plt.title("Eigenvalue plot")
-        plt.xlabel("real")
-        plt.ylabel("imaginary")
+        axes[0].plot(xvals, yvals, 'o')
+        axes[0].set_title('Eigenvalue plot')
+        axes[0].set_xlabel('real')
+        axes[0].set_ylabel('imaginary')
+
+        _,_,_,img = axes[1].hist2d(xvals, yvals, cmap=plt.cm.nipy_spectral)
+        fig.colorbar(img, ax=axes[1])
+        axes[1].set_title('Heatmap eigenvalue plot')
+        axes[1].set_xlabel('real')
+        axes[1].set_ylabel('imaginary')
 
         # Saving plot or showing it
         if fig_path:
             plt.savefig(fig_path)
         else:
             plt.show()
+
 
     def eigval_pdf(self):
         '''Calculates joint eigenvalue pdf.
