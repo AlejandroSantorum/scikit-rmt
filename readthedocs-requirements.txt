@@ -1,0 +1,8 @@
+matplotlib
+numpy
+scipy
+Sphinx>=3
+sphinx_rtd_theme
+sphinx-gallery
+matplotlib
+pytest
