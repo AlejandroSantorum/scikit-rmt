@@ -25,11 +25,13 @@ requirements:
 	@echo "\t numpy: Library for efficient mathematical calculus for Python"
 	@echo "\t scipy: Python-based library for mathematics, science, and engineering"
 	@echo "\t matplotlib: Python plotting library"
+	@echo "==> You can install all requirements by executing 'make install_requirements'"
+	@echo "===> OTHER NON-STANDARD LIBRARIES TO BE INSTALLED (DEVS) <==="
 	@echo "\t pytest: Python testing library"
 	@echo "\t pytest-cov: Python testing coverage library"
 	@echo "\t sphinx: Python library for auto-generation of documentation"
-	@echo "\t pylint: Python code style linter"
-	@echo "==> You can install all requirements by executing 'make install_requirements'"
+	@echo "\t pylint: Python code style linter"	
+
 
 
 .PHONY: install_requirements
