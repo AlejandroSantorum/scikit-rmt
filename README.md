@@ -34,7 +34,7 @@ Create a virtual environment (you can change the name "env").
 python3 -m venv env
 ```
 
-Active the environment "env".
+Activate the environment "env".
 ```bash
 source env/bin/activate
 ```
@@ -56,9 +56,9 @@ pip install scikit-rmt
 
 ### Requirements
 *scikit-rmt* depends on the following packages:
-* `numpy <https://github.com/numpy/numpy>`_ - The fundamental package for scientific computing with Python
-* `matplotlib <https://github.com/matplotlib/matplotlib>`_ - Plotting with Python
-* `scipy <https://github.com/scipy/scipy>`_ - Scientific computation in Python
+* [numpy](https://github.com/numpy/numpy) - The fundamental package for scientific computing with Python
+* [matplotlib](https://github.com/matplotlib/matplotlib) - Plotting with Python
+* [scipy](https://github.com/scipy/scipy) - Scientific computation in Python
 
 
 -----------------
@@ -85,14 +85,13 @@ The package is licensed under the BSD 3-Clause License. A copy of the [license](
     "Sturm Sequences and Random Eigenvalue Distributions",
     *Foundations of Computational Mathematics*,
     vol. 9 iss. 4 (2009), pp 461-483.
-    [[pdf]](www-math.mit.edu/~edelman/homepage/papers/sturm.pdf)
+    [[pdf]](http://www-math.mit.edu/~edelman/homepage/papers/sturm.pdf)
     [[doi]](http://dx.doi.org/10.1007/s10208-008-9037-x)
 
 - Ioana Dumitriu and Alan Edelman,
     "Matrix Models for Beta Ensembles",
     *Journal of Mathematical Physics*,
     vol. 43 no. 11 (2002), pp. 5830-5547
-    [[doi]](http://dx.doi.org/doi: 10.1063/1.1507823)
     [arXiv:math-ph/0206043](http://arxiv.org/abs/math-ph/0206043)
 
 - Rowan Killip and Rostyslav Kozhan,
