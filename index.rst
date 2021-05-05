@@ -12,9 +12,7 @@ Welcome to scikit-rmt documentation!
 
    docs/modules
    docs/skrmt.ensemble
-   docs/skrmt.ensemble.tests
    docs/skrmt.covariance
-   docs/skrmt.covariance.tests
    docs/skrmt
 
 Indices and tables

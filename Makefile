@@ -56,7 +56,7 @@ cov_html:
 ### Minimal makefile for Sphinx documentation ###
 .PHONY: apidoc
 apidoc:
-	sphinx-apidoc -o docs skrmt
+	sphinx-apidoc -o docs skrmt **/tests/*
 
 # You can set these variables from the command line, and also
 # from the environment for the first two.
