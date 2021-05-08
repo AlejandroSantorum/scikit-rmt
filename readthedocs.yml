@@ -14,6 +14,6 @@ sphinx:
 python:
   version: 3.7
   install:
-    - requirements: readthedocs-requirements.txt
-    - method: pip
+    - requirements: docs/readthedocs-requirements.txt
+    - method: pip3
       path: .
