@@ -8,8 +8,6 @@ from setuptools import find_packages, setup
 with open("README.md", "r") as f:
     LONG_DESCRIPTION = f.read()
 
-REQUIREMENTS = read_file("requirements.txt").split("\n")
-
 setup(
     name='scikit-rmt',
     author='Alejandro Santorum Varela',
@@ -24,7 +22,7 @@ setup(
     download_url='https://github.com/user/reponame/archive/v_01.tar.gz',
     packages=find_packages(),
     keywords=['RMT', 'Random Matrix Theory', 'Ensemble', 'Covariance matrices'],
-    install_requires=REQUIREMENTS,
+    install_requires=["numpy", "matplotlib", "scipy"],
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Intended Audience :: Developers',
