@@ -6,6 +6,15 @@
 Welcome to scikit-rmt documentation!
 ====================================
 
+Bla bla
+
+.. toctree::
+   :maxdepth: 1
+   :titlesonly:
+   :hidden:
+
+   auto_examples/index
+
 .. toctree::
    :maxdepth: 2
    :caption: Contents:

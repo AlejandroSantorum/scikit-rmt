@@ -9,3 +9,4 @@ htmlcov
 
 # sphinx
 _build
+auto_examples
