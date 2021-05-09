@@ -259,8 +259,12 @@ class CircularEnsemble(_Ensemble):
         axes[0].set_xlabel('real')
         axes[0].set_ylabel('imaginary')
 
-        _,_,_,img = axes[1].hist2d(xvals, yvals, cmap=plt.cm.get_cmap('nipy_spectral'))
+        h,_,_,img = axes[1].hist2d(xvals, yvals, cmap=plt.cm.get_cmap('nipy_spectral'))
         fig.colorbar(img, ax=axes[1])
+        axes[1].cla()
+        ext_const = self.beta/2
+        extent = [-ext_const, ext_const, -ext_const, ext_const]
+        axes[1].imshow(h, interpolation="bilinear", extent=extent)
         axes[1].set_title('Heatmap eigenvalue plot')
         axes[1].set_xlabel('real')
         axes[1].set_ylabel('imaginary')
