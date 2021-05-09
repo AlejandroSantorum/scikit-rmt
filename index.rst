@@ -9,6 +9,12 @@ Welcome to scikit-rmt documentation!
 Bla bla
 
 .. toctree::
+   :caption: Using scikit-rmt
+   :hidden:
+	
+   auto_tutorial/index
+
+.. toctree::
    :maxdepth: 1
    :titlesonly:
    :hidden:

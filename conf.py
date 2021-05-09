@@ -74,7 +74,11 @@ html_theme = 'sphinx_rtd_theme'
 # so a file named "default.css" will overwrite the builtin "default.css".
 #html_static_path = ['_static']
 
+# tutorial_list = [
+#     "plot_introduction.py",
+# ]
+
 sphinx_gallery_conf = {
-    'examples_dirs': ['examples'],
-    'gallery_dirs': ['auto_examples'],
+    'examples_dirs': ['examples', 'tutorial'],
+    'gallery_dirs': ['auto_examples', 'auto_tutorial'],
 }
