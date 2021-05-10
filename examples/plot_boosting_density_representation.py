@@ -16,10 +16,10 @@ from skrmt.ensemble import GaussianEnsemble, WishartEnsemble
 # We can sample a random matrix of the Gaussian Ensemble with a relatively
 # large size and plot its spectral density.
 
-goe = GaussianEnsemble(beta=1, n=10000)
+goe = GaussianEnsemble(beta=1, n=5000)
 
 t1 = time.time()
-goe.plot_eigval_hist(bins=80, interval=(-2,2))
+goe.plot_eigval_hist(bins=60, interval=(-2,2))
 t2 = time.time()
 
 ##############################################################################
@@ -30,10 +30,10 @@ print(t2-t1, 'seconds')
 # We can speed up this procedure using the tridiagonal form of Gaussian
 # Ensemble random matrices.
 
-goe_tridiag = GaussianEnsemble(beta=1, n=10000, use_tridiagonal=True)
+goe_tridiag = GaussianEnsemble(beta=1, n=5000, use_tridiagonal=True)
 
 t1 = time.time()
-goe_tridiag.plot_eigval_hist(bins=80, interval=(-2,2))
+goe_tridiag.plot_eigval_hist(bins=60, interval=(-2,2))
 t2 = time.time()
 
 ##############################################################################
@@ -43,10 +43,10 @@ print(t2-t1, 'seconds')
 ##############################################################################
 # This boosting trick can be used with Wishart Ensemble too
 
-wre = WishartEnsemble(beta=1, p=10000, n=30000)
+wre = WishartEnsemble(beta=1, p=5000, n=10000)
 
 t1 = time.time()
-wre.plot_eigval_hist(bins=80, interval=(0.2,2.5))
+wre.plot_eigval_hist(bins=60, interval=(0.2,2.5))
 t2 = time.time()
 
 ##############################################################################
@@ -56,10 +56,10 @@ print(t2-t1, 'seconds')
 ##############################################################################
 # Using tridiagonal form of the Wishart Ensemble:
 
-wre_tridiag = WishartEnsemble(beta=1, p=10000, n=30000, use_tridiagonal=True)
+wre_tridiag = WishartEnsemble(beta=1, p=5000, n=10000, use_tridiagonal=True)
 
 t1 = time.time()
-wre_tridiag.plot_eigval_hist(bins=80, interval=(0.2,2.5))
+wre_tridiag.plot_eigval_hist(bins=60, interval=(0.2,2.5))
 t2 = time.time()
 
 ##############################################################################
