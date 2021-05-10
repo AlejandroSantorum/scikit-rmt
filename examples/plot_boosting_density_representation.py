@@ -46,7 +46,7 @@ print(t2-t1, 'seconds')
 wre = WishartEnsemble(beta=1, p=5000, n=10000)
 
 t1 = time.time()
-wre.plot_eigval_hist(bins=60, interval=(0.2,2.5))
+wre.plot_eigval_hist(bins=60, interval=(0,3))
 t2 = time.time()
 
 ##############################################################################
@@ -59,7 +59,7 @@ print(t2-t1, 'seconds')
 wre_tridiag = WishartEnsemble(beta=1, p=5000, n=10000, use_tridiagonal=True)
 
 t1 = time.time()
-wre_tridiag.plot_eigval_hist(bins=60, interval=(0.2,2.5))
+wre_tridiag.plot_eigval_hist(bins=60, interval=(0,3))
 t2 = time.time()
 
 ##############################################################################
