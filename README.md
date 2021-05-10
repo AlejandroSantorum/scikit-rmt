@@ -1,3 +1,5 @@
+[![Documentation Status](https://readthedocs.org/projects/scikit-rmt/badge/?version=latest)](https://scikit-rmt.readthedocs.io/en/latest/?badge=latest)
+
 # scikit-rmt: Random Matrix Theory Python package
 
 Random Matrix Theory, or RMT, is the field of Statistics that analyses
