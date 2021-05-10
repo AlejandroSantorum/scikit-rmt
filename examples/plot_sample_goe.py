@@ -1,8 +1,12 @@
 """
 Sampling GOE
 ============
-Shows the sampling method of GOE
+
+Shows the sampling method of GOE, the most known random matrix ensemble.
 """
+
+# Author: Alejandro Santorum Varela
+# License: BSD 3-Clause
 
 from skrmt.ensemble import GaussianEnsemble
 
