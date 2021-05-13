@@ -19,7 +19,7 @@ def _build_m_labels(M):
 
 
 
-def plot_times(N_list, bins_list, times_naive, times_tridiag):
+def _plot_times(N_list, bins_list, times_naive, times_tridiag):
     # creating subplots
     fig, axes = plt.subplots(nrows=1, ncols=2)
     fig.set_figheight(5)
@@ -67,7 +67,7 @@ def plot_times(N_list, bins_list, times_naive, times_tridiag):
     fit_line1 = axes[1].plot(nodes, y_smooth_tridiag_low, '--')
     fit_line2 = axes[1].plot(nodes, y_smooth_tridiag_up, '--')
     legend1 = axes[1].legend(lines, labels, loc=0)
-    legend2 = axes[1].legend(fit_line1, ['lower fit'], loc=8)
+    legend2 = axes[1].legend(fit_line1, ['lower fit'], loc=4)
     legend3 = axes[1].legend(fit_line2, ['upper fit'], loc=9)
     axes[1].add_artist(legend1)
     axes[1].add_artist(legend2)
@@ -108,7 +108,7 @@ def gaussian_tridiagonal_sim(N_list, bins_list, nreps=10):
             times_naive[i][j] /= nreps
             times_tridiag[i][j] /= nreps
     
-    plot_times(N_list, bins_list, times_naive, times_tridiag)
+    _plot_times(N_list, bins_list, times_naive, times_tridiag)
 
 
 
@@ -140,5 +140,5 @@ def wishart_tridiagonal_sim(N_list, bins_list, nreps=10):
             times_naive[i][j] /= nreps
             times_tridiag[i][j] /= nreps
     
-    plot_times(N_list, bins_list, times_naive, times_tridiag)
+    _plot_times(N_list, bins_list, times_naive, times_tridiag)
 

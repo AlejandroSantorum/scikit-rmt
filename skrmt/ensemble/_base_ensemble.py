@@ -169,6 +169,8 @@ class _Ensemble(metaclass=ABCMeta):
                 Journal of Mathematical Physics. 43.11 (2002): 5830-5847.
 
         """
+        if not isinstance(interval, tuple):
+            raise ValueError("interval argument must be a tuple")
         # pylint: disable=too-many-arguments
         observed, bins = self.eigval_hist(bins=bins, interval=interval,
                                           density=density, norm_const=norm_const)

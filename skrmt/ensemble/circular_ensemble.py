@@ -244,27 +244,39 @@ class CircularEnsemble(_Ensemble):
         # pylint: disable=too-many-arguments
         if self.beta == 1:
             return super().plot_eigval_hist(bins, interval, density, norm_const, fig_path)
+        
+        if (interval is not None) and not isinstance(interval, tuple):
+            raise ValueError("interval argument must be a tuple (or None)")
 
         eigvals = self.eigvals()
         xvals = eigvals.real
         yvals = eigvals.imag
+
+        if interval is None:
+            rang_val = self.beta/2
+            rang = ((-rang_val, rang_val), (-rang_val, rang_val))
+            extent = [-rang_val, rang_val, -rang_val, rang_val]
+        else:
+            rang = (interval, interval)
+            extent = [interval[0], interval[1], interval[0], interval[1]]
 
         fig, axes = plt.subplots(nrows=1, ncols=2)
         fig.set_figheight(5)
         fig.set_figwidth(13)
         fig.subplots_adjust(hspace=.5)
 
+        axes[0].set_xlim(rang[0][0], rang[0][1])
+        axes[0].set_ylim(rang[1][0], rang[1][1])
         axes[0].plot(xvals, yvals, 'o')
         axes[0].set_title('Eigenvalue plot')
         axes[0].set_xlabel('real')
         axes[0].set_ylabel('imaginary')
 
-        h,_,_,img = axes[1].hist2d(xvals, yvals, cmap=plt.cm.get_cmap('nipy_spectral'))
+        h,_,_,img = axes[1].hist2d(xvals, yvals, range=rang,
+                                   cmap=plt.cm.get_cmap('nipy_spectral'))
         fig.colorbar(img, ax=axes[1])
         axes[1].cla()
-        ext_const = self.beta/2
-        extent = [-ext_const, ext_const, -ext_const, ext_const]
-        axes[1].imshow(h, interpolation="bilinear", extent=extent)
+        axes[1].imshow(h.transpose(), origin='lower', interpolation="bilinear", extent=extent)
         axes[1].set_title('Heatmap eigenvalue plot')
         axes[1].set_xlabel('real')
         axes[1].set_ylabel('imaginary')
