@@ -14,3 +14,7 @@ auto_tutorial
 
 # my files
 my_tests*
+
+# dist
+dist
+scikit_rmt.egg-info

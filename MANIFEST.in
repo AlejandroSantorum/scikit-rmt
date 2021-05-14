@@ -10,7 +10,7 @@ include .coveragerc
 recursive-include docs *
 recursive-include examples *
 recursive-include tutorial *
+ecursive-include imgs *
 
 recursive-exclude notebooks *
-recursive-exclude imgs *
 recursive-exclude htmlcov *
