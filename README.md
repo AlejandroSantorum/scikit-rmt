@@ -110,7 +110,10 @@ in *Matrix Models for Beta Ensembles* and by J. Albrecht, C. Chan, and A. Edelma
 random matrices (**Gaussian Ensemble** and **Wishart Ensemble** matrices) in its **tridiagonal form**
 we can speed up histogramming procedure. The following graphical simulation using GOE matrices
 tries to illustrate it.
-<img src="imgs/gauss_tridiag_sim.png" width=820 height=400 alt="Speed up by tridigonal forms">
+![Speed up by tridigonal forms](imgs/gauss_tridiag_sim.png)
+<!---
+<img src="imgs/gauss_tridiag_sim.png" width=820 height=370 alt="Speed up by tridigonal forms">
+-->
 
 In addition, several spectral laws can be analyzed using this library, such as Wigner's Semicircle Law,
 Marchenko-Pastur Law and Tracy-Widom Law.
