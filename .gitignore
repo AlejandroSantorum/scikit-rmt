@@ -11,3 +11,6 @@ htmlcov
 _build
 auto_examples
 auto_tutorial
+
+# my files
+my_tests*
