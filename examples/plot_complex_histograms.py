@@ -25,24 +25,24 @@ from skrmt.ensemble import ManovaEnsemble, CircularEnsemble
 # In this example, we plot the eigenvalue histogram of a MCE random matrix.
 
 mce = ManovaEnsemble(beta=2, m=1000, n1=3000, n2=3000)
-mce.plot_eigval_hist(bins=80)
+mce.plot_eigval_hist(bins=80, interval=(-2,2))
 
 ##############################################################################
 # And now the eigenvalue histogram of a MQE random matrix.
 
 mqe = ManovaEnsemble(beta=4, m=1000, n1=3000, n2=3000)
-mqe.plot_eigval_hist(bins=80)
+mqe.plot_eigval_hist(bins=80, interval=(-2,2))
 
 ##############################################################################
 # In this example, eigenvalue spectrum of CUE random matrix is shown.
 
 cue = CircularEnsemble(beta=2, n=1000)
-cue.plot_eigval_hist(bins=80)
+cue.plot_eigval_hist(bins=80, interval=(-2.2,2.2))
 
 ##############################################################################
 # And the eigenvalue spectrum of CSE.
 
 cse = CircularEnsemble(beta=4, n=1000)
-cse.plot_eigval_hist(bins=80)
+cse.plot_eigval_hist(bins=80, interval=(-2.2,2.2))
 
 

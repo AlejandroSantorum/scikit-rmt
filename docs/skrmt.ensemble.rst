@@ -1,5 +1,5 @@
-ensemble package
-================
+ensemble subpackage
+===================
 
 Submodules
 ----------

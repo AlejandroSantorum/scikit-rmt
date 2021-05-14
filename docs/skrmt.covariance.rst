@@ -1,5 +1,5 @@
-covariance package
-==================
+covariance subpackage
+=====================
 
 Submodules
 ----------
