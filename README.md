@@ -69,9 +69,9 @@ pip install scikit-rmt
 -----------------
 ## A brief tutorial
 
-First of all, several random matrix ensembles can be sampled: Gaussian Ensembles, Wishart Ensembles,
-Manova Ensembles and Circular Ensembles. As an example, the following code shows how to sample
-a Gaussian Orthogonal Ensemble (GOE) random matrix.
+First of all, several random matrix ensembles can be sampled: **Gaussian Ensembles**, **Wishart Ensembles**,
+**Manova Ensembles** and **Circular Ensembles**. As an example, the following code shows how to sample
+a **Gaussian Orthogonal Ensemble (GOE)** random matrix.
 
 ```python
 from skrmt.ensemble import GaussianEnsemble
@@ -92,9 +92,9 @@ goe = GaussianEnsemble(beta=1, n=1000)
 goe.plot_eigval_hist(bins=80, interval=(-2,2), density=True)
 ```
 <img src="imgs/hist_goe.png" width=450 height=320 alt="GOE density plot">
-If we sample a non-symmetric/non-hermitian random matrix, its eigenvalues do not need to be real,
-so a 2D complex histogram has been implemented in order to study spectral density of these type
-of random matrices. It would be the case, for example, of Circular Symplectic Ensemble (CSE).
+If we sample a **non-symmetric/non-hermitian** random matrix, its eigenvalues do not need to be real,
+so a **2D complex histogram** has been implemented in order to study spectral density of these type
+of random matrices. It would be the case, for example, of **Circular Symplectic Ensemble (CSE)**.
 
 ```python
 # sampling a CSE (beta=4) matrix of size 2000x2000
@@ -103,18 +103,18 @@ cse.plot_eigval_hist(bins=80, interval=(-2.2,2.2))
 ```
 <img src="imgs/hist_cse_smooth.png" width=650 height=320 alt="CSE density plot">
 
-We can boost histogram representation using the results described by A. Edelman and I. Dumitriu
+We can **boost histogram representation** using the results described by A. Edelman and I. Dumitriu
 in *Matrix Models for Beta Ensembles* and by J. Albrecht, C. Chan, and A. Edelman in
 *Sturm Sequences and Random Eigenvalue Distributions* (check references). Sampling certain
-random matrices (Gaussian Ensemble and Wishart Ensemble matrices) in its tridiagonal form we
-can speed up histogramming procedure. The following graphical simulation using GOE matrices
+random matrices (**Gaussian Ensemble** and **Wishart Ensemble** matrices) in its **tridiagonal form**
+we can speed up histogramming procedure. The following graphical simulation using GOE matrices
 tries to illustrate it.
 <img src="imgs/gauss_tridiag_sim.png" width=820 height=400 alt="Speed up by tridigonal forms">
 
 In addition, several spectral laws can be analyzed using this library, such as Wigner's Semicircle Law,
 Marchenko-Pastur Law and Tracy-Widom Law.
 
-Plot of Wigner's Semicircle Law, sampling a GOE matrix 5000x5000:
+Plot of **Wigner's Semicircle Law**, sampling a GOE matrix 5000x5000:
 ```python
 from skrmt.ensemble import wigner_semicircular_law
 
@@ -122,7 +122,7 @@ wigner_semicircular_law(ensemble='goe', n_size=5000, bins=80, density=True)
 ```
 <img src="imgs/scl_goe.png" width=450 height=320 alt="Wigner Semicircle Law">
 
-Plot of Marchenko-Pastur Law, sampling a WRE matrix 5000x5000:
+Plot of **Marchenko-Pastur Law**, sampling a WRE matrix 5000x5000:
 ```python
 from skrmt.ensemble import marchenko_pastur_law
 
@@ -130,7 +130,7 @@ marchenko_pastur_law(ensemble='wre', p_size=5000, n_size=15000, bins=80, density
 ```
 <img src="imgs/mpl_wre.png" width=450 height=320 alt="Marchenko-Pastur Law">
 
-Plot of Tracy-Widom Law, sampling 20000 GOE matrices of size 100x100:
+Plot of **Tracy-Widom Law**, sampling 20000 GOE matrices of size 100x100:
 ```python
 from skrmt.ensemble import tracy_widom_law
 
@@ -138,7 +138,7 @@ tracy_widom_law(ensemble='goe', n_size=100, times=20000, bins=80, density=True)
 ```
 <img src="imgs/twl_goe.png" width=450 height=320 alt="Tracy-Widom Law">
 
-The other module of this library implements several covariance matrix estimators:
+The other module of this library implements **several covariance matrix estimators**:
 * Sample estimator.
 * Finite-sample optimal estimator (FSOpt estimator).
 * Non-linear shrinkage analytical estimator (Ledoit & Wolf, 2020).
@@ -162,9 +162,9 @@ Sigma = analytical_shrinkage_estimator(X)
 # ... Do something with Sigma. For example, PCA.
 ```
 
-For more information or insight about the usage of the library, you can visit the official documentation 
+For more information or insight about the usage of the library, you can visit the official **documentation** 
 <https://scikit-rmt.readthedocs.io/en/latest/> or the directory [notebooks](notebooks), that contains several
-*Python notebooks* with tutorials and plenty of examples.
+*Python notebooks* with **tutorials** and plenty of **examples**.
 
 -----------------
 ## License
