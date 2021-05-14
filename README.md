@@ -134,7 +134,7 @@ from skrmt.ensemble import tracy_widom_law
 
 tracy_widom_law(ensemble='goe', n_size=100, times=20000, bins=80, density=True)
 ```
-![Tracy-Widom Law](imgs/twl_goe.png)
+![Tracy-Widom Law](imgs/twl_goe.png =150x100)
 
 The other module of this library implements several covariance matrix estimators:
 * Sample estimator.
@@ -143,6 +143,7 @@ The other module of this library implements several covariance matrix estimators
 * Linear shrinkage estimator (Ledoit & Wolf, 2004).
 * Empirical Bayesian estimator (Haff, 1980).
 * Minimax estimator (Stain, 1982).
+
 For certain problems, sample covariance matrix is not the best estimation for the
 population covariance matrix.
 
