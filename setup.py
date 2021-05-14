@@ -5,7 +5,7 @@ import sys
 
 from setuptools import find_packages, setup
 
-VERSION = '0.1.2'
+VERSION = '0.1.3'
 
 with open("README.md", "r") as f:
     LONG_DESCRIPTION = f.read()
@@ -24,7 +24,7 @@ setup(
     long_description=LONG_DESCRIPTION,
     long_description_content_type="text/markdown",
     url = 'https://github.com/AlejandroSantorum/scikit-rmt',
-    download_url='https://github.com/AlejandroSantorum/scikit-rmt/archive/refs/tags/v0.1.1.tar.gz',
+    download_url='https://github.com/AlejandroSantorum/scikit-rmt/archive/refs/tags/v0.1.2.tar.gz',
     include_package_data=True,
     packages=find_packages(),
     keywords=['RMT', 'Random Matrix Theory', 'Ensemble', 'Covariance matrices'],
