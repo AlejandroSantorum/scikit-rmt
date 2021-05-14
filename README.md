@@ -1,5 +1,6 @@
 [![Documentation Status](https://readthedocs.org/projects/scikit-rmt/badge/?version=latest)](https://scikit-rmt.readthedocs.io/en/latest/?badge=latest)
 [![License Status](https://img.shields.io/github/license/AlejandroSantorum/scikit-rmt)](https://img.shields.io/github/license/AlejandroSantorum/scikit-rmt)
+[![codecov](https://codecov.io/gh/AlejandroSantorum/scikit-rmt/branch/main/graph/badge.svg?token=56TNEASPJK)](https://codecov.io/gh/AlejandroSantorum/scikit-rmt)
 
 # scikit-rmt: Random Matrix Theory Python package
 
