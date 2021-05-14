@@ -134,7 +134,7 @@ from skrmt.ensemble import tracy_widom_law
 
 tracy_widom_law(ensemble='goe', n_size=100, times=20000, bins=80, density=True)
 ```
-<img src="imgs/twl_goe.png" width=150 height=80 >
+<img src="imgs/twl_goe.png" width=400 height=300 >
 ![Tracy-Widom Law](imgs/twl_goe.png =150x100)
 
 The other module of this library implements several covariance matrix estimators:
