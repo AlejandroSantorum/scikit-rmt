@@ -92,6 +92,7 @@ goe = GaussianEnsemble(beta=1, n=1000)
 goe.plot_eigval_hist(bins=80, interval=(-2,2), density=True)
 ```
 <img src="imgs/hist_goe.png" width=450 height=320 alt="GOE density plot">
+
 If we sample a **non-symmetric/non-hermitian** random matrix, its eigenvalues do not need to be real,
 so a **2D complex histogram** has been implemented in order to study spectral density of these type
 of random matrices. It would be the case, for example, of **Circular Symplectic Ensemble (CSE)**.
