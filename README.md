@@ -91,7 +91,7 @@ goe = GaussianEnsemble(beta=1, n=1000)
 # plotting its spectral distribution in the interval (-2,2)
 goe.plot_eigval_hist(bins=80, interval=(-2,2), density=True)
 ```
-![GOE density plot](imgs/hist_goe.png)
+<img src="imgs/hist_goe.png" width=450 height=320 alt="GOE density plot">
 If we sample a non-symmetric/non-hermitian random matrix, its eigenvalues do not need to be real,
 so a 2D complex histogram has been implemented in order to study spectral density of these type
 of random matrices. It would be the case, for example, of Circular Symplectic Ensemble (CSE).
@@ -100,14 +100,14 @@ of random matrices. It would be the case, for example, of Circular Symplectic En
 cse = CircularEnsemble(beta=4, n=1000)
 cse.plot_eigval_hist(bins=80, interval=(-2.2,2.2))
 ```
-![CSE density plot](imgs/hist_cse_smooth.png)
+<img src="imgs/hist_cse_smooth.png" width=450 height=320 alt="CSE density plot">
 We can boost histogram representation using the results described by A. Edelman and I. Dumitriu
 in "*Matrix Models for Beta Ensembles*" and by J. Albrecht, C. Chan, and A. Edelman in
 "*Sturm Sequences and Random Eigenvalue Distributions*" (check references). Sampling certain
 random matrices (Gaussian Ensemble and Wishart Ensemble matrices) in its tridiagonal form we
 can speed up histogramming procedure. The following graphical simulation using GOE matrices
 tries to illustrate it.
-![Speed up by tridigonal forms](imgs/gauss_tridiag_sim.png)
+<img src="imgs/gauss_tridiag_sim.png" width=600 height=450 alt="Speed up by tridigonal forms">
 
 In addition, several spectral laws can be analyzed using this library, such as Wigner's Semicircle Law,
 Marchenko-Pastur Law and Tracy-Widom Law.
@@ -118,7 +118,7 @@ from skrmt.ensemble import wigner_semicircular_law
 
 wigner_semicircular_law(ensemble='goe', n_size=5000, bins=80, density=True)
 ```
-![Wigner Semicircle Law](imgs/scl_goe.png)
+<img src="imgs/scl_goe.png" width=450 height=320 alt="Wigner Semicircle Law">
 
 Plot of Marchenko-Pastur Law, sampling a WRE matrix 5000x5000:
 ```python
@@ -126,7 +126,7 @@ from skrmt.ensemble import marchenko_pastur_law
 
 marchenko_pastur_law(ensemble='wre', p_size=5000, n_size=15000, bins=80, density=True)
 ```
-![Marchenko-Pastur Law](imgs/mpl_wre.png)
+<img src="imgs/mpl_wre.png" width=450 height=320 alt="Marchenko-Pastur Law">
 
 Plot of Tracy-Widom Law, sampling 20000 GOE matrices of size 100x100:
 ```python
@@ -134,8 +134,7 @@ from skrmt.ensemble import tracy_widom_law
 
 tracy_widom_law(ensemble='goe', n_size=100, times=20000, bins=80, density=True)
 ```
-<img src="imgs/twl_goe.png" width=400 height=300 >
-![Tracy-Widom Law](imgs/twl_goe.png =150x100)
+<img src="imgs/twl_goe.png" width=450 height=320 alt="Tracy-Widom Law">
 
 The other module of this library implements several covariance matrix estimators:
 * Sample estimator.
