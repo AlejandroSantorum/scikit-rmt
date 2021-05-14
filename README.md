@@ -69,16 +69,99 @@ pip install scikit-rmt
 -----------------
 ## A brief tutorial
 
-TODO
+First of all, several random matrix ensembles can be sampled: Gaussian Ensembles, Wishart Ensembles,
+Manova Ensembles and Circular Ensembles. As an example, the following code shows how to sample
+a Gaussian Orthogonal Ensemble (GOE) random matrix.
 
 ```python
 from skrmt.ensemble import GaussianEnsemble
-
-goe = GaussianEnsemble(beta=1, n=100)
+# sampling a GOE (beta=1) matrix of size 3x3
+goe = GaussianEnsemble(beta=1, n=3)
+print(goe.matrix)
+```
+```bash
+[[ 0.34574696 -0.10802385  0.38245343]
+ [-0.10802385 -0.60113963  0.28624612]
+ [ 0.38245343  0.28624612 -0.96503739]]
+```
+Its spectral density can be easily plotted:
+```python
+# sampling a GOE matrix of size 1000x1000
+goe = GaussianEnsemble(beta=1, n=1000)
+# plotting its spectral distribution in the interval (-2,2)
 goe.plot_eigval_hist(bins=80, interval=(-2,2), density=True)
 ```
+![GOE density plot](imgs/hist_goe.png)
+If we sample a non-symmetric/non-hermitian random matrix, its eigenvalues do not need to be real,
+so a 2D complex histogram has been implemented in order to study spectral density of these type
+of random matrices. It would be the case, for example, of Circular Symplectic Ensemble (CSE).
+```python
+# sampling a CSE (beta=4) matrix of size 2000x2000
+cse = CircularEnsemble(beta=4, n=1000)
+cse.plot_eigval_hist(bins=80, interval=(-2.2,2.2))
+```
+![CSE density plot](imgs/hist_cse_smooth.png)
+We can boost histogram representation using the results described by A. Edelman and I. Dumitriu
+in "*Matrix Models for Beta Ensembles*" and by J. Albrecht, C. Chan, and A. Edelman in
+"*Sturm Sequences and Random Eigenvalue Distributions*" (check references). Sampling certain
+random matrices (Gaussian Ensemble and Wishart Ensemble matrices) in its tridiagonal form we
+can speed up histogramming procedure. The following graphical simulation using GOE matrices
+tries to illustrate it.
+![Speed up by tridigonal forms](imgs/gauss_tridiag_sim.png)
 
-TODO
+In addition, several spectral laws can be analyzed using this library, such as Wigner's Semicircle Law,
+Marchenko-Pastur Law and Tracy-Widom Law.
+
+Plot of Wigner's Semicircle Law, sampling a GOE matrix 5000x5000:
+```python
+from skrmt.ensemble import wigner_semicircular_law
+
+wigner_semicircular_law(ensemble='goe', n_size=5000, bins=80, density=True)
+```
+![Wigner Semicircle Law](imgs/scl_goe.png)
+
+Plot of Marchenko-Pastur Law, sampling a WRE matrix 5000x5000:
+```python
+from skrmt.ensemble import marchenko_pastur_law
+
+marchenko_pastur_law(ensemble='wre', p_size=5000, n_size=15000, bins=80, density=True)
+```
+![Marchenko-Pastur Law](imgs/mpl_wre.png)
+
+Plot of Tracy-Widom Law, sampling 20000 GOE matrices of size 100x100:
+```python
+from skrmt.ensemble import tracy_widom_law
+
+tracy_widom_law(ensemble='goe', n_size=100, times=20000, bins=80, density=True)
+```
+![Tracy-Widom Law](imgs/twl_goe.png)
+
+The other module of this library implements several covariance matrix estimators:
+* Sample estimator.
+* Finite-sample optimal estimator (FSOpt estimator).
+* Non-linear shrinkage analytical estimator (Ledoit & Wolf, 2020).
+* Linear shrinkage estimator (Ledoit & Wolf, 2004).
+* Empirical Bayesian estimator (Haff, 1980).
+* Minimax estimator (Stain, 1982).
+For certain problems, sample covariance matrix is not the best estimation for the
+population covariance matrix.
+
+The following code illustrates the usage of the estimators.
+```python
+from skrmt.covariance import analytical_shrinkage_estimator
+
+# load dataset with your own/favorite function (such as pandas.read_csv)
+X = load_dataset('dataset_file.data')
+
+# get estimation
+Sigma = analytical_shrinkage_estimator(X)
+
+# ... Do something with Sigma. For example, PCA.
+```
+
+For more information or insight about the usage of the library, you can visit the official documentation 
+<https://scikit-rmt.readthedocs.io/en/latest/> or the directory [notebooks](notebooks), that contains several
+*Python notebooks* with tutorials and plenty of examples.
 
 -----------------
 ## License
