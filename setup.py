@@ -5,24 +5,31 @@ import sys
 
 from setuptools import find_packages, setup
 
+VERSION = '0.1'
+
 with open("README.md", "r") as f:
     LONG_DESCRIPTION = f.read()
+
+with open("README.md", "r") as f:
+    REQUIREMENTS = f.read().split('\n')
 
 setup(
     name='scikit-rmt',
     author='Alejandro Santorum Varela',
     author_email='alejandro.santorum@gmail.com',
     #packages = ['scikit-rmt'],
-    version = '0.1',
+    version = VERSION,
     license='BSD',
     description='Random Matrix Theory Python package',
     long_description=LONG_DESCRIPTION,
     long_description_content_type="text/markdown",
     url = 'https://github.com/AlejandroSantorum/scikit-rmt',
     download_url='https://github.com/user/reponame/archive/v_01.tar.gz',
+    include_package_data=True,
     packages=find_packages(),
     keywords=['RMT', 'Random Matrix Theory', 'Ensemble', 'Covariance matrices'],
-    install_requires=["numpy", "matplotlib", "scipy"],
+    #install_requires=["numpy", "matplotlib", "scipy"],
+    install_requires=REQUIREMENTS,
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Intended Audience :: Developers',

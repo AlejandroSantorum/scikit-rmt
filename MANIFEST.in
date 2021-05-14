@@ -1,0 +1,16 @@
+include README.md
+include MANIFEST.in
+include LICENSE
+include Makefile
+include *.yml
+include *.rst
+include conf.py
+include requirements.txt
+include .coveragerc
+recursive-include docs *
+recursive-include examples *
+recursive-include tutorial *
+
+recursive-exclude notebooks *
+recursive-exclude imgs *
+recursive-exclude htmlcov *
