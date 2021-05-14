@@ -91,7 +91,7 @@ goe = GaussianEnsemble(beta=1, n=1000)
 # plotting its spectral distribution in the interval (-2,2)
 goe.plot_eigval_hist(bins=80, interval=(-2,2), density=True)
 ```
-<img src="imgs/hist_goe.png" width=520 height=330 alt="GOE density plot">
+<img src="imgs/hist_goe.png" width=450 height=320 alt="GOE density plot">
 If we sample a non-symmetric/non-hermitian random matrix, its eigenvalues do not need to be real,
 so a 2D complex histogram has been implemented in order to study spectral density of these type
 of random matrices. It would be the case, for example, of Circular Symplectic Ensemble (CSE).
@@ -101,7 +101,7 @@ of random matrices. It would be the case, for example, of Circular Symplectic En
 cse = CircularEnsemble(beta=4, n=1000)
 cse.plot_eigval_hist(bins=80, interval=(-2.2,2.2))
 ```
-<img src="imgs/hist_cse_smooth.png" width=620 height=320 alt="CSE density plot">
+<img src="imgs/hist_cse_smooth.png" width=650 height=320 alt="CSE density plot">
 
 We can boost histogram representation using the results described by A. Edelman and I. Dumitriu
 in *Matrix Models for Beta Ensembles* and by J. Albrecht, C. Chan, and A. Edelman in
@@ -109,7 +109,7 @@ in *Matrix Models for Beta Ensembles* and by J. Albrecht, C. Chan, and A. Edelma
 random matrices (Gaussian Ensemble and Wishart Ensemble matrices) in its tridiagonal form we
 can speed up histogramming procedure. The following graphical simulation using GOE matrices
 tries to illustrate it.
-<img src="imgs/gauss_tridiag_sim.png" width=800 height=400 alt="Speed up by tridigonal forms">
+<img src="imgs/gauss_tridiag_sim.png" width=820 height=400 alt="Speed up by tridigonal forms">
 
 In addition, several spectral laws can be analyzed using this library, such as Wigner's Semicircle Law,
 Marchenko-Pastur Law and Tracy-Widom Law.
