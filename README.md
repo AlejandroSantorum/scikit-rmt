@@ -91,7 +91,7 @@ goe = GaussianEnsemble(beta=1, n=1000)
 # plotting its spectral distribution in the interval (-2,2)
 goe.plot_eigval_hist(bins=80, interval=(-2,2), density=True)
 ```
-![GOE density plot](imgs/hist_goe.png)
+![GOE density plot](https://github.com/AlejandroSantorum/scikit-rmt/blob/main/imgs/hist_goe.png)
 <!---
 <img src="imgs/hist_goe.png" width=450 height=320 alt="GOE density plot">
 -->
@@ -105,7 +105,7 @@ of random matrices. It would be the case, for example, of **Circular Symplectic 
 cse = CircularEnsemble(beta=4, n=1000)
 cse.plot_eigval_hist(bins=80, interval=(-2.2,2.2))
 ```
-![CSE density plot](imgs/hist_cse_smooth.png)
+![CSE density plot](https://github.com/AlejandroSantorum/scikit-rmt/blob/main/imgs/hist_cse_smooth.png)
 <!---
 <img src="imgs/hist_cse_smooth.png" width=650 height=320 alt="CSE density plot">
 -->
@@ -116,7 +116,7 @@ in *Matrix Models for Beta Ensembles* and by J. Albrecht, C. Chan, and A. Edelma
 random matrices (**Gaussian Ensemble** and **Wishart Ensemble** matrices) in its **tridiagonal form**
 we can speed up histogramming procedure. The following graphical simulation using GOE matrices
 tries to illustrate it.
-![Speed up by tridigonal forms](imgs/gauss_tridiag_sim.png)
+![Speed up by tridigonal forms](https://github.com/AlejandroSantorum/scikit-rmt/blob/main/imgs/gauss_tridiag_sim.png)
 <!---
 <img src="imgs/gauss_tridiag_sim.png" width=820 height=370 alt="Speed up by tridigonal forms">
 -->
@@ -130,7 +130,7 @@ from skrmt.ensemble import wigner_semicircular_law
 
 wigner_semicircular_law(ensemble='goe', n_size=5000, bins=80, density=True)
 ```
-![Wigner Semicircle Law](imgs/scl_goe.png)
+![Wigner Semicircle Law](https://github.com/AlejandroSantorum/scikit-rmt/blob/main/imgs/scl_goe.png)
 <!---
 <img src="imgs/scl_goe.png" width=450 height=320 alt="Wigner Semicircle Law">
 -->
@@ -141,7 +141,7 @@ from skrmt.ensemble import marchenko_pastur_law
 
 marchenko_pastur_law(ensemble='wre', p_size=5000, n_size=15000, bins=80, density=True)
 ```
-![Marchenko-Pastur Law](imgs/mpl_wre.png)
+![Marchenko-Pastur Law](https://github.com/AlejandroSantorum/scikit-rmt/blob/main/imgs/mpl_wre.png)
 <!---
 <img src="imgs/mpl_wre.png" width=450 height=320 alt="Marchenko-Pastur Law">
 -->
@@ -152,7 +152,7 @@ from skrmt.ensemble import tracy_widom_law
 
 tracy_widom_law(ensemble='goe', n_size=100, times=20000, bins=80, density=True)
 ```
-![Tracy-Widom Law](imgs/twl_goe.png)
+![Tracy-Widom Law](https://github.com/AlejandroSantorum/scikit-rmt/blob/main/imgs/twl_goe.png)
 <!---
 <img src="imgs/twl_goe.png" width=450 height=320 alt="Tracy-Widom Law">
 -->
