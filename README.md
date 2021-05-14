@@ -152,7 +152,7 @@ from skrmt.ensemble import tracy_widom_law
 
 tracy_widom_law(ensemble='goe', n_size=100, times=20000, bins=80, density=True)
 ```
-![Tracy-Widom Law](https://raw.githubusercontent.com/AlejandroSantorum/scikit-rmt/main/mgs/twl_goe.png)
+![Tracy-Widom Law](https://raw.githubusercontent.com/AlejandroSantorum/scikit-rmt/main/imgs/twl_goe.png)
 <!---
 <img src="imgs/twl_goe.png" width=450 height=320 alt="Tracy-Widom Law">
 -->
