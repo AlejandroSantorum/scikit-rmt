@@ -10,7 +10,7 @@ VERSION = '0.1'
 with open("README.md", "r") as f:
     LONG_DESCRIPTION = f.read()
 
-with open("README.md", "r") as f:
+with open("requirements.txt", "r") as f:
     REQUIREMENTS = f.read().split('\n')
 
 setup(
