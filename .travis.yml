@@ -6,6 +6,6 @@ python:
 install:
   - pip install -r requirements.txt
 script: 
-  - pytest --cov=skrmt
+  - pytest #--cov=skrmt
 after_success:
   - codecov
