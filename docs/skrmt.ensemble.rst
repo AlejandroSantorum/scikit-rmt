@@ -1,61 +1,53 @@
-skrmt.ensemble package
-======================
+ensemble package
+================
 
 Submodules
 ----------
 
-skrmt.ensemble.circular\_ensemble module
-----------------------------------------
-
-.. automodule:: skrmt.ensemble.circular_ensemble
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-skrmt.ensemble.gaussian\_ensemble module
-----------------------------------------
+gaussian\_ensemble module
+-------------------------
 
 .. automodule:: skrmt.ensemble.gaussian_ensemble
    :members:
    :undoc-members:
    :show-inheritance:
 
-skrmt.ensemble.manova\_ensemble module
---------------------------------------
-
-.. automodule:: skrmt.ensemble.manova_ensemble
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-skrmt.ensemble.plot\_law module
--------------------------------
-
-.. automodule:: skrmt.ensemble.plot_law
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-skrmt.ensemble.tridiagonal\_utils module
-----------------------------------------
-
-.. automodule:: skrmt.ensemble.tridiagonal_utils
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-skrmt.ensemble.wishart\_ensemble module
----------------------------------------
+wishart\_ensemble module
+------------------------
 
 .. automodule:: skrmt.ensemble.wishart_ensemble
    :members:
    :undoc-members:
    :show-inheritance:
 
-Module contents
----------------
+manova\_ensemble module
+-----------------------
 
-.. automodule:: skrmt.ensemble
+.. automodule:: skrmt.ensemble.manova_ensemble
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+circular\_ensemble module
+-------------------------
+
+.. automodule:: skrmt.ensemble.circular_ensemble
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+plot\_law module
+----------------
+
+.. automodule:: skrmt.ensemble.plot_law
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+tridiagonal\_utils routines
+---------------------------
+
+.. automodule:: skrmt.ensemble.tridiagonal_utils
    :members:
    :undoc-members:
    :show-inheritance:

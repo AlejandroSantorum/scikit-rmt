@@ -1,5 +1,5 @@
-skrmt package
-=============
+scikit-rmt package
+==================
 
 Subpackages
 -----------
@@ -9,11 +9,3 @@ Subpackages
 
    skrmt.covariance
    skrmt.ensemble
-
-Module contents
----------------
-
-.. automodule:: skrmt
-   :members:
-   :undoc-members:
-   :show-inheritance:
