@@ -1,9 +1,9 @@
-[![Build Status](https://travis-ci.com/AlejandroSantorum/scikit-rmt.svg?branch=main)](https://travis-ci.com/AlejandroSantorum/scikit-rmt)
+[![PyPI](https://img.shields.io/pypi/v/scikit-rmt?color=g)](https://pypi.org/project/scikit-rmt/)
 [![Documentation Status](https://readthedocs.org/projects/scikit-rmt/badge/?version=latest)](https://scikit-rmt.readthedocs.io/en/latest/?badge=latest)
-[![License Status](https://img.shields.io/github/license/AlejandroSantorum/scikit-rmt)](https://img.shields.io/github/license/AlejandroSantorum/scikit-rmt)
+[![Build Status](https://travis-ci.com/AlejandroSantorum/scikit-rmt.svg?branch=main)](https://travis-ci.com/AlejandroSantorum/scikit-rmt)
 [![codecov](https://codecov.io/gh/AlejandroSantorum/scikit-rmt/branch/main/graph/badge.svg?token=56TNEASPJK)](https://codecov.io/gh/AlejandroSantorum/scikit-rmt)
-![PyPI](https://img.shields.io/pypi/v/scikit-rmt?color=blue)
-![PyPI-Python Version](https://img.shields.io/pypi/pyversions/scikit-rmt)
+[![License Status](https://img.shields.io/github/license/AlejandroSantorum/scikit-rmt?color=blue)](https://github.com/AlejandroSantorum/scikit-rmt/blob/main/LICENSE)
+[![PyPI-Python Version](https://img.shields.io/pypi/pyversions/scikit-rmt)](https://pypi.org/project/scikit-rmt)
 
 
 # scikit-rmt: Random Matrix Theory Python package
