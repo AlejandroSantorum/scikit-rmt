@@ -223,11 +223,24 @@ The package is licensed under the BSD 3-Clause License. A copy of the [license](
     [[pdf]](http://www.ledoit.net/ole1a.pdf)
 
 -----------------
-## Author
+## Attribution
 This project has been developed by Alejandro Santorum Varela (2021) as part of the final degree project
 in Computer Science (Autonomous University of Madrid), supervised by Alberto Suárez González.
 
+If you happen to use `scikit-rmt` in your work or research, please cite its GitHub repository:
 
+A. Santorum, "scikit-rmt", https://github.com/AlejandroSantorum/scikit-rmt, 2021. GitHub repository.
+
+The corresponding BibTex entry is
+```
+@misc{Santorum2021,
+  author = {A. Santorum},
+  title = {scikit-rmt},
+  year = {2021},
+  howpublished = {\url{https://github.com/AlejandroSantorum/scikit-rmt}},
+  note = {GitHub repository}
+}
+```
 
 
 
