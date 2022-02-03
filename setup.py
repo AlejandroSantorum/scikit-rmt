@@ -5,7 +5,8 @@ import sys
 
 from setuptools import find_packages, setup
 
-VERSION = '0.1.4'
+with open("VERSION", "r") as version_file:
+    VERSION = version_file.read().strip()
 
 with open("README.md", "r") as f:
     LONG_DESCRIPTION = f.read()
