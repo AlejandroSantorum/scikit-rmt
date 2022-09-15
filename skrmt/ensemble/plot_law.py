@@ -81,7 +81,7 @@ def wigner_semicircular_law(ensemble='goe', n_size=1000, bins=100, interval=None
 
     # Saving plot or showing it
     if savefig_path:
-        plt.savefig(savefig_path)
+        plt.savefig(savefig_path, dpi=1200)
     else:
         plt.show()
 
@@ -161,7 +161,7 @@ def marchenko_pastur_law(ensemble='wre', p_size=3000, n_size=10000, bins=100, in
 
     # Saving plot or showing it
     if savefig_path:
-        plt.savefig(savefig_path)
+        plt.savefig(savefig_path, dpi=1200)
     else:
         plt.show()
 
@@ -241,6 +241,6 @@ def tracy_widom_law(ensemble='goe', n_size=100, times=1000, bins=100, interval=N
 
     # Saving plot or showing it
     if savefig_path:
-        plt.savefig(savefig_path)
+        plt.savefig(savefig_path, dpi=1200)
     else:
         plt.show()

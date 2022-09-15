@@ -255,12 +255,14 @@ class GaussianEnsemble(_Ensemble):
                                                  interval=interval, density=density)
             width = bins[1]-bins[0]
             plt.bar(bins[:-1], observed, width=width, align='edge')
-            plt.title("Eigenvalue density histogram")
+            plt.title("Eigenvalue density histogram (matrix size: "+\
+                      str(len(self.matrix))+"x"+str(len(self.matrix))+")", fontweight="bold")
             plt.xlabel("x")
             plt.ylabel("density")
             # Saving plot or showing it
             if fig_path:
-                plt.savefig(fig_path)
+                #plt.savefig(fig_path)
+                plt.savefig(fig_path, dpi=1000)
             else:
                 plt.show()
 

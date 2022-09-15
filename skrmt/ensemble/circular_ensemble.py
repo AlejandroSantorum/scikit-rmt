@@ -282,9 +282,12 @@ class CircularEnsemble(_Ensemble):
         axes[1].set_xlabel('real')
         axes[1].set_ylabel('imaginary')
 
+        plt.suptitle("matrix size: "+\
+                      str(len(self.matrix))+"x"+str(len(self.matrix)), fontweight="bold")
+
         # Saving plot or showing it
         if fig_path:
-            plt.savefig(fig_path)
+            plt.savefig(fig_path, dpi=600)
         else:
             plt.show()
 

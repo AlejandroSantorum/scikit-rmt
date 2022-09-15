@@ -285,7 +285,7 @@ class ManovaEnsemble(_Ensemble):
 
         # Saving plot or showing it
         if fig_path:
-            plt.savefig(fig_path)
+            plt.savefig(fig_path, dpi=1200)
         else:
             plt.show()
 
