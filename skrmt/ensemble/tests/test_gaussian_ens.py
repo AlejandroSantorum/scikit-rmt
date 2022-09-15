@@ -155,25 +155,25 @@ def test_gue_init():
 
     assert gue.matrix.shape == (n_size,n_size)
 
-    mtx_sol = [[1.62434536-0.24937038j, -0.84236252+0.56984537j,\
-                0.60832001-1.58001599j],
-               [-0.84236252+0.56984537j, 0.86540763-0.38405435j, \
-                -1.5313728 +0.48067062j],
-               [0.60832001-1.58001599j, -1.5313728 +0.48067062j, \
-                0.3190391 -0.87785842j]]
+    mtx_sol = [[1.62434536+0.j, -0.84236252+0.89226257j,\
+                0.60832001-0.48012472j],
+               [-0.84236252-0.89226257j, 0.86540763+0.j,\
+                -1.5313728 +0.65309882j],
+               [0.60832001+0.48012472j, -1.5313728 -0.65309882j,\
+                0.3190391 +0.j]]
 
     assert_almost_equal(gue.matrix, np.array(mtx_sol),
                         decimal=4)
 
 
-def test_gue_symmetric():
-    '''Testing that GUE matrix is symmetric
+def test_gue_hermitian():
+    '''Testing that GUE matrix is hermitian
     '''
     n_size = 5
     gue = GaussianEnsemble(beta=2, n=n_size)
 
     m_mtx = gue.matrix
-    assert (m_mtx.transpose() == m_mtx).all()
+    assert (m_mtx.transpose().conj() == m_mtx).all()
 
 
 def test_gue_set_size():
