@@ -138,9 +138,9 @@ class GaussianEnsemble(_Ensemble):
     def _sample_gue(self):
         size = self.n
         # n by n random complex matrix
-        mtx = np.random.randn(size,size) + (0+1j)*np.random.randn(size,size)
+        mtx = np.random.randn(size,size) + 1j*np.random.randn(size,size)
         # hermitian matrix
-        self.matrix = (mtx + mtx.transpose())/2
+        self.matrix = (mtx + mtx.transpose().conj())/2
         return self.matrix
 
     def _sample_gse(self):
