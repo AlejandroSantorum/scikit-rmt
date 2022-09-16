@@ -194,6 +194,7 @@ The package is licensed under the BSD 3-Clause License. A copy of the [license](
 
 -----------------
 ## Main references
+
 - James Albrecht, Cy Chan, and Alan Edelman,
     "Sturm Sequences and Random Eigenvalue Distributions",
     *Foundations of Computational Mathematics*,
