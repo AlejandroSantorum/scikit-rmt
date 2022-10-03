@@ -322,7 +322,7 @@ def test_wqe_hermitian():
     wqe = WishartEnsemble(beta=4, p=p_size, n=n_size)
 
     mtx = wqe.matrix
-    assert (mtx.transpose().conj() == mtx).all()
+    assert_almost_equal(mtx, mtx.transpose().conj(), decimal=7)
 
 
 def test_wqe_set_size():
