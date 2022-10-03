@@ -67,7 +67,7 @@ class CircularEnsemble(_Ensemble):
 
     References:
         Killip, R. and Zozhan, R.
-            Matrix Models AND Eigenvalue Statistics for Truncations of
+            Matrix Models and Eigenvalue Statistics for Truncations of
             Classical Ensembles of Random Unitary Matrices.
             Communications in Mathematical Physics. 349 (2017): 991-1027.
         "Circular ensemble". Wikipedia.
@@ -124,7 +124,7 @@ class CircularEnsemble(_Ensemble):
 
         References:
             Killip, R. and Zozhan, R.
-                Matrix Models AND Eigenvalue Statistics for Truncations of
+                Matrix Models and Eigenvalue Statistics for Truncations of
                 Classical Ensembles of Random Unitary Matrices.
                 Communications in Mathematical Physics. 349 (2017): 991-1027.
             "Circular ensemble". Wikipedia.
@@ -177,7 +177,7 @@ class CircularEnsemble(_Ensemble):
 
         References:
             Killip, R. and Zozhan, R.
-                Matrix Models AND Eigenvalue Statistics for Truncations of
+                Matrix Models and Eigenvalue Statistics for Truncations of
                 Classical Ensembles of Random Unitary Matrices.
                 Communications in Mathematical Physics. 349 (2017): 991-1027.
             "Circular ensemble". Wikipedia.
@@ -236,7 +236,7 @@ class CircularEnsemble(_Ensemble):
 
         References:
             Killip, R. and Zozhan, R.
-                Matrix Models AND Eigenvalue Statistics for Truncations of
+                Matrix Models and Eigenvalue Statistics for Truncations of
                 Classical Ensembles of Random Unitary Matrices.
                 Communications in Mathematical Physics. 349 (2017): 991-1027.
 
@@ -304,7 +304,7 @@ class CircularEnsemble(_Ensemble):
 
         References:
             Killip, R. and Zozhan, R.
-                Matrix Models AND Eigenvalue Statistics for Truncations of
+                Matrix Models and Eigenvalue Statistics for Truncations of
                 Classical Ensembles of Random Unitary Matrices.
                 Communications in Mathematical Physics. 349 (2017): 991-1027.
             "Circular ensemble". Wikipedia.
