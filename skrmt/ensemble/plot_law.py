@@ -222,8 +222,10 @@ def tracy_widom_law(ensemble='goe', n_size=100, times=1000, bins=100, interval=N
         eigvals = np.append(eigvals, vals.max())
         ens.sample()
 
-    # Wigner/Tracy-Widom eigenvalue normalization constant
-    eigvals = eigvals/np.sqrt(n_size/2)
+    # Tracy-Widom eigenvalue distr. normalization constant
+    if ensemble == 'gse':
+        n_size *= 2
+    eigvals = (n_size**(1/6)) * (eigvals - (2*np.sqrt(n_size)))
 
     if interval is None:
         xmin=eigvals.min()

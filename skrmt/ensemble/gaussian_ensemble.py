@@ -132,7 +132,7 @@ class GaussianEnsemble(_Ensemble):
         # n by n matrix of random Gaussians
         mtx = np.random.randn(self.n,self.n)
         # symmetrize matrix
-        self.matrix = (mtx + mtx.transpose())/2
+        self.matrix = (mtx + mtx.transpose())/np.sqrt(2)
         return self.matrix
 
     def _sample_gue(self):
@@ -246,11 +246,10 @@ class GaussianEnsemble(_Ensemble):
                 Journal of Mathematical Physics. 43.11 (2002): 5830-5847.
 
         """
-        # pylint: disable=too-many-arguments
-        if norm_const is None:
-            norm_const = 1/np.sqrt(self.n/2)
-
         if self.use_tridiagonal:
+            # pylint: disable=too-many-arguments
+            if norm_const is None:
+                norm_const = 1/np.sqrt(self.n/2)
             observed, bins = tridiag_eigval_hist(self.matrix*norm_const, bins=bins,
                                                  interval=interval, density=density)
             width = bins[1]-bins[0]
@@ -267,6 +266,10 @@ class GaussianEnsemble(_Ensemble):
                 plt.show()
 
         else:
+            # pylint: disable=too-many-arguments
+            if norm_const is None:
+                aux_const = 1 if self.beta==1 else 2
+                norm_const = 1/np.sqrt(self.n/aux_const)
             super().plot_eigval_hist(bins, interval, density, norm_const, fig_path)
 
     def eigval_pdf(self):
