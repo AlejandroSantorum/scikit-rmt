@@ -24,9 +24,9 @@ def test_goe_init():
 
     assert goe.matrix.shape == (n_size,n_size)
 
-    assert_almost_equal(goe.matrix, np.array([[ 1.62434536, -0.84236252, 0.60832001],
-                                              [-0.84236252, 0.86540763, -1.5313728 ],
-                                              [ 0.60832001, -1.5313728, 0.3190391 ]]),
+    assert_almost_equal(goe.matrix, np.array([[ 2.29717124, -1.1912805 ,  0.8602944 ],
+                                              [-1.1912805 ,  1.22387121, -2.16568818],
+                                              [0.8602944 , -2.16568818,  0.45118942]]),
                         decimal=4)
 
 
