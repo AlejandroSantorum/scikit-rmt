@@ -161,9 +161,9 @@ class ManovaEnsemble(_Ensemble):
         # m by n2 random complex matrix of random Gaussians
         y_mtx = np.random.randn(m_size,n2_size) + (0+1j)*np.random.randn(m_size,n2_size)
         # A1 = X * X'
-        a1_mtx = np.matmul(x_mtx, x_mtx.transpose())
+        a1_mtx = np.matmul(x_mtx, x_mtx.transpose().conj())
         # A2 = X * X' + Y * Y'
-        a2_mtx = a1_mtx + np.matmul(y_mtx, y_mtx.transpose())
+        a2_mtx = a1_mtx + np.matmul(y_mtx, y_mtx.transpose().conj())
         # A = (X * X') / (X * X' + Y * Y') = (X * X') * (X * X' + Y * Y')^(-1)
         self.matrix = np.matmul(a1_mtx, np.linalg.inv(a2_mtx))
         return self.matrix
@@ -191,9 +191,9 @@ class ManovaEnsemble(_Ensemble):
                          [-np.conjugate(y2_mtx), np.conjugate(y1_mtx)]
                         ])
         # A1 = X * X'
-        a1_mtx = np.matmul(x_mtx, x_mtx.transpose())
+        a1_mtx = np.matmul(x_mtx, x_mtx.transpose().conj())
         # A2 = X * X' + Y * Y'
-        a2_mtx = a1_mtx + np.matmul(y_mtx, y_mtx.transpose())
+        a2_mtx = a1_mtx + np.matmul(y_mtx, y_mtx.transpose().conj())
         # A = (X * X') / (X * X' + Y * Y') = (X * X') * (X * X' + Y * Y')^(-1)
         self.matrix = np.matmul(a1_mtx, np.linalg.inv(a2_mtx))
         return self.matrix
