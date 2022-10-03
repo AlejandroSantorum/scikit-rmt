@@ -3,6 +3,7 @@
 Testing WishartEnsemble module
 '''
 
+from unicodedata import decimal
 import numpy as np
 from scipy import sparse
 from numpy.testing import (
@@ -175,25 +176,25 @@ def test_wishart_complex_init():
 
     assert wce.matrix.shape == (p_size,p_size)
 
-    mtx_sol = [[10.95414504+1.18652432j, 6.49496169+2.33465966j, \
-                -0.41256652-0.97218795j],
-               [6.49496169+2.33465966j, 3.04633885+0.74413531j, \
-                -3.62175065-2.09216231j],
-               [-0.41256652-0.97218795j, -3.62175065-2.09216231j, \
-                -4.3742556 +4.41905659j]]
+    mtx_sol = [[17.27142618+0.j, 4.56375544+1.14721231j, \
+                -5.16181787+0.9188017j],
+               [4.56375544-1.14721231j, 15.53877203+0.j, \
+                2.44108976+10.47646539j],
+               [-5.16181787-0.9188017j, 2.44108976-10.47646539j, \
+                13.83214319+0.j]]
 
     assert_almost_equal(wce.matrix, np.array(mtx_sol), decimal=7)
 
 
-def test_wce_symmetric():
-    '''Testing that WCE matrix is symmetric
+def test_wce_hermitian():
+    '''Testing that WCE matrix is hermitian
     '''
     p_size = 3
     n_size = 5
     wce = WishartEnsemble(beta=2, p=p_size, n=n_size)
 
-    mtx= wce.matrix
-    assert (mtx.transpose() == mtx).all()
+    mtx = wce.matrix
+    assert_almost_equal(mtx.transpose().conj(), mtx, decimal=7)
 
 
 def test_wce_set_size():
@@ -301,27 +302,27 @@ def test_wishart_quatern_init():
 
     assert wqe.matrix.shape == (2*p_size,2*p_size)
 
-    mtx_sol = [[-6.01217359e-01+7.71388293j, -2.91531515e+00-6.39395501j,\
-                8.10811919e-17+6.4759398j, 2.16853073e+00-0.3065013j],
-               [-2.91531515e+00-6.39395501j, 3.83549752e+00+5.28492599j,\
-                -2.16853073e+00-0.3065013j, -1.30942157e-16-7.29353772j],
-               [8.10811919e-17+6.4759398j, -2.16853073e+00-0.3065013j,\
-                -6.01217359e-01-7.71388293j, -2.91531515e+00+6.39395501j],
-               [2.16853073e+00-0.3065013j, -1.30942157e-16-7.29353772j,\
-                -2.91531515e+00+6.39395501j, 3.83549752e+00-5.28492599j]]
+    mtx_sol = [[1.97823453e+01+0.00000000e+00j, -6.78596934e+00-5.77477475e+00j,\
+                5.04164630e-17+4.44089210e-16j, 4.98065254e+00+2.42862094e+00j],
+               [-6.78596934e+00+5.77477475e+00j, 1.77567967e+01+0.00000000e+00j,\
+                -4.98065254e+00-2.42862094e+00j, 4.13628735e-17+4.44089210e-16j],
+               [5.04164630e-17-4.44089210e-16j, -4.98065254e+00+2.42862094e+00j,\
+                1.97823453e+01+0.00000000e+00j, -6.78596934e+00+5.77477475e+00j],
+               [4.98065254e+00-2.42862094e+00j, 4.13628735e-17-4.44089210e-16j,\
+                -6.78596934e+00-5.77477475e+00j, 1.77567967e+01+0.00000000e+00j]]
 
     assert_almost_equal(wqe.matrix, np.array(mtx_sol), decimal=7)
 
 
-def test_wqe_symmetric():
-    '''Testing that WQE matrix is symmetric
+def test_wqe_hermitian():
+    '''Testing that WQE matrix is hermitian
     '''
     p_size = 3
     n_size = 5
     wqe = WishartEnsemble(beta=4, p=p_size, n=n_size)
 
     mtx = wqe.matrix
-    assert (mtx.transpose() == mtx).all()
+    assert (mtx.transpose().conj() == mtx).all()
 
 
 def test_wqe_set_size():

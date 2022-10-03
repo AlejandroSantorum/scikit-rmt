@@ -150,7 +150,7 @@ class WishartEnsemble(_Ensemble):
         # p by n random complex matrix of random Gaussians
         mtx = np.random.randn(p_size,n_size) + (0+1j)*np.random.randn(p_size,n_size)
         # hermitian matrix
-        self.matrix = np.matmul(mtx, mtx.transpose())
+        self.matrix = np.matmul(mtx, mtx.transpose().conj())
         return self.matrix
 
     def _sample_wqe(self):
@@ -166,7 +166,7 @@ class WishartEnsemble(_Ensemble):
                         [-np.conjugate(y_mtx), np.conjugate(x_mtx)]
                     ])
         # hermitian matrix
-        self.matrix = np.matmul(mtx, mtx.transpose())
+        self.matrix = np.matmul(mtx, mtx.transpose().conj())
         return self.matrix
 
     def sample_tridiagonal(self):
