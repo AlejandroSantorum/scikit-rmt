@@ -155,7 +155,7 @@ class GaussianEnsemble(_Ensemble):
                        [-np.conjugate(y_mtx), np.conjugate(x_mtx)]
                         ])
         # hermitian matrix
-        self.matrix = (mtx + mtx.transpose())/2
+        self.matrix = (mtx + mtx.transpose().conj())/2
         return self.matrix
 
     def sample_tridiagonal(self):

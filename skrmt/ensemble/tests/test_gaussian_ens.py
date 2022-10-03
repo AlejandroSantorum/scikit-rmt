@@ -260,27 +260,27 @@ def test_gse_init():
 
     assert gse.matrix.shape == (2*n_size,2*n_size)
 
-    mtx_sol = [[1.62434536+0.86540763j, -0.56996408-0.27836347j,\
-                0.-0.3224172j, -0.85573916+0.37485754j],
-               [-0.56996408-0.27836347j, -1.07296862-0.7612069j,\
-                0.85573916+0.37485754j, 0.-1.09989127j],
-               [0.-0.3224172j, 0.85573916+0.37485754j,\
-                1.62434536-0.86540763j, -0.56996408+0.27836347j],
-               [-0.85573916+0.37485754j, 0.-1.09989127j, \
-                -0.56996408+0.27836347j, -1.07296862+0.7612069j]]
+    mtx_sol = [[ 1.62434536+0.j, -0.56996408-2.02317523j,\
+                0.+0.j, -0.85573916-0.7589119j],
+               [-0.56996408+2.02317523j, -1.07296862+0.j,\
+                0.85573916+0.7589119j, 0.+0.j],
+               [0.+0.j, 0.85573916-0.7589119j, \
+                1.62434536+0.j, -0.56996408+2.02317523j],
+               [-0.85573916+0.7589119j, 0.+0.j, \
+                -0.56996408-2.02317523j, -1.07296862+0.j]]
 
     assert_almost_equal(gse.matrix, np.array(mtx_sol),
                         decimal=4)
 
 
-def test_gse_symmetric():
-    '''Testing that GSE matrix is symmetric
+def test_gse_hermitian():
+    '''Testing that GSE matrix is hermitian
     '''
     n_size = 5
     gse = GaussianEnsemble(beta=4, n=n_size)
 
     m_tx = gse.matrix
-    assert (m_tx.transpose() == m_tx).all()
+    assert (m_tx.transpose().conj() == m_tx).all()
 
 
 def test_gse_set_size():
