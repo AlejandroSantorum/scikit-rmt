@@ -137,7 +137,7 @@ class _Ensemble(metaclass=ABCMeta):
         return observed, bins
 
 
-    def plot_eigval_hist(self, bins, interval=None, density=False, norm_const=None, avoid_img=False, fig_path=None):
+    def plot_eigval_hist(self, bins, interval=None, density=False, norm_const=None, fig_path=None, avoid_img=False):
         """Calculates and plots the histogram of the matrix eigenvalues
 
         Calculates and plots the histogram of the current sampled matrix eigenvalues.
