@@ -1,53 +1,61 @@
-ensemble subpackage
-===================
+skrmt.ensemble package
+======================
 
 Submodules
 ----------
 
-gaussian\_ensemble module
--------------------------
-
-.. automodule:: skrmt.ensemble.gaussian_ensemble
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-wishart\_ensemble module
-------------------------
-
-.. automodule:: skrmt.ensemble.wishart_ensemble
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-manova\_ensemble module
------------------------
-
-.. automodule:: skrmt.ensemble.manova_ensemble
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-circular\_ensemble module
--------------------------
+skrmt.ensemble.circular\_ensemble module
+----------------------------------------
 
 .. automodule:: skrmt.ensemble.circular_ensemble
    :members:
    :undoc-members:
    :show-inheritance:
 
-plot\_law module
-----------------
+skrmt.ensemble.gaussian\_ensemble module
+----------------------------------------
+
+.. automodule:: skrmt.ensemble.gaussian_ensemble
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+skrmt.ensemble.manova\_ensemble module
+--------------------------------------
+
+.. automodule:: skrmt.ensemble.manova_ensemble
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+skrmt.ensemble.plot\_law module
+-------------------------------
 
 .. automodule:: skrmt.ensemble.plot_law
    :members:
    :undoc-members:
    :show-inheritance:
 
-tridiagonal\_utils routines
----------------------------
+skrmt.ensemble.tridiagonal\_utils module
+----------------------------------------
 
 .. automodule:: skrmt.ensemble.tridiagonal_utils
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+skrmt.ensemble.wishart\_ensemble module
+---------------------------------------
+
+.. automodule:: skrmt.ensemble.wishart_ensemble
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: skrmt.ensemble
    :members:
    :undoc-members:
    :show-inheritance:
