@@ -23,8 +23,8 @@ copyright = '2021, Alejandro Santorum Varela'
 author = 'Alejandro Santorum Varela'
 
 # The full version, including alpha/beta/rc tags
-release = '0.1'
-
+with open("VERSION", "r") as version_file:
+    release = version_file.read().strip()
 
 # -- General configuration ---------------------------------------------------
 
