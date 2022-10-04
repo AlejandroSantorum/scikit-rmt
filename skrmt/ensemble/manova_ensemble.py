@@ -60,6 +60,9 @@ class ManovaEnsemble(_Ensemble):
             that generates the matrix of the corresponding ensemble.
 
     References:
+        Erdos, L. and Farrell, B.
+            "Local Eigenvalue Density for General MANOVA Matrices".
+            Journal of Statistical Physics. 152.6 (2013): 1003-1032.
         Dumitriu, I. and Edelman, A. "Matrix Models for Beta Ensembles".
             Journal of Mathematical Physics. 43.11 (2002): 5830-5847.
 
@@ -214,9 +217,6 @@ class ManovaEnsemble(_Ensemble):
         """Calculates and plots the histogram of the matrix eigenvalues
 
         Calculates and plots the histogram of the current sampled matrix eigenvalues.
-        It is important to underline that this function works with real and complex
-        eigenvalues: if the matrix eigenvalues are complex, they are plotted in the
-        complex plane next to a heap map to study eigenvalue density.
 
         Args:
             bins (int or sequence): If bins is an integer, it defines the number of
@@ -238,13 +238,15 @@ class ManovaEnsemble(_Ensemble):
                 provided, the plot is shown are the end of the routine.
 
         References:
+            Erdos, L. and Farrell, B.
+                "Local Eigenvalue Density for General MANOVA Matrices".
+                Journal of Statistical Physics. 152.6 (2013): 1003-1032.
             Dumitriu, I. and Edelman, A.
                 "Matrix Models for Beta Ensembles".
                 Journal of Mathematical Physics. 43.11 (2002): 5830-5847.
 
         """
         # pylint: disable=too-many-arguments
-        # pylint: disable=too-many-locals
         return super().plot_eigval_hist(bins, interval, density,
                                         norm_const=norm_const, avoid_img=True, fig_path=fig_path)
 
