@@ -208,7 +208,7 @@ class GaussianEnsemble(_Ensemble):
                                            interval=interval, density=density)
             return tridiag_eigval_hist(self.matrix, bins=bins, interval=interval, density=density)
 
-        return super().eigval_hist(bins, interval, density, norm_const)
+        return super().eigval_hist(bins, interval=interval, density=density, norm_const=norm_const)
 
     def plot_eigval_hist(self, bins, interval=None, density=False, norm_const=None, fig_path=None):
         """Calculates and plots the histogram of the matrix eigenvalues
@@ -269,7 +269,8 @@ class GaussianEnsemble(_Ensemble):
             # pylint: disable=too-many-arguments
             if norm_const is None:
                 norm_const = 1/np.sqrt(self.n)
-            super().plot_eigval_hist(bins, interval, density, norm_const, fig_path)
+            super().plot_eigval_hist(bins, interval=interval, density=density,
+                                     norm_const=norm_const, fig_path=fig_path)
 
     def eigval_pdf(self):
         '''Calculates joint eigenvalue pdf.
