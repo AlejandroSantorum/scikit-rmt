@@ -67,7 +67,7 @@ class _Ensemble(metaclass=ABCMeta):
         # this will be commented at inherited classes
         pass
 
-    def eigval_hist(self, bins, interval=None, density=False, norm_const=None):
+    def eigval_hist(self, bins, interval=None, density=False, norm_const=None, avoid_img=False):
         """Calculates the histogram of the matrix eigenvalues
 
         Calculates the histogram of the current sampled matrix eigenvalues. Some ensembles
@@ -93,6 +93,10 @@ class _Ensemble(metaclass=ABCMeta):
                 it is set to None, so eigenvalues are not normalized. However, it is advisable
                 to specify a normalization constant to observe eigenvalue spectrum, e.g.
                 1/sqrt(n/2) if you want to analyze Wigner's Semicircular Law.
+            avoid_img (bool, default=False): If True, eigenvalue imaginary part is ignored.
+                This should be used when the eigenvalue compatation is expected to generate
+                complex eigenvalues with really small imaginary part because of computing
+                rounding errors. E.g.: MANOVA Ensemble eigenvalues.
 
         Returns:
             (tuple) tuple containing:
@@ -121,6 +125,9 @@ class _Ensemble(metaclass=ABCMeta):
 
         # calculating eigenvalues using standard algorithm
         eigvals = self.eigvals()
+        # ignoring imaginary part because of computing rounding errors
+        if avoid_img:
+            eigvals = eigvals.real
 
         if norm_const:
             eigvals = norm_const*eigvals
@@ -130,7 +137,7 @@ class _Ensemble(metaclass=ABCMeta):
         return observed, bins
 
 
-    def plot_eigval_hist(self, bins, interval=None, density=False, norm_const=None, fig_path=None):
+    def plot_eigval_hist(self, bins, interval=None, density=False, norm_const=None, avoid_img=False, fig_path=None):
         """Calculates and plots the histogram of the matrix eigenvalues
 
         Calculates and plots the histogram of the current sampled matrix eigenvalues.
@@ -157,6 +164,10 @@ class _Ensemble(metaclass=ABCMeta):
                 it is set to None, so eigenvalues are not normalized. However, it is advisable
                 to specify a normalization constant to observe eigenvalue spectrum, e.g.
                 1/sqrt(n/2) if you want to analyze Wigner's Semicircular Law.
+            avoid_img (bool, default=False): If True, eigenvalue imaginary part is ignored.
+                This should be used when the eigenvalue compatation is expected to generate
+                complex eigenvalues with really small imaginary part because of computing
+                rounding errors. E.g.: MANOVA Ensemble eigenvalues.
             fig_path (string, default=None): path to save the created figure. If it is not
                 provided, the plot is shown are the end of the routine.
 
@@ -173,8 +184,8 @@ class _Ensemble(metaclass=ABCMeta):
         if not isinstance(interval, tuple):
             raise ValueError("interval argument must be a tuple")
 
-        observed, bins = self.eigval_hist(bins=bins, interval=interval,
-                                          density=density, norm_const=norm_const)
+        observed, bins = self.eigval_hist(bins=bins, interval=interval, density=density,
+                                          norm_const=norm_const, avoid_img=avoid_img)
         width = bins[1]-bins[0]
         plt.bar(bins[:-1], observed, width=width, align='edge')
 
