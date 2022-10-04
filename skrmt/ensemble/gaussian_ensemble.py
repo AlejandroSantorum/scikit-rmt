@@ -201,14 +201,15 @@ class GaussianEnsemble(_Ensemble):
         """
         return np.linalg.eigvalsh(self.matrix)
 
-    def eigval_hist(self, bins, interval=None, density=False, norm_const=None):
+    def eigval_hist(self, bins, interval=None, density=False, norm_const=None, avoid_img=False):
         if self.use_tridiagonal:
             if norm_const:
                 return tridiag_eigval_hist(self.matrix*norm_const, bins=bins,
                                            interval=interval, density=density)
             return tridiag_eigval_hist(self.matrix, bins=bins, interval=interval, density=density)
 
-        return super().eigval_hist(bins, interval=interval, density=density, norm_const=norm_const)
+        return super().eigval_hist(bins, interval=interval, density=density,
+                                   norm_const=norm_const, avoid_img=False)
 
     def plot_eigval_hist(self, bins, interval=None, density=False, norm_const=None, fig_path=None):
         """Calculates and plots the histogram of the matrix eigenvalues
