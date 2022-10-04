@@ -209,7 +209,7 @@ class GaussianEnsemble(_Ensemble):
             return tridiag_eigval_hist(self.matrix, bins=bins, interval=interval, density=density)
 
         return super().eigval_hist(bins, interval=interval, density=density,
-                                   norm_const=norm_const, avoid_img=False)
+                                   norm_const=norm_const, avoid_img=avoid_img)
 
     def plot_eigval_hist(self, bins, interval=None, density=False, norm_const=None, fig_path=None):
         """Calculates and plots the histogram of the matrix eigenvalues
