@@ -33,4 +33,6 @@ cue.plot_eigval_hist(bins=80, interval=(-2.2,2.2))
 cse = CircularEnsemble(beta=4, n=1000)
 cse.plot_eigval_hist(bins=80, interval=(-2.2,2.2))
 
+# The provided heatmap gives an illustration of the eigenvalue accumulation.
+
 
