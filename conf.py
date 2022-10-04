@@ -80,5 +80,5 @@ html_theme = 'sphinx_rtd_theme'
 
 sphinx_gallery_conf = {
     'examples_dirs': ['examples', 'tutorial'],
-    'gallery_dirs': ['examples', 'tutorial'],
+    'gallery_dirs': ['auto_examples', 'auto_tutorial'],
 }
