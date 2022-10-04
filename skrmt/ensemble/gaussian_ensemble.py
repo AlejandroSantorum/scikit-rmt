@@ -140,7 +140,7 @@ class GaussianEnsemble(_Ensemble):
         # n by n random complex matrix
         mtx = np.random.randn(size,size) + 1j*np.random.randn(size,size)
         # hermitian matrix
-        self.matrix = (mtx + mtx.transpose().conj())/2
+        self.matrix = (mtx + mtx.transpose().conj())/np.sqrt(2)
         return self.matrix
 
     def _sample_gse(self):
@@ -155,7 +155,7 @@ class GaussianEnsemble(_Ensemble):
                        [-np.conjugate(y_mtx), np.conjugate(x_mtx)]
                         ])
         # hermitian matrix
-        self.matrix = (mtx + mtx.transpose().conj())/2
+        self.matrix = (mtx + mtx.transpose().conj())/np.sqrt(2)
         return self.matrix
 
     def sample_tridiagonal(self):
@@ -268,8 +268,7 @@ class GaussianEnsemble(_Ensemble):
         else:
             # pylint: disable=too-many-arguments
             if norm_const is None:
-                aux_const = 1 if self.beta==1 else 2
-                norm_const = 1/np.sqrt(self.n/aux_const)
+                norm_const = 1/np.sqrt(self.n)
             super().plot_eigval_hist(bins, interval, density, norm_const, fig_path)
 
     def eigval_pdf(self):
