@@ -12,8 +12,47 @@ import matplotlib.pyplot as plt
 from .gaussian_ensemble import GaussianEnsemble
 from .wishart_ensemble import WishartEnsemble
 
+
+def __get_bins_centers_and_contour(bins):
+    """Calculates the centers and contour of the given bins.
+
+    Computes the centers of the given bins. Also, the smallest and the largest bin
+    delimitiers are included to define the countour of the representation interval.
+
+    Args:
+        bins (list): list of numbers (floats) that specify each bin delimiter.
+
+    Returns:
+        list of numbers (floats) consisting in the list of bin centers and contour.
+    
+    """
+    centers = [bins[0]] # Adding initial contour
+    l = len(bins)
+    for i in range(l-1):
+        centers.append((bins[i]+bins[i+1])/2) # Adding centers
+    centers.append(bins[-1]) # Adding final contour
+    return centers
+
+
+def theory_wigner_law(val):
+    """Computes the theoretical Wigner's semicircle law on a given point.
+
+    Args:
+        val (array_like): point or array of points whose evaluation is required.
+    
+    Returns:
+        array_like (ndarray) of the same shape as 'val' containing the image
+        of the given values evaluated on Wigner's semicircle law.
+    """
+    return np.sqrt(4 - np.array(val)**2)/(2*np.pi)
+
+# # We indicate the matplotlib function 'plot' that 'theory_wigner_law' function
+# # receives a real vector as input and returns its element-wise image vector
+# theory_wigner_law_func = np.vectorize(theory_wigner_law)
+
+
 def wigner_semicircular_law(ensemble='goe', n_size=1000, bins=100, interval=None,
-                            density=False, savefig_path=None):
+                            density=False, limit_pdf=False, savefig_path=None):
     """Calculates and plots Wigner's Semicircle Law using Gaussian Ensemble.
 
     Calculates and plots Wigner's Semicircle Law using Gaussian Ensemble random matrices.
@@ -36,6 +75,9 @@ def wigner_semicircular_law(ensemble='goe', n_size=1000, bins=100, interval=None
             number of counts and the bin width, so that the area under the histogram
             integrates to 1. If set to False, the absolute frequencies of the eigenvalues
             are returned.
+        limit_pdf (bool, default=False): If True, the limiting theoretical law is plotted.
+            If set to False, just the empirical histogram is shown. This parameter is only
+            considered when the argument 'density' is set also to True.
         fig_path (string, default=None): path to save the created figure. If it is not
             provided, the plot is shown are the end of the routine.
 
@@ -74,6 +116,12 @@ def wigner_semicircular_law(ensemble='goe', n_size=1000, bins=100, interval=None
                                      density=density, norm_const=norm_const)
     width = bins[1]-bins[0]
     plt.bar(bins[:-1], observed, width=width, align='edge')
+
+    # Plotting theoretical graphic
+    if limit_pdf and density:
+        centers = __get_bins_centers_and_contour(bins)
+        expected_frec = theory_wigner_law(centers)
+        plt.plot(centers, expected_frec, color='red', linewidth=2)
 
     plt.title("Eigenvalue density histogram")
     plt.xlabel("x")
