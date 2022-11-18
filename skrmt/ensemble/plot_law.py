@@ -6,6 +6,7 @@ Marchenko-Pastur Law and Tracy-Widom Law.
 
 """
 
+import math
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -34,21 +35,27 @@ def __get_bins_centers_and_contour(bins):
     return centers
 
 
-def theory_wigner_law(val):
+def theory_wigner_law(val, beta):
     """Computes the theoretical Wigner's semicircle law on a given point.
 
     Args:
-        val (array_like): point or array of points whose evaluation is required.
+        val (float): point whose evaluation is required.
+        beta (int): integer representing type of matrix entries. beta=1 if real
+            entries are used (GOE), beta=2 if they are complex (GUE) or beta=4
+            if they are quaternions (GSE). 
     
     Returns:
-        array_like (ndarray) of the same shape as 'val' containing the image
-        of the given values evaluated on Wigner's semicircle law.
+        number (float) which is image of the given value evaluated on Wigner's
+        semicircle law.
     """
-    return np.sqrt(4 - np.array(val)**2)/(2*np.pi)
+    radius = 2*math.sqrt(beta)
+    if abs(val) >= radius:
+        return 0
+    return 2*math.sqrt(radius**2 - val**2)/(math.pi*radius**2)
 
-# # We indicate the matplotlib function 'plot' that 'theory_wigner_law' function
-# # receives a real vector as input and returns its element-wise image vector
-# theory_wigner_law_func = np.vectorize(theory_wigner_law)
+# We indicate the matplotlib function 'plot' that 'theory_wigner_law' function
+# receives a real vector as input and returns its element-wise image vector
+# theory_wigner_law_func = np.vectorize(theory_wigner_law, excluded="beta")
 
 
 def wigner_semicircular_law(ensemble='goe', n_size=1000, bins=100, interval=None,
@@ -95,19 +102,21 @@ def wigner_semicircular_law(ensemble='goe', n_size=1000, bins=100, interval=None
         raise ValueError("matrix size must be positive")
 
     if ensemble == 'goe':
-        ens = GaussianEnsemble(beta=1, n=n_size, use_tridiagonal=True)
+        beta = 1
         if interval is None:
             interval = (-2,2)
     elif ensemble == 'gue':
-        ens = GaussianEnsemble(beta=2, n=n_size, use_tridiagonal=True)
+        beta = 2
         if interval is None:
             interval = (-3,3)
     elif ensemble == 'gse':
-        ens = GaussianEnsemble(beta=4, n=n_size, use_tridiagonal=True)
+        beta = 4
         if interval is None:
             interval = (-4,4)
     else:
         raise ValueError("ensemble not supported")
+    
+    ens = GaussianEnsemble(beta=beta, n=n_size, use_tridiagonal=True)
 
     # Wigner eigenvalue normalization constant
     norm_const = 1/np.sqrt(n_size/2)
@@ -120,7 +129,7 @@ def wigner_semicircular_law(ensemble='goe', n_size=1000, bins=100, interval=None
     # Plotting theoretical graphic
     if limit_pdf and density:
         centers = __get_bins_centers_and_contour(bins)
-        expected_frec = theory_wigner_law(centers)
+        expected_frec = [theory_wigner_law(cent, beta) for cent in centers]
         plt.plot(centers, expected_frec, color='red', linewidth=2)
 
     plt.title("Eigenvalue density histogram")
