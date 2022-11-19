@@ -35,6 +35,18 @@ def __get_bins_centers_and_contour(bins):
     return centers
 
 
+def __relu_func(vals):
+    """Element-wise maximum between the value and zero.
+
+    Args:
+        vals (ndarray): list of numbers to compute its element-wise maximum.
+    
+    Returns:
+        array_like consisting in the element-wise maximum vector of the given values.
+    """
+    return np.maximum(vals, np.zeros_like(vals))
+
+
 def theory_wigner_law(val, beta):
     """Computes the theoretical Wigner's semicircle law on a given point.
 
@@ -52,10 +64,6 @@ def theory_wigner_law(val, beta):
     if abs(val) >= radius:
         return 0
     return 2*math.sqrt(radius**2 - val**2)/(math.pi*radius**2)
-
-# We indicate the matplotlib function 'plot' that 'theory_wigner_law' function
-# receives a real vector as input and returns its element-wise image vector
-# theory_wigner_law_func = np.vectorize(theory_wigner_law, excluded="beta")
 
 
 def wigner_semicircular_law(ensemble='goe', n_size=1000, bins=100, interval=None,
@@ -143,14 +151,35 @@ def wigner_semicircular_law(ensemble='goe', n_size=1000, bins=100, interval=None
         plt.show()
 
 
+def theory_marchenko_pastur(vals, ratio, lambda_plus, lambda_minus):
+    """Computes the theoretical Wigner's semicircle law on a given point or points.
+
+    Args:
+        vals (ndarray): numpy array of numbers whose evaluation is required.
+        ratio (float): ratio between the matrix size. ratio is equal to p/n,
+            where p is the number of rows and n is the number of columns of
+            the matrix that generates a Wishart matrix. 'p' is also known as
+            the degrees of freedom and 'n' as the sample size.
+        lambda_plus (float): upper limit of the Marchenko-Pastur distribution.
+        lambda_minus (float): lower limit of the Marchenko-Pastur distribution.
+    
+    Returns:
+        array_like (ndarray) which is the image of the given value (or values)
+        evaluated on Marchenko-Pastur Law.
+    """
+    return np.sqrt(__relu_func(lambda_plus - vals) * __relu_func(vals - lambda_minus)) \
+          / (2*np.pi*ratio*vals)
+
+
 def marchenko_pastur_law(ensemble='wre', p_size=3000, n_size=10000, bins=100, interval=None,
-                         density=False, savefig_path=None):
+                         density=False, limit_pdf=False, savefig_path=None):
     """Calculates and plots Wigner's Semicircle Law using Gaussian Ensemble.
 
     Calculates and plots Marchenko-Pastur Law using Wishart Ensemble random matrices.
     Wishart (Laguerre) ensemble has improved routines (using tridiagonal forms and Sturm
     sequences) to avoid calculating the eigenvalues, so the histogram
-    is built using certain techniques to boost efficiency.
+    is built using certain techniques to boost efficiency. This optimization is only used
+    when the ratio p_size/n_size is less or equal than 1.
 
     Args:
         ensemble ('wre', 'wce' or 'wqe', default='wre'): ensemble to draw the
@@ -170,6 +199,9 @@ def marchenko_pastur_law(ensemble='wre', p_size=3000, n_size=10000, bins=100, in
             number of counts and the bin width, so that the area under the histogram
             integrates to 1. If set to False, the absolute frequencies of the eigenvalues
             are returned.
+        limit_pdf (bool, default=False): If True, the limiting theoretical law is plotted.
+            If set to False, just the empirical histogram is shown. This parameter is only
+            considered when the argument 'density' is set also to True.
         fig_path (string, default=None): path to save the created figure. If it is not
             provided, the plot is shown are the end of the routine.
 
@@ -186,13 +218,19 @@ def marchenko_pastur_law(ensemble='wre', p_size=3000, n_size=10000, bins=100, in
     if n_size<1:
         raise ValueError("matrix size must be positive")
 
+    # calculating constants depending on matrix sizes
+    ratio = p_size/n_size
+    lambda_plus = (1 + np.sqrt(ratio))**2
+    lambda_minus = (1 - np.sqrt(ratio))**2
+
     if ensemble == 'wre':
-        ens = WishartEnsemble(beta=1, p=p_size, n=n_size, use_tridiagonal=True)
+        use_tridiag = (ratio <= 1)
+        ens = WishartEnsemble(beta=1, p=p_size, n=n_size, use_tridiagonal=use_tridiag)
         if interval is None:
-            ratio = p_size/n_size
-            lambda_plus = (1 + np.sqrt(ratio))**2
-            lambda_minus = (1 - np.sqrt(ratio))**2
-            interval = (lambda_minus, lambda_plus)
+            if ratio <= 1:
+                interval = (lambda_minus, lambda_plus)
+            else:
+                interval = (-0.05, lambda_plus)
     elif ensemble == 'wce':
         ens = WishartEnsemble(beta=2, p=p_size, n=n_size, use_tridiagonal=True)
         if interval is None:
@@ -212,9 +250,17 @@ def marchenko_pastur_law(ensemble='wre', p_size=3000, n_size=10000, bins=100, in
     width = bins[1]-bins[0]
     plt.bar(bins[:-1], observed, width=width, align='edge')
 
+    # Plotting theoretical graphic
+    if limit_pdf and density and ensemble=='wre':
+        centers = np.array(__get_bins_centers_and_contour(bins))
+        expected_frec = theory_marchenko_pastur(centers, ratio, lambda_plus, lambda_minus)
+        plt.plot(centers, expected_frec, color='red', linewidth=2)
+
     plt.title("Eigenvalue density histogram")
     plt.xlabel("x")
     plt.ylabel("density")
+    if ratio > 1:
+        plt.ylim(0, np.max(expected_frec)+0.2*np.max(expected_frec))
 
     # Saving plot or showing it
     if savefig_path:
