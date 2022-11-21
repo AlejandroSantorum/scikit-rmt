@@ -151,7 +151,7 @@ def wigner_semicircular_law(ensemble='goe', n_size=1000, bins=100, interval=None
         plt.show()
 
 
-def theory_marchenko_pastur(vals, ratio, lambda_plus, lambda_minus):
+def theory_marchenko_pastur(vals, ratio, lambda_plus, lambda_minus, beta):
     """Computes the theoretical Wigner's semicircle law on a given point or points.
 
     Args:
@@ -162,13 +162,20 @@ def theory_marchenko_pastur(vals, ratio, lambda_plus, lambda_minus):
             the degrees of freedom and 'n' as the sample size.
         lambda_plus (float): upper limit of the Marchenko-Pastur distribution.
         lambda_minus (float): lower limit of the Marchenko-Pastur distribution.
+        beta (int): integer representing type of matrix entries. beta=1 if real
+            entries are used (WRE), beta=2 if they are complex (WCE) or beta=4
+            if they are quaternions (WQE). Beta is considered as the variance
+            of the matrix entries.
     
     Returns:
         array_like (ndarray) which is the image of the given value (or values)
         evaluated on Marchenko-Pastur Law.
     """
-    return np.sqrt(__relu_func(lambda_plus - vals) * __relu_func(vals - lambda_minus)) \
-          / (2*np.pi*ratio*vals)
+    var = beta
+    lambda_minus = var*lambda_minus
+    lambda_plus = var*lambda_plus
+    return np.sqrt(__relu_func(lambda_plus-vals)*__relu_func(vals-lambda_minus)) \
+          / (2*np.pi*ratio*var*vals)
 
 
 def marchenko_pastur_law(ensemble='wre', p_size=3000, n_size=10000, bins=100, interval=None,
@@ -217,30 +224,37 @@ def marchenko_pastur_law(ensemble='wre', p_size=3000, n_size=10000, bins=100, in
     # pylint: disable=too-many-arguments
     if n_size<1:
         raise ValueError("matrix size must be positive")
+    
+    if interval and interval[0] == 0:
+        print("Warning: setting the beginning of the interval to zero may generate numerical errors.")
+        print(f"Setting interval to (-0.01, {interval[1]})")
+        interval = (-0.01, interval[1])
 
     # calculating constants depending on matrix sizes
     ratio = p_size/n_size
     lambda_plus = (1 + np.sqrt(ratio))**2
     lambda_minus = (1 - np.sqrt(ratio))**2
+    use_tridiag = (ratio <= 1)
 
     if ensemble == 'wre':
-        use_tridiag = (ratio <= 1)
-        ens = WishartEnsemble(beta=1, p=p_size, n=n_size, use_tridiagonal=use_tridiag)
+        beta = 1
         if interval is None:
             if ratio <= 1:
                 interval = (lambda_minus, lambda_plus)
             else:
                 interval = (-0.05, lambda_plus)
     elif ensemble == 'wce':
-        ens = WishartEnsemble(beta=2, p=p_size, n=n_size, use_tridiagonal=True)
+        beta = 2
         if interval is None:
-            interval = (0.2, 5)
+            interval = (-0.05, 7)
     elif ensemble == 'wqe':
-        ens = WishartEnsemble(beta=4, p=p_size, n=n_size, use_tridiagonal=True)
+        beta = 4
         if interval is None:
-            interval = (0.5, 10)
+            interval = (-0.05, 12)
     else:
         raise ValueError("ensemble not supported")
+    
+    ens = WishartEnsemble(beta=beta, p=p_size, n=n_size, use_tridiagonal=use_tridiag)
 
     # Wigner eigenvalue normalization constant
     norm_const = 1/n_size
@@ -251,16 +265,21 @@ def marchenko_pastur_law(ensemble='wre', p_size=3000, n_size=10000, bins=100, in
     plt.bar(bins[:-1], observed, width=width, align='edge')
 
     # Plotting theoretical graphic
-    if limit_pdf and density and ensemble=='wre':
+    if limit_pdf and density:
         centers = np.array(__get_bins_centers_and_contour(bins))
-        expected_frec = theory_marchenko_pastur(centers, ratio, lambda_plus, lambda_minus)
+        expected_frec = theory_marchenko_pastur(centers, ratio, lambda_plus,
+                                                lambda_minus, beta)
         plt.plot(centers, expected_frec, color='red', linewidth=2)
 
     plt.title("Eigenvalue density histogram")
     plt.xlabel("x")
     plt.ylabel("density")
     if ratio > 1:
-        plt.ylim(0, np.max(expected_frec)+0.2*np.max(expected_frec))
+        try:
+            plt.ylim(0, np.max(expected_frec)+0.25*np.max(expected_frec))
+        except ValueError:
+            second_highest_val = np.partition(expected_frec.flatten(), -2)[-2]
+            plt.ylim(0, second_highest_val+0.25*second_highest_val)
 
     # Saving plot or showing it
     if savefig_path:
