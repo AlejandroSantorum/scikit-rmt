@@ -172,8 +172,6 @@ def theory_marchenko_pastur(vals, ratio, lambda_plus, lambda_minus, beta):
         evaluated on Marchenko-Pastur Law.
     """
     var = beta
-    lambda_minus = var*lambda_minus
-    lambda_plus = var*lambda_plus
     return np.sqrt(__relu_func(lambda_plus-vals)*__relu_func(vals-lambda_minus)) \
           / (2*np.pi*ratio*var*vals)
 
@@ -230,29 +228,22 @@ def marchenko_pastur_law(ensemble='wre', p_size=3000, n_size=10000, bins=100, in
         print(f"Setting interval to (-0.01, {interval[1]})")
         interval = (-0.01, interval[1])
 
+    try:
+        beta = ["wre", "wce", None, "wqe"].index(ensemble) + 1
+    except ValueError:
+        raise ValueError("ensemble not supported: "+str(ensemble))
     # calculating constants depending on matrix sizes
     ratio = p_size/n_size
-    lambda_plus = (1 + np.sqrt(ratio))**2
-    lambda_minus = (1 - np.sqrt(ratio))**2
+    lambda_plus = beta*(1 + np.sqrt(ratio))**2
+    lambda_minus = beta*(1 - np.sqrt(ratio))**2
     use_tridiag = (ratio <= 1)
 
-    if ensemble == 'wre':
-        beta = 1
-        if interval is None:
-            if ratio <= 1:
-                interval = (lambda_minus, lambda_plus)
-            else:
-                interval = (-0.05, lambda_plus)
-    elif ensemble == 'wce':
-        beta = 2
-        if interval is None:
-            interval = (-0.05, 7)
-    elif ensemble == 'wqe':
-        beta = 4
-        if interval is None:
-            interval = (-0.05, 12)
-    else:
-        raise ValueError("ensemble not supported")
+    # computing interval according to the matrix size ratio and support
+    if interval is None:
+        if ratio <= 1:
+            interval = (lambda_minus, lambda_plus)
+        else:
+            interval = (min(-0.05, lambda_minus), lambda_plus)
     
     ens = WishartEnsemble(beta=beta, p=p_size, n=n_size, use_tridiagonal=use_tridiag)
 
