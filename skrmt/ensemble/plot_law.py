@@ -12,6 +12,7 @@ import matplotlib.pyplot as plt
 
 from .gaussian_ensemble import GaussianEnsemble
 from .wishart_ensemble import WishartEnsemble
+from .tracy_widom_approximator import TW_Approximator
 
 
 def __get_bins_centers_and_contour(bins):
@@ -280,7 +281,7 @@ def marchenko_pastur_law(ensemble='wre', p_size=3000, n_size=10000, bins=100, in
 
 
 def tracy_widom_law(ensemble='goe', n_size=100, times=1000, bins=100, interval=None,
-                    density=False, savefig_path=None):
+                    density=False, limit_pdf=False, savefig_path=None):
     """Calculates and plots Tracy-Widom Law using Gaussian Ensemble.
 
     Calculates and plots Tracy-Widom Law using Gaussian Ensemble random matrices.
@@ -304,6 +305,9 @@ def tracy_widom_law(ensemble='goe', n_size=100, times=1000, bins=100, interval=N
             number of counts and the bin width, so that the area under the histogram
             integrates to 1. If set to False, the absolute frequencies of the eigenvalues
             are returned.
+        limit_pdf (bool, default=False): If True, the limiting theoretical law is plotted.
+            If set to False, just the empirical histogram is shown. This parameter is only
+            considered when the argument 'density' is set also to True.
         fig_path (string, default=None): path to save the created figure. If it is not
             provided, the plot is shown are the end of the routine.
 
@@ -319,15 +323,13 @@ def tracy_widom_law(ensemble='goe', n_size=100, times=1000, bins=100, interval=N
     # pylint: disable=too-many-arguments
     if n_size<1 or times<1:
         raise ValueError("matrix size or number of repetitions must be positive")
+    
+    try:
+        beta = ["goe", "gue", None, "gse"].index(ensemble) + 1
+    except ValueError:
+        raise ValueError("ensemble not supported: "+str(ensemble))
 
-    if ensemble == 'goe':
-        ens = GaussianEnsemble(beta=1, n=n_size, use_tridiagonal=False)
-    elif ensemble == 'gue':
-        ens = GaussianEnsemble(beta=2, n=n_size, use_tridiagonal=False)
-    elif ensemble == 'gse':
-        ens = GaussianEnsemble(beta=4, n=n_size, use_tridiagonal=False)
-    else:
-        raise ValueError("ensemble not supported")
+    ens = GaussianEnsemble(beta=beta, n=n_size, use_tridiagonal=False)
 
     eigvals = np.asarray([])
     for _ in range(times):
@@ -353,6 +355,13 @@ def tracy_widom_law(ensemble='goe', n_size=100, times=1000, bins=100, interval=N
     observed, bins = np.histogram(eigvals, bins=bins, range=interval, density=density)
     width = bins[1]-bins[0]
     plt.bar(bins[:-1], observed, width=width, align='edge')
+
+    # Plotting theoretical graphic
+    if limit_pdf and density:
+        centers = __get_bins_centers_and_contour(bins)
+        tw_approx = TW_Approximator(beta=beta)
+        expected_frec = tw_approx.pdf(centers)
+        plt.plot(centers, expected_frec, color='red', linewidth=2)
 
     plt.title("Eigenvalue density histogram")
     plt.xlabel("x")
