@@ -267,10 +267,14 @@ def marchenko_pastur_law(ensemble='wre', p_size=3000, n_size=10000, bins=100, in
     plt.xlabel("x")
     plt.ylabel("density")
     if ratio > 1:
+        if limit_pdf and density:
+            ylim_vals = expected_frec
+        else:
+            ylim_vals = observed
         try:
-            plt.ylim(0, np.max(expected_frec)+0.25*np.max(expected_frec))
+            plt.ylim(0, np.max(ylim_vals)+0.25*np.max(ylim_vals))
         except ValueError:
-            second_highest_val = np.partition(expected_frec.flatten(), -2)[-2]
+            second_highest_val = np.partition(ylim_vals.flatten(), -2)[-2]
             plt.ylim(0, second_highest_val+0.25*second_highest_val)
 
     # Saving plot or showing it

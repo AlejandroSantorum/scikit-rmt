@@ -77,19 +77,6 @@ def _find_u_v (x, f, dlnf, N, a, b, c):
     return u, v
 
 
-def _finv(y, N, a, b, c, u=0, v=0):
-    # a * x**3 + b*x**1.5 + c * log x + log y - log N
-    ya = np.asanyarray(y)
-    xa = np.ones_like(ya)
-    flag = (ya>0)
-    logyn = np.log(ya[flag]/N)
-    xa[~flag] = np.inf
-    for i in range(3):
-        ca =  np.log(xa[flag])*c + logyn - np.log1p(u/xa[flag]**1.5 + v/xa[flag]**3)
-        xa[flag] = ((np.sqrt(b*b-4.*a*ca) -b)/(a*2.) if a else ca/(-b))**(2./3.)
-    return xa
-
-
 
 class TW_Approximator(object):
     """Provide the Tracy-Widom distribution functions for beta = 1, 2, or 4.
@@ -192,51 +179,3 @@ class TW_Approximator(object):
         """
         xa = np.asanyarray(x)
         return derivative(self.cdf, xa, dx=0.08, order=5)
-
-
-    def cdfinv(self, x):
-        """Return the inverse cumulative distribution function at x.
-        cdfinv(x) = cdf^{-1}(x)
-
-        Args:
-            x (float or array-like): value to evaluate the inverse of the cdf.
-                Only values in (0, 1) are valid.
-
-        Returns:
-            y (float or array-like): result of y = cdfinv(x).
-        """
-        xa = np.asanyarray(x)
-        scalar = (xa.ndim==0)
-        if scalar: xa = xa.flatten()
-        y = self.__cdfinv(xa)
-        flag = xa < self.__ylim[0]
-        y[flag] = self.__asym_inv_n(xa[flag])
-        flag = xa > self.__ylim[1]
-        y[flag] = self.__asym_inv_p(xa[flag])
-        return y[0] if scalar else y
-
-
-
-if __name__ == "__main__":
-    tw = TW_Approximator(beta=2)
-
-    # We test CDF becuase PDF is directly the PDF derivative
-    print(tw.cdf(0.1))   # ≈ 0.9754704606594619
-
-    print(tw.cdf(-1.0))  # ≈ 0.8072142419992853
-    print(tw.cdf(-2.0))  # ≈ 0.41322414250512257
-    print(tw.cdf(-3.0))  # ≈ 0.08031955293933454
-    print(tw.cdf(-4.0))  # ≈ 0.0035445535955092003
-    print(tw.cdf(-5.0))  # ≈ 2.135996984741116e-5
-    print(tw.cdf(-6.0))  # ≈ 1.062254674124451e-8
-    print(tw.cdf(-7.0))  # ≈ 2.639614767246062e-13
-    print(tw.cdf(-8.0))  # ≈ 1.9859004257636574e-19
-
-    print(tw.cdf(1.0))   # ≈ 0.9975054381493893
-    print(tw.cdf(2.0))   # ≈ 0.9998875536983092
-    print(tw.cdf(3.0))   # ≈ 0.9999970059566077
-    print(tw.cdf(4.0))   # ≈ 0.9999999504208784
-    print(tw.cdf(5.0))   # ≈ 0.9999999994682207
-    print(tw.cdf(6.0))   # ≈ 0.9999999999961827
-    print(tw.cdf(7.0))   # ≈ 0.9999999999999811
-    print(tw.cdf(8.0))   # ≈ 0.9999999999999999
