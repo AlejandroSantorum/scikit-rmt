@@ -12,6 +12,7 @@ import matplotlib.pyplot as plt
 
 from .gaussian_ensemble import GaussianEnsemble
 from .wishart_ensemble import WishartEnsemble
+from .manova_ensemble import ManovaEnsemble
 from .tracy_widom_approximator import TW_Approximator
 
 
@@ -221,7 +222,7 @@ def marchenko_pastur_law(ensemble='wre', p_size=3000, n_size=10000, bins=100, in
 
     """
     # pylint: disable=too-many-arguments
-    if n_size<1:
+    if n_size<1 or p_size<1:
         raise ValueError("matrix size must be positive")
     
     if interval and interval[0] == 0:
@@ -367,6 +368,46 @@ def tracy_widom_law(ensemble='goe', n_size=100, times=1000, bins=100, interval=N
         tw_approx = TW_Approximator(beta=beta)
         expected_frec = tw_approx.pdf(centers)
         plt.plot(centers, expected_frec, color='red', linewidth=2)
+
+    plt.title("Eigenvalue density histogram")
+    plt.xlabel("x")
+    plt.ylabel("density")
+
+    # Saving plot or showing it
+    if savefig_path:
+        plt.savefig(savefig_path, dpi=1200)
+    else:
+        plt.show()
+
+
+def manova_spectrum_distr(ensemble='mre', m_size=1000, n1_size=3000, n2_size=3000,
+                          bins=100, interval=None, density=False, limit_pdf=False,
+                          savefig_path=None):
+    
+    if m_size<1 or n1_size<1 or n2_size<1:
+        raise ValueError("matrix size must be positive")
+    
+    try:
+        beta = ["mre", "mce", None, "mqe"].index(ensemble) + 1
+    except ValueError:
+        raise ValueError("ensemble not supported: "+str(ensemble))
+    
+    ens = ManovaEnsemble(beta=beta, m=m_size, n1=n1_size, n2=n2_size)
+
+    a = n1_size/m_size
+    b = n2_size/m_size
+    lambda_term1 = np.sqrt((a/(a+b)) * (1 - (1/(a+b))))
+    lambda_term2 = np.sqrt((1/(a+b)) * (1 - (a/(a+b))))
+    lambda_minus = (lambda_term1 - lambda_term2)**2
+    lambda_plus = (lambda_term1 + lambda_term2)**2
+    if interval is None:
+        interval = (lambda_minus, lambda_plus)
+
+    #norm_const = m_size
+    observed, bins = ens.eigval_hist(bins=bins, interval=interval,
+                                     density=density, avoid_img=True) #norm_const = norm_const
+    width = bins[1]-bins[0]
+    plt.bar(bins[:-1], observed, width=width, align='edge')
 
     plt.title("Eigenvalue density histogram")
     plt.xlabel("x")
