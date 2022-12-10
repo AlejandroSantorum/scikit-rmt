@@ -213,7 +213,7 @@ class ManovaEnsemble(_Ensemble):
         """
         return np.linalg.eigvals(self.matrix)
 
-    def plot_eigval_hist(self, bins, interval=None, density=False, norm_const=None, fig_path=None):
+    def plot_eigval_hist(self, bins, interval=(0,1), density=False, norm_const=None, fig_path=None):
         """Calculates and plots the histogram of the matrix eigenvalues
 
         Calculates and plots the histogram of the current sampled matrix eigenvalues.
@@ -223,7 +223,7 @@ class ManovaEnsemble(_Ensemble):
                 equal-width bins in the range. If bins is a sequence, it defines the
                 bin edges, including the left edge of the first bin and the right
                 edge of the last bin; in this case, bins may be unequally spaced.
-            interval (tuple, default=None): Delimiters (xmin, xmax) of the histogram.
+            interval (tuple, default=(0,1)): Delimiters (xmin, xmax) of the histogram.
                 The lower and upper range of the bins. Lower and upper outliers are ignored.
             density (bool, default=False): If True, draw and return a probability
                 density: each bin will display the bin's raw count divided by the total
