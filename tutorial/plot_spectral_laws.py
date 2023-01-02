@@ -149,5 +149,32 @@ from skrmt.ensemble import tracy_widom_law
 
 tracy_widom_law(ensemble='goe', n_size=100, times=10000, bins=80)
 
+##############################################################################
+# Spectral Laws analytical expression
+# -----------------------------------
+# 
+# The spectral laws described so far have been proven to converge to certain
+# analytical functions that defines the limiting behaviour of the eigenvalue
+# distribution of the random matrices. The functions of scikit-rmt that are
+# capable of plotting the spectral laws also support the representation of the
+# theoretical eigenvalue pdf.
 
+##############################################################################
+# The analytical probability function for the Gaussian Ensemble, known as
+# Wigner Semicircle Law, supported on :math:`[-R, R]` and centered at :math:`(0,0)`
+# is :math:`f(x) = \frac{2}{\pi R^2} \sqrt{R^2 - x^2}`.
 
+from skrmt.ensemble import wigner_semicircular_law
+
+wigner_semicircular_law(ensemble='goe', n_size=2000, bins=80, density=True, limit_pdf=True)
+
+##############################################################################
+# The analytical probability function for the Wishart Ensemble known as
+# Marchenko-Pastur Law with parameter :math:`lambda = p/n \in (0,1]` is
+# :math:`f_{\lambda}(x) = \frac{1}{2\pi \sigma^2}\frac{\sqrt{(\lambda_+ - x)(x - \lambda_-)}}{\lambda x}`,
+# where :math:`\lambda_{\pm} = \sigma^2 (1 \pm \sqrt{\lambda})^2`. 
+# If :math:`lambda > 1` then the limiting distribution has an additional
+# mass probability point in the origin of size :math:`1 - \frac{1}{\lambda}`.
+from skrmt.ensemble import marchenko_pastur_law
+
+marchenko_pastur_law(ensemble='wre', p_size=2000, n_size=6000, bins=80, density=True, limit_pdf=True)
