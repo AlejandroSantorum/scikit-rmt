@@ -175,6 +175,29 @@ wigner_semicircular_law(ensemble='goe', n_size=2000, bins=80, density=True, limi
 # where :math:`\lambda_{\pm} = \sigma^2 (1 \pm \sqrt{\lambda})^2`. 
 # If :math:`lambda > 1` then the limiting distribution has an additional
 # mass probability point in the origin of size :math:`1 - \frac{1}{\lambda}`.
+
 from skrmt.ensemble import marchenko_pastur_law
 
 marchenko_pastur_law(ensemble='wre', p_size=2000, n_size=6000, bins=80, density=True, limit_pdf=True)
+
+##############################################################################
+# In the other hand, the Tracy-Widom Law has a complex analytical expression,
+# that is the solution of a particular non-linear differential equation, described
+# in detail in: S. Bauman. "The Tracy-Widom Distribution and its Application to Statistical Physics".
+# MIT Department of Physics. 2017. The package scikit-rmt represents a precise
+# approximation of the theoretical Tracy-Widom pdf.
+
+from skrmt.ensemble import tracy_widom_law
+
+tracy_widom_law(ensemble='goe', n_size=1000, times=20000, bins=80, density=True, limit_pdf=True)
+
+##############################################################################
+# Finally, the limiting distribution of the Manova Ensemble is not described
+# by any famous Law, but its expression has been determined. This library
+# provides functionality to show it on top of the empirical histogram of the
+# eigenvalue spectrum.
+
+from skrmt.ensemble import manova_spectrum_distr
+
+manova_spectrum_distr(ensemble='mre', m_size=1000, n1_size=3000, n2_size=3000,
+                      bins=80, density=True, limit_pdf=True)
