@@ -189,7 +189,7 @@ marchenko_pastur_law(ensemble='wre', p_size=2000, n_size=6000, bins=80, density=
 
 from skrmt.ensemble import tracy_widom_law
 
-tracy_widom_law(ensemble='goe', n_size=1000, times=20000, bins=80, density=True, limit_pdf=True)
+tracy_widom_law(ensemble='goe', n_size=10, times=1000, bins=80, density=True, limit_pdf=True)
 
 ##############################################################################
 # Finally, the limiting distribution of the Manova Ensemble is not described
