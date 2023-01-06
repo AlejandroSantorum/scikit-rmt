@@ -174,7 +174,7 @@ Plot of **Tracy-Widom Law**, sampling 20000 GOE matrices of size 100x100:
 ```python
 from skrmt.ensemble import tracy_widom_law
 
-tracy_widom_law(ensemble='goe', n_size=100, times=20000, bins=80, density=True)
+tracy_widom_law(ensemble='goe', n_size=500, times=20000, bins=80, density=True)
 ```
 ![Tracy-Widom Law](https://raw.githubusercontent.com/AlejandroSantorum/scikit-rmt/main/imgs/twl_goe.png)
 <!---
@@ -184,7 +184,7 @@ tracy_widom_law(ensemble='goe', n_size=100, times=20000, bins=80, density=True)
 ```python
 from skrmt.ensemble import tracy_widom_law
 
-tracy_widom_law(ensemble='goe', n_size=100, times=20000, bins=80, density=True, limit_pdf=True)
+tracy_widom_law(ensemble='goe', n_size=500, times=20000, bins=80, density=True, limit_pdf=True)
 ```
 ![Tracy-Widom Law PDF](https://raw.githubusercontent.com/AlejandroSantorum/scikit-rmt/main/imgs/twl_goe_pdf.png)
 <!---
