@@ -1,18 +1,25 @@
 # encoding: utf-8
 
 import os
-import sys
-
 from setuptools import find_packages, setup
 
-with open("VERSION", "r") as version_file:
+with open(
+    os.path.join(os.path.dirname(__file__), "VERSION"),
+    "r",
+) as version_file:
     VERSION = version_file.read().strip()
 
-with open("README.md", "r") as f:
-    LONG_DESCRIPTION = f.read()
+with open(
+    os.path.join(os.path.dirname(__file__), "README.md"),
+    "r",
+) as readme_file:
+    LONG_DESCRIPTION = readme_file.read()
 
-with open("requirements.txt", "r") as f:
-    REQUIREMENTS = f.read().split('\n')
+with open(
+    os.path.join(os.path.dirname(__file__), "requirements.txt"),
+    "r",
+) as req_file:
+    REQUIREMENTS = req_file.read().split('\n')
 
 DOWNLOAD_URL = f'https://github.com/AlejandroSantorum/scikit-rmt/archive/refs/tags/v{VERSION}.tar.gz'
 
@@ -31,7 +38,6 @@ setup(
     include_package_data=True,
     packages=find_packages(),
     keywords=['RMT', 'Random Matrix Theory', 'Ensemble', 'Covariance matrices'],
-    #install_requires=["numpy", "matplotlib", "scipy"],
     install_requires=REQUIREMENTS,
     classifiers=[
         'Development Status :: 3 - Alpha',
