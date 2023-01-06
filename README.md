@@ -125,7 +125,8 @@ tries to illustrate it.
 -->
 
 In addition, several spectral laws can be analyzed using this library, such as Wigner's Semicircle Law,
-Marchenko-Pastur Law and Tracy-Widom Law.
+Marchenko-Pastur Law and Tracy-Widom Law. The analytical probability density function can also be plotted
+by using the `limit_pdf` argument.
 
 Plot of **Wigner's Semicircle Law**, sampling a GOE matrix 5000x5000:
 ```python
@@ -136,6 +137,16 @@ wigner_semicircular_law(ensemble='goe', n_size=5000, bins=80, density=True)
 ![Wigner Semicircle Law](https://raw.githubusercontent.com/AlejandroSantorum/scikit-rmt/main/imgs/scl_goe.png)
 <!---
 <img src="imgs/scl_goe.png" width=450 height=320 alt="Wigner Semicircle Law">
+-->
+
+```python
+from skrmt.ensemble import wigner_semicircular_law
+
+wigner_semicircular_law(ensemble='goe', n_size=5000, bins=80, density=True, limit_pdf=True)
+```
+![Wigner Semicircle Law PDF](https://raw.githubusercontent.com/AlejandroSantorum/scikit-rmt/main/imgs/scl_goe_pdf.png)
+<!---
+<img src="imgs/scl_goe_pdf.png" width=450 height=320 alt="Wigner Semicircle Law PDF">
 -->
 
 Plot of **Marchenko-Pastur Law**, sampling a WRE matrix 5000x5000:
@@ -149,6 +160,16 @@ marchenko_pastur_law(ensemble='wre', p_size=5000, n_size=15000, bins=80, density
 <img src="imgs/mpl_wre.png" width=450 height=320 alt="Marchenko-Pastur Law">
 -->
 
+```python
+from skrmt.ensemble import marchenko_pastur_law
+
+marchenko_pastur_law(ensemble='wre', p_size=5000, n_size=15000, bins=80, density=True, limit_pdf=True)
+```
+![Marchenko-Pastur Law PDF](https://raw.githubusercontent.com/AlejandroSantorum/scikit-rmt/main/imgs/mpl_wre_pdf.png)
+<!---
+<img src="imgs/mpl_wre_pdf.png" width=450 height=320 alt="Marchenko-Pastur Law PDF">
+-->
+
 Plot of **Tracy-Widom Law**, sampling 20000 GOE matrices of size 100x100:
 ```python
 from skrmt.ensemble import tracy_widom_law
@@ -158,6 +179,16 @@ tracy_widom_law(ensemble='goe', n_size=100, times=20000, bins=80, density=True)
 ![Tracy-Widom Law](https://raw.githubusercontent.com/AlejandroSantorum/scikit-rmt/main/imgs/twl_goe.png)
 <!---
 <img src="imgs/twl_goe.png" width=450 height=320 alt="Tracy-Widom Law">
+-->
+
+```python
+from skrmt.ensemble import tracy_widom_law
+
+tracy_widom_law(ensemble='goe', n_size=100, times=20000, bins=80, density=True, limit_pdf=True)
+```
+![Tracy-Widom Law PDF](https://raw.githubusercontent.com/AlejandroSantorum/scikit-rmt/main/imgs/twl_goe_pdf.png)
+<!---
+<img src="imgs/twl_goe_pdf.png" width=450 height=320 alt="Tracy-Widom Law PDF">
 -->
 
 The other module of this library implements **several covariance matrix estimators**:
