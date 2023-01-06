@@ -14,7 +14,7 @@ auto_tutorial
 
 # my files
 my_tests*
-imgs
+imgs/slides
 
 # dist
 dist
