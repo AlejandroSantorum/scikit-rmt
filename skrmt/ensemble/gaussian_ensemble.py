@@ -261,7 +261,6 @@ class GaussianEnsemble(_Ensemble):
             plt.ylabel("density")
             # Saving plot or showing it
             if fig_path:
-                #plt.savefig(fig_path)
                 plt.savefig(fig_path, dpi=1000)
             else:
                 plt.show()
