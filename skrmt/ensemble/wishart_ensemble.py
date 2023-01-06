@@ -267,11 +267,9 @@ class WishartEnsemble(_Ensemble):
             norm_const = 1/self.n
         if interval is None:
             ratio = self.p/self.n
-            lambda_plus = (1 + np.sqrt(ratio))**2
-            lambda_minus = (1 - np.sqrt(ratio))**2
-            xmin = lambda_minus
-            xmax = lambda_plus
-            interval = (xmin, xmax)
+            lambda_plus = self.beta * (1 + np.sqrt(ratio))**2
+            lambda_minus = self.beta * (1 - np.sqrt(ratio))**2
+            interval = (lambda_minus, lambda_plus)
 
         if self.use_tridiagonal:
             observed, bins = tridiag_eigval_hist(self.matrix*norm_const, bins=bins,

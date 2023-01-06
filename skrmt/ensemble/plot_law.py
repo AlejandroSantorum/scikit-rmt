@@ -142,7 +142,7 @@ def wigner_semicircular_law(ensemble='goe', n_size=1000, bins=100, interval=None
         expected_frec = [theory_wigner_law(cent, beta) for cent in centers]
         plt.plot(centers, expected_frec, color='red', linewidth=2)
 
-    plt.title("Eigenvalue density histogram")
+    plt.title("Eigenvalue density histogram", fontweight="bold")
     plt.xlabel("x")
     plt.ylabel("density")
 
@@ -265,7 +265,7 @@ def marchenko_pastur_law(ensemble='wre', p_size=3000, n_size=10000, bins=100, in
                                                 lambda_plus, beta)
         plt.plot(centers, expected_frec, color='red', linewidth=2)
 
-    plt.title("Eigenvalue density histogram")
+    plt.title("Eigenvalue density histogram", fontweight="bold")
     plt.xlabel("x")
     plt.ylabel("density")
     if ratio > 1:
@@ -371,7 +371,7 @@ def tracy_widom_law(ensemble='goe', n_size=100, times=1000, bins=100, interval=N
         expected_frec = tw_approx.pdf(centers)
         plt.plot(centers, expected_frec, color='red', linewidth=2)
 
-    plt.title("Eigenvalue density histogram")
+    plt.title("Eigenvalue density histogram", fontweight="bold")
     plt.xlabel("x")
     plt.ylabel("density")
 
@@ -492,7 +492,7 @@ def manova_spectrum_distr(ensemble='mre', m_size=1000, n1_size=3000, n2_size=300
                                                     lambda_minus, lambda_plus)
         plt.plot(centers, expected_frec, color='red', linewidth=2)
 
-    plt.title("Eigenvalue density histogram")
+    plt.title("Eigenvalue density histogram", fontweight="bold")
     plt.xlabel("x")
     plt.ylabel("density")
     if a <= 1 or b <= 1:
