@@ -1,0 +1,9 @@
+cff-version: 1.2.0
+message: "If you use scikit-rmt in your research or project, please cite it using the following metadata."
+authors:
+- family-names: "Santorum Varela"
+  given-names: "Alejandro"
+  orcid: "https://orcid.org/0000-0003-3555-9501"
+title: "scikit-rmt: Random Matrix Theory python package"
+date-released: 2021-05-14
+url: "https://github.com/AlejandroSantorum/scikit-rmt"

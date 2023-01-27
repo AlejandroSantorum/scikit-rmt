@@ -1,6 +1,7 @@
 include README.md
 include MANIFEST.in
 include LICENSE
+include CITATION.cff
 include Makefile
 include *.yml
 include *.rst
