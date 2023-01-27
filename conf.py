@@ -12,6 +12,7 @@
 #
 import os
 import sys
+import re
 sys.path.insert(0, os.path.abspath('.'))
 sys.path.append('skrmt')
 
@@ -23,8 +24,18 @@ copyright = '2021, Alejandro Santorum Varela'
 author = 'Alejandro Santorum Varela'
 
 # The full version, including alpha/beta/rc tags
-with open("VERSION", "r") as version_file:
-    release = version_file.read().strip()
+VERSION_FILEPATH = "skrmt/_version.py"
+with open(
+    os.path.join(os.path.dirname(__file__), VERSION_FILEPATH),
+    "r",
+) as version_file:
+    version_file_text = version_file.read()
+    VSRE = r"^__version__ = ['\"]([^'\"]*)['\"]"
+    match = re.search(VSRE, version_file_text, re.M)
+    if match:
+        VERSION = match.group(1)
+    else:
+        raise RuntimeError(f"Unable to find version in {VERSION_FILEPATH}.")
 
 # -- General configuration ---------------------------------------------------
 
