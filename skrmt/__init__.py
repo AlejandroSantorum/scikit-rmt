@@ -1,5 +1,3 @@
-import os
+from _version import __version__, __version_info__
 
-with open(os.path.join(os.path.dirname(__file__),
-                        '..', 'VERSION'), 'r') as version_file:
-    __version__ = version_file.read().strip()
+__all__ = [__version__, __version_info__]
