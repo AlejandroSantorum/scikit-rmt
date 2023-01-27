@@ -11,8 +11,8 @@
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
 import os
-import sys
 import re
+import sys
 sys.path.insert(0, os.path.abspath('.'))
 sys.path.append('skrmt')
 
@@ -33,7 +33,7 @@ with open(
     VSRE = r"^__version__ = ['\"]([^'\"]*)['\"]"
     match = re.search(VSRE, version_file_text, re.M)
     if match:
-        VERSION = match.group(1)
+        release = match.group(1)
     else:
         raise RuntimeError(f"Unable to find version in {VERSION_FILEPATH}.")
 
