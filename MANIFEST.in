@@ -1,6 +1,5 @@
 include README.md
 include MANIFEST.in
-include VERSION
 include LICENSE
 include Makefile
 include *.yml
