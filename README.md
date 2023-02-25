@@ -273,4 +273,3 @@ The corresponding BibTex entry is
   note = {GitHub repository}
 }
 ```
-
