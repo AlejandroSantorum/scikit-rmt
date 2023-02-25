@@ -274,5 +274,3 @@ The corresponding BibTex entry is
 }
 ```
 
-
-
