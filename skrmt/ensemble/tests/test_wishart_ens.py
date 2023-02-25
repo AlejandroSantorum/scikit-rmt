@@ -350,7 +350,7 @@ def test_wqe_set_size():
 def test_wqe_build_tridiagonal():
     '''Testing tridiagonal form of WQE
     '''
-    p_size, n_size = 3, 5
+    p_size, n_size = 2, 5
     beta = 4
 
     # sampling WishartQuaternion tridiagonal
@@ -359,6 +359,7 @@ def test_wqe_build_tridiagonal():
 
     # sampling chi-squares and finding tridiagonal matrix in two ways
     np.random.seed(1)
+    p_size *= 2  # WQE matrices are 2p times 2p
     a_val = n_size*beta/ 2
     dfs = np.arange(p_size)
     chisqs_diag = np.array([np.sqrt(np.random.chisquare(2*a_val - beta*df)) for df in dfs])

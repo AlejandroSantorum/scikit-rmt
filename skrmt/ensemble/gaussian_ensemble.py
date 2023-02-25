@@ -75,6 +75,9 @@ class GaussianEnsemble(_Ensemble):
             its standard form.
 
         """
+        if beta not in [1,2,4]:
+            raise ValueError(f"Invalid beta: {beta}. Beta value has to be 1, 2 or 4.")
+
         super().__init__()
         # pylint: disable=invalid-name
         self.n = n
@@ -176,10 +179,11 @@ class GaussianEnsemble(_Ensemble):
                 Journal of Mathematical Physics. 43.11 (2002): 5830-5847.
 
         '''
+        size = 2*self.n if self.beta==4 else self.n
         # sampling diagonal normals
-        normals = (1/np.sqrt(2)) * np.random.normal(loc=0, scale=np.sqrt(2), size=self.n)
+        normals = (1/np.sqrt(2)) * np.random.normal(loc=0, scale=np.sqrt(2), size=size)
         # sampling chi-squares
-        dfs = np.flip(np.arange(1, self.n))
+        dfs = np.flip(np.arange(1, size))
         chisqs = (1/np.sqrt(2)) * \
                  np.array([np.sqrt(np.random.chisquare(df*self.beta)) for df in dfs])
         # inserting diagonals
@@ -250,7 +254,8 @@ class GaussianEnsemble(_Ensemble):
         if self.use_tridiagonal:
             # pylint: disable=too-many-arguments
             if norm_const is None:
-                norm_const = 1/np.sqrt(self.n/2)
+                norm_const = 1/np.sqrt(self.n) if self.beta==4 else 1/np.sqrt(self.n/2)
+
             observed, bins = tridiag_eigval_hist(self.matrix*norm_const, bins=bins,
                                                  interval=interval, density=density)
             width = bins[1]-bins[0]

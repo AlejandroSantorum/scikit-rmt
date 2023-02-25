@@ -129,7 +129,7 @@ def wigner_semicircular_law(ensemble='goe', n_size=1000, bins=100, interval=None
     ens = GaussianEnsemble(beta=beta, n=n_size, use_tridiagonal=True)
 
     # Wigner eigenvalue normalization constant
-    norm_const = 1/np.sqrt(n_size/2)
+    norm_const = 1/np.sqrt(n_size) if beta==4 else 1/np.sqrt(n_size/2)
 
     observed, bins = ens.eigval_hist(bins=bins, interval=interval,
                                      density=density, norm_const=norm_const)
@@ -236,7 +236,7 @@ def marchenko_pastur_law(ensemble='wre', p_size=3000, n_size=10000, bins=100, in
     except ValueError:
         raise ValueError("ensemble not supported: "+str(ensemble))
     # calculating constants depending on matrix sizes
-    ratio = p_size/n_size
+    ratio = (2*p_size)/n_size if beta == 4 else p_size/n_size
     lambda_plus = beta*(1 + np.sqrt(ratio))**2
     lambda_minus = beta*(1 - np.sqrt(ratio))**2
     use_tridiag = (ratio <= 1)
@@ -251,7 +251,7 @@ def marchenko_pastur_law(ensemble='wre', p_size=3000, n_size=10000, bins=100, in
     ens = WishartEnsemble(beta=beta, p=p_size, n=n_size, use_tridiagonal=use_tridiag)
 
     # Wigner eigenvalue normalization constant
-    norm_const = 1/n_size
+    norm_const = 1/n_size 
 
     observed, bins = ens.eigval_hist(bins=bins, interval=interval,
                                      density=density, norm_const=norm_const)

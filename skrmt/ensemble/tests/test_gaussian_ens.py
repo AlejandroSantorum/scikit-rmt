@@ -312,6 +312,7 @@ def test_gse_build_tridiagonal():
     gse = GaussianEnsemble(beta=4, n=n_size, use_tridiagonal=True)
 
     np.random.seed(1)
+    n_size *= 2  # WQE matrices are 2p times 2p
     normals = (1/np.sqrt(2)) * np.random.normal(loc=0, scale=np.sqrt(2), size=n_size)
     dfs = np.flip(np.arange(1, n_size))
     chisqs = (1/np.sqrt(2)) * np.array([np.sqrt(np.random.chisquare(df*beta)) for df in dfs])

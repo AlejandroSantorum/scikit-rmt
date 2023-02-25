@@ -41,8 +41,8 @@ class WishartEnsemble(_Ensemble):
         matrix (numpy array): instance of the WishartReal, WishartComplex
             or WishartQuaternion random ensembles. If it is an instance
             of WishartReal or WishartComplex, the random matrix is of
-            size n times n. If it is a WishartQuaternion, the random matrix
-            is of size 2n times 2n.
+            size p times p. If it is a WishartQuaternion, the random matrix
+            is of size 2p times 2p.
         beta (int): descriptive integer of the Wishart ensemble type.
             For Real beta=1, for Complex beta=2, for Quaternion beta=4.
         p (int): number of rows of the guassian matrix that generates
@@ -80,6 +80,9 @@ class WishartEnsemble(_Ensemble):
             eigenvalues than its standard form.
 
         """
+        if beta not in [1,2,4]:
+            raise ValueError(f"Invalid beta: {beta}. Beta value has to be 1, 2 or 4.")
+
         super().__init__()
         # pylint: disable=invalid-name
         self.p = p
@@ -187,15 +190,16 @@ class WishartEnsemble(_Ensemble):
                 Journal of Mathematical Physics. 43.11 (2002): 5830-5847.
 
         '''
+        mtx_size = 2*self.p if self.beta==4 else self.p
         a_val = self.n*self.beta/ 2
         # sampling chi-squares
-        dfs = np.arange(self.p)
+        dfs = np.arange(mtx_size)
         chisqs_diag = np.array([np.sqrt(np.random.chisquare(2*a_val - self.beta*df)) for df in dfs])
         dfs = np.flip(dfs)
         chisqs_offdiag = np.array([np.sqrt(np.random.chisquare(self.beta*df)) for df in dfs[:-1]])
         # calculating tridiagonal diagonals
         diag = np.array([chisqs_diag[0]**2]+[chisqs_diag[i+1]**2 + \
-                         chisqs_offdiag[i]**2 for i in range(self.p-1)])
+                         chisqs_offdiag[i]**2 for i in range(mtx_size-1)])
         offdiag = np.multiply(chisqs_offdiag, chisqs_diag[:-1])
         # inserting diagonals
         diagonals = [offdiag, diag, offdiag]
@@ -264,9 +268,9 @@ class WishartEnsemble(_Ensemble):
         """
         # pylint: disable=too-many-arguments
         if norm_const is None:
-            norm_const = 1/self.n
+            norm_const = 1/self.n 
         if interval is None:
-            ratio = self.p/self.n
+            ratio = (2*self.p)/self.n if self.beta==4 else self.p/self.n
             lambda_plus = self.beta * (1 + np.sqrt(ratio))**2
             lambda_minus = self.beta * (1 - np.sqrt(ratio))**2
             interval = (lambda_minus, lambda_plus)
