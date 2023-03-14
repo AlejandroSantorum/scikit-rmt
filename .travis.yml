@@ -10,3 +10,8 @@ script:
   - pytest --cov-report term --cov=skrmt
 after_success:
   - codecov
+
+# safelist (branches to build)
+branches:
+  only:
+  - main
