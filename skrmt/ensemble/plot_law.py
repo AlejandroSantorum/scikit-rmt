@@ -49,7 +49,7 @@ def __relu_func(vals):
     return np.maximum(vals, np.zeros_like(vals))
 
 
-def theory_wigner_law(val, beta):
+def theory_wigner_law(x, beta, sigma=1.0):
     """Computes the theoretical Wigner's semicircle law on a given point.
 
     Args:
@@ -62,13 +62,13 @@ def theory_wigner_law(val, beta):
         number (float) which is image of the given value evaluated on Wigner's
         semicircle law.
     """
-    radius = 2*math.sqrt(beta)
-    if abs(val) >= radius:
+    radius = 2 * math.sqrt(beta) * sigma
+    if abs(x) >= radius:
         return 0
-    return 2*math.sqrt(radius**2 - val**2)/(math.pi*radius**2)
+    return 2*math.sqrt(radius**2 - x**2)/(math.pi*radius**2)
 
 
-def wigner_semicircular_law(ensemble='goe', n_size=1000, bins=100, interval=None,
+def wigner_semicircular_law(ensemble='goe', n_size=1000, sigma=1.0, bins=100, interval=None,
                             density=False, limit_pdf=False, savefig_path=None):
     """Calculates and plots Wigner's Semicircle Law using Gaussian Ensemble.
 
@@ -110,26 +110,30 @@ def wigner_semicircular_law(ensemble='goe', n_size=1000, bins=100, interval=None
     # pylint: disable=too-many-arguments
     if n_size<1:
         raise ValueError("matrix size must be positive")
-
-    if ensemble == 'goe':
-        beta = 1
-        if interval is None:
-            interval = (-2,2)
-    elif ensemble == 'gue':
-        beta = 2
-        if interval is None:
-            interval = (-3,3)
-    elif ensemble == 'gse':
-        beta = 4
-        if interval is None:
-            interval = (-4,4)
-    else:
-        raise ValueError("ensemble not supported")
     
-    ens = GaussianEnsemble(beta=beta, n=n_size, use_tridiagonal=True)
+    try:
+        beta = ["goe", "gue", None, "gse"].index(ensemble) + 1
+    except ValueError:
+        raise ValueError(f"Ensemble '{ensemble}' not supported."
+                         " Check that ensemble is one of the following: 'goe', 'gue' or 'gse'.")
+
+    if interval is None:
+        radius = 2 * math.sqrt(beta) * sigma
+        interval = (-radius, radius)
+    
+    use_tridiag = (sigma == 1.0)
+    if not use_tridiag:
+        print(f"Warning: The given scale is not the standard (sigma = {sigma}).\n"
+              "\t Tridiagonal histogramming is deactivated.\n"
+              "\t It is adviced to set sigma=1.0 to optimize and boost histogramming.")
+
+    ens = GaussianEnsemble(beta=beta, n=n_size, sigma=sigma, use_tridiagonal=use_tridiag)
 
     # Wigner eigenvalue normalization constant
-    norm_const = 1/np.sqrt(n_size) if beta==4 else 1/np.sqrt(n_size/2)
+    if use_tridiag:
+        norm_const = 1/math.sqrt(n_size) if beta==4 else 1/math.sqrt(n_size/2)
+    else:
+        norm_const = 1/np.sqrt(n_size)
 
     observed, bins = ens.eigval_hist(bins=bins, interval=interval,
                                      density=density, norm_const=norm_const)
@@ -139,8 +143,10 @@ def wigner_semicircular_law(ensemble='goe', n_size=1000, bins=100, interval=None
     # Plotting theoretical graphic
     if limit_pdf and density:
         centers = __get_bins_centers_and_contour(bins)
-        expected_frec = [theory_wigner_law(cent, beta) for cent in centers]
+        expected_frec = [theory_wigner_law(cent, beta, sigma) for cent in centers]
         plt.plot(centers, expected_frec, color='red', linewidth=2)
+    elif limit_pdf and not density:
+        print("Warning: Wigner's Semicircle Law PDF is only plotted when density is True.")
 
     plt.title("Eigenvalue density histogram", fontweight="bold")
     plt.xlabel("x")

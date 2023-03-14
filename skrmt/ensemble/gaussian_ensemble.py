@@ -58,7 +58,7 @@ class GaussianEnsemble(_Ensemble):
 
     """
 
-    def __init__(self, beta, n, use_tridiagonal=False):
+    def __init__(self, beta, n, use_tridiagonal=False, sigma=1.0):
         """Constructor for GaussianEnsemble class.
 
         Initializes an instance of this class with the given parameters.
@@ -83,6 +83,7 @@ class GaussianEnsemble(_Ensemble):
         self.n = n
         self.beta = beta
         self.use_tridiagonal = use_tridiagonal
+        self.sigma = sigma
         self.matrix = self.sample()
 
 
@@ -133,7 +134,7 @@ class GaussianEnsemble(_Ensemble):
 
     def _sample_goe(self):
         # n by n matrix of random Gaussians
-        mtx = np.random.randn(self.n,self.n)
+        mtx = np.random.randn(self.n,self.n) * self.sigma
         # symmetrize matrix
         self.matrix = (mtx + mtx.transpose())/np.sqrt(2)
         return self.matrix
@@ -141,7 +142,7 @@ class GaussianEnsemble(_Ensemble):
     def _sample_gue(self):
         size = self.n
         # n by n random complex matrix
-        mtx = np.random.randn(size,size) + 1j*np.random.randn(size,size)
+        mtx = np.random.randn(size,size)*self.sigma + 1j*np.random.randn(size,size)*self.sigma
         # hermitian matrix
         self.matrix = (mtx + mtx.transpose().conj())/np.sqrt(2)
         return self.matrix
@@ -149,9 +150,9 @@ class GaussianEnsemble(_Ensemble):
     def _sample_gse(self):
         size = self.n
         # n by n random complex matrix
-        x_mtx = np.random.randn(size,size) + (0+1j)*np.random.randn(size,size)
+        x_mtx = np.random.randn(size,size)*self.sigma + 1j*np.random.randn(size,size)*self.sigma
         # another n by n random complex matrix
-        y_mtx = np.random.randn(size,size) + (0+1j)*np.random.randn(size,size)
+        y_mtx = np.random.randn(size,size)*self.sigma + 1j*np.random.randn(size,size)*self.sigma
         # [X Y; -conj(Y) conj(X)]
         mtx = np.block([
                        [x_mtx               , y_mtx],
@@ -215,7 +216,7 @@ class GaussianEnsemble(_Ensemble):
         return super().eigval_hist(bins, interval=interval, density=density,
                                    norm_const=norm_const, avoid_img=avoid_img)
 
-    def plot_eigval_hist(self, bins, interval=None, density=False, norm_const=None, fig_path=None):
+    def plot_eigval_hist(self, bins=100, interval=None, density=False, norm_const=None, fig_path=None):
         """Calculates and plots the histogram of the matrix eigenvalues
 
         Calculates and plots the histogram of the current sampled matrix eigenvalues.
@@ -224,7 +225,7 @@ class GaussianEnsemble(_Ensemble):
         is built using certain techniques to boost efficiency.
 
         Args:
-            bins (int or sequence): If bins is an integer, it defines the number of
+            bins (int or sequence, default=100): If bins is an integer, it defines the number of
                 equal-width bins in the range. If bins is a sequence, it defines the
                 bin edges, including the left edge of the first bin and the right
                 edge of the last bin; in this case, bins may be unequally spaced.
@@ -251,6 +252,9 @@ class GaussianEnsemble(_Ensemble):
                 Journal of Mathematical Physics. 43.11 (2002): 5830-5847.
 
         """
+        if interval is None:
+            wsl_radius = 2*np.sqrt(self.beta)*self.sigma
+            interval = (-wsl_radius, wsl_radius)
         if self.use_tridiagonal:
             # pylint: disable=too-many-arguments
             if norm_const is None:
