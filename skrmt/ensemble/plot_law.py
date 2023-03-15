@@ -160,7 +160,7 @@ def wigner_semicircular_law(ensemble='goe', n_size=1000, sigma=1.0, bins=100, in
 
 
 
-def theory_marchenko_pastur(vals, ratio, lambda_minus, lambda_plus, beta):
+def theory_marchenko_pastur(vals, ratio, lambda_minus, lambda_plus, beta, sigma=1.0):
     """Computes the theoretical Wigner's semicircle law on a given point or points.
 
     Args:
@@ -180,13 +180,13 @@ def theory_marchenko_pastur(vals, ratio, lambda_minus, lambda_plus, beta):
         array_like (ndarray) which is the image of the given value (or values)
         evaluated on Marchenko-Pastur Law.
     """
-    var = beta
+    var = beta * sigma**2
     return np.sqrt(__relu_func(lambda_plus-vals)*__relu_func(vals-lambda_minus)) \
           / (2*np.pi*ratio*var*vals)
 
 
-def marchenko_pastur_law(ensemble='wre', p_size=3000, n_size=10000, bins=100, interval=None,
-                         density=False, limit_pdf=False, savefig_path=None):
+def marchenko_pastur_law(ensemble='wre', p_size=3000, n_size=10000, sigma=1.0, bins=100,
+                         interval=None, density=False, limit_pdf=False, savefig_path=None):
     """Computes and plots Marchenko-Pastur Law using Wishart Ensemble random matrices.
 
     Calculates and plots Marchenko-Pastur Law using Wishart Ensemble random matrices.
@@ -240,12 +240,19 @@ def marchenko_pastur_law(ensemble='wre', p_size=3000, n_size=10000, bins=100, in
     try:
         beta = ["wre", "wce", None, "wqe"].index(ensemble) + 1
     except ValueError:
-        raise ValueError("ensemble not supported: "+str(ensemble))
+        raise ValueError(f"Ensemble '{ensemble}' not supported."
+                         " Check that ensemble is one of the following: 'wre', 'wce' or 'wqe'.")
+
     # calculating constants depending on matrix sizes
     ratio = (2*p_size)/n_size if beta == 4 else p_size/n_size
-    lambda_plus = beta*(1 + np.sqrt(ratio))**2
-    lambda_minus = beta*(1 - np.sqrt(ratio))**2
-    use_tridiag = (ratio <= 1)
+    lambda_plus = beta * sigma**2 * (1 + np.sqrt(ratio))**2
+    lambda_minus = beta * sigma**2 * (1 - np.sqrt(ratio))**2
+    use_tridiag_ratio = (ratio <= 1)
+    if not use_tridiag_ratio:
+        print("Warning: Cannot use tridiagonal histogramming if 'p' (degrees of freedom) is "
+              " greater than 'n' (sample size).\n"
+              f"\t Provided n={n_size} and p={p_size}. Tridiagonal histogramming is therefore deactivated.\n"
+              "\t It is adviced to increase sample size (`n`) to optimize and boost histogramming.")
 
     # computing interval according to the matrix size ratio and support
     if interval is None:
@@ -254,7 +261,14 @@ def marchenko_pastur_law(ensemble='wre', p_size=3000, n_size=10000, bins=100, in
         else:
             interval = (min(-0.05, lambda_minus), lambda_plus)
     
-    ens = WishartEnsemble(beta=beta, p=p_size, n=n_size, use_tridiagonal=use_tridiag)
+    use_tridiag_sigma = (sigma == 1.0)
+    if not use_tridiag_sigma:
+        print(f"Warning: The given scale is not the standard (sigma = {sigma}).\n"
+              "\t Tridiagonal histogramming is deactivated.\n"
+              "\t It is adviced to set sigma=1.0 to optimize and boost histogramming.")
+    
+    ens = WishartEnsemble(beta=beta, p=p_size, n=n_size, sigma=sigma,
+                          use_tridiagonal=(use_tridiag_ratio and use_tridiag_sigma))
 
     # Wigner eigenvalue normalization constant
     norm_const = 1/n_size 
@@ -268,7 +282,7 @@ def marchenko_pastur_law(ensemble='wre', p_size=3000, n_size=10000, bins=100, in
     if limit_pdf and density:
         centers = np.array(__get_bins_centers_and_contour(bins))
         expected_frec = theory_marchenko_pastur(centers, ratio, lambda_minus,
-                                                lambda_plus, beta)
+                                                lambda_plus, beta, sigma)
         plt.plot(centers, expected_frec, color='red', linewidth=2)
 
     plt.title("Eigenvalue density histogram", fontweight="bold")

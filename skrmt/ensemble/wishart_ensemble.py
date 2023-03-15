@@ -63,7 +63,7 @@ class WishartEnsemble(_Ensemble):
 
     """
 
-    def __init__(self, beta, p, n, use_tridiagonal=False):
+    def __init__(self, beta, p, n, use_tridiagonal=False, sigma=1.0):
         """Constructor for WishartEnsemble class.
 
         Initializes an instance of this class with the given parameters.
@@ -89,6 +89,7 @@ class WishartEnsemble(_Ensemble):
         self.n = n
         self.beta = beta
         self.use_tridiagonal = use_tridiagonal
+        self.sigma = sigma
         self.matrix = self.sample()
 
     def set_size(self, p, n, resample_mtx=False):
@@ -129,6 +130,12 @@ class WishartEnsemble(_Ensemble):
                 Journal of Mathematical Physics. 43.11 (2002): 5830-5847.
         """
         if self.use_tridiagonal:
+            if self.p > self.n:  # check reference ("Matrix Models for Beta Ensembles"): page 5, table 1.
+                raise ValueError("Error: cannot use tridiagonal form if 'p' (degrees of freedom)"
+                                 " is greater than 'n' (sample size).\n"
+                                 f"\t Provided n={self.n} and p={self.p}."
+                                 " Set `use_tridiagonal=False` or increase sample size (`n`).")
+
             return self.sample_tridiagonal()
 
         if self.beta == 1:
@@ -142,7 +149,7 @@ class WishartEnsemble(_Ensemble):
         p_size = self.p
         n_size = self.n
         # p by n matrix of random Gaussians
-        mtx = np.random.randn(p_size,n_size)
+        mtx = np.random.randn(p_size,n_size) * self.sigma
         # symmetrize matrix
         self.matrix = np.matmul(mtx, mtx.transpose())
         return self.matrix
@@ -151,7 +158,7 @@ class WishartEnsemble(_Ensemble):
         p_size = self.p
         n_size = self.n
         # p by n random complex matrix of random Gaussians
-        mtx = np.random.randn(p_size,n_size) + (0+1j)*np.random.randn(p_size,n_size)
+        mtx = np.random.randn(p_size,n_size)*self.sigma + 1j*np.random.randn(p_size,n_size)*self.sigma
         # hermitian matrix
         self.matrix = np.matmul(mtx, mtx.transpose().conj())
         return self.matrix
@@ -160,9 +167,9 @@ class WishartEnsemble(_Ensemble):
         p_size = self.p
         n_size = self.n
         # p by n random complex matrix of random Gaussians
-        x_mtx = np.random.randn(p_size,n_size) + (0+1j)*np.random.randn(p_size,n_size)
+        x_mtx = np.random.randn(p_size,n_size)*self.sigma + 1j*np.random.randn(p_size,n_size)*self.sigma
         # p by n random complex matrix of random Gaussians
-        y_mtx = np.random.randn(p_size,n_size) + (0+1j)*np.random.randn(p_size,n_size)
+        y_mtx = np.random.randn(p_size,n_size)*self.sigma + 1j*np.random.randn(p_size,n_size)*self.sigma
         # [X Y; -conj(Y) conj(X)]
         mtx = np.block([
                         [x_mtx              , y_mtx],
@@ -190,6 +197,11 @@ class WishartEnsemble(_Ensemble):
                 Journal of Mathematical Physics. 43.11 (2002): 5830-5847.
 
         '''
+        if self.sigma != 1.0:
+            raise ValueError("Error: cannot sample tridiagonal random matrix using non-unitary scale"
+                             f" (sigma = {self.sigma}).\n"
+                             "\t Set `sigma=1.0` (default) or deactivate tridiagonal sampling.")
+
         mtx_size = 2*self.p if self.beta==4 else self.p
         a_val = self.n*self.beta/ 2
         # sampling chi-squares
@@ -230,7 +242,7 @@ class WishartEnsemble(_Ensemble):
 
         return super().eigval_hist(bins, interval, density, norm_const, avoid_img=avoid_img)
 
-    def plot_eigval_hist(self, bins, interval=None, density=False, norm_const=None, fig_path=None):
+    def plot_eigval_hist(self, bins=100, interval=None, density=False, norm_const=None, fig_path=None):
         """Calculates and plots the histogram of the matrix eigenvalues
 
         Calculates and plots the histogram of the current sampled matrix eigenvalues.
@@ -239,7 +251,7 @@ class WishartEnsemble(_Ensemble):
         is built using certain techniques to boost efficiency.
 
         Args:
-            bins (int or sequence): If bins is an integer, it defines the number of
+            bins (int or sequence, default=100): If bins is an integer, it defines the number of
                 equal-width bins in the range. If bins is a sequence, it defines the
                 bin edges, including the left edge of the first bin and the right
                 edge of the last bin; in this case, bins may be unequally spaced.
@@ -271,8 +283,8 @@ class WishartEnsemble(_Ensemble):
             norm_const = 1/self.n 
         if interval is None:
             ratio = (2*self.p)/self.n if self.beta==4 else self.p/self.n
-            lambda_plus = self.beta * (1 + np.sqrt(ratio))**2
-            lambda_minus = self.beta * (1 - np.sqrt(ratio))**2
+            lambda_plus = self.beta * self.sigma**2 * (1 + np.sqrt(ratio))**2
+            lambda_minus = self.beta * self.sigma**2 * (1 - np.sqrt(ratio))**2
             interval = (lambda_minus, lambda_plus)
 
         if self.use_tridiagonal:

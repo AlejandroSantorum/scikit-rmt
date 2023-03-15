@@ -180,6 +180,11 @@ class GaussianEnsemble(_Ensemble):
                 Journal of Mathematical Physics. 43.11 (2002): 5830-5847.
 
         '''
+        if self.sigma != 1.0:
+            raise ValueError("Error: cannot sample tridiagonal random matrix using non-unitary scale"
+                             f" (sigma = {self.sigma}).\n"
+                             "\t Set `sigma=1.0` (default) or deactivate tridiagonal sampling.")
+
         size = 2*self.n if self.beta==4 else self.n
         # sampling diagonal normals
         normals = (1/np.sqrt(2)) * np.random.normal(loc=0, scale=np.sqrt(2), size=size)
