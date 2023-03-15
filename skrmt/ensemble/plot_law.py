@@ -6,7 +6,6 @@ Marchenko-Pastur Law and Tracy-Widom Law.
 
 """
 
-import math
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -37,23 +36,23 @@ def __get_bins_centers_and_contour(bins):
     return centers
 
 
-def __relu_func(vals):
+def __relu_func(values):
     """Element-wise maximum between the value and zero.
 
     Args:
-        vals (ndarray): list of numbers to compute its element-wise maximum.
+        values (ndarray): list of numbers to compute its element-wise maximum.
     
     Returns:
         array_like consisting in the element-wise maximum vector of the given values.
     """
-    return np.maximum(vals, np.zeros_like(vals))
+    return np.maximum(values, np.zeros_like(values))
 
 
-def theory_wigner_law(x, beta, sigma=1.0):
+def theory_wigner_law(values, beta, sigma=1.0):
     """Computes the theoretical Wigner's semicircle law on a given point.
 
     Args:
-        val (float): point whose evaluation is required.
+        values (ndarray): numpy array of numbers whose evaluation is required.
         beta (int): integer representing type of matrix entries. beta=1 if real
             entries are used (GOE), beta=2 if they are complex (GUE) or beta=4
             if they are quaternions (GSE). 
@@ -62,10 +61,8 @@ def theory_wigner_law(x, beta, sigma=1.0):
         number (float) which is image of the given value evaluated on Wigner's
         semicircle law.
     """
-    radius = 2 * math.sqrt(beta) * sigma
-    if abs(x) >= radius:
-        return 0
-    return 2*math.sqrt(radius**2 - x**2)/(math.pi*radius**2)
+    radius = 2.0 * np.sqrt(beta) * sigma
+    return __relu_func(2.0 * np.sqrt(radius**2 - values**2) / (np.pi * radius**2))
 
 
 def wigner_semicircular_law(ensemble='goe', n_size=1000, sigma=1.0, bins=100, interval=None,
@@ -118,7 +115,7 @@ def wigner_semicircular_law(ensemble='goe', n_size=1000, sigma=1.0, bins=100, in
                          " Check that ensemble is one of the following: 'goe', 'gue' or 'gse'.")
 
     if interval is None:
-        radius = 2 * math.sqrt(beta) * sigma
+        radius = 2.0 * np.sqrt(beta) * sigma
         interval = (-radius, radius)
     
     use_tridiag = (sigma == 1.0)
@@ -131,7 +128,7 @@ def wigner_semicircular_law(ensemble='goe', n_size=1000, sigma=1.0, bins=100, in
 
     # Wigner eigenvalue normalization constant
     if use_tridiag:
-        norm_const = 1/math.sqrt(n_size) if beta==4 else 1/math.sqrt(n_size/2)
+        norm_const = 1/np.sqrt(n_size) if beta==4 else 1/np.sqrt(n_size/2)
     else:
         norm_const = 1/np.sqrt(n_size)
 
@@ -142,8 +139,8 @@ def wigner_semicircular_law(ensemble='goe', n_size=1000, sigma=1.0, bins=100, in
 
     # Plotting theoretical graphic
     if limit_pdf and density:
-        centers = __get_bins_centers_and_contour(bins)
-        expected_frec = [theory_wigner_law(cent, beta, sigma) for cent in centers]
+        centers = np.array(__get_bins_centers_and_contour(bins))
+        expected_frec = theory_wigner_law(centers, beta, sigma)
         plt.plot(centers, expected_frec, color='red', linewidth=2)
     elif limit_pdf and not density:
         print("Warning: Wigner's Semicircle Law PDF is only plotted when density is True.")
@@ -160,11 +157,11 @@ def wigner_semicircular_law(ensemble='goe', n_size=1000, sigma=1.0, bins=100, in
 
 
 
-def theory_marchenko_pastur(vals, ratio, lambda_minus, lambda_plus, beta, sigma=1.0):
+def theory_marchenko_pastur(values, ratio, lambda_minus, lambda_plus, beta, sigma=1.0):
     """Computes the theoretical Wigner's semicircle law on a given point or points.
 
     Args:
-        vals (ndarray): numpy array of numbers whose evaluation is required.
+        values (ndarray): numpy array of numbers whose evaluation is required.
         ratio (float): ratio between the matrix size. ratio is equal to p/n,
             where p is the number of rows and n is the number of columns of
             the matrix that generates a Wishart matrix. 'p' is also known as
@@ -181,8 +178,8 @@ def theory_marchenko_pastur(vals, ratio, lambda_minus, lambda_plus, beta, sigma=
         evaluated on Marchenko-Pastur Law.
     """
     var = beta * sigma**2
-    return np.sqrt(__relu_func(lambda_plus-vals)*__relu_func(vals-lambda_minus)) \
-          / (2*np.pi*ratio*var*vals)
+    return np.sqrt(__relu_func(lambda_plus - values) * __relu_func(values - lambda_minus)) \
+          / (2.0 * np.pi * ratio * var * values)
 
 
 def marchenko_pastur_law(ensemble='wre', p_size=3000, n_size=10000, sigma=1.0, bins=100,
@@ -402,13 +399,12 @@ def tracy_widom_law(ensemble='goe', n_size=100, times=1000, bins=100, interval=N
         plt.show()
 
 
-
-def theory_manova_spectrum_distr(vals, a, b, lambda_minus, lambda_plus):
+def theory_manova_spectrum_distr(values, a, b, lambda_minus, lambda_plus):
     """Computes the theoretical Manova spectrum limiting distribution law
     on a given point or points.
 
     Args:
-        vals (ndarray): numpy array of numbers whose evaluation is required.
+        values (ndarray): numpy array of numbers whose evaluation is required.
         a (float): parameter of the theoretical analytical function.
         b (float): parameter of the theoretical analytical function.
         lambda_minus (float): lower limit of the Manova spectrum distribution.
@@ -422,8 +418,8 @@ def theory_manova_spectrum_distr(vals, a, b, lambda_minus, lambda_plus):
         array_like (ndarray) which is the image of the given value (or values)
         evaluated on the Manova spectrum limiting distribution.
     """
-    return (a+b) * np.sqrt(__relu_func(lambda_plus-vals)*__relu_func(vals-lambda_minus)) \
-        / (2*np.pi*vals*(1-vals))
+    return (a+b) * np.sqrt(__relu_func(lambda_plus - values) * __relu_func(values - lambda_minus)) \
+        / (2.0 * np.pi * values * (1-values))
 
 
 def manova_spectrum_distr(ensemble='mre', m_size=1000, n1_size=3000, n2_size=3000,
@@ -521,10 +517,10 @@ def manova_spectrum_distr(ensemble='mre', m_size=1000, n1_size=3000, n2_size=300
         else:
             ylim_vals = observed
         try:
-            plt.ylim(0, np.max(ylim_vals)+0.25*np.max(ylim_vals))
+            plt.ylim(0, np.max(ylim_vals) + 0.25*np.max(ylim_vals))
         except ValueError:
             second_highest_val = np.partition(ylim_vals.flatten(), -2)[-2]
-            plt.ylim(0, second_highest_val+0.25*second_highest_val)
+            plt.ylim(0, second_highest_val + 0.25*second_highest_val)
 
     # Saving plot or showing it
     if savefig_path:
