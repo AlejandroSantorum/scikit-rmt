@@ -222,6 +222,38 @@ class TracyWidomDistribution:
     def cdf(self, x):
         return self.tw_approx.cdf(x)
 
+    def plot_pdf(self, interval=None, bins=1000, savefig_path=None):
+        if not interval:
+            interval = (-5, 4-self.beta)
+        
+        xx = np.linspace(interval[0], interval[1], num=bins)
+        yy = self.pdf(xx)
+
+        plt.plot(xx, yy)
+        plt.xlabel("x")
+        plt.ylabel("probability density")
+
+        if savefig_path:
+            plt.savefig(savefig_path, dpi=1200)
+        else:
+            plt.show()
+    
+    def plot_cdf(self, interval=None, bins=1000, savefig_path=None):
+        if not interval:
+            interval = (-5, 4-self.beta)
+        
+        xx = np.linspace(interval[0], interval[1], num=bins)
+        yy = self.cdf(xx)
+
+        plt.plot(xx, yy)
+        plt.xlabel("x")
+        plt.ylabel("cumulative density")
+
+        if savefig_path:
+            plt.savefig(savefig_path, dpi=1200)
+        else:
+            plt.show()
+
 
 class ManovaSpectrumDistribution:
 
