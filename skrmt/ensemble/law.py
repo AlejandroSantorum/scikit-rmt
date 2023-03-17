@@ -1,5 +1,7 @@
 import numpy as np
 
+from .tracy_widom_approximator import TW_Approximator
+
 
 def _relu(x):
     """Element-wise maximum between the value and zero.
@@ -139,6 +141,21 @@ class MarchenkoPasturDistribution:
     def _cdf_aux_r(self, x):
         return np.sqrt((self.lambda_plus-x)/(x - self.lambda_minus))
 
+
+class TracyWidomDistribution:
+
+    def __init__(self, beta=1):
+        if beta not in [1,2,4]:
+            raise ValueError(f"Error: invalid beta. It has to be 1,2 or 4. Provided beta = {beta}.")
+
+        self.beta = beta
+        self.tw_approx = TW_Approximator(beta=self.beta)
+
+    def pdf(self, x):
+        return self.tw_approx.pdf(x)
+
+    def cdf(self, x):
+        return self.tw_approx.cdf(x)
 
 
 class ManovaSpectrumDistribution:
