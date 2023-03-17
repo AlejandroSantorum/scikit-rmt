@@ -97,7 +97,7 @@ class WignerSemicircleDistribution:
         plt.ylabel("probability density")
 
         if savefig_path:
-            plt.savefig(savefig_path, dpi=1200)
+            plt.savefig(savefig_path, dpi=800)
         else:
             plt.show()
     
@@ -110,10 +110,10 @@ class WignerSemicircleDistribution:
 
         plt.plot(xx, yy)
         plt.xlabel("x")
-        plt.ylabel("cumulative density")
+        plt.ylabel("cumulative distribution")
 
         if savefig_path:
-            plt.savefig(savefig_path, dpi=1200)
+            plt.savefig(savefig_path, dpi=800)
         else:
             plt.show()
 
@@ -186,7 +186,7 @@ class MarchenkoPasturDistribution:
         plt.ylabel("probability density")
 
         if savefig_path:
-            plt.savefig(savefig_path, dpi=1200)
+            plt.savefig(savefig_path, dpi=800)
         else:
             plt.show()
     
@@ -199,10 +199,10 @@ class MarchenkoPasturDistribution:
 
         plt.plot(xx, yy)
         plt.xlabel("x")
-        plt.ylabel("cumulative density")
+        plt.ylabel("cumulative distribution")
 
         if savefig_path:
-            plt.savefig(savefig_path, dpi=1200)
+            plt.savefig(savefig_path, dpi=800)
         else:
             plt.show()
 
@@ -234,7 +234,7 @@ class TracyWidomDistribution:
         plt.ylabel("probability density")
 
         if savefig_path:
-            plt.savefig(savefig_path, dpi=1200)
+            plt.savefig(savefig_path, dpi=800)
         else:
             plt.show()
     
@@ -247,10 +247,10 @@ class TracyWidomDistribution:
 
         plt.plot(xx, yy)
         plt.xlabel("x")
-        plt.ylabel("cumulative density")
+        plt.ylabel("cumulative distribution")
 
         if savefig_path:
-            plt.savefig(savefig_path, dpi=1200)
+            plt.savefig(savefig_path, dpi=800)
         else:
             plt.show()
 
@@ -281,3 +281,19 @@ class ManovaSpectrumDistribution:
                             (self.a + self.b) * np.sqrt((self.lambda_plus - x) * (x - self.lambda_minus)) \
                                 / (2.0 * np.pi * x * (1-x)),
                             0.0)
+
+    def plot_pdf(self, interval=None, bins=1000, savefig_path=None):
+        if not interval:
+            interval = (self.lambda_minus, self.lambda_plus)
+        
+        xx = np.linspace(interval[0], interval[1], num=bins)
+        yy = self.pdf(xx)
+
+        plt.plot(xx, yy)
+        plt.xlabel("x")
+        plt.ylabel("probability density")
+
+        if savefig_path:
+            plt.savefig(savefig_path, dpi=800)
+        else:
+            plt.show()
