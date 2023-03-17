@@ -62,14 +62,11 @@ def _indicator(x, start=None, stop=None, inclusive="both"):
 
 class WignerSemicircleDistribution:
 
-    def __init__(self, ensemble="goe", sigma=1.0):
-        try:
-            self.beta = ["goe", "gue", None, "gse"].index(ensemble) + 1
-        except ValueError:
-            raise ValueError(f"Ensemble '{ensemble}' not supported."
-                            " Check that ensemble is one of the following: 'goe', 'gue' or 'gse'.")
+    def __init__(self, beta=1, sigma=1.0):
+        if beta not in [1,2,4]:
+            raise ValueError(f"Error: invalid beta. It has to be 1,2 or 4. Provided beta = {beta}.")
 
-        self.ensemble = ensemble
+        self.beta = beta
         self.sigma = sigma
         self.radius = 2.0 * np.sqrt(self.beta) * sigma
 
@@ -91,17 +88,14 @@ class MarchenkoPasturDistribution:
 
     ARCTAN_OF_INFTY = np.pi/2
 
-    def __init__(self, ratio, ensemble="wre", sigma=1.0):
+    def __init__(self, ratio, beta=1, sigma=1.0):
+        if beta not in [1,2,4]:
+            raise ValueError(f"Error: invalid beta. It has to be 1,2 or 4. Provided beta = {beta}.")
         if ratio <= 0:
             raise ValueError(f"Error: invalid ratio. It has to be positive. Provided ratio = {ratio}.")
-        try:
-            self.beta = ["wre", "wce", None, "wqe"].index(ensemble) + 1
-        except ValueError:
-            raise ValueError(f"Error: Ensemble '{ensemble}' not supported."
-                            " Check that ensemble is one of the following: 'wre', 'wce' or 'wqe'.")
 
         self.ratio = ratio
-        self.ensemble = ensemble
+        self.beta = beta
         self.sigma = sigma
         self.lambda_minus = self.beta * self.sigma**2 * (1 - np.sqrt(self.ratio))**2
         self.lambda_plus = self.beta * self.sigma**2 * (1 + np.sqrt(self.ratio))**2
@@ -149,22 +143,19 @@ class MarchenkoPasturDistribution:
 
 class ManovaSpectrumDistribution:
 
-    def __init__(self, a, b, ensemble="mre"):
+    def __init__(self, a, b, beta=1):
+        if beta not in [1,2,4]:
+            raise ValueError(f"Error: invalid beta. It has to be 1,2 or 4. Provided beta = {beta}.")
         if a <= 0 or b <= 0:
             raise ValueError("Error: invalid matrix parameters. They have to be both positive.\n"
                              f"\tProvided a = {a} and b = {b}.")
-        try:
-            self.beta = ["mre", "mce", None, "mqe"].index(ensemble) + 1
-        except ValueError:
-            raise ValueError(f"Error: Ensemble '{ensemble}' not supported."
-                             " Check that ensemble is one of the following: 'mre', 'mce' or 'mqe'.")
-        
+
         if a < 1 or b < 1:
             print(f"Warning: Setting a < 1 (a = {a}) or b < 1 (b = {b}) may cause numerical instability.")
 
         self.a = a
         self.b = b
-        self.ensemble = ensemble
+        self.beta = beta
         self.lambda_term1 = np.sqrt((a/(a+b)) * (1 - (1/(a+b))))
         self.lambda_term2 = np.sqrt((1/(a+b)) * (1 - (a/(a+b))))
         self.lambda_minus = (self.lambda_term1 - self.lambda_term2)**2
