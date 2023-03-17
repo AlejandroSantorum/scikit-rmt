@@ -174,6 +174,38 @@ class MarchenkoPasturDistribution:
     def _cdf_aux_r(self, x):
         return np.sqrt((self.lambda_plus-x)/(x - self.lambda_minus))
 
+    def plot_pdf(self, interval=None, bins=1000, savefig_path=None):
+        if not interval:
+            interval = (self.lambda_minus, self.lambda_plus)
+        
+        xx = np.linspace(interval[0], interval[1], num=bins)
+        yy = self.pdf(xx)
+
+        plt.plot(xx, yy)
+        plt.xlabel("x")
+        plt.ylabel("probability density")
+
+        if savefig_path:
+            plt.savefig(savefig_path, dpi=1200)
+        else:
+            plt.show()
+    
+    def plot_cdf(self, interval=None, bins=1000, savefig_path=None):
+        if not interval:
+            interval = (self.lambda_minus, self.lambda_plus)
+        
+        xx = np.linspace(interval[0], interval[1], num=bins)
+        yy = self.cdf(xx)
+
+        plt.plot(xx, yy)
+        plt.xlabel("x")
+        plt.ylabel("cumulative density")
+
+        if savefig_path:
+            plt.savefig(savefig_path, dpi=1200)
+        else:
+            plt.show()
+
 
 class TracyWidomDistribution:
 
