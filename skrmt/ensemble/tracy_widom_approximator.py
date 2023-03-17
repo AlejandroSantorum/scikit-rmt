@@ -124,7 +124,7 @@ class TW_Approximator(object):
         # y = np.fromstring(digits, dtype=np.int32).astype(float) * 1.e-6
         y = np.frombuffer(digits, dtype=np.int32).astype(float) * 1.e-6
         self.__xlim = (x[1], x[-2])
-        self.__cdf    = interp1d(x, y, kind='cubic', bounds_error=False)
+        self.__cdf = interp1d(x, y, kind='cubic', bounds_error=False)
 
         dlnf = derivative(lambda xx: np.log(self.__cdf(-xx)), -x[1], \
                 dx=3.33e-3, order=7)

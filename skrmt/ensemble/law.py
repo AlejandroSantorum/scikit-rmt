@@ -1,4 +1,5 @@
 import numpy as np
+import matplotlib.pyplot as plt
 
 from .tracy_widom_approximator import TW_Approximator
 
@@ -83,6 +84,38 @@ class WignerSemicircleDistribution:
                 default=(0.5 + (x * np.sqrt(self.radius**2 - x**2))/(np.pi * self.radius**2) + \
                          (np.arcsin(x/self.radius)) / np.pi)
             )
+    
+    def plot_pdf(self, interval=None, bins=1000, savefig_path=None):
+        if not interval:
+            interval = (-self.radius, self.radius)
+        
+        xx = np.linspace(interval[0], interval[1], num=bins)
+        yy = self.pdf(xx)
+
+        plt.plot(xx, yy)
+        plt.xlabel("x")
+        plt.ylabel("probability density")
+
+        if savefig_path:
+            plt.savefig(savefig_path, dpi=1200)
+        else:
+            plt.show()
+    
+    def plot_cdf(self, interval=None, bins=1000, savefig_path=None):
+        if not interval:
+            interval = (-self.radius - 0.1, self.radius + 0.1)
+        
+        xx = np.linspace(interval[0], interval[1], num=bins)
+        yy = self.cdf(xx)
+
+        plt.plot(xx, yy)
+        plt.xlabel("x")
+        plt.ylabel("cumulative density")
+
+        if savefig_path:
+            plt.savefig(savefig_path, dpi=1200)
+        else:
+            plt.show()
 
 
 
