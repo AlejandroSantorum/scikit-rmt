@@ -68,7 +68,7 @@ class WignerSemicircleDistribution:
         except ValueError:
             raise ValueError(f"Ensemble '{ensemble}' not supported."
                             " Check that ensemble is one of the following: 'goe', 'gue' or 'gse'.")
-    
+
         self.ensemble = ensemble
         self.sigma = sigma
         self.radius = 2.0 * np.sqrt(self.beta) * sigma
@@ -118,7 +118,6 @@ class MarchenkoPasturDistribution:
                             self._cdf_aux_f(x), 0.0)
 
             if self.ratio <= 1:
-                if acum.shape == (): return float(acum)
                 return acum
             
             acum += np.where(_indicator(x, start=self.lambda_minus, stop=self.lambda_plus, inclusive="left"),
@@ -126,7 +125,6 @@ class MarchenkoPasturDistribution:
             acum += np.where(_indicator(x, start=0, stop=self.lambda_minus, inclusive="left"),
                             (self.ratio-1)/self.ratio, 0.0)
 
-            if acum.shape == (): return float(acum)
             return acum
 
     def _cdf_aux_f(self, x):
