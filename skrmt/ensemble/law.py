@@ -74,11 +74,17 @@ class WignerSemicircleDistribution:
         self.radius = 2.0 * np.sqrt(self.beta) * sigma
 
     def pdf(self, x):
-        return _relu(2.0 * np.sqrt(self.radius**2 - x**2) / (np.pi * self.radius**2))
+        return 2.0 * np.sqrt(_relu(self.radius**2 - x**2)) / (np.pi * self.radius**2)
     
     def cdf(self, x):
-        return 0.5 + (x * np.sqrt(self.radius**2 - x**2))/(np.pi * self.radius**2) + \
-            (np.arcsin(x/self.radius)) / np.pi
+        with np.errstate(divide='ignore', invalid='ignore'):
+            return np.select(
+                condlist=[x >= self.radius, x <= -self.radius],
+                choicelist=[1.0, 0.0],
+                default=(0.5 + (x * np.sqrt(self.radius**2 - x**2))/(np.pi * self.radius**2) + \
+                         (np.arcsin(x/self.radius)) / np.pi)
+            )
+
 
 
 class MarchenkoPasturDistribution:
@@ -106,24 +112,22 @@ class MarchenkoPasturDistribution:
             / (2.0 * np.pi * self.ratio * self._var * x)
 
     def cdf(self, x):
-        np.seterr(divide='ignore')
-        np.seterr(invalid='ignore')
+        with np.errstate(divide='ignore', invalid='ignore'):
+            acum = _indicator(x, start=self.lambda_plus, inclusive="left")
+            acum += np.where(_indicator(x, start=self.lambda_minus, stop=self.lambda_plus, inclusive="left"),
+                            self._cdf_aux_f(x), 0.0)
 
-        acum = _indicator(x, start=self.lambda_plus, inclusive="left")
-        acum += np.where(_indicator(x, start=self.lambda_minus, stop=self.lambda_plus, inclusive="left"),
-                         self._cdf_aux_f(x), 0.0)
+            if self.ratio <= 1:
+                if acum.shape == (): return float(acum)
+                return acum
+            
+            acum += np.where(_indicator(x, start=self.lambda_minus, stop=self.lambda_plus, inclusive="left"),
+                            (self.ratio-1)/(2*self.ratio), 0.0)
+            acum += np.where(_indicator(x, start=0, stop=self.lambda_minus, inclusive="left"),
+                            (self.ratio-1)/self.ratio, 0.0)
 
-        if self.ratio <= 1:
             if acum.shape == (): return float(acum)
             return acum
-        
-        acum += np.where(_indicator(x, start=self.lambda_minus, stop=self.lambda_plus, inclusive="left"),
-                         (self.ratio-1)/(2*self.ratio), 0.0)
-        acum += np.where(_indicator(x, start=0, stop=self.lambda_minus, inclusive="left"),
-                         (self.ratio-1)/self.ratio, 0.0)
-
-        if acum.shape == (): return float(acum)
-        return acum
 
     def _cdf_aux_f(self, x):
         first_arctan_term = np.where(x == self.lambda_minus,
