@@ -353,32 +353,10 @@ def tracy_widom(ensemble='goe', n_size=100, times=1000, bins=100, interval=None,
         plt.show()
 
 
-def theory_manova_spectrum_distr(values, a, b, lambda_minus, lambda_plus):
-    """Computes the theoretical Manova spectrum limiting distribution law
-    on a given point or points.
 
-    Args:
-        values (ndarray): numpy array of numbers whose evaluation is required.
-        a (float): parameter of the theoretical analytical function.
-        b (float): parameter of the theoretical analytical function.
-        lambda_minus (float): lower limit of the Manova spectrum distribution.
-        lambda_plus (float): upper limit of the Manova spectrum distribution.
-        beta (int): integer representing type of matrix entries. beta=1 if real
-            entries are used (MRE), beta=2 if they are complex (MCE) or beta=4
-            if they are quaternions (MQE). Beta is considered as the variance
-            of the matrix entries.
-    
-    Returns:
-        array_like (ndarray) which is the image of the given value (or values)
-        evaluated on the Manova spectrum limiting distribution.
-    """
-    return (a+b) * np.sqrt(__relu_func(lambda_plus - values) * __relu_func(values - lambda_minus)) \
-        / (2.0 * np.pi * values * (1-values))
-
-
-def manova_spectrum_distr(ensemble='mre', m_size=1000, n1_size=3000, n2_size=3000,
-                          bins=100, interval=None, density=False, plot_law_pdf=False,
-                          savefig_path=None):
+def manova_spectrum(ensemble='mre', m_size=1000, n1_size=3000, n2_size=3000,
+                    bins=100, interval=None, density=False, plot_law_pdf=False,
+                    savefig_path=None):
     """Computes and plots Manova spectrum limiting and analytical distribution.
 
     Calculates and plots Manova spectrum limiting Law using Manova Ensemble random matrices.
@@ -457,13 +435,13 @@ def manova_spectrum_distr(ensemble='mre', m_size=1000, n1_size=3000, n2_size=300
     # Plotting theoretical graphic
     if plot_law_pdf and density:
         centers = np.array(__get_bins_centers_and_contour(bins))
-        expected_frec = theory_manova_spectrum_distr(centers, a, b, 
-                                                    lambda_minus, lambda_plus)
-        plt.plot(centers, expected_frec, color='red', linewidth=2)
+        msd = ManovaSpectrumDistribution(beta=beta, a=a, b=b)
+        pdf = msd.pdf(centers)
+        plt.plot(centers, pdf, color='red', linewidth=2)
 
-    plt.title("Eigenvalue density histogram", fontweight="bold")
+    plt.title("Manova Spectrum - Empirical density histogram", fontweight="bold")
     plt.xlabel("x")
-    plt.ylabel("density")
+    plt.ylabel("probability density")
     if a <= 1 or b <= 1:
         if plot_law_pdf and density:
             ylim_vals = expected_frec
