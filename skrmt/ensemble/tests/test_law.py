@@ -245,3 +245,77 @@ class TestMarchenkoPasturDistribution:
         mpd = MarchenkoPasturDistribution(ratio=1/3)
         mpd.plot_cdf(interval=(-1,10), savefig_path=TMP_DIR_PATH+"/"+fig_name)
         assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name)) == True
+
+
+
+class TestTracyWidomDistribution:
+
+    def test_twd_init_success(self):
+        beta = 4
+
+        twd = TracyWidomDistribution(beta=beta)
+
+        assert twd.beta == beta
+        assert twd.tw_approx is not None
+    
+    def test_twd_init_raise(self):
+        with pytest.raises(ValueError):
+            _ = TracyWidomDistribution(beta=3)
+
+    def test_twd_rvs_success(self):
+        beta = 1
+        size = 5
+        twd1 = TracyWidomDistribution(beta=beta)
+        samples = twd1.rvs(size=size)
+        assert len(samples == size)
+
+        beta = 4
+        size = 5
+        twd4 = TracyWidomDistribution(beta=beta)
+        samples = twd4.rvs(size=size)
+        assert len(samples == size)
+
+        size = 10
+        samples = twd4.rvs(size=size)
+        assert len(samples == size)
+    
+    def test_twd_rvs_raise(self):
+        with pytest.raises(ValueError):
+            twd = TracyWidomDistribution(beta=1)
+            twd.rvs(-5)
+    
+    def test_twd_pdf(self):
+        beta = 4
+        twd = TracyWidomDistribution(beta=beta)
+        assert twd.pdf(-1) > 0.0
+        assert twd.pdf(100) < 1e-10
+        assert twd.pdf(-100) < 1e-10
+    
+    def test_twd_cdf(self):
+        beta = 4
+        twd = TracyWidomDistribution(beta=beta)
+        assert twd.cdf(-1) > 0.0
+        assert twd.cdf(100) > 0.99999
+        assert twd.pdf(-100) < 1e-10
+    
+    def test_twd_plot_pdf(self):
+        fig_name = "test_twd_pdf_wo_interval.png"
+        twd = TracyWidomDistribution()
+        twd.plot_pdf(savefig_path=TMP_DIR_PATH+"/"+fig_name)
+        assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name)) == True
+
+        fig_name = "test_twd_pdf_w_interval.png"
+        twd = TracyWidomDistribution()
+        twd.plot_pdf(interval=(-5,5), savefig_path=TMP_DIR_PATH+"/"+fig_name)
+        assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name)) == True
+    
+    def test_twd_plot_cdf(self):
+        fig_name = "test_twd_cdf_wo_interval.png"
+        twd = TracyWidomDistribution()
+        twd.plot_cdf(savefig_path=TMP_DIR_PATH+"/"+fig_name)
+        assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name)) == True
+
+        fig_name = "test_twd_cdf_w_interval.png"
+        twd = TracyWidomDistribution()
+        twd.plot_cdf(interval=(-5,5), savefig_path=TMP_DIR_PATH+"/"+fig_name)
+        assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name)) == True
