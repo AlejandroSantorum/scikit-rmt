@@ -8,12 +8,13 @@ from skrmt.ensemble import WignerSemicircleDistribution
 from skrmt.ensemble import MarchenkoPasturDistribution
 from skrmt.ensemble import TracyWidomDistribution
 from skrmt.ensemble import ManovaSpectrumDistribution
+from skrmt.ensemble.law import _indicator
 
 
 TMP_DIR_PATH = os.path.join(os.getcwd(), "skrmt/ensemble/tests/tmp")
 
 
-@pytest.fixture(scope="session", autouse=True)
+@pytest.fixture(scope="module", autouse=True)
 def _setup_tmp_dir(request):
     """Function that is run before all tests in this script.
 
@@ -283,6 +284,10 @@ class TestTracyWidomDistribution:
         with pytest.raises(ValueError):
             twd = TracyWidomDistribution(beta=1)
             twd.rvs(-5)
+
+        with pytest.raises(ValueError):
+            twd = TracyWidomDistribution(beta=1)
+            twd.rvs(size=5, mtx_size=0)
     
     def test_twd_pdf(self):
         beta = 4
@@ -392,3 +397,27 @@ class TestManovaSpectrumDistribution:
         msd = ManovaSpectrumDistribution(a=3, b=3)
         msd.plot_pdf(interval=(-1,2), savefig_path=TMP_DIR_PATH+"/"+fig_name)
         assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name)) == True
+
+
+
+def test_indicator_func():
+    assert _indicator(1.0, start=1.0, stop=2.0, inclusive="both") == 1.0
+    assert _indicator(1.0, start=1.0, stop=2.0, inclusive="left") == 1.0
+    assert _indicator(1.0, start=1.0, stop=2.0, inclusive="right") == 0.0
+    assert _indicator(1.0, start=1.0, stop=2.0, inclusive="neither") == 0.0
+    assert _indicator(2.0, start=1.0, stop=2.0, inclusive="both") == 1.0
+    assert _indicator(2.0, start=1.0, stop=2.0, inclusive="left") == 0.0
+    assert _indicator(2.0, start=1.0, stop=2.0, inclusive="right") == 1.0
+    assert _indicator(2.0, start=1.0, stop=2.0, inclusive="neither") == 0.0
+    assert _indicator(2.0, stop=2.0, inclusive="both") == 1.0
+    assert _indicator(2.0, stop=2.0, inclusive="left") == 0.0
+    assert _indicator(2.0, stop=2.0, inclusive="right") == 1.0
+    assert _indicator(2.0, stop=2.0, inclusive="neither") == 0.0
+
+def test_indicator_func_except():
+    with pytest.raises(ValueError):
+        _ = _indicator(2.0)
+    
+    with pytest.raises(ValueError):
+        _ = _indicator(2.0, start=2.0, inclusive="foo")
+    

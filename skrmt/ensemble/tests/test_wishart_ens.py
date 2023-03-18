@@ -3,7 +3,7 @@
 Testing WishartEnsemble module
 '''
 
-from unicodedata import decimal
+import pytest
 import numpy as np
 from scipy import sparse
 from numpy.testing import (
@@ -12,6 +12,20 @@ from numpy.testing import (
 )
 
 from skrmt.ensemble import WishartEnsemble
+
+
+
+def test_init_exception():
+    with pytest.raises(ValueError):
+        _ = WishartEnsemble(beta=3, p=100, n=300)
+
+def test_tridiagonal_ratio_exception():
+    with pytest.raises(ValueError):
+        _ = WishartEnsemble(beta=1, p=300, n=100, use_tridiagonal=True)
+
+def test_tridiagonal_sigma_exception():
+    with pytest.raises(ValueError):
+        _ = WishartEnsemble(beta=1, p=100, n=300, sigma=2.0, use_tridiagonal=True)
 
 
 ##########################################

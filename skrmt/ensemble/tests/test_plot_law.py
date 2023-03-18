@@ -16,7 +16,7 @@ from skrmt.ensemble import manova_spectrum
 TMP_DIR_PATH = os.path.join(os.getcwd(), "skrmt/ensemble/tests/tmp")
 
 
-@pytest.fixture(scope="session", autouse=True)
+@pytest.fixture(scope="module", autouse=True)
 def _setup_tmp_dir(request):
     """Function that is run before all tests in this script.
 

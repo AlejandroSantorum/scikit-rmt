@@ -3,6 +3,7 @@
 Testing GaussianEnsemble module
 '''
 
+import pytest
 import numpy as np
 from numpy.testing import (
     assert_almost_equal,
@@ -10,6 +11,17 @@ from numpy.testing import (
 )
 
 from skrmt.ensemble import GaussianEnsemble
+
+
+
+def test_init_exception():
+    with pytest.raises(ValueError):
+        _ = GaussianEnsemble(beta=3, n=100)
+
+def test_build_tridiagonal_exception():
+    with pytest.raises(ValueError):
+        _ = GaussianEnsemble(beta=1, n=100, sigma=2.0, use_tridiagonal=True)
+
 
 ##########################################
 ### Gaussian Orthogonal Ensemble = GOE
