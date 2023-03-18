@@ -79,7 +79,7 @@ def test_wre_build_tridiagonal():
 
     # sampling chi-squares and finding tridiagonal matrix in two ways
     np.random.seed(1)
-    a_val = n_size*beta/ 2
+    a_val = n_size*beta/2
     dfs = np.arange(p_size)
     chisqs_diag = np.array([np.sqrt(np.random.chisquare(2*a_val - beta*df)) for df in dfs])
     dfs = np.flip(dfs)
@@ -359,7 +359,6 @@ def test_wqe_build_tridiagonal():
 
     # sampling chi-squares and finding tridiagonal matrix in two ways
     np.random.seed(1)
-    p_size *= 2  # WQE matrices are 2p times 2p
     a_val = n_size*beta/ 2
     dfs = np.arange(p_size)
     chisqs_diag = np.array([np.sqrt(np.random.chisquare(2*a_val - beta*df)) for df in dfs])
