@@ -189,8 +189,7 @@ class _Ensemble(metaclass=ABCMeta):
         width = bins[1]-bins[0]
         plt.bar(bins[:-1], observed, width=width, align='edge')
 
-        plt.title("Eigenvalue density histogram (matrix size: "+\
-                      str(len(self.matrix))+"x"+str(len(self.matrix))+")", fontweight="bold")
+        plt.title("Eigenvalue density histogram", fontweight="bold")
         plt.xlabel("x")
         plt.ylabel("density")
 

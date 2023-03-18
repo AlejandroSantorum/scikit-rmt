@@ -90,10 +90,6 @@ def wigner_semicircle(ensemble='goe', n_size=1000, sigma=1.0, bins=100, interval
     except ValueError:
         raise ValueError(f"Ensemble '{ensemble}' not supported."
                          " Check that ensemble is one of the following: 'goe', 'gue' or 'gse'.")
-
-    if interval is None:
-        radius = 2.0 * np.sqrt(beta) * sigma
-        interval = (-radius, radius)
     
     use_tridiag = (sigma == 1.0)
     if not use_tridiag:
@@ -102,6 +98,11 @@ def wigner_semicircle(ensemble='goe', n_size=1000, sigma=1.0, bins=100, interval
               "\t It is adviced to set sigma=1.0 to optimize and boost histogramming.")
 
     ens = GaussianEnsemble(beta=beta, n=n_size, sigma=sigma, use_tridiagonal=use_tridiag)
+
+    # default plotting interval in case it's not provided
+    if not interval:
+        radius = 2.0 * np.sqrt(beta) * sigma
+        interval = (-radius, radius)
 
     # Wigner eigenvalue normalization constant
     if use_tridiag:
@@ -114,7 +115,7 @@ def wigner_semicircle(ensemble='goe', n_size=1000, sigma=1.0, bins=100, interval
     width = bins[1]-bins[0]
     plt.bar(bins[:-1], observed, width=width, align='edge')
 
-    # Plotting theoretical graphic
+    # Plotting Wigner Semicircle Law pdf
     if plot_law_pdf and density:
         centers = np.asarray(__get_bins_centers_and_contour(bins))
         wsd = WignerSemicircleDistribution(beta=beta, sigma=sigma)
@@ -123,7 +124,7 @@ def wigner_semicircle(ensemble='goe', n_size=1000, sigma=1.0, bins=100, interval
     elif plot_law_pdf and not density:
         print("Warning: Wigner's Semicircle Law PDF is only plotted when density is True.")
 
-    plt.title("Wigner Semicircle - Empirical density histogram", fontweight="bold")
+    plt.title("Wigner Semicircle Law - Empirical density histogram", fontweight="bold")
     plt.xlabel("x")
     plt.ylabel("probability density")
 
@@ -135,33 +136,8 @@ def wigner_semicircle(ensemble='goe', n_size=1000, sigma=1.0, bins=100, interval
 
 
 
-def theory_marchenko_pastur(values, ratio, lambda_minus, lambda_plus, beta, sigma=1.0):
-    """Computes the theoretical Wigner's semicircle law on a given point or points.
-
-    Args:
-        values (ndarray): numpy array of numbers whose evaluation is required.
-        ratio (float): ratio between the matrix size. ratio is equal to p/n,
-            where p is the number of rows and n is the number of columns of
-            the matrix that generates a Wishart matrix. 'p' is also known as
-            the degrees of freedom and 'n' as the sample size.
-        lambda_minus (float): lower limit of the Marchenko-Pastur distribution.
-        lambda_plus (float): upper limit of the Marchenko-Pastur distribution.
-        beta (int): integer representing type of matrix entries. beta=1 if real
-            entries are used (WRE), beta=2 if they are complex (WCE) or beta=4
-            if they are quaternions (WQE). Beta is considered as the variance
-            of the matrix entries.
-    
-    Returns:
-        array_like (ndarray) which is the image of the given value (or values)
-        evaluated on Marchenko-Pastur Law.
-    """
-    var = beta * sigma**2
-    return np.sqrt(__relu_func(lambda_plus - values) * __relu_func(values - lambda_minus)) \
-          / (2.0 * np.pi * ratio * var * values)
-
-
-def marchenko_pastur_law(ensemble='wre', p_size=3000, n_size=10000, sigma=1.0, bins=100,
-                         interval=None, density=False, limit_pdf=False, savefig_path=None):
+def marchenko_pastur(ensemble='wre', p_size=1000, n_size=3000, sigma=1.0, bins=100,
+                     interval=None, density=False, plot_law_pdf=False, savefig_path=None):
     """Computes and plots Marchenko-Pastur Law using Wishart Ensemble random matrices.
 
     Calculates and plots Marchenko-Pastur Law using Wishart Ensemble random matrices.
@@ -173,9 +149,9 @@ def marchenko_pastur_law(ensemble='wre', p_size=3000, n_size=10000, sigma=1.0, b
     Args:
         ensemble ('wre', 'wce' or 'wqe', default='wre'): ensemble to draw the
             random matrices to study Marchenko-Pastur Law.
-        p_size (int, default=3000): number of rows of the guassian matrix that generates
+        p_size (int, default=1000): number of rows of the guassian matrix that generates
             the matrix of the corresponding ensemble.
-        n_size (int, default=10000): number of columns of the guassian matrix that generates
+        n_size (int, default=3000): number of columns of the guassian matrix that generates
             the matrix of the corresponding ensemble.
         bins (int or sequence, default=100): If bins is an integer, it defines the number
             of equal-width bins in the range. If bins is a sequence, it defines the
@@ -188,7 +164,7 @@ def marchenko_pastur_law(ensemble='wre', p_size=3000, n_size=10000, sigma=1.0, b
             number of counts and the bin width, so that the area under the histogram
             integrates to 1. If set to False, the absolute frequencies of the eigenvalues
             are returned.
-        limit_pdf (bool, default=False): If True, the limiting theoretical law is plotted.
+        plot_law_pdf (bool, default=False): If True, the limiting theoretical law is plotted.
             If set to False, just the empirical histogram is shown. This parameter is only
             considered when the argument 'density' is set also to True.
         fig_path (string, default=None): path to save the created figure. If it is not
@@ -206,20 +182,20 @@ def marchenko_pastur_law(ensemble='wre', p_size=3000, n_size=10000, sigma=1.0, b
     # pylint: disable=too-many-arguments
     if n_size<1 or p_size<1:
         raise ValueError("matrix size must be positive")
-    
-    if interval and interval[0] == 0:
-        print("Warning: setting the beginning of the interval to zero may generate numerical errors.")
-        print(f"Setting interval to (-0.01, {interval[1]})")
-        interval = (-0.01, interval[1])
 
     try:
         beta = ["wre", "wce", None, "wqe"].index(ensemble) + 1
     except ValueError:
         raise ValueError(f"Ensemble '{ensemble}' not supported."
                          " Check that ensemble is one of the following: 'wre', 'wce' or 'wqe'.")
+    
+    if interval and interval[0] == 0:
+        print("Warning: setting the beginning of the interval to zero may generate numerical errors.")
+        print(f"Setting interval to (-0.01, {interval[1]})")
+        interval = (-0.01, interval[1])
 
     # calculating constants depending on matrix sizes
-    ratio = (2*p_size)/n_size if beta == 4 else p_size/n_size
+    ratio = p_size/n_size
     lambda_plus = beta * sigma**2 * (1 + np.sqrt(ratio))**2
     lambda_minus = beta * sigma**2 * (1 - np.sqrt(ratio))**2
     use_tridiag_ratio = (ratio <= 1)
@@ -230,7 +206,7 @@ def marchenko_pastur_law(ensemble='wre', p_size=3000, n_size=10000, sigma=1.0, b
               "\t It is adviced to increase sample size (`n`) to optimize and boost histogramming.")
 
     # computing interval according to the matrix size ratio and support
-    if interval is None:
+    if not interval:
         if ratio <= 1:
             interval = (lambda_minus, lambda_plus)
         else:
@@ -241,7 +217,7 @@ def marchenko_pastur_law(ensemble='wre', p_size=3000, n_size=10000, sigma=1.0, b
         print(f"Warning: The given scale is not the standard (sigma = {sigma}).\n"
               "\t Tridiagonal histogramming is deactivated.\n"
               "\t It is adviced to set sigma=1.0 to optimize and boost histogramming.")
-    
+
     ens = WishartEnsemble(beta=beta, p=p_size, n=n_size, sigma=sigma,
                           use_tridiagonal=(use_tridiag_ratio and use_tridiag_sigma))
 
@@ -254,18 +230,18 @@ def marchenko_pastur_law(ensemble='wre', p_size=3000, n_size=10000, sigma=1.0, b
     plt.bar(bins[:-1], observed, width=width, align='edge')
 
     # Plotting theoretical graphic
-    if limit_pdf and density:
+    if plot_law_pdf and density:
         centers = np.array(__get_bins_centers_and_contour(bins))
-        expected_frec = theory_marchenko_pastur(centers, ratio, lambda_minus,
-                                                lambda_plus, beta, sigma)
-        plt.plot(centers, expected_frec, color='red', linewidth=2)
+        mpd = MarchenkoPasturDistribution(beta=beta, ratio=ratio, sigma=sigma)
+        pdf = mpd.pdf(centers)
+        plt.plot(centers, pdf, color='red', linewidth=2)
 
-    plt.title("Eigenvalue density histogram", fontweight="bold")
+    plt.title("Marchenko-Pastur Law - Empirical density histogram", fontweight="bold")
     plt.xlabel("x")
-    plt.ylabel("density")
+    plt.ylabel("probability density")
     if ratio > 1:
-        if limit_pdf and density:
-            ylim_vals = expected_frec
+        if plot_law_pdf and density:
+            ylim_vals = pdf
         else:
             ylim_vals = observed
         try:

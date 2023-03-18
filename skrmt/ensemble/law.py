@@ -172,8 +172,9 @@ class MarchenkoPasturDistribution:
         return _eigval_norm_const * self._wishart_ens.eigvals()
 
     def pdf(self, x):
-        return np.sqrt(_relu(self.lambda_plus - x) * _relu(x - self.lambda_minus)) \
-            / (2.0 * np.pi * self.ratio * self._var * x)
+        with np.errstate(divide='ignore', invalid='ignore'):
+            return np.sqrt(_relu(self.lambda_plus - x) * _relu(x - self.lambda_minus)) \
+                / (2.0 * np.pi * self.ratio * self._var * x)
 
     def cdf(self, x):
         with np.errstate(divide='ignore', invalid='ignore'):

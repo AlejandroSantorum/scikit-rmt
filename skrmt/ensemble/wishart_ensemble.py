@@ -135,6 +135,11 @@ class WishartEnsemble(_Ensemble):
                                  " is greater than 'n' (sample size).\n"
                                  f"\t Provided n={self.n} and p={self.p}."
                                  " Set `use_tridiagonal=False` or increase sample size (`n`).")
+            
+            if self.sigma != 1.0:
+                raise ValueError("Error: cannot sample tridiagonal random matrix using non-unitary scale"
+                                f" (sigma = {self.sigma}).\n"
+                                "\t Set `sigma=1.0` (default) or deactivate tridiagonal sampling.")
 
             return self.sample_tridiagonal()
 
@@ -197,21 +202,15 @@ class WishartEnsemble(_Ensemble):
                 Journal of Mathematical Physics. 43.11 (2002): 5830-5847.
 
         '''
-        if self.sigma != 1.0:
-            raise ValueError("Error: cannot sample tridiagonal random matrix using non-unitary scale"
-                             f" (sigma = {self.sigma}).\n"
-                             "\t Set `sigma=1.0` (default) or deactivate tridiagonal sampling.")
-
-        mtx_size = 2*self.p if self.beta==4 else self.p
-        a_val = self.n*self.beta/ 2
+        a_val = self.n*self.beta/2
         # sampling chi-squares
-        dfs = np.arange(mtx_size)
+        dfs = np.arange(self.p)
         chisqs_diag = np.array([np.sqrt(np.random.chisquare(2*a_val - self.beta*df)) for df in dfs])
         dfs = np.flip(dfs)
         chisqs_offdiag = np.array([np.sqrt(np.random.chisquare(self.beta*df)) for df in dfs[:-1]])
         # calculating tridiagonal diagonals
         diag = np.array([chisqs_diag[0]**2]+[chisqs_diag[i+1]**2 + \
-                         chisqs_offdiag[i]**2 for i in range(mtx_size-1)])
+                         chisqs_offdiag[i]**2 for i in range(self.p-1)])
         offdiag = np.multiply(chisqs_offdiag, chisqs_diag[:-1])
         # inserting diagonals
         diagonals = [offdiag, diag, offdiag]
@@ -281,8 +280,9 @@ class WishartEnsemble(_Ensemble):
         # pylint: disable=too-many-arguments
         if norm_const is None:
             norm_const = 1/self.n 
-        if interval is None:
-            ratio = (2*self.p)/self.n if self.beta==4 else self.p/self.n
+        if not interval:
+            # calculating constants depending on matrix sizes
+            ratio = self.p/self.n
             lambda_plus = self.beta * self.sigma**2 * (1 + np.sqrt(ratio))**2
             lambda_minus = self.beta * self.sigma**2 * (1 - np.sqrt(ratio))**2
             interval = (lambda_minus, lambda_plus)
@@ -292,8 +292,7 @@ class WishartEnsemble(_Ensemble):
                                                  interval=interval, density=density)
             width = bins[1]-bins[0]
             plt.bar(bins[:-1], observed, width=width, align='edge')
-            plt.title("Eigenvalue density histogram (matrix size: "+\
-                      str(len(self.matrix))+"x"+str(len(self.matrix))+")", fontweight="bold")
+            plt.title("Eigenvalue density histogram", fontweight="bold")
             plt.xlabel("x")
             plt.ylabel("density")
             # Saving plot or showing it
