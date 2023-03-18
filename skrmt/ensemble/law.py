@@ -251,6 +251,32 @@ class TracyWidomDistribution:
         self.beta = beta
         self.tw_approx = TW_Approximator(beta=self.beta)
 
+    def rvs(self, size, mtx_size=100):
+        if size <= 0:
+            raise ValueError(f"Error: invalid sample size. It has to be positive. Provided size = {size}.")
+        if mtx_size <= 0:
+            raise ValueError(f"Error: invalid matrix size. It has to be positive. Provided matrix size = {mtx_size}.")
+
+        self._gaussian_ens = GaussianEnsemble(beta=self.beta, n=mtx_size, use_tridiagonal=False)
+
+        max_eigvals = []
+        for _ in range(size):
+            max_eigvals.append(self._gaussian_ens.eigvals().max())
+            self._gaussian_ens.sample()
+        max_eigvals = np.asarray(max_eigvals)
+
+        # Tracy-Widom eigenvalue distr. normalization constants
+        eigval_scale = 1.0
+        size_scale = 1.0
+        if self.beta == 2:
+            eigval_scale = 1/np.sqrt(2)
+        if self.beta == 4:
+            eigval_scale = size_scale = 1/np.sqrt(2)
+            mtx_size *= 2
+
+        max_eigvals = size_scale*(mtx_size**(1/6))*(eigval_scale*max_eigvals - (2.0*np.sqrt(mtx_size)))
+        return max_eigvals
+
     def pdf(self, x):
         return self.tw_approx.pdf(x)
 
@@ -323,10 +349,10 @@ class ManovaSpectrumDistribution:
         else:
             self._manova_ens.set_size(m=size, n1=_n1, n2=_n2, resample_mtx=True)
         
-        _eigval_norm_const = 1.0
+        # Here, _eigval_norm_const = 1.0
         if self.beta == 4:
-            return _eigval_norm_const * self._manova_ens.eigvals()[::2].real
-        return _eigval_norm_const * self._manova_ens.eigvals().real
+            return self._manova_ens.eigvals()[::2].real
+        return self._manova_ens.eigvals().real
     
     def pdf(self, x):
         with np.errstate(divide='ignore', invalid='ignore'): 

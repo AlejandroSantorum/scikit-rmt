@@ -355,21 +355,21 @@ def tracy_widom_law(ensemble='goe', n_size=100, times=1000, bins=100, interval=N
 
     ens = GaussianEnsemble(beta=beta, n=n_size, use_tridiagonal=False)
 
-    eigvals = np.asarray([])
+    eigvals = []
     for _ in range(times):
-        vals = ens.eigvals()
-        eigvals = np.append(eigvals, vals.max())
+        eigvals.append(ens.eigvals().max())
         ens.sample()
+    eigvals = np.asarray(eigvals)
 
     # Tracy-Widom eigenvalue distr. normalization constants
-    eigval_scale = 1
-    size_scale = 1
+    eigval_scale = 1.0
+    size_scale = 1.0
     if ensemble == 'gue':
         eigval_scale = 1/np.sqrt(2)
-    if ensemble == 'gse':
+    elif ensemble == 'gse':
         eigval_scale = size_scale = 1/np.sqrt(2)
         n_size *= 2
-    eigvals = size_scale*(n_size**(1/6))*(eigval_scale*eigvals - (2*np.sqrt(n_size)))
+    eigvals = size_scale*(n_size**(1/6))*(eigval_scale*eigvals - (2.0*np.sqrt(n_size)))
 
     if interval is None:
         xmin=eigvals.min()
