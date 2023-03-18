@@ -1,6 +1,9 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
+from .gaussian_ensemble import GaussianEnsemble
+from .wishart_ensemble import WishartEnsemble
+from .manova_ensemble import ManovaEnsemble
 from .tracy_widom_approximator import TW_Approximator
 
 
@@ -72,6 +75,20 @@ class WignerSemicircleDistribution:
         self.beta = beta
         self.sigma = sigma
         self.radius = 2.0 * np.sqrt(self.beta) * sigma
+        self.gaussian_ens = None
+    
+    def rvs(self, size):
+        if size <= 0:
+            raise ValueError(f"Error: invalid sample size. It has to be positive. Provided size = {size}.")
+        
+        if not self.gaussian_ens:
+            self.gaussian_ens = GaussianEnsemble(beta=self.beta, n=size, use_tridiagonal=False, sigma=self.sigma)
+        else:
+            self.gaussian_ens.set_size(size, resample_mtx=True)
+        
+        if self.beta == 4:
+            return self.gaussian_ens.eigvals()[::2]
+        return self.gaussian_ens.eigvals()
 
     def pdf(self, x):
         return 2.0 * np.sqrt(_relu(self.radius**2 - x**2)) / (np.pi * self.radius**2)
