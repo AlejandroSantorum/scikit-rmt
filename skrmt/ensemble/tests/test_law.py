@@ -137,4 +137,111 @@ class TestWignerSemicircleDistribution:
 
     
 
+class TestMarchenkoPasturDistribution:
 
+    def test_mpd_init_success(self):
+        beta = 4
+        ratio = 1/2
+        sigma = 2.0
+
+        mpd = MarchenkoPasturDistribution(beta=beta, ratio=ratio, sigma=sigma)
+
+        assert mpd.beta == beta
+        assert mpd.ratio == ratio
+        assert mpd.sigma == sigma
+        assert mpd.lambda_minus == beta * sigma**2 * (1 - np.sqrt(ratio))**2
+        assert mpd.lambda_plus == beta * sigma**2 * (1 + np.sqrt(ratio))**2
+        assert mpd._var == beta * sigma**2
+        assert mpd._wishart_ens is None
+    
+    def test_mpd_init_raise(self):
+        with pytest.raises(ValueError):
+            _ = MarchenkoPasturDistribution(ratio=1, beta=3)
+        
+        with pytest.raises(ValueError):
+            _ = MarchenkoPasturDistribution(ratio=0)
+
+    def test_mpd_rvs_success(self):
+        beta = 1
+        ratio = 1/3
+        size = 5
+        mpd1 = MarchenkoPasturDistribution(beta=beta, ratio=ratio)
+        samples = mpd1.rvs(size=size)
+        assert len(samples == size)
+
+        beta = 4
+        ratio = 1/3
+        size = 5
+        mpd4 = MarchenkoPasturDistribution(beta=beta, ratio=ratio)
+        samples = mpd4.rvs(size=size)
+        assert len(samples == size)
+
+        size = 10
+        samples = mpd4.rvs(size=size)
+        assert len(samples == size)
+    
+    def test_mpd_rvs_raise(self):
+        with pytest.raises(ValueError):
+            mpd = MarchenkoPasturDistribution(beta=1, ratio=1)
+            mpd.rvs(-5)
+    
+    def test_mpd_pdf(self):
+        beta = 4
+        ratio = 1/3
+        sigma = 1
+        mpd = MarchenkoPasturDistribution(beta=beta, ratio=ratio, sigma=sigma)
+
+        middle = np.mean([mpd.lambda_minus, mpd.lambda_plus])
+        assert mpd.pdf(middle) > 0.0
+        assert mpd.pdf(mpd.lambda_plus + 0.1) == 0.0
+        assert mpd.pdf(mpd.lambda_minus - 0.01) == 0.0
+
+        sigma = 10
+        mpd = MarchenkoPasturDistribution(beta=beta, ratio=ratio, sigma=sigma)
+
+        middle = np.mean([mpd.lambda_minus, mpd.lambda_plus])
+        assert mpd.pdf(middle) > 0.0
+        assert mpd.pdf(mpd.lambda_plus + 0.1) == 0.0
+        assert mpd.pdf(mpd.lambda_minus - 0.01) == 0.0
+    
+    def test_mpd_cdf(self):
+        beta = 1
+        ratio = 1/3
+        sigma = 1
+        mpd = MarchenkoPasturDistribution(beta=beta, ratio=ratio, sigma=sigma)
+
+        middle = np.mean([mpd.lambda_minus, mpd.lambda_plus])
+        assert mpd.cdf(middle) > 0.0
+        assert mpd.cdf(mpd.lambda_plus + 0.1) == 1.0
+        assert mpd.cdf(mpd.lambda_minus - 0.01) == 0.0
+
+        sigma = 2
+        ratio = 2
+        mpd = MarchenkoPasturDistribution(beta=beta, ratio=ratio, sigma=sigma)
+
+        middle = np.mean([mpd.lambda_minus, mpd.lambda_plus])
+        assert mpd.cdf(middle) > 0.0
+        assert mpd.cdf(mpd.lambda_plus + 0.1) == 1.0
+        assert mpd.cdf(mpd.lambda_minus - 0.1) == 0.0
+    
+    def test_mpd_plot_pdf(self):
+        fig_name = "test_mpd_pdf_wo_interval.png"
+        mpd = MarchenkoPasturDistribution(ratio=1/3)
+        mpd.plot_pdf(savefig_path=TMP_DIR_PATH+"/"+fig_name)
+        assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name)) == True
+
+        fig_name = "test_mpd_pdf_w_interval.png"
+        mpd = MarchenkoPasturDistribution(ratio=1/3)
+        mpd.plot_pdf(interval=(-1,10), savefig_path=TMP_DIR_PATH+"/"+fig_name)
+        assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name)) == True
+    
+    def test_mpd_plot_cdf(self):
+        fig_name = "test_mpd_cdf_wo_interval.png"
+        mpd = MarchenkoPasturDistribution(ratio=1/3)
+        mpd.plot_cdf(savefig_path=TMP_DIR_PATH+"/"+fig_name)
+        assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name)) == True
+
+        fig_name = "test_mpd_cdf_w_interval.png"
+        mpd = MarchenkoPasturDistribution(ratio=1/3)
+        mpd.plot_cdf(interval=(-1,10), savefig_path=TMP_DIR_PATH+"/"+fig_name)
+        assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name)) == True

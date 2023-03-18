@@ -45,13 +45,13 @@ def _indicator(x, start=None, stop=None, inclusive="both"):
         raise ValueError(f"Error: invalid interval inclusive parameter: {inclusive}\n"
                          "\t inclusive has to be one of the following: {INCLUSIVE_OPTIONS}.")
 
-    if start:
+    if start is not None:
         if inclusive == "both" or inclusive == "left":
             condition = (start <= x)
         elif inclusive == "neither" or inclusive == "right":
             condition = (start < x)
     
-    if start and stop:
+    if (start is not None) and (stop is not None):
         if inclusive == "both" or inclusive == "right":
             condition = np.logical_and(condition, (x <= stop))
         elif inclusive == "neither" or inclusive == "left":
@@ -61,7 +61,7 @@ def _indicator(x, start=None, stop=None, inclusive="both"):
             condition = (x <= stop)
         elif inclusive == "neither" or inclusive == "left":
             condition = (x < stop)
-    
+
     return np.where(condition, 1.0, 0.0)
 
 
@@ -188,9 +188,11 @@ class MarchenkoPasturDistribution:
             
             acum += np.where(_indicator(x, start=self.lambda_minus, stop=self.lambda_plus, inclusive="left"),
                             (self.ratio-1)/(2*self.ratio), 0.0)
-            acum += np.where(_indicator(x, start=0, stop=self.lambda_minus, inclusive="left"),
-                            (self.ratio-1)/self.ratio, 0.0)
 
+            ### This would need to be added if the extra density point at zero is measured
+            # https://en.wikipedia.org/wiki/Marchenko%E2%80%93Pastur_distribution
+            # acum += np.where(_indicator(x, start=0, stop=self.lambda_minus, inclusive="left"),
+            #                 (self.ratio-1)/self.ratio, 0.0)
             return acum
 
     def _cdf_aux_f(self, x):
