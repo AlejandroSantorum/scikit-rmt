@@ -495,9 +495,8 @@ def manova_spectrum_distr(ensemble='mre', m_size=1000, n1_size=3000, n2_size=300
             interval[1] = max(lambda_plus, 1.05)
         interval = tuple(interval)
 
-    #norm_const = m_size
-    observed, bins = ens.eigval_hist(bins=bins, interval=interval,
-                                     density=density, avoid_img=True) #norm_const = norm_const
+    observed, bins = ens.eigval_hist(bins=bins, interval=interval, density=density, avoid_img=True)
+
     width = bins[1]-bins[0]
     plt.bar(bins[:-1], observed, width=width, align='edge')
 

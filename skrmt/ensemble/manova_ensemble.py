@@ -42,14 +42,14 @@ class ManovaEnsemble(_Ensemble):
     X = [X1  X2; -conj(X2)  conj(X1)]
     Y = [Y1  Y2; -conj(Y2)  conj(Y1)]
     Finally, matrix A = (X * X') / (X * X' + Y * Y') generates a matrix of
-    the Manova Quaternion Ensemble.
+    the Manova Quaternion Ensemble of size m times m.
 
     Attributes:
         matrix (numpy array): instance of the ManovaReal, ManovaComplex
             or ManovaQuaternion random ensembles. If it is an instance
             of ManovaReal or ManovaComplex, the random matrix is of
-            size n times n. If it is a ManovaQuaternion, the random matrix
-            is of size 2n times 2n.
+            size m times m. If it is a ManovaQuaternion, the random matrix
+            is of size 2m times 2m.
         beta (int): descriptive integer of the Manova ensemble type.
             For Real beta=1, for Complex beta=2, for Quaternion beta=4.
         m (int): number of rows of the random guassian matrices that
@@ -92,7 +92,7 @@ class ManovaEnsemble(_Ensemble):
         self.beta = beta
         self.matrix = self.sample()
 
-    def set_size(self, m, n1, n2, resample_mtx=False):
+    def set_size(self, m, n1, n2, resample_mtx=True):
         # pylint: disable=arguments-differ
         """Setter of matrix size.
 
@@ -105,7 +105,7 @@ class ManovaEnsemble(_Ensemble):
                 that generates the matrix of the corresponding ensemble.
             n2 (int): number of columns of the second random guassian matrix
                 that generates the matrix of the corresponding ensemble.
-            resample_mtx (bool, default=False): If set to True, the ensemble matrix is
+            resample_mtx (bool, default=True): If set to True, the ensemble matrix is
                 resampled with the new dimensions.
 
         """

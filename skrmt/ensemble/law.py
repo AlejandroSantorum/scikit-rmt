@@ -309,6 +309,24 @@ class ManovaSpectrumDistribution:
         self.lambda_term2 = np.sqrt((1/(a+b)) * (1 - (a/(a+b))))
         self.lambda_minus = (self.lambda_term1 - self.lambda_term2)**2
         self.lambda_plus = (self.lambda_term1 + self.lambda_term2)**2
+        self._manova_ens = None
+    
+    def rvs(self, size):
+        if size <= 0:
+            raise ValueError(f"Error: invalid sample size. It has to be positive. Provided size = {size}.")
+        
+        _n1 = int(np.round(size * self.a))
+        _n2 = int(np.round(size * self.b))
+
+        if not self._manova_ens:
+            self._manova_ens = ManovaEnsemble(beta=self.beta, m=size, n1=_n1, n2=_n2)
+        else:
+            self._manova_ens.set_size(m=size, n1=_n1, n2=_n2, resample_mtx=True)
+        
+        _eigval_norm_const = 1.0
+        if self.beta == 4:
+            return _eigval_norm_const * self._manova_ens.eigvals()[::2].real
+        return _eigval_norm_const * self._manova_ens.eigvals().real
     
     def pdf(self, x):
         with np.errstate(divide='ignore', invalid='ignore'): 
