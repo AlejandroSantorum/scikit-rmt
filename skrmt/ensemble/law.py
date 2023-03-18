@@ -68,11 +68,12 @@ def _indicator(x, start=None, stop=None, inclusive="both"):
 
 class WignerSemicircleDistribution:
 
-    def __init__(self, beta=1, sigma=1.0):
+    def __init__(self, beta=1, center=0.0, sigma=1.0):
         if beta not in [1,2,4]:
             raise ValueError(f"Error: invalid beta. It has to be 1,2 or 4. Provided beta = {beta}.")
 
         self.beta = beta
+        self.center = center
         self.sigma = sigma
         self.radius = 2.0 * np.sqrt(self.beta) * sigma
         self._gaussian_ens = None
@@ -92,15 +93,15 @@ class WignerSemicircleDistribution:
         return _eigval_norm_const * self._gaussian_ens.eigvals()
 
     def pdf(self, x):
-        return 2.0 * np.sqrt(_relu(self.radius**2 - x**2)) / (np.pi * self.radius**2)
+        return 2.0 * np.sqrt(_relu(self.radius**2 - (x-self.center)**2)) / (np.pi * self.radius**2)
     
     def cdf(self, x):
         with np.errstate(divide='ignore', invalid='ignore'):
             return np.select(
-                condlist=[x >= self.radius, x <= -self.radius],
+                condlist=[x >= (self.center + self.radius), x <= (self.center - self.radius)],
                 choicelist=[1.0, 0.0],
-                default=(0.5 + (x * np.sqrt(self.radius**2 - x**2))/(np.pi * self.radius**2) + \
-                         (np.arcsin(x/self.radius)) / np.pi)
+                default=(0.5 + ((x-self.center) * np.sqrt(self.radius**2 - (x-self.center)**2))/(np.pi * self.radius**2) \
+                         + (np.arcsin((x-self.center)/self.radius)) / np.pi)
             )
     
     def plot_pdf(self, interval=None, bins=1000, savefig_path=None):
