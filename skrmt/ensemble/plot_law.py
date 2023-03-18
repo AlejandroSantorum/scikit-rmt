@@ -258,8 +258,8 @@ def marchenko_pastur(ensemble='wre', p_size=1000, n_size=3000, sigma=1.0, bins=1
 
 
 
-def tracy_widom_law(ensemble='goe', n_size=100, times=1000, bins=100, interval=None,
-                    density=False, limit_pdf=False, savefig_path=None):
+def tracy_widom(ensemble='goe', n_size=100, times=1000, bins=100, interval=None,
+                density=False, plot_law_pdf=False, savefig_path=None):
     """Calculates and plots Tracy-Widom Law using Gaussian Ensemble.
 
     Calculates and plots Tracy-Widom Law using Gaussian Ensemble random matrices.
@@ -283,7 +283,7 @@ def tracy_widom_law(ensemble='goe', n_size=100, times=1000, bins=100, interval=N
             number of counts and the bin width, so that the area under the histogram
             integrates to 1. If set to False, the absolute frequencies of the eigenvalues
             are returned.
-        limit_pdf (bool, default=False): If True, the limiting theoretical law is plotted.
+        plot_law_pdf (bool, default=False): If True, the limiting theoretical law is plotted.
             If set to False, just the empirical histogram is shown. This parameter is only
             considered when the argument 'density' is set also to True.
         fig_path (string, default=None): path to save the created figure. If it is not
@@ -336,15 +336,15 @@ def tracy_widom_law(ensemble='goe', n_size=100, times=1000, bins=100, interval=N
     plt.bar(bins[:-1], observed, width=width, align='edge')
 
     # Plotting theoretical graphic
-    if limit_pdf and density:
+    if plot_law_pdf and density:
         centers = __get_bins_centers_and_contour(bins)
-        tw_approx = TW_Approximator(beta=beta)
-        expected_frec = tw_approx.pdf(centers)
-        plt.plot(centers, expected_frec, color='red', linewidth=2)
+        twd = TracyWidomDistribution(beta=beta)
+        pdf = twd.pdf(centers)
+        plt.plot(centers, pdf, color='red', linewidth=2)
 
-    plt.title("Eigenvalue density histogram", fontweight="bold")
+    plt.title("Tracy-Widom Law - Empirical density histogram", fontweight="bold")
     plt.xlabel("x")
-    plt.ylabel("density")
+    plt.ylabel("probability density")
 
     # Saving plot or showing it
     if savefig_path:
@@ -377,7 +377,7 @@ def theory_manova_spectrum_distr(values, a, b, lambda_minus, lambda_plus):
 
 
 def manova_spectrum_distr(ensemble='mre', m_size=1000, n1_size=3000, n2_size=3000,
-                          bins=100, interval=None, density=False, limit_pdf=False,
+                          bins=100, interval=None, density=False, plot_law_pdf=False,
                           savefig_path=None):
     """Computes and plots Manova spectrum limiting and analytical distribution.
 
@@ -403,7 +403,7 @@ def manova_spectrum_distr(ensemble='mre', m_size=1000, n1_size=3000, n2_size=300
             number of counts and the bin width, so that the area under the histogram
             integrates to 1. If set to False, the absolute frequencies of the eigenvalues
             are returned.
-        limit_pdf (bool, default=False): If True, the limiting theoretical law is plotted.
+        plot_law_pdf (bool, default=False): If True, the limiting theoretical law is plotted.
             If set to False, just the empirical histogram is shown. This parameter is only
             considered when the argument 'density' is set also to True.
         fig_path (string, default=None): path to save the created figure. If it is not
@@ -455,7 +455,7 @@ def manova_spectrum_distr(ensemble='mre', m_size=1000, n1_size=3000, n2_size=300
     plt.bar(bins[:-1], observed, width=width, align='edge')
 
     # Plotting theoretical graphic
-    if limit_pdf and density:
+    if plot_law_pdf and density:
         centers = np.array(__get_bins_centers_and_contour(bins))
         expected_frec = theory_manova_spectrum_distr(centers, a, b, 
                                                     lambda_minus, lambda_plus)
@@ -465,7 +465,7 @@ def manova_spectrum_distr(ensemble='mre', m_size=1000, n1_size=3000, n2_size=300
     plt.xlabel("x")
     plt.ylabel("density")
     if a <= 1 or b <= 1:
-        if limit_pdf and density:
+        if plot_law_pdf and density:
             ylim_vals = expected_frec
         else:
             ylim_vals = observed
