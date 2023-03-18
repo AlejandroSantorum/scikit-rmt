@@ -92,7 +92,7 @@ class WishartEnsemble(_Ensemble):
         self.sigma = sigma
         self.matrix = self.sample()
 
-    def set_size(self, p, n, resample_mtx=False):
+    def set_size(self, p, n, resample_mtx=True):
         # pylint: disable=arguments-differ
         """Setter of matrix size.
 
@@ -103,7 +103,7 @@ class WishartEnsemble(_Ensemble):
                 the matrix of the corresponding ensemble.
             n (int): number of columns of the guassian matrix that generates
                 the matrix of the corresponding ensemble.
-            resample_mtx (bool, default=False): If set to True, the ensemble matrix is
+            resample_mtx (bool, default=True): If set to True, the ensemble matrix is
                 resampled with the new dimensions.
 
         """

@@ -75,20 +75,21 @@ class WignerSemicircleDistribution:
         self.beta = beta
         self.sigma = sigma
         self.radius = 2.0 * np.sqrt(self.beta) * sigma
-        self.gaussian_ens = None
+        self._gaussian_ens = None
     
     def rvs(self, size):
         if size <= 0:
             raise ValueError(f"Error: invalid sample size. It has to be positive. Provided size = {size}.")
         
-        if not self.gaussian_ens:
-            self.gaussian_ens = GaussianEnsemble(beta=self.beta, n=size, use_tridiagonal=False, sigma=self.sigma)
+        if not self._gaussian_ens:
+            self._gaussian_ens = GaussianEnsemble(beta=self.beta, n=size, use_tridiagonal=False, sigma=self.sigma)
         else:
-            self.gaussian_ens.set_size(size, resample_mtx=True)
+            self._gaussian_ens.set_size(size, resample_mtx=True)
         
+        _eigval_norm_const = 1/np.sqrt(size)
         if self.beta == 4:
-            return self.gaussian_ens.eigvals()[::2]
-        return self.gaussian_ens.eigvals()
+            return _eigval_norm_const * self._gaussian_ens.eigvals()[::2]
+        return _eigval_norm_const * self._gaussian_ens.eigvals()
 
     def pdf(self, x):
         return 2.0 * np.sqrt(_relu(self.radius**2 - x**2)) / (np.pi * self.radius**2)
@@ -152,6 +153,23 @@ class MarchenkoPasturDistribution:
         self.lambda_minus = self.beta * self.sigma**2 * (1 - np.sqrt(self.ratio))**2
         self.lambda_plus = self.beta * self.sigma**2 * (1 + np.sqrt(self.ratio))**2
         self._var = self.beta * self.sigma**2
+        self._wishart_ens = None
+    
+    def rvs(self, size):
+        if size <= 0:
+            raise ValueError(f"Error: invalid sample size. It has to be positive. Provided size = {size}.")
+        
+        _n = int(np.round(size / self.ratio))
+
+        if not self._wishart_ens:
+            self._wishart_ens = WishartEnsemble(beta=self.beta, p=size, n=_n, use_tridiagonal=False, sigma=self.sigma)
+        else:
+            self._wishart_ens.set_size(p=size, n=_n, resample_mtx=True)
+        
+        _eigval_norm_const = 1/_n 
+        if self.beta == 4:
+            return _eigval_norm_const * self._wishart_ens.eigvals()[::2]
+        return _eigval_norm_const * self._wishart_ens.eigvals()
 
     def pdf(self, x):
         return np.sqrt(_relu(self.lambda_plus - x) * _relu(x - self.lambda_minus)) \
