@@ -319,3 +319,76 @@ class TestTracyWidomDistribution:
         twd = TracyWidomDistribution()
         twd.plot_cdf(interval=(-5,5), savefig_path=TMP_DIR_PATH+"/"+fig_name)
         assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name)) == True
+
+
+
+class TestManovaSpectrumDistribution:
+
+    def test_msd_init_success(self):
+        beta = 4
+        a = 3
+        b = 3
+
+        msd = ManovaSpectrumDistribution(beta=beta, a=a, b=b)
+
+        assert msd.beta == beta
+        assert msd.a == a
+        assert msd.b == b
+
+        assert msd.lambda_term1 == np.sqrt((a/(a+b)) * (1 - (1/(a+b))))
+        assert msd.lambda_term2 == np.sqrt((1/(a+b)) * (1 - (a/(a+b))))
+        assert msd.lambda_minus == (msd.lambda_term1 - msd.lambda_term2)**2
+        assert msd.lambda_plus == (msd.lambda_term1 + msd.lambda_term2)**2
+        assert msd._manova_ens is None
+    
+    def test_msd_init_raise(self):
+        with pytest.raises(ValueError):
+            _ = ManovaSpectrumDistribution(a=1, b=1, beta=3)
+        
+        with pytest.raises(ValueError):
+            _ = ManovaSpectrumDistribution(a=0, b=0, beta=1)
+
+    def test_msd_rvs_success(self):
+        beta = 1
+        a = b = 3
+        size = 5
+        msd1 = ManovaSpectrumDistribution(beta=beta, a=a, b=b)
+        samples = msd1.rvs(size=size)
+        assert len(samples == size)
+
+        beta = 4
+        a = b = 3
+        size = 5
+        msd4 = ManovaSpectrumDistribution(beta=beta, a=a, b=b)
+        samples = msd4.rvs(size=size)
+        assert len(samples == size)
+
+        size = 10
+        samples = msd4.rvs(size=size)
+        assert len(samples == size)
+    
+    def test_msd_rvs_raise(self):
+        with pytest.raises(ValueError):
+            msd = ManovaSpectrumDistribution(beta=1, a=1, b=1)
+            msd.rvs(-5)
+    
+    def test_msd_pdf(self):
+        beta = 4
+        a = b = 2
+        msd = ManovaSpectrumDistribution(beta=beta, a=a, b=b)
+
+        middle = np.mean([msd.lambda_minus, msd.lambda_plus])
+        assert msd.pdf(middle) > 0.0
+        assert msd.pdf(msd.lambda_plus + 0.1) == 0.0
+        assert msd.pdf(msd.lambda_minus - 0.01) == 0.0
+    
+    def test_msd_plot_pdf(self):
+        fig_name = "test_msd_pdf_wo_interval.png"
+        msd = ManovaSpectrumDistribution(a=3, b=3)
+        msd.plot_pdf(savefig_path=TMP_DIR_PATH+"/"+fig_name)
+        assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name)) == True
+
+        fig_name = "test_msd_pdf_w_interval.png"
+        msd = ManovaSpectrumDistribution(a=3, b=3)
+        msd.plot_pdf(interval=(-1,2), savefig_path=TMP_DIR_PATH+"/"+fig_name)
+        assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name)) == True
