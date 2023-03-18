@@ -444,7 +444,7 @@ def manova_spectrum(ensemble='mre', m_size=1000, n1_size=3000, n2_size=3000,
     plt.ylabel("probability density")
     if a <= 1 or b <= 1:
         if plot_law_pdf and density:
-            ylim_vals = expected_frec
+            ylim_vals = pdf
         else:
             ylim_vals = observed
         try:

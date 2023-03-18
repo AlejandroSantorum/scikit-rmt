@@ -33,7 +33,6 @@ def _setup_tmp_dir(request):
     request.addfinalizer(_remove_tmp_dir)
 
 
-
 def _remove_tmp_dir():
     """Function that removes the created temporary directory.
 
