@@ -242,6 +242,7 @@ class MarchenkoPasturDistribution:
             plt.show()
 
 
+
 class TracyWidomDistribution:
 
     def __init__(self, beta=1):
@@ -314,6 +315,7 @@ class TracyWidomDistribution:
             plt.savefig(savefig_path, dpi=800)
         else:
             plt.show()
+
 
 
 class ManovaSpectrumDistribution:

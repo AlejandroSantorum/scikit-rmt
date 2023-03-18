@@ -12,6 +12,12 @@ import matplotlib.pyplot as plt
 from .gaussian_ensemble import GaussianEnsemble
 from .wishart_ensemble import WishartEnsemble
 from .manova_ensemble import ManovaEnsemble
+from .law import (
+    WignerSemicircleDistribution,
+    MarchenkoPasturDistribution,
+    TracyWidomDistribution,
+    ManovaSpectrumDistribution
+)
 from .tracy_widom_approximator import TW_Approximator
 
 
@@ -36,37 +42,8 @@ def __get_bins_centers_and_contour(bins):
     return centers
 
 
-def __relu_func(values):
-    """Element-wise maximum between the value and zero.
-
-    Args:
-        values (ndarray): list of numbers to compute its element-wise maximum.
-    
-    Returns:
-        array_like consisting in the element-wise maximum vector of the given values.
-    """
-    return np.maximum(values, np.zeros_like(values))
-
-
-def theory_wigner_law(values, beta, sigma=1.0):
-    """Computes the theoretical Wigner's semicircle law on a given point.
-
-    Args:
-        values (ndarray): numpy array of numbers whose evaluation is required.
-        beta (int): integer representing type of matrix entries. beta=1 if real
-            entries are used (GOE), beta=2 if they are complex (GUE) or beta=4
-            if they are quaternions (GSE). 
-    
-    Returns:
-        number (float) which is image of the given value evaluated on Wigner's
-        semicircle law.
-    """
-    radius = 2.0 * np.sqrt(beta) * sigma
-    return __relu_func(2.0 * np.sqrt(radius**2 - values**2) / (np.pi * radius**2))
-
-
-def wigner_semicircular_law(ensemble='goe', n_size=1000, sigma=1.0, bins=100, interval=None,
-                            density=False, limit_pdf=False, savefig_path=None):
+def wigner_semicircle(ensemble='goe', n_size=1000, sigma=1.0, bins=100, interval=None,
+                      density=False, plot_law_pdf=False, savefig_path=None):
     """Calculates and plots Wigner's Semicircle Law using Gaussian Ensemble.
 
     Calculates and plots Wigner's Semicircle Law using Gaussian Ensemble random matrices.
@@ -89,7 +66,7 @@ def wigner_semicircular_law(ensemble='goe', n_size=1000, sigma=1.0, bins=100, in
             number of counts and the bin width, so that the area under the histogram
             integrates to 1. If set to False, the absolute frequencies of the eigenvalues
             are returned.
-        limit_pdf (bool, default=False): If True, the limiting theoretical law is plotted.
+        plot_law_pdf (bool, default=False): If True, the limiting theoretical law is plotted.
             If set to False, just the empirical histogram is shown. This parameter is only
             considered when the argument 'density' is set also to True.
         fig_path (string, default=None): path to save the created figure. If it is not
@@ -138,16 +115,17 @@ def wigner_semicircular_law(ensemble='goe', n_size=1000, sigma=1.0, bins=100, in
     plt.bar(bins[:-1], observed, width=width, align='edge')
 
     # Plotting theoretical graphic
-    if limit_pdf and density:
-        centers = np.array(__get_bins_centers_and_contour(bins))
-        expected_frec = theory_wigner_law(centers, beta, sigma)
-        plt.plot(centers, expected_frec, color='red', linewidth=2)
-    elif limit_pdf and not density:
+    if plot_law_pdf and density:
+        centers = np.asarray(__get_bins_centers_and_contour(bins))
+        wsd = WignerSemicircleDistribution(beta=beta, sigma=sigma)
+        pdf = wsd.pdf(centers)
+        plt.plot(centers, pdf, color='red', linewidth=2)
+    elif plot_law_pdf and not density:
         print("Warning: Wigner's Semicircle Law PDF is only plotted when density is True.")
 
-    plt.title("Eigenvalue density histogram", fontweight="bold")
+    plt.title("Wigner Semicircle - Empirical density histogram", fontweight="bold")
     plt.xlabel("x")
-    plt.ylabel("density")
+    plt.ylabel("probability density")
 
     # Saving plot or showing it
     if savefig_path:
