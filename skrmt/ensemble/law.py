@@ -1,5 +1,7 @@
 import numpy as np
+import scipy as sp
 import matplotlib.pyplot as plt
+import collections.abc
 
 from .gaussian_ensemble import GaussianEnsemble
 from .wishart_ensemble import WishartEnsemble
@@ -64,6 +66,23 @@ def _indicator(x, start=None, stop=None, inclusive="both"):
 
     return np.where(condition, 1.0, 0.0)
 
+
+def _plot_func(xmin, xmax, func, bins=1000, plot_title=None, plot_ylabel=None, savefig_path=None):
+    xx = np.linspace(xmin, xmax, num=bins)
+    yy = func(xx)
+
+    plt.plot(xx, yy)
+    plt.xlabel("x")
+    if plot_ylabel:
+        plt.ylabel(plot_ylabel)
+    
+    if plot_title:
+        plt.title(plot_title)
+
+    if savefig_path:
+        plt.savefig(savefig_path, dpi=800)
+    else:
+        plt.show()
 
 
 class WignerSemicircleDistribution:
@@ -366,6 +385,26 @@ class ManovaSpectrumDistribution:
                             (self.a + self.b) * np.sqrt((self.lambda_plus - x) * (x - self.lambda_minus)) \
                                 / (2.0 * np.pi * x * (1-x)),
                             0.0)
+    
+    def __cdf(self, x):
+        if x <= self.lambda_minus:
+            return 0.0
+
+        if x >= self.lambda_plus:
+            return 1.0
+
+        return sp.integrate.quad(self.pdf, self.lambda_minus, x)[0]
+
+    def cdf(self, x):
+        # if x is array-like
+        if isinstance(x, (collections.abc.Sequence, np.ndarray)):
+            y_ret = []
+            for val in x:
+                y_ret.append(self.__cdf(val))
+            return np.asarray(y_ret)
+        
+        # if x is a number (int or float)
+        return self.__cdf(x)
 
     def plot_pdf(self, interval=None, bins=1000, savefig_path=None):
         if not interval:
@@ -382,3 +421,29 @@ class ManovaSpectrumDistribution:
             plt.savefig(savefig_path, dpi=800)
         else:
             plt.show()
+
+    def plot_cdf(self, interval=None, bins=1000, savefig_path=None):
+        if not interval:
+            interval = (self.lambda_minus, self.lambda_plus)
+        
+        if not isinstance(interval, tuple):
+                raise ValueError("interval argument must be a tuple")
+
+        _plot_func(
+            interval[0], interval[1], func=self.cdf, bins=bins,
+            plot_ylabel="cumulative distribution", savefig_path=savefig_path
+        )
+        
+        # xx = np.linspace(interval[0], interval[1], num=bins)
+        # yy = []
+
+        # yy = self.cdf(xx)
+
+        # plt.plot(xx, yy)
+        # plt.xlabel("x")
+        # plt.ylabel("cumulative distribution")
+
+        # if savefig_path:
+        #     plt.savefig(savefig_path, dpi=800)
+        # else:
+        #     plt.show()

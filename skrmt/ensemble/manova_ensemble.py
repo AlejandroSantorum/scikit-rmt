@@ -8,7 +8,6 @@ and Manova Quaternion Ensemble.
 """
 
 import numpy as np
-import matplotlib.pyplot as plt
 from scipy import special
 
 from ._base_ensemble import _Ensemble

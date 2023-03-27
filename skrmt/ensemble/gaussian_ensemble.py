@@ -8,8 +8,7 @@ Gaussian Unitary Ensemble (GUE) and Gaussian Symplectic Ensemble (GSE).
 """
 
 import numpy as np
-from scipy import sparse
-from scipy import special
+from scipy import sparse, special
 import matplotlib.pyplot as plt
 
 from ._base_ensemble import _Ensemble
