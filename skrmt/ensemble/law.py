@@ -67,7 +67,12 @@ def _indicator(x, start=None, stop=None, inclusive="both"):
     return np.where(condition, 1.0, 0.0)
 
 
-def _plot_func(xmin, xmax, func, bins=1000, plot_title=None, plot_ylabel=None, savefig_path=None):
+def _plot_func(interval, func, bins=1000, plot_title=None, plot_ylabel=None, savefig_path=None):
+    if not isinstance(interval, tuple):
+        raise ValueError("interval argument must be a tuple")
+    
+    (xmin, xmax) = interval
+
     xx = np.linspace(xmin, xmax, num=bins)
     yy = func(xx)
 
@@ -127,33 +132,19 @@ class WignerSemicircleDistribution:
         if not interval:
             interval = (-self.radius, self.radius)
         
-        xx = np.linspace(interval[0], interval[1], num=bins)
-        yy = self.pdf(xx)
-
-        plt.plot(xx, yy)
-        plt.xlabel("x")
-        plt.ylabel("probability density")
-
-        if savefig_path:
-            plt.savefig(savefig_path, dpi=800)
-        else:
-            plt.show()
+        _plot_func(
+            interval, func=self.pdf, bins=bins, 
+            plot_ylabel="probability density", savefig_path=savefig_path
+        )
     
     def plot_cdf(self, interval=None, bins=1000, savefig_path=None):
         if not interval:
             interval = (-self.radius - 0.1, self.radius + 0.1)
         
-        xx = np.linspace(interval[0], interval[1], num=bins)
-        yy = self.cdf(xx)
-
-        plt.plot(xx, yy)
-        plt.xlabel("x")
-        plt.ylabel("cumulative distribution")
-
-        if savefig_path:
-            plt.savefig(savefig_path, dpi=800)
-        else:
-            plt.show()
+        _plot_func(
+            interval, func=self.cdf, bins=bins, 
+            plot_ylabel="cumulative distribution", savefig_path=savefig_path
+        )
 
 
 
@@ -236,33 +227,19 @@ class MarchenkoPasturDistribution:
         if not interval:
             interval = (self.lambda_minus, self.lambda_plus)
         
-        xx = np.linspace(interval[0], interval[1], num=bins)
-        yy = self.pdf(xx)
-
-        plt.plot(xx, yy)
-        plt.xlabel("x")
-        plt.ylabel("probability density")
-
-        if savefig_path:
-            plt.savefig(savefig_path, dpi=800)
-        else:
-            plt.show()
+        _plot_func(
+            interval, func=self.pdf, bins=bins, 
+            plot_ylabel="probability density", savefig_path=savefig_path
+        )
     
     def plot_cdf(self, interval=None, bins=1000, savefig_path=None):
         if not interval:
             interval = (self.lambda_minus, self.lambda_plus)
         
-        xx = np.linspace(interval[0], interval[1], num=bins)
-        yy = self.cdf(xx)
-
-        plt.plot(xx, yy)
-        plt.xlabel("x")
-        plt.ylabel("cumulative distribution")
-
-        if savefig_path:
-            plt.savefig(savefig_path, dpi=800)
-        else:
-            plt.show()
+        _plot_func(
+            interval, func=self.cdf, bins=bins, 
+            plot_ylabel="cumulative distribution", savefig_path=savefig_path
+        )
 
 
 
@@ -311,33 +288,19 @@ class TracyWidomDistribution:
         if not interval:
             interval = (-5, 4-self.beta)
         
-        xx = np.linspace(interval[0], interval[1], num=bins)
-        yy = self.pdf(xx)
-
-        plt.plot(xx, yy)
-        plt.xlabel("x")
-        plt.ylabel("probability density")
-
-        if savefig_path:
-            plt.savefig(savefig_path, dpi=800)
-        else:
-            plt.show()
+        _plot_func(
+            interval, func=self.pdf, bins=bins, 
+            plot_ylabel="probability density", savefig_path=savefig_path
+        )
     
     def plot_cdf(self, interval=None, bins=1000, savefig_path=None):
         if not interval:
             interval = (-5, 4-self.beta)
         
-        xx = np.linspace(interval[0], interval[1], num=bins)
-        yy = self.cdf(xx)
-
-        plt.plot(xx, yy)
-        plt.xlabel("x")
-        plt.ylabel("cumulative distribution")
-
-        if savefig_path:
-            plt.savefig(savefig_path, dpi=800)
-        else:
-            plt.show()
+        _plot_func(
+            interval, func=self.cdf, bins=bins, 
+            plot_ylabel="cumulative distribution", savefig_path=savefig_path
+        )
 
 
 
@@ -410,40 +373,16 @@ class ManovaSpectrumDistribution:
         if not interval:
             interval = (self.lambda_minus, self.lambda_plus)
         
-        xx = np.linspace(interval[0], interval[1], num=bins)
-        yy = self.pdf(xx)
-
-        plt.plot(xx, yy)
-        plt.xlabel("x")
-        plt.ylabel("probability density")
-
-        if savefig_path:
-            plt.savefig(savefig_path, dpi=800)
-        else:
-            plt.show()
+        _plot_func(
+            interval, func=self.pdf, bins=bins, 
+            plot_ylabel="probability density", savefig_path=savefig_path
+        )
 
     def plot_cdf(self, interval=None, bins=1000, savefig_path=None):
         if not interval:
             interval = (self.lambda_minus, self.lambda_plus)
-        
-        if not isinstance(interval, tuple):
-                raise ValueError("interval argument must be a tuple")
 
         _plot_func(
-            interval[0], interval[1], func=self.cdf, bins=bins,
+            interval, func=self.cdf, bins=bins, 
             plot_ylabel="cumulative distribution", savefig_path=savefig_path
         )
-        
-        # xx = np.linspace(interval[0], interval[1], num=bins)
-        # yy = []
-
-        # yy = self.cdf(xx)
-
-        # plt.plot(xx, yy)
-        # plt.xlabel("x")
-        # plt.ylabel("cumulative distribution")
-
-        # if savefig_path:
-        #     plt.savefig(savefig_path, dpi=800)
-        # else:
-        #     plt.show()
