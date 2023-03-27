@@ -100,7 +100,7 @@ def wigner_semicircle(ensemble='goe', n_size=1000, sigma=1.0, bins=100, interval
     ens = GaussianEnsemble(beta=beta, n=n_size, sigma=sigma, use_tridiagonal=use_tridiag)
 
     # default plotting interval in case it's not provided
-    if not interval:
+    if interval is None:
         radius = 2.0 * np.sqrt(beta) * sigma
         interval = (-radius, radius)
 
@@ -206,7 +206,7 @@ def marchenko_pastur(ensemble='wre', p_size=1000, n_size=3000, sigma=1.0, bins=1
               "\t It is adviced to increase sample size (`n`) to optimize and boost histogramming.")
 
     # computing interval according to the matrix size ratio and support
-    if not interval:
+    if interval is None:
         if ratio <= 1:
             interval = (lambda_minus, lambda_plus)
         else:

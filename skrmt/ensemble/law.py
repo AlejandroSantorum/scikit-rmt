@@ -1,6 +1,6 @@
 import numpy as np
-import scipy as sp
 import matplotlib.pyplot as plt
+from scipy.integrate import quad
 import collections.abc
 
 from .gaussian_ensemble import GaussianEnsemble
@@ -22,7 +22,7 @@ def _relu(x):
 
 
 def _indicator(x, start=None, stop=None, inclusive="both"):
-    """Element-wise indicator function within a real interval.
+    r"""Element-wise indicator function within a real interval.
     The interval can be left-closed, right-closed, closed or open.
     Visit https://en.wikipedia.org/wiki/Indicator_function for more information.
 
@@ -129,7 +129,7 @@ class WignerSemicircleDistribution:
             )
     
     def plot_pdf(self, interval=None, bins=1000, savefig_path=None):
-        if not interval:
+        if interval is None:
             interval = (-self.radius, self.radius)
         
         _plot_func(
@@ -138,7 +138,7 @@ class WignerSemicircleDistribution:
         )
     
     def plot_cdf(self, interval=None, bins=1000, savefig_path=None):
-        if not interval:
+        if interval is None:
             interval = (-self.radius - 0.1, self.radius + 0.1)
         
         _plot_func(
@@ -224,7 +224,7 @@ class MarchenkoPasturDistribution:
         return np.sqrt((self.lambda_plus-x)/(x - self.lambda_minus))
 
     def plot_pdf(self, interval=None, bins=1000, savefig_path=None):
-        if not interval:
+        if interval is None:
             interval = (self.lambda_minus, self.lambda_plus)
         
         _plot_func(
@@ -233,7 +233,7 @@ class MarchenkoPasturDistribution:
         )
     
     def plot_cdf(self, interval=None, bins=1000, savefig_path=None):
-        if not interval:
+        if interval is None:
             interval = (self.lambda_minus, self.lambda_plus)
         
         _plot_func(
@@ -285,7 +285,7 @@ class TracyWidomDistribution:
         return self.tw_approx.cdf(x)
 
     def plot_pdf(self, interval=None, bins=1000, savefig_path=None):
-        if not interval:
+        if interval is None:
             interval = (-5, 4-self.beta)
         
         _plot_func(
@@ -294,7 +294,7 @@ class TracyWidomDistribution:
         )
     
     def plot_cdf(self, interval=None, bins=1000, savefig_path=None):
-        if not interval:
+        if interval is None:
             interval = (-5, 4-self.beta)
         
         _plot_func(
@@ -356,7 +356,7 @@ class ManovaSpectrumDistribution:
         if x >= self.lambda_plus:
             return 1.0
 
-        return sp.integrate.quad(self.pdf, self.lambda_minus, x)[0]
+        return quad(self.pdf, self.lambda_minus, x)[0]
 
     def cdf(self, x):
         # if x is array-like
@@ -370,7 +370,7 @@ class ManovaSpectrumDistribution:
         return self.__cdf(x)
 
     def plot_pdf(self, interval=None, bins=1000, savefig_path=None):
-        if not interval:
+        if interval is None:
             interval = (self.lambda_minus, self.lambda_plus)
         
         _plot_func(
@@ -379,7 +379,7 @@ class ManovaSpectrumDistribution:
         )
 
     def plot_cdf(self, interval=None, bins=1000, savefig_path=None):
-        if not interval:
+        if interval is None:
             interval = (self.lambda_minus, self.lambda_plus)
 
         _plot_func(

@@ -135,6 +135,11 @@ class TestWignerSemicircleDistribution:
         wsd = WignerSemicircleDistribution()
         wsd.plot_cdf(interval=(-2,2), savefig_path=TMP_DIR_PATH+"/"+fig_name)
         assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name)) == True
+    
+    def test_wsd_plot_pdf_raise(self):
+        with pytest.raises(ValueError):
+            wsd = WignerSemicircleDistribution(beta=1)
+            wsd.plot_pdf(interval=1)
 
     
 
@@ -387,6 +392,16 @@ class TestManovaSpectrumDistribution:
         assert msd.pdf(msd.lambda_plus + 0.1) == 0.0
         assert msd.pdf(msd.lambda_minus - 0.01) == 0.0
     
+    def test_msd_cdf(self):
+        beta = 4
+        a = b = 2
+        msd = ManovaSpectrumDistribution(beta=beta, a=a, b=b)
+
+        middle = np.mean([msd.lambda_minus, msd.lambda_plus])
+        assert msd.cdf(middle) > 0.0
+        assert msd.cdf(msd.lambda_plus + 0.1) == 1.0
+        assert msd.cdf(msd.lambda_minus - 0.01) == 0.0
+    
     def test_msd_plot_pdf(self):
         fig_name = "test_msd_pdf_wo_interval.png"
         msd = ManovaSpectrumDistribution(a=3, b=3)
@@ -396,6 +411,17 @@ class TestManovaSpectrumDistribution:
         fig_name = "test_msd_pdf_w_interval.png"
         msd = ManovaSpectrumDistribution(a=3, b=3)
         msd.plot_pdf(interval=(-1,2), savefig_path=TMP_DIR_PATH+"/"+fig_name)
+        assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name)) == True
+    
+    def test_msd_plot_cdf(self):
+        fig_name = "test_msd_cdf_wo_interval.png"
+        msd = ManovaSpectrumDistribution(a=3, b=3)
+        msd.plot_cdf(savefig_path=TMP_DIR_PATH+"/"+fig_name)
+        assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name)) == True
+
+        fig_name = "test_msd_cdf_w_interval.png"
+        msd = ManovaSpectrumDistribution(a=3, b=3)
+        msd.plot_cdf(interval=(-1,2), savefig_path=TMP_DIR_PATH+"/"+fig_name)
         assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name)) == True
 
 

@@ -279,7 +279,7 @@ class WishartEnsemble(_Ensemble):
         # pylint: disable=too-many-arguments
         if norm_const is None:
             norm_const = 1/self.n 
-        if not interval:
+        if interval is None:
             # calculating constants depending on matrix sizes
             ratio = self.p/self.n
             lambda_plus = self.beta * self.sigma**2 * (1 + np.sqrt(ratio))**2
