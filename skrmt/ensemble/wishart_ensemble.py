@@ -52,6 +52,8 @@ class WishartEnsemble(_Ensemble):
             matrices are sampled in its tridiagonal form, which has the same
             eigenvalues than its standard form. Otherwise, it is sampled using
             its standard form.
+        sigma (float): scale (standard deviation) of the random entries of the
+            sampled matrix.
 
     References:
         Albrecht, J. and Chan, C.P. and Edelman, A.
@@ -75,8 +77,10 @@ class WishartEnsemble(_Ensemble):
             n (int): number of columns of the guassian matrix that generates
                 the matrix of the corresponding ensemble.
             use_tridiagonal (bool, default=False): if set to True, Wishart Ensemble
-            matrices are sampled in its tridiagonal form, which has the same
-            eigenvalues than its standard form.
+                matrices are sampled in its tridiagonal form, which has the same
+                eigenvalues than its standard form.
+            sigma (float, 1.0): scale (standard deviation) of the random entries of the
+                sampled matrix.
 
         """
         if beta not in [1,2,4]:

@@ -47,6 +47,8 @@ class GaussianEnsemble(_Ensemble):
             matrices are sampled in its tridiagonal form, which has the same
             eigenvalues than its standard form. Otherwise, it is sampled using
             its standard form.
+        sigma (float): scale (standard deviation) of the random entries of the
+            sampled matrix.
 
     References:
         Albrecht, J. and Chan, C.P. and Edelman, A.
@@ -63,15 +65,17 @@ class GaussianEnsemble(_Ensemble):
         Initializes an instance of this class with the given parameters.
 
         Args:
+            beta (int, default=1): descriptive integer of the gaussian ensemble type.
+                For GOE beta=1, for GUE beta=2, for GSE beta=4.
             n (int): random matrix size. Gaussian ensemble matrices are
                 squared matrices. GOE and GUE are of size n times n,
                 and GSE are of size 2n times 2n.
-            beta (int, default=1): descriptive integer of the gaussian ensemble type.
-                For GOE beta=1, for GUE beta=2, for GSE beta=4.
             use_tridiagonal (bool, default=False): if set to True, Gaussian Ensemble
-            matrices are sampled in its tridiagonal form, which has the same
-            eigenvalues than its standard form. Otherwise, it is sampled using
-            its standard form.
+                matrices are sampled in its tridiagonal form, which has the same
+                eigenvalues than its standard form. Otherwise, it is sampled using
+                its standard form.
+            sigma (float, 1.0): scale (standard deviation) of the random entries of the
+                sampled matrix.
 
         """
         if beta not in [1,2,4]:
