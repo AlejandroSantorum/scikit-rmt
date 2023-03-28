@@ -1,3 +1,7 @@
+'''Spectral Law Test module
+
+Testing law module for spectral law simulations
+'''
 
 import os
 import pytest
@@ -16,11 +20,11 @@ TMP_DIR_PATH = os.path.join(os.getcwd(), "skrmt/ensemble/tests/tmp")
 
 @pytest.fixture(scope="module", autouse=True)
 def _setup_tmp_dir(request):
-    """Function that is run before all tests in this script.
+    '''Function that is run before all tests in this script.
 
     It creates a temporary folder in order to store useful files
     for the following tests.
-    """
+    '''
     # if the directory already exists, it is deleted
     if os.path.exists(TMP_DIR_PATH):
         shutil.rmtree(TMP_DIR_PATH)
@@ -32,10 +36,10 @@ def _setup_tmp_dir(request):
 
 
 def _remove_tmp_dir():
-    """Function that removes the created temporary directory.
+    '''Function that removes the created temporary directory.
 
     The function is run when all tests in this module are completed.
-    """
+    '''
     shutil.rmtree(TMP_DIR_PATH)
 
 
@@ -43,6 +47,8 @@ def _remove_tmp_dir():
 class TestWignerSemicircleDistribution:
 
     def test_wsd_init_success(self):
+        '''Testing WignerSemicircleDistribution init
+        '''
         beta = 4
         sigma = 2
 
@@ -55,10 +61,14 @@ class TestWignerSemicircleDistribution:
         assert wsd._gaussian_ens is None
     
     def test_wsd_init_raise(self):
+        '''Testing WignerSemicircleDistribution init raising exception
+        '''
         with pytest.raises(ValueError):
             _ = WignerSemicircleDistribution(beta=3)
 
     def test_wsd_rvs_success(self):
+        '''Testing WignerSemicircleDistribution random variates (sampling)
+        '''
         beta = 1
         size = 5
         wsd1 = WignerSemicircleDistribution(beta=beta)
@@ -76,11 +86,16 @@ class TestWignerSemicircleDistribution:
         assert len(samples == size)
     
     def test_wsd_rvs_raise(self):
+        '''Testing WignerSemicircleDistribution random variates (sampling)
+        raising an exception because of invalid argument
+        '''
         with pytest.raises(ValueError):
             wsd = WignerSemicircleDistribution(beta=1)
             wsd.rvs(-5)
     
     def test_wsd_pdf(self):
+        '''Testing WignerSemicircleDistribution pdf
+        '''
         beta = 4
         sigma = 2
         center = 0
@@ -98,6 +113,8 @@ class TestWignerSemicircleDistribution:
         assert wsd.pdf(center - wsd.radius - 0.01) == 0.0
     
     def test_wsd_cdf(self):
+        '''Testing WignerSemicircleDistribution cdf
+        '''
         beta = 4
         sigma = 2
         center = 0
@@ -115,6 +132,8 @@ class TestWignerSemicircleDistribution:
         assert wsd.cdf(center - wsd.radius - 0.01) == 0.0
     
     def test_wsd_plot_pdf(self):
+        '''Testing WignerSemicircleDistribution plot pdf
+        '''
         fig_name = "test_wsd_pdf_wo_interval.png"
         wsd = WignerSemicircleDistribution()
         wsd.plot_pdf(savefig_path=TMP_DIR_PATH+"/"+fig_name)
@@ -126,6 +145,8 @@ class TestWignerSemicircleDistribution:
         assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name)) == True
     
     def test_wsd_plot_cdf(self):
+        '''Testing WignerSemicircleDistribution plot cdf
+        '''
         fig_name = "test_wsd_cdf_wo_interval.png"
         wsd = WignerSemicircleDistribution()
         wsd.plot_cdf(savefig_path=TMP_DIR_PATH+"/"+fig_name)
@@ -137,6 +158,8 @@ class TestWignerSemicircleDistribution:
         assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name)) == True
     
     def test_wsd_plot_pdf_raise(self):
+        '''Testing WignerSemicircleDistribution pdf raising exception
+        '''
         with pytest.raises(ValueError):
             wsd = WignerSemicircleDistribution(beta=1)
             wsd.plot_pdf(interval=1)
@@ -146,6 +169,8 @@ class TestWignerSemicircleDistribution:
 class TestMarchenkoPasturDistribution:
 
     def test_mpd_init_success(self):
+        '''Testing MarchenkoPasturDistribution init
+        '''
         beta = 4
         ratio = 1/2
         sigma = 2.0
@@ -161,6 +186,8 @@ class TestMarchenkoPasturDistribution:
         assert mpd._wishart_ens is None
     
     def test_mpd_init_raise(self):
+        '''Testing MarchenkoPasturDistribution init raising exception
+        '''
         with pytest.raises(ValueError):
             _ = MarchenkoPasturDistribution(ratio=1, beta=3)
         
@@ -168,6 +195,8 @@ class TestMarchenkoPasturDistribution:
             _ = MarchenkoPasturDistribution(ratio=0)
 
     def test_mpd_rvs_success(self):
+        '''Testing MarchenkoPasturDistribution random variates (sampling)
+        '''
         beta = 1
         ratio = 1/3
         size = 5
@@ -187,11 +216,16 @@ class TestMarchenkoPasturDistribution:
         assert len(samples == size)
     
     def test_mpd_rvs_raise(self):
+        '''Testing MarchenkoPasturDistribution random variates (sampling) raising
+        an exception because of an invalid argument
+        '''
         with pytest.raises(ValueError):
             mpd = MarchenkoPasturDistribution(beta=1, ratio=1)
             mpd.rvs(-5)
     
     def test_mpd_pdf(self):
+        '''Testing MarchenkoPasturDistribution pdf
+        '''
         beta = 4
         ratio = 1/3
         sigma = 1
@@ -211,6 +245,8 @@ class TestMarchenkoPasturDistribution:
         assert mpd.pdf(mpd.lambda_minus - 0.01) == 0.0
     
     def test_mpd_cdf(self):
+        '''Testing MarchenkoPasturDistribution cdf
+        '''
         beta = 1
         ratio = 1/3
         sigma = 1
@@ -231,6 +267,8 @@ class TestMarchenkoPasturDistribution:
         assert mpd.cdf(mpd.lambda_minus - 0.1) == 0.0
     
     def test_mpd_plot_pdf(self):
+        '''Testing MarchenkoPasturDistribution plot pdf
+        '''
         fig_name = "test_mpd_pdf_wo_interval.png"
         mpd = MarchenkoPasturDistribution(ratio=1/3)
         mpd.plot_pdf(savefig_path=TMP_DIR_PATH+"/"+fig_name)
@@ -242,6 +280,8 @@ class TestMarchenkoPasturDistribution:
         assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name)) == True
     
     def test_mpd_plot_cdf(self):
+        '''Testing MarchenkoPasturDistribution plot cdf
+        '''
         fig_name = "test_mpd_cdf_wo_interval.png"
         mpd = MarchenkoPasturDistribution(ratio=1/3)
         mpd.plot_cdf(savefig_path=TMP_DIR_PATH+"/"+fig_name)
@@ -257,6 +297,8 @@ class TestMarchenkoPasturDistribution:
 class TestTracyWidomDistribution:
 
     def test_twd_init_success(self):
+        '''Testing TracyWidomDistribution init
+        '''
         beta = 4
 
         twd = TracyWidomDistribution(beta=beta)
@@ -265,10 +307,14 @@ class TestTracyWidomDistribution:
         assert twd.tw_approx is not None
     
     def test_twd_init_raise(self):
+        '''Testing TracyWidomDistribution init raising exception
+        '''
         with pytest.raises(ValueError):
             _ = TracyWidomDistribution(beta=3)
 
     def test_twd_rvs_success(self):
+        '''Testing TracyWidomDistribution random variates (sampling)
+        '''
         beta = 1
         size = 5
         twd1 = TracyWidomDistribution(beta=beta)
@@ -286,6 +332,9 @@ class TestTracyWidomDistribution:
         assert len(samples == size)
     
     def test_twd_rvs_raise(self):
+        '''Testing TracyWidomDistribution random variates (sampling) raising
+        an exception because of an invalid argument
+        '''
         with pytest.raises(ValueError):
             twd = TracyWidomDistribution(beta=1)
             twd.rvs(-5)
@@ -295,6 +344,8 @@ class TestTracyWidomDistribution:
             twd.rvs(size=5, mtx_size=0)
     
     def test_twd_pdf(self):
+        '''Testing TracyWidomDistribution pdf
+        '''
         beta = 4
         twd = TracyWidomDistribution(beta=beta)
         assert twd.pdf(-1) > 0.0
@@ -302,6 +353,8 @@ class TestTracyWidomDistribution:
         assert twd.pdf(-100) < 1e-10
     
     def test_twd_cdf(self):
+        '''Testing TracyWidomDistribution cdf
+        '''
         beta = 4
         twd = TracyWidomDistribution(beta=beta)
         assert twd.cdf(-1) > 0.0
@@ -309,6 +362,8 @@ class TestTracyWidomDistribution:
         assert twd.pdf(-100) < 1e-10
     
     def test_twd_plot_pdf(self):
+        '''Testing TracyWidomDistribution plot pdf
+        '''
         fig_name = "test_twd_pdf_wo_interval.png"
         twd = TracyWidomDistribution()
         twd.plot_pdf(savefig_path=TMP_DIR_PATH+"/"+fig_name)
@@ -320,6 +375,8 @@ class TestTracyWidomDistribution:
         assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name)) == True
     
     def test_twd_plot_cdf(self):
+        '''Testing TracyWidomDistribution plot cdf
+        '''
         fig_name = "test_twd_cdf_wo_interval.png"
         twd = TracyWidomDistribution()
         twd.plot_cdf(savefig_path=TMP_DIR_PATH+"/"+fig_name)
@@ -335,6 +392,8 @@ class TestTracyWidomDistribution:
 class TestManovaSpectrumDistribution:
 
     def test_msd_init_success(self):
+        '''Testing ManovaSpectrumDistribution init
+        '''
         beta = 4
         a = 3
         b = 3
@@ -352,6 +411,8 @@ class TestManovaSpectrumDistribution:
         assert msd._manova_ens is None
     
     def test_msd_init_raise(self):
+        '''Testing ManovaSpectrumDistribution init raising exception
+        '''
         with pytest.raises(ValueError):
             _ = ManovaSpectrumDistribution(a=1, b=1, beta=3)
         
@@ -359,6 +420,8 @@ class TestManovaSpectrumDistribution:
             _ = ManovaSpectrumDistribution(a=0, b=0, beta=1)
 
     def test_msd_rvs_success(self):
+        '''Testing ManovaSpectrumDistribution random variates (sampling)
+        '''
         beta = 1
         a = b = 3
         size = 5
@@ -378,11 +441,16 @@ class TestManovaSpectrumDistribution:
         assert len(samples == size)
     
     def test_msd_rvs_raise(self):
+        '''Testing ManovaSpectrumDistribution random variates (sampling) raising an
+        exception because of an invalid argument
+        '''
         with pytest.raises(ValueError):
             msd = ManovaSpectrumDistribution(beta=1, a=1, b=1)
             msd.rvs(-5)
     
     def test_msd_pdf(self):
+        '''Testing ManovaSpectrumDistribution pdf
+        '''
         beta = 4
         a = b = 2
         msd = ManovaSpectrumDistribution(beta=beta, a=a, b=b)
@@ -393,6 +461,8 @@ class TestManovaSpectrumDistribution:
         assert msd.pdf(msd.lambda_minus - 0.01) == 0.0
     
     def test_msd_cdf(self):
+        '''Testing ManovaSpectrumDistribution cdf
+        '''
         beta = 4
         a = b = 2
         msd = ManovaSpectrumDistribution(beta=beta, a=a, b=b)
@@ -403,6 +473,8 @@ class TestManovaSpectrumDistribution:
         assert msd.cdf(msd.lambda_minus - 0.01) == 0.0
     
     def test_msd_plot_pdf(self):
+        '''Testing ManovaSpectrumDistribution plot pdf
+        '''
         fig_name = "test_msd_pdf_wo_interval.png"
         msd = ManovaSpectrumDistribution(a=3, b=3)
         msd.plot_pdf(savefig_path=TMP_DIR_PATH+"/"+fig_name)
@@ -414,6 +486,8 @@ class TestManovaSpectrumDistribution:
         assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name)) == True
     
     def test_msd_plot_cdf(self):
+        '''Testing ManovaSpectrumDistribution plot cdf
+        '''
         fig_name = "test_msd_cdf_wo_interval.png"
         msd = ManovaSpectrumDistribution(a=3, b=3)
         msd.plot_cdf(savefig_path=TMP_DIR_PATH+"/"+fig_name)
@@ -427,6 +501,8 @@ class TestManovaSpectrumDistribution:
 
 
 def test_indicator_func():
+    '''Testing indicator function
+    '''
     assert _indicator(1.0, start=1.0, stop=2.0, inclusive="both") == 1.0
     assert _indicator(1.0, start=1.0, stop=2.0, inclusive="left") == 1.0
     assert _indicator(1.0, start=1.0, stop=2.0, inclusive="right") == 0.0
@@ -441,6 +517,8 @@ def test_indicator_func():
     assert _indicator(2.0, stop=2.0, inclusive="neither") == 0.0
 
 def test_indicator_func_except():
+    '''Testing indicator function raising exception
+    '''
     with pytest.raises(ValueError):
         _ = _indicator(2.0)
     
