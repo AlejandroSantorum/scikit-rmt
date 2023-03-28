@@ -55,6 +55,8 @@ def wigner_semicircle(ensemble='goe', n_size=1000, sigma=1.0, bins=100, interval
         ensemble ('goe', 'gue' or 'gse', default='goe'): ensemble to draw the
             random matrices to study Wigner's Law.
         n_size (int, default=1000): random matrix size n times n.
+        sigma (float, 1.0): scale (standard deviation) of the random entries of the
+            sampled matrix.
         bins (int or sequence, default=100): If bins is an integer, it defines the number
             of equal-width bins in the range. If bins is a sequence, it defines the
             bin edges, including the left edge of the first bin and the right
@@ -153,6 +155,8 @@ def marchenko_pastur(ensemble='wre', p_size=1000, n_size=3000, sigma=1.0, bins=1
             the matrix of the corresponding ensemble.
         n_size (int, default=3000): number of columns of the guassian matrix that generates
             the matrix of the corresponding ensemble.
+        sigma (float, 1.0): scale (standard deviation) of the random entries of the
+            sampled matrix.
         bins (int or sequence, default=100): If bins is an integer, it defines the number
             of equal-width bins in the range. If bins is a sequence, it defines the
             bin edges, including the left edge of the first bin and the right
