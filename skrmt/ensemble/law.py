@@ -1,3 +1,14 @@
+"""Law module
+
+This module contains classes that implement the main spectral distributions.
+When the limiting behaviour of the spectrum of a random matrix ensemble is
+well-known, it is often described with a mathematical proven law.
+Probability density functions and cumulative distribution functions are provided
+for the Wigner Semicircle Law, Marchenko-Pastur Law, Tracy-Widom Law and for the
+spectrum of the Manova Ensemble.
+
+"""
+
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.integrate import quad
@@ -68,6 +79,20 @@ def _indicator(x, start=None, stop=None, inclusive="both"):
 
 
 def _plot_func(interval, func, bins=1000, plot_title=None, plot_ylabel=None, savefig_path=None):
+    """Plots a given function (callable) within the provided interval.
+
+    Args:
+        interval (tuple): Delimiters (xmin, xmax) of the histogram.
+        func (callable): Function to be evaluated. The image of the function builds
+            the y-axis values that are plotted.
+        bins (int, default=100): It defines the number of equal-width bins within the
+            provided interval or range.
+        plot_title (string, default=None): Title of the plot.
+        plot_ylabel (string, default=None): Label of the y-axis.
+        savefig_path (string, default=None): path to save the created figure. If it is not
+            provided, the plot is shown at the end of the routine.
+    
+    """
     if not isinstance(interval, tuple):
         raise ValueError("interval argument must be a tuple")
     
@@ -91,8 +116,42 @@ def _plot_func(interval, func, bins=1000, plot_title=None, plot_ylabel=None, sav
 
 
 class WignerSemicircleDistribution:
+    """Wigner Semicircle Distribution class.
+
+    The Wigner Semicircle Law describes the spectrum of the Wigner random matrices.
+    In particular, random matrices of the Gaussian Ensemble are Wigner matrices,
+    and therefore the spectrum of the random matrices of this ensemble converge
+    to the Wigner Semicircle Law when the matrix size goes to infinity. This
+    class provides methods to sample eigenvalues following Wigner Semicircle
+    distribution, computing the PDF, computing the CDF and simple methods to
+    plot the former two.
+
+    Attributes:
+        beta (int): descriptive integer of the Gaussian ensemble type.
+            For GOE beta=1, for GUE beta=2, for GSE beta=4.
+        center (float): center of the distribution. Since the distribution
+            has the shape of a semicircle, the center corresponds to its center.
+        sigma (float): scale of the distribution. This value also corresponds
+            to the standard deviation of the random entries of the sampled matrix.
+        radius (float): radius of the semicircle of the Wigner law. This depends on
+            the scale (sigma) and on beta.
+    
+    """
 
     def __init__(self, beta=1, center=0.0, sigma=1.0):
+        """Constructor for WignerSemicircleDistribution class.
+
+        Initializes an instance of this class with the given parameters.
+
+        Args:
+            beta (int, default=1): descriptive integer of the Gaussian ensemble type.
+                For GOE beta=1, for GUE beta=2, for GSE beta=4.
+            center (float, default=0.0): center of the distribution. Since the distribution
+                has the shape of a semicircle, the center corresponds to its center.
+            sigma (float, default=1.0): scale of the distribution. This value also corresponds
+                to the standard deviation of the random entries of the sampled matrix.
+        
+        """
         if beta not in [1,2,4]:
             raise ValueError(f"Error: invalid beta. It has to be 1,2 or 4. Provided beta = {beta}.")
 
@@ -103,6 +162,14 @@ class WignerSemicircleDistribution:
         self._gaussian_ens = None
     
     def rvs(self, size):
+        """Samples ranfom variates following this distribution.
+
+        Args:
+            size (int): sample size.
+        
+        Returns:
+            numpy array with the generated samples.
+        """
         if size <= 0:
             raise ValueError(f"Error: invalid sample size. It has to be positive. Provided size = {size}.")
         
@@ -117,9 +184,27 @@ class WignerSemicircleDistribution:
         return _eigval_norm_const * self._gaussian_ens.eigvals()
 
     def pdf(self, x):
+        """Computes PDF of the Wigner Semicircle Law.
+
+        Args:
+            x (float or ndarray): value or (numpy) array of values in which compute the PDF.
+        
+        Returns:
+            float or numpy array with the computed PDF in the given value(s).
+        
+        """
         return 2.0 * np.sqrt(_relu(self.radius**2 - (x-self.center)**2)) / (np.pi * self.radius**2)
     
     def cdf(self, x):
+        """Computes CDF of the Wigner Semicircle Law.
+
+        Args:
+            x (float or ndarray): value or (numpy) array of values in which compute the CDF.
+        
+        Returns:
+            float or numpy array with the computed CDF in the given value(s).
+        
+        """
         with np.errstate(divide='ignore', invalid='ignore'):
             return np.select(
                 condlist=[x >= (self.center + self.radius), x <= (self.center - self.radius)],
@@ -129,8 +214,19 @@ class WignerSemicircleDistribution:
             )
     
     def plot_pdf(self, interval=None, bins=1000, savefig_path=None):
+        """Plots the PDF of the Wigner Semicircle Law.
+
+        Args:
+            interval (tuple, default=None): Delimiters (xmin, xmax) of the histogram. If not
+                provided, the used interval is calculated depending on beta, center, radius and scale.
+            bins (int, default=100): It defines the number of equal-width bins within the
+                provided interval or range.
+            savefig_path (string, default=None): path to save the created figure. If it is not
+                provided, the plot is shown at the end of the routine.
+        
+        """
         if interval is None:
-            interval = (-self.radius, self.radius)
+            interval = (self.center - self.radius - 0.1, self.center + self.radius + 0.1)
         
         _plot_func(
             interval, func=self.pdf, bins=bins, 
@@ -138,8 +234,19 @@ class WignerSemicircleDistribution:
         )
     
     def plot_cdf(self, interval=None, bins=1000, savefig_path=None):
+        """Plots the CDF of the Wigner Semicircle Law.
+
+        Args:
+            interval (tuple, default=None): Delimiters (xmin, xmax) of the histogram. If not
+                provided, the used interval is calculated depending on beta, center, radius and scale.
+            bins (int, default=100): It defines the number of equal-width bins within the
+                provided interval or range.
+            savefig_path (string, default=None): path to save the created figure. If it is not
+                provided, the plot is shown at the end of the routine.
+        
+        """
         if interval is None:
-            interval = (-self.radius - 0.1, self.radius + 0.1)
+            interval = (self.center - self.radius - 0.1, self.center + self.radius + 0.1)
         
         _plot_func(
             interval, func=self.cdf, bins=bins, 
@@ -149,10 +256,47 @@ class WignerSemicircleDistribution:
 
 
 class MarchenkoPasturDistribution:
+    """Marchenko-Pastur Distribution class.
+
+    The Marchenko-Pastur Law describes the spectrum of the Wishart random matrices.
+    Therefore the spectrum of the random matrices of this ensemble converge
+    to the Marchenko-Pastur Law when the matrix size goes to infinity. This
+    class provides methods to sample eigenvalues following Marchenko-Pastur
+    distribution, computing the PDF, computing the CDF and simple methods to
+    plot the former two.
+
+    Attributes:
+        ratio (float): random matrix size ratio. This is the ratio between the
+            number of degrees of freedom 'p' and the sample size 'n'. The value
+            of ratio = p/n.
+        beta (int): descriptive integer of the Wishart ensemble type.
+            For WRE beta=1, for WCEE beta=2, for WQE beta=4.
+        sigma (float): scale of the distribution. This value also corresponds
+            to the standard deviation of the random entries of the sampled matrix.
+        lambda_minus (float): lower bound of the support of the Marchenko-Pastur Law.
+            It depends on beta, on the scale (sigma) and on the ratio.
+        lambda_plus (float): upper bound of the support of the Marchenko-Pastur Law.
+            It depends on beta, on the scale (sigma) and on the ratio.
+    
+    """
 
     ARCTAN_OF_INFTY = np.pi/2
 
     def __init__(self, ratio, beta=1, sigma=1.0):
+        """Constructor for MarchenkoPasturDistribution class.
+
+        Initializes an instance of this class with the given parameters.
+
+        Args:
+            ratio (float): random matrix size ratio. This is the ratio between the
+                number of degrees of freedom 'p' and the sample size 'n'. The value
+                of ratio = p/n.
+            beta (int, default=1): descriptive integer of the Wishart ensemble type.
+                For WRE beta=1, for WCE beta=2, for WQE beta=4.
+            sigma (float, default=1.0): scale of the distribution. This value also corresponds
+                to the standard deviation of the random entries of the sampled matrix.
+        
+        """
         if beta not in [1,2,4]:
             raise ValueError(f"Error: invalid beta. It has to be 1,2 or 4. Provided beta = {beta}.")
         if ratio <= 0:
@@ -167,6 +311,14 @@ class MarchenkoPasturDistribution:
         self._wishart_ens = None
     
     def rvs(self, size):
+        """Samples ranfom variates following this distribution.
+
+        Args:
+            size (int): sample size.
+        
+        Returns:
+            numpy array with the generated samples.
+        """
         if size <= 0:
             raise ValueError(f"Error: invalid sample size. It has to be positive. Provided size = {size}.")
         
@@ -183,11 +335,29 @@ class MarchenkoPasturDistribution:
         return _eigval_norm_const * self._wishart_ens.eigvals()
 
     def pdf(self, x):
+        """Computes PDF of the Marchenko-Pastur Law.
+
+        Args:
+            x (float or ndarray): value or (numpy) array of values in which compute the PDF.
+        
+        Returns:
+            float or numpy array with the computed PDF in the given value(s).
+        
+        """
         with np.errstate(divide='ignore', invalid='ignore'):
             return np.sqrt(_relu(self.lambda_plus - x) * _relu(x - self.lambda_minus)) \
                 / (2.0 * np.pi * self.ratio * self._var * x)
 
     def cdf(self, x):
+        """Computes CDF of the Marchenko-Pastur Law.
+
+        Args:
+            x (float or ndarray): value or (numpy) array of values in which compute the CDF.
+        
+        Returns:
+            float or numpy array with the computed CDF in the given value(s).
+        
+        """
         with np.errstate(divide='ignore', invalid='ignore'):
             acum = _indicator(x, start=self.lambda_plus, inclusive="left")
             acum += np.where(_indicator(x, start=self.lambda_minus, stop=self.lambda_plus, inclusive="left"),
@@ -224,6 +394,17 @@ class MarchenkoPasturDistribution:
         return np.sqrt((self.lambda_plus-x)/(x - self.lambda_minus))
 
     def plot_pdf(self, interval=None, bins=1000, savefig_path=None):
+        """Plots the PDF of the Marchenko-Pastur Law.
+
+        Args:
+            interval (tuple, default=None): Delimiters (xmin, xmax) of the histogram. If not
+                provided, the used interval is calculated depending on beta, ratio, and scale.
+            bins (int, default=100): It defines the number of equal-width bins within the
+                provided interval or range.
+            savefig_path (string, default=None): path to save the created figure. If it is not
+                provided, the plot is shown at the end of the routine.
+        
+        """
         if interval is None:
             interval = (self.lambda_minus, self.lambda_plus)
         
@@ -233,6 +414,17 @@ class MarchenkoPasturDistribution:
         )
     
     def plot_cdf(self, interval=None, bins=1000, savefig_path=None):
+        """Plots the CDF of the Marchenko-Pastur Law.
+
+        Args:
+            interval (tuple, default=None): Delimiters (xmin, xmax) of the histogram. If not
+                provided, the used interval is calculated depending on beta, ratio, and scale.
+            bins (int, default=100): It defines the number of equal-width bins within the
+                provided interval or range.
+            savefig_path (string, default=None): path to save the created figure. If it is not
+                provided, the plot is shown at the end of the routine.
+        
+        """
         if interval is None:
             interval = (self.lambda_minus, self.lambda_plus)
         
@@ -244,8 +436,33 @@ class MarchenkoPasturDistribution:
 
 
 class TracyWidomDistribution:
+    """Tracy-Widom Distribution class.
+
+    The Tracy-Widom Law describes the behaviour of the largest eigenvalue of the
+    Wigner random matrices. In particular, random matrices of the Gaussian Ensemble
+    are Wigner matrices, and therefore the largest eigenvalues of the spectrum of
+    the random matrices of this ensemble converge to the Tracy-Widom Law when the
+    matrix size and the sample size (number of times a Wigner matrix is generated to
+    compute the largest eigenvalue) goes to infinity. This class provides methods to
+    sample eigenvalues following Tracy-Widom distribution, computing the PDF,
+    computing the CDF and simple methods to plot the former two.
+
+    Attributes:
+        beta (int): descriptive integer of the Gaussian ensemble type.
+            For GOE beta=1, for GUE beta=2, for GSE beta=4.
+    
+    """
 
     def __init__(self, beta=1):
+        """Constructor for TracyWidomDistribution class.
+
+        Initializes an instance of this class with the given parameters.
+
+        Args:
+            beta (int, default=1): descriptive integer of the Gaussian ensemble type.
+                For GOE beta=1, for GUE beta=2, for GSE beta=4.
+        
+        """
         if beta not in [1,2,4]:
             raise ValueError(f"Error: invalid beta. It has to be 1,2 or 4. Provided beta = {beta}.")
 
@@ -253,6 +470,18 @@ class TracyWidomDistribution:
         self.tw_approx = TW_Approximator(beta=self.beta)
 
     def rvs(self, size, mtx_size=100):
+        """Samples ranfom variates following this distribution.
+
+        Args:
+            size (int): sample size.
+            mtx_size (int, default=100): matrix size. Remember the Tracy-Widom Law describes the
+                limiting behaviour of the largest eigenvalue of a Wigner matrix. Therefore,
+                a matrix has to be generated to get each sample. This argument specifies the size
+                of the matrix.
+        
+        Returns:
+            numpy array with the generated samples.
+        """
         if size <= 0:
             raise ValueError(f"Error: invalid sample size. It has to be positive. Provided size = {size}.")
         if mtx_size <= 0:
@@ -279,12 +508,41 @@ class TracyWidomDistribution:
         return max_eigvals
 
     def pdf(self, x):
+        """Computes PDF of the Tracy-Widom Law.
+
+        Args:
+            x (float or ndarray): value or (numpy) array of values in which compute the PDF.
+        
+        Returns:
+            float or numpy array with the computed PDF in the given value(s).
+        
+        """
         return self.tw_approx.pdf(x)
 
     def cdf(self, x):
+        """Computes CDF of the Tracy-Widom Law.
+
+        Args:
+            x (float or ndarray): value or (numpy) array of values in which compute the CDF.
+        
+        Returns:
+            float or numpy array with the computed CDF in the given value(s).
+        
+        """
         return self.tw_approx.cdf(x)
 
     def plot_pdf(self, interval=None, bins=1000, savefig_path=None):
+        """Plots the PDF of the Tracy-Widom Law.
+
+        Args:
+            interval (tuple, default=None): Delimiters (xmin, xmax) of the histogram. If not
+                provided, the used interval is calculated depending on beta.
+            bins (int, default=100): It defines the number of equal-width bins within the
+                provided interval or range.
+            savefig_path (string, default=None): path to save the created figure. If it is not
+                provided, the plot is shown at the end of the routine.
+        
+        """
         if interval is None:
             interval = (-5, 4-self.beta)
         
@@ -294,6 +552,17 @@ class TracyWidomDistribution:
         )
     
     def plot_cdf(self, interval=None, bins=1000, savefig_path=None):
+        """Plots the PDF of the Tracy-Widom Law.
+
+        Args:
+            interval (tuple, default=None): Delimiters (xmin, xmax) of the histogram. If not
+                provided, the used interval is calculated depending on beta.
+            bins (int, default=100): It defines the number of equal-width bins within the
+                provided interval or range.
+            savefig_path (string, default=None): path to save the created figure. If it is not
+                provided, the plot is shown at the end of the routine.
+        
+        """
         if interval is None:
             interval = (-5, 4-self.beta)
         
@@ -305,8 +574,51 @@ class TracyWidomDistribution:
 
 
 class ManovaSpectrumDistribution:
+    """Manova Spectrum Distribution class.
+
+    The spectrum of the random matrices of the Manova Ensemble converge to a
+    well-defined function implemented in this class. The class provides methods
+    to sample eigenvalues of the Manova Ensemble, computing the PDF, computing
+    the CDF and simple methods to plot the former two.
+
+    Attributes:
+        a (float): first random matrix size ratio. This is the ratio between the
+            number of degrees of freedom 'p' and the first sample size 'n1'. The value
+            of a = p/n1. Remember a Manova randon matrix is considered a double-Wishart
+            matrix, that's why there are two sample sizes 'n1' and 'n2' (see below).
+        b (float): second random matrix size ratio. This is the ratio between the
+            number of degrees of freedom 'p' and the second sample size 'n2'. The value
+            of b = p/n2. Remember a Manova randon matrix is considered a double-Wishart
+            matrix, that's why there are two sample sizes 'n1' and 'n2'.
+        beta (int, default=1): descriptive integer of the Manova ensemble type.
+            For MRE beta=1, for WME beta=2, for MQE beta=4.
+        sigma (float): scale of the distribution. This value also corresponds
+            to the standard deviation of the random entries of the sampled matrix.
+        lambda_minus (float): lower bound of the support of the Manova spectrum distribution.
+            It depends on beta, on the scale (sigma) and on the ratio.
+        lambda_plus (float): upper bound of the support of the Manova spectrum distribution.
+            It depends on beta, on the scale (sigma) and on the ratio.
+    
+    """
 
     def __init__(self, a, b, beta=1):
+        """Constructor for ManovaSpectrumDistribution class.
+
+        Initializes an instance of this class with the given parameters.
+
+        Args:
+            a (float): first random matrix size ratio. This is the ratio between the
+                number of degrees of freedom 'p' and the first sample size 'n1'. The value
+                of a = p/n1. Remember a Manova randon matrix is considered a double-Wishart
+                matrix, that's why there are two sample sizes 'n1' and 'n2' (see below).
+            b (float): second random matrix size ratio. This is the ratio between the
+                number of degrees of freedom 'p' and the second sample size 'n2'. The value
+                of b = p/n2. Remember a Manova randon matrix is considered a double-Wishart
+                matrix, that's why there are two sample sizes 'n1' and 'n2'.
+            beta (int, default=1): descriptive integer of the Manova ensemble type.
+                For MRE beta=1, for WME beta=2, for MQE beta=4.
+        
+        """
         if beta not in [1,2,4]:
             raise ValueError(f"Error: invalid beta. It has to be 1,2 or 4. Provided beta = {beta}.")
         if a <= 0 or b <= 0:
@@ -326,6 +638,14 @@ class ManovaSpectrumDistribution:
         self._manova_ens = None
     
     def rvs(self, size):
+        """Samples random variates following this distribution.
+
+        Args:
+            size (int): sample size.
+        
+        Returns:
+            numpy array with the generated samples.
+        """
         if size <= 0:
             raise ValueError(f"Error: invalid sample size. It has to be positive. Provided size = {size}.")
         
@@ -343,6 +663,15 @@ class ManovaSpectrumDistribution:
         return self._manova_ens.eigvals().real
     
     def pdf(self, x):
+        """Computes PDF of the Manova Spectrum distribution.
+
+        Args:
+            x (float or ndarray): value or (numpy) array of values in which compute the PDF.
+        
+        Returns:
+            float or numpy array with the computed PDF in the given value(s).
+        
+        """
         with np.errstate(divide='ignore', invalid='ignore'): 
             return np.where(np.logical_and(x > self.lambda_minus, x < self.lambda_plus),
                             (self.a + self.b) * np.sqrt((self.lambda_plus - x) * (x - self.lambda_minus)) \
@@ -359,6 +688,15 @@ class ManovaSpectrumDistribution:
         return quad(self.pdf, self.lambda_minus, x)[0]
 
     def cdf(self, x):
+        """Computes CDF of the Manova Spectrum distribution.
+
+        Args:
+            x (float or ndarray): value or (numpy) array of values in which compute the CDF.
+        
+        Returns:
+            float or numpy array with the computed CDF in the given value(s).
+        
+        """
         # if x is array-like
         if isinstance(x, (collections.abc.Sequence, np.ndarray)):
             y_ret = []
@@ -370,6 +708,17 @@ class ManovaSpectrumDistribution:
         return self.__cdf(x)
 
     def plot_pdf(self, interval=None, bins=1000, savefig_path=None):
+        """Plots the PDF of the Manova Spectrum distribution.
+
+        Args:
+            interval (tuple, default=None): Delimiters (xmin, xmax) of the histogram. If not
+                provided, the used interval is calculated depending on beta, a, and b.
+            bins (int, default=100): It defines the number of equal-width bins within the
+                provided interval or range.
+            savefig_path (string, default=None): path to save the created figure. If it is not
+                provided, the plot is shown at the end of the routine.
+        
+        """
         if interval is None:
             interval = (self.lambda_minus, self.lambda_plus)
         
@@ -379,6 +728,17 @@ class ManovaSpectrumDistribution:
         )
 
     def plot_cdf(self, interval=None, bins=1000, savefig_path=None):
+        """Plots the CDF of the Manova Spectrum distribution.
+
+        Args:
+            interval (tuple, default=None): Delimiters (xmin, xmax) of the histogram. If not
+                provided, the used interval is calculated depending on beta, a, and b.
+            bins (int, default=100): It defines the number of equal-width bins within the
+                provided interval or range.
+            savefig_path (string, default=None): path to save the created figure. If it is not
+                provided, the plot is shown at the end of the routine.
+        
+        """
         if interval is None:
             interval = (self.lambda_minus, self.lambda_plus)
 
