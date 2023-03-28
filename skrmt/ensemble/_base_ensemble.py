@@ -169,7 +169,7 @@ class _Ensemble(metaclass=ABCMeta):
                 complex eigenvalues with really small imaginary part because of computing
                 rounding errors. E.g.: MANOVA Ensemble eigenvalues.
             fig_path (string, default=None): path to save the created figure. If it is not
-                provided, the plot is shown are the end of the routine.
+                provided, the plot is shown at the end of the routine.
 
         References:
             Albrecht, J. and Chan, C.P. and Edelman, A.

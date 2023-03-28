@@ -2,7 +2,9 @@
 
 This module contains several functions that simulate various
 random matrix laws, including Wigner's Semicircle Law,
-Marchenko-Pastur Law and Tracy-Widom Law.
+Marchenko-Pastur Law and Tracy-Widom Law. The spectrum of
+the Manova ensemble is also simulated when the matrix size
+goes to infinity.
 
 """
 

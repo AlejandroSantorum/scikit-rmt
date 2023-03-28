@@ -269,7 +269,7 @@ class WishartEnsemble(_Ensemble):
                 to specify a normalization constant to observe eigenvalue spectrum, e.g.
                 1/sqrt(n/2) if you want to analyze Wigner's Semicircular Law.
             fig_path (string, default=None): path to save the created figure. If it is not
-                provided, the plot is shown are the end of the routine.
+                provided, the plot is shown at the end of the routine.
 
         References:
             Albrecht, J. and Chan, C.P. and Edelman, A.
