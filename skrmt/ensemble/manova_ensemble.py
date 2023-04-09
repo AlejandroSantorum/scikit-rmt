@@ -201,7 +201,7 @@ class ManovaEnsemble(_Ensemble):
         return self.matrix
 
     def eigvals(self):
-        """Calculates the random matrix eigenvalues.
+        """Computes the random matrix eigenvalues.
 
         Calculates the random matrix eigenvalues using numpy standard procedure.
         If the matrix ensemble is symmetric, a faster algorithm is used.
@@ -213,7 +213,7 @@ class ManovaEnsemble(_Ensemble):
         return np.linalg.eigvals(self.matrix)
 
     def plot_eigval_hist(self, bins, interval=(0,1), density=False, norm_const=None, fig_path=None):
-        """Calculates and plots the histogram of the matrix eigenvalues
+        """Computes and plots the histogram of the matrix eigenvalues
 
         Calculates and plots the histogram of the current sampled matrix eigenvalues.
 
@@ -250,7 +250,7 @@ class ManovaEnsemble(_Ensemble):
                                         norm_const=norm_const, avoid_img=True, fig_path=fig_path)
 
     def eigval_pdf(self):
-        '''Calculates joint eigenvalue pdf.
+        '''Computes joint eigenvalue pdf.
 
         Calculates joint eigenvalue probability density function given the current
             random matrix (so its eigenvalues). This function depends on beta, i.e.,

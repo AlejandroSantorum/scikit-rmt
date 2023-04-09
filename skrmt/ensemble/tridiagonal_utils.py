@@ -35,7 +35,7 @@ def tridiag_eigval_neg(tridiag_mtx):
 def tridiag_eigval_hist(tridiag_mtx, interval, bins=100, density=False):
     """Computes efficiently eigenvalue histogram.
 
-    Computes the eigenvalue histogram of the given matrix, using the
+    Calculates the eigenvalue histogram of the given matrix, using the
     specified bins between the introduced interval. The given matrix has
     to be tridiagonal, so this function builds the histogram efficiently
     using Sturm sequences, avoiding to calculate eigenvalues.

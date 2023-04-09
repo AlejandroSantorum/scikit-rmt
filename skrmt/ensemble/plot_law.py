@@ -46,7 +46,7 @@ def __get_bins_centers_and_contour(bins):
 
 def wigner_semicircle(ensemble='goe', n_size=1000, sigma=1.0, bins=100, interval=None,
                       density=False, plot_law_pdf=False, savefig_path=None):
-    """Calculates and plots Wigner's Semicircle Law using Gaussian Ensemble.
+    """Computes and plots Wigner's Semicircle Law using Gaussian Ensemble.
 
     Calculates and plots Wigner's Semicircle Law using Gaussian Ensemble random matrices.
     Gaussian (Hermite) ensemble has improved routines (using tridiagonal forms and Sturm
@@ -266,7 +266,7 @@ def marchenko_pastur(ensemble='wre', p_size=1000, n_size=3000, sigma=1.0, bins=1
 
 def tracy_widom(ensemble='goe', n_size=100, times=1000, bins=100, interval=None,
                 density=False, plot_law_pdf=False, savefig_path=None):
-    """Calculates and plots Tracy-Widom Law using Gaussian Ensemble.
+    """Computes and plots Tracy-Widom Law using Gaussian Ensemble.
 
     Calculates and plots Tracy-Widom Law using Gaussian Ensemble random matrices.
     Because we need to obtain the largest eigenvalue of each sampled random matrix,

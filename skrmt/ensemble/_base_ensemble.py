@@ -68,7 +68,7 @@ class _Ensemble(metaclass=ABCMeta):
         pass
 
     def eigval_hist(self, bins, interval=None, density=False, norm_const=None, avoid_img=False):
-        """Calculates the histogram of the matrix eigenvalues
+        """Calculates the histogram of the matrix eigenvalues.
 
         Calculates the histogram of the current sampled matrix eigenvalues. Some ensembles
         like Gaussian (Hermite) ensemble or Wishart (Laguerre) ensemble might have
@@ -138,7 +138,7 @@ class _Ensemble(metaclass=ABCMeta):
 
 
     def plot_eigval_hist(self, bins, interval=None, density=False, norm_const=None, fig_path=None, avoid_img=False):
-        """Calculates and plots the histogram of the matrix eigenvalues
+        """Computes and plots the histogram of the matrix eigenvalues.
 
         Calculates and plots the histogram of the current sampled matrix eigenvalues.
         Some ensembles like Gaussian (Hermite) ensemble or Wishart (Laguerre) ensemble

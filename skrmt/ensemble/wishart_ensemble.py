@@ -227,7 +227,7 @@ class WishartEnsemble(_Ensemble):
 
 
     def eigvals(self):
-        """Calculates the random matrix eigenvalues.
+        """Computes the random matrix eigenvalues.
 
         Calculates the random matrix eigenvalues using numpy standard procedure.
         If the matrix ensemble is symmetric, a faster algorithm is used.
@@ -248,7 +248,7 @@ class WishartEnsemble(_Ensemble):
         return super().eigval_hist(bins, interval, density, norm_const, avoid_img=avoid_img)
 
     def plot_eigval_hist(self, bins=100, interval=None, density=False, norm_const=None, fig_path=None):
-        """Calculates and plots the histogram of the matrix eigenvalues
+        """Computes and plots the histogram of the matrix eigenvalues.
 
         Calculates and plots the histogram of the current sampled matrix eigenvalues.
         Gaussian (Hermite) ensemble and Wishart (Laguerre) ensemble have improved
@@ -311,7 +311,7 @@ class WishartEnsemble(_Ensemble):
             super().plot_eigval_hist(bins, interval, density, norm_const, fig_path)
 
     def eigval_pdf(self):
-        '''Calculates joint eigenvalue pdf.
+        '''Computes joint eigenvalue pdf.
 
         Calculates joint eigenvalue probability density function given the current
             random matrix (so its eigenvalues). This function depends on beta, i.e.,
