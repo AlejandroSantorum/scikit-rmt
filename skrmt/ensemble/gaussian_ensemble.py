@@ -51,10 +51,10 @@ class GaussianEnsemble(_Ensemble):
             sampled matrix.
 
     References:
-        Albrecht, J. and Chan, C.P. and Edelman, A.
+        - Albrecht, J. and Chan, C.P. and Edelman, A.
             "Sturm sequences and random eigenvalue distributions".
             Foundations of Computational Mathematics. 9.4 (2008): 461-483.
-        Dumitriu, I. and Edelman, A. "Matrix Models for Beta Ensembles".
+        - Dumitriu, I. and Edelman, A. "Matrix Models for Beta Ensembles".
             Journal of Mathematical Physics. 43.11 (2002): 5830-5847.
 
     """
@@ -122,7 +122,7 @@ class GaussianEnsemble(_Ensemble):
             numpy array containing new matrix sampled.
 
         References:
-            Dumitriu, I. and Edelman, A. "Matrix Models for Beta Ensembles".
+            - Dumitriu, I. and Edelman, A. "Matrix Models for Beta Ensembles".
                 Journal of Mathematical Physics. 43.11 (2002): 5830-5847.
         """
         if self.use_tridiagonal:
@@ -176,10 +176,10 @@ class GaussianEnsemble(_Ensemble):
             numpy array containing new matrix sampled.
 
         References:
-            Albrecht, J. and Chan, C.P. and Edelman, A.
+            - Albrecht, J. and Chan, C.P. and Edelman, A.
                 "Sturm sequences and random eigenvalue distributions".
                 Foundations of Computational Mathematics. 9.4 (2008): 461-483.
-            Dumitriu, I. and Edelman, A. "Matrix Models for Beta Ensembles".
+            - Dumitriu, I. and Edelman, A. "Matrix Models for Beta Ensembles".
                 Journal of Mathematical Physics. 43.11 (2002): 5830-5847.
 
         '''
@@ -252,10 +252,10 @@ class GaussianEnsemble(_Ensemble):
                 provided, the plot is shown at the end of the routine.
 
         References:
-            Albrecht, J. and Chan, C.P. and Edelman, A.
+            - Albrecht, J. and Chan, C.P. and Edelman, A.
                 "Sturm sequences and random eigenvalue distributions".
                 Foundations of Computational Mathematics. 9.4 (2008): 461-483.
-            Dumitriu, I. and Edelman, A.
+            - Dumitriu, I. and Edelman, A.
                 "Matrix Models for Beta Ensembles".
                 Journal of Mathematical Physics. 43.11 (2002): 5830-5847.
 
@@ -299,7 +299,7 @@ class GaussianEnsemble(_Ensemble):
             real number. Value of the joint pdf of the current eigenvalues.
 
         References:
-            Dumitriu, I. and Edelman, A.
+            - Dumitriu, I. and Edelman, A.
                 "Matrix Models for Beta Ensembles".
                 Journal of Mathematical Physics. 43.11 (2002): 5830-5847.
 

@@ -77,10 +77,10 @@ def wigner_semicircle(ensemble='goe', n_size=1000, sigma=1.0, bins=100, interval
             provided, the plot is shown are the end of the routine.
 
     References:
-        Albrecht, J. and Chan, C.P. and Edelman, A.
+        - Albrecht, J. and Chan, C.P. and Edelman, A.
             "Sturm sequences and random eigenvalue distributions".
             Foundations of Computational Mathematics. 9.4 (2008): 461-483.
-        Dumitriu, I. and Edelman, A.
+        - Dumitriu, I. and Edelman, A.
             "Matrix Models for Beta Ensembles".
             Journal of Mathematical Physics. 43.11 (2002): 5830-5847.
 
@@ -177,10 +177,10 @@ def marchenko_pastur(ensemble='wre', p_size=1000, n_size=3000, sigma=1.0, bins=1
             provided, the plot is shown are the end of the routine.
 
     References:
-        Albrecht, J. and Chan, C.P. and Edelman, A.
+        - Albrecht, J. and Chan, C.P. and Edelman, A.
             "Sturm sequences and random eigenvalue distributions".
             Foundations of Computational Mathematics. 9.4 (2008): 461-483.
-        Dumitriu, I. and Edelman, A.
+        - Dumitriu, I. and Edelman, A.
             "Matrix Models for Beta Ensembles".
             Journal of Mathematical Physics. 43.11 (2002): 5830-5847.
 
@@ -296,10 +296,10 @@ def tracy_widom(ensemble='goe', n_size=100, times=1000, bins=100, interval=None,
             provided, the plot is shown are the end of the routine.
 
     References:
-        Albrecht, J. and Chan, C.P. and Edelman, A.
+        - Albrecht, J. and Chan, C.P. and Edelman, A.
             "Sturm sequences and random eigenvalue distributions".
             Foundations of Computational Mathematics. 9.4 (2008): 461-483.
-        Dumitriu, I. and Edelman, A.
+        - Dumitriu, I. and Edelman, A.
             "Matrix Models for Beta Ensembles".
             Journal of Mathematical Physics. 43.11 (2002): 5830-5847.
 
@@ -394,13 +394,13 @@ def manova_spectrum(ensemble='mre', m_size=1000, n1_size=3000, n2_size=3000,
             provided, the plot is shown are the end of the routine.
 
     References:
-        Laszlo, L. and Farrel, B.
+        - Laszlo, L. and Farrel, B.
             "Local Eigenvalue Density for General MANOVA Matrices".
             Journal of Statistical Physics. 152.6 (2013): 1003-1032.
-        Albrecht, J. and Chan, C.P. and Edelman, A.
+        - Albrecht, J. and Chan, C.P. and Edelman, A.
             "Sturm sequences and random eigenvalue distributions".
             Foundations of Computational Mathematics. 9.4 (2008): 461-483.
-        Dumitriu, I. and Edelman, A.
+        - Dumitriu, I. and Edelman, A.
             "Matrix Models for Beta Ensembles".
             Journal of Mathematical Physics. 43.11 (2002): 5830-5847.
 

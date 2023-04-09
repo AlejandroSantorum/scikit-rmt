@@ -66,11 +66,11 @@ class CircularEnsemble(_Ensemble):
             and CSE are of size 2n times 2n.
 
     References:
-        Killip, R. and Zozhan, R.
+        - Killip, R. and Zozhan, R.
             Matrix Models and Eigenvalue Statistics for Truncations of
             Classical Ensembles of Random Unitary Matrices.
             Communications in Mathematical Physics. 349 (2017): 991-1027.
-        "Circular ensemble". Wikipedia.
+        - "Circular ensemble". Wikipedia.
             en.wikipedia.org/wiki/Circular_ensemble
 
     """
@@ -123,11 +123,11 @@ class CircularEnsemble(_Ensemble):
             numpy array containing new matrix sampled.
 
         References:
-            Killip, R. and Zozhan, R.
+            - Killip, R. and Zozhan, R.
                 Matrix Models and Eigenvalue Statistics for Truncations of
                 Classical Ensembles of Random Unitary Matrices.
                 Communications in Mathematical Physics. 349 (2017): 991-1027.
-            "Circular ensemble". Wikipedia.
+            - "Circular ensemble". Wikipedia.
                 en.wikipedia.org/wiki/Circular_ensemble
 
         """
@@ -176,11 +176,11 @@ class CircularEnsemble(_Ensemble):
             numpy array containing J matrix.
 
         References:
-            Killip, R. and Zozhan, R.
+            - Killip, R. and Zozhan, R.
                 Matrix Models and Eigenvalue Statistics for Truncations of
                 Classical Ensembles of Random Unitary Matrices.
                 Communications in Mathematical Physics. 349 (2017): 991-1027.
-            "Circular ensemble". Wikipedia.
+            - "Circular ensemble". Wikipedia.
                 en.wikipedia.org/wiki/Circular_ensemble
         """
         size = 2*self.n
@@ -235,7 +235,7 @@ class CircularEnsemble(_Ensemble):
                 provided, the plot is shown at the end of the routine.
 
         References:
-            Killip, R. and Zozhan, R.
+            - Killip, R. and Zozhan, R.
                 Matrix Models and Eigenvalue Statistics for Truncations of
                 Classical Ensembles of Random Unitary Matrices.
                 Communications in Mathematical Physics. 349 (2017): 991-1027.
@@ -303,11 +303,11 @@ class CircularEnsemble(_Ensemble):
             real number. Value of the joint pdf of the current eigenvalues.
 
         References:
-            Killip, R. and Zozhan, R.
+            - Killip, R. and Zozhan, R.
                 Matrix Models and Eigenvalue Statistics for Truncations of
                 Classical Ensembles of Random Unitary Matrices.
                 Communications in Mathematical Physics. 349 (2017): 991-1027.
-            "Circular ensemble". Wikipedia.
+            - "Circular ensemble". Wikipedia.
                 en.wikipedia.org/wiki/Circular_ensemble
 
         '''

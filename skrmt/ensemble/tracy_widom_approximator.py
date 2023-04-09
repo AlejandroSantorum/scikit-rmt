@@ -6,17 +6,17 @@ https://github.com/yymao/TracyWidom. Tracy-Widom distribution
 functions for beta = 1, 2 and 4 are provided.
 
 References:
-    Bejan, A.
+    - Bejan, A.
         "Largest eigenvalues and sample covariance matrices".
         Tracy-Widom and Painleve II: Computational aspects and
         realization in S-Plus with applications, M.Sc. dissertation,
         Department of Statistics, The University of Warwick. (2005).
 
-    Borot, G. and Nadal, C.
+    - Borot, G. and Nadal, C.
         "Right tail expansion of Tracy-Widom beta laws".
         Random Matrices: Theory and Applications. 01.03. (2012).
     
-    Yao-Yuan Mao.
+    - Yao-Yuan Mao.
         TracyWidom GitHUb repository. (2013).
         https://github.com/yymao/TracyWidom
 
@@ -135,13 +135,13 @@ class TW_Approximator(object):
     """Provide the Tracy-Widom distribution functions for beta = 1, 2, or 4.
 
     References:
-        Bejan, A.
+        - Bejan, A.
             "Largest eigenvalues and sample covariance matrices".
             Tracy-Widom and Painleve II: Computational aspects and
             realization in S-Plus with applications, M.Sc. dissertation,
             Department of Statistics, The University of Warwick. (2005).
 
-        Borot, G. and Nadal, C.
+        - Borot, G. and Nadal, C.
             "Right tail expansion of Tracy-Widom beta laws".
             Random Matrices: Theory and Applications. 01.03. (2012).
     """

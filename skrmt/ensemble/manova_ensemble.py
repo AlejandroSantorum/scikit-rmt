@@ -59,10 +59,10 @@ class ManovaEnsemble(_Ensemble):
             that generates the matrix of the corresponding ensemble.
 
     References:
-        Erdos, L. and Farrell, B.
+        - Erdos, L. and Farrell, B.
             "Local Eigenvalue Density for General MANOVA Matrices".
             Journal of Statistical Physics. 152.6 (2013): 1003-1032.
-        Dumitriu, I. and Edelman, A. "Matrix Models for Beta Ensembles".
+        - Dumitriu, I. and Edelman, A. "Matrix Models for Beta Ensembles".
             Journal of Mathematical Physics. 43.11 (2002): 5830-5847.
 
     """
@@ -127,7 +127,7 @@ class ManovaEnsemble(_Ensemble):
             numpy array containing new matrix sampled.
 
         References:
-            Dumitriu, I. and Edelman, A. "Matrix Models for Beta Ensembles".
+            - Dumitriu, I. and Edelman, A. "Matrix Models for Beta Ensembles".
                 Journal of Mathematical Physics. 43.11 (2002): 5830-5847.
 
         """
@@ -237,10 +237,10 @@ class ManovaEnsemble(_Ensemble):
                 provided, the plot is shown at the end of the routine.
 
         References:
-            Erdos, L. and Farrell, B.
+            - Erdos, L. and Farrell, B.
                 "Local Eigenvalue Density for General MANOVA Matrices".
                 Journal of Statistical Physics. 152.6 (2013): 1003-1032.
-            Dumitriu, I. and Edelman, A.
+            - Dumitriu, I. and Edelman, A.
                 "Matrix Models for Beta Ensembles".
                 Journal of Mathematical Physics. 43.11 (2002): 5830-5847.
 
@@ -260,7 +260,7 @@ class ManovaEnsemble(_Ensemble):
             real number. Value of the joint pdf of the current eigenvalues.
 
         References:
-            Dumitriu, I. and Edelman, A. "Matrix Models for Beta Ensembles".
+            - Dumitriu, I. and Edelman, A. "Matrix Models for Beta Ensembles".
                 Journal of Mathematical Physics. 43.11 (2002): 5830-5847.
 
         '''

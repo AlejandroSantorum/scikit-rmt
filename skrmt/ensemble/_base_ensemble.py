@@ -111,10 +111,10 @@ class _Ensemble(metaclass=ABCMeta):
             ValueError if interval is not a tuple.
 
         References:
-            Albrecht, J. and Chan, C.P. and Edelman, A.
+            - Albrecht, J. and Chan, C.P. and Edelman, A.
                 "Sturm sequences and random eigenvalue distributions".
                 Foundations of Computational Mathematics. 9.4 (2008): 461-483.
-            Dumitriu, I. and Edelman, A.
+            - Dumitriu, I. and Edelman, A.
                 "Matrix Models for Beta Ensembles".
                 Journal of Mathematical Physics. 43.11 (2002): 5830-5847.
 
@@ -172,10 +172,10 @@ class _Ensemble(metaclass=ABCMeta):
                 provided, the plot is shown at the end of the routine.
 
         References:
-            Albrecht, J. and Chan, C.P. and Edelman, A.
+            - Albrecht, J. and Chan, C.P. and Edelman, A.
                 "Sturm sequences and random eigenvalue distributions".
                 Foundations of Computational Mathematics. 9.4 (2008): 461-483.
-            Dumitriu, I. and Edelman, A.
+            - Dumitriu, I. and Edelman, A.
                 "Matrix Models for Beta Ensembles".
                 Journal of Mathematical Physics. 43.11 (2002): 5830-5847.
 

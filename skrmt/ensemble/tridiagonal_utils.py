@@ -122,7 +122,7 @@ def householder_reduction(mtx, ret_iterations=False):
             ret_iterations is set to True.
 
     References:
-        R. Hildebrand. “Householder numerically with mathematica.” 2007.
+        - R. Hildebrand. “Householder numerically with mathematica.” 2007.
             http://buzzard.ups.edu/courses/2007spring/projects/hildebrand-paper-revised.pdf
     """
     n_size = len(mtx)
