@@ -50,7 +50,7 @@ def _indicator(x, start=None, stop=None, inclusive="both"):
     Returns:
         array_like consisting in the element-wise indicator function image of the given values.
     """
-    if not start and not stop:
+    if start is None and stop is None:
         raise ValueError("Error: provide start and/or stop for indicator function.")
 
     INCLUSIVE_OPTIONS = ["both", "left", "right", "neither"]
