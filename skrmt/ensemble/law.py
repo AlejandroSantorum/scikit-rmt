@@ -136,6 +136,14 @@ class WignerSemicircleDistribution:
         radius (float): radius of the semicircle of the Wigner law. This depends on
             the scale (sigma) and on beta.
     
+    References:
+        - Wigner, E.
+            "Characteristic Vectors of Bordered Matrices With Infinite Dimensions".
+            Annals of Mathematics. 62.3. (1955).
+        - Wigner, E.
+            "On the Distribution of the Roots of Certain Symmetric Matrices".
+            Annals of Mathematics. 67.2. (1958).
+    
     """
 
     def __init__(self, beta=1, center=0.0, sigma=1.0):
@@ -277,6 +285,11 @@ class MarchenkoPasturDistribution:
             It depends on beta, on the scale (sigma) and on the ratio.
         lambda_plus (float): upper bound of the support of the Marchenko-Pastur Law.
             It depends on beta, on the scale (sigma) and on the ratio.
+    
+    References:
+        - Bar, Z.D. and Silverstain, J.W.
+            "Spectral Analysis of Large Dimensional Random Matrices".
+            2nd edition. Springer. (2010).
     
     """
 
@@ -451,6 +464,23 @@ class TracyWidomDistribution:
         beta (int): descriptive integer of the Gaussian ensemble type.
             For GOE beta=1, for GUE beta=2, for GSE beta=4.
     
+    References:
+        - Bauman, S.
+            "The Tracy-Widom Distribution and its Application to Statistical Physics".
+            http://web.mit.edu/8.334/www/grades/projects/projects17/SamBauman.pdf
+            MIT Department of Physics. (2017).
+        - Tracy, C.A. and Widom, H.
+            "On orthogonal and symplectic matrix ensembles".
+            Communications in Mathematical Physics. 177.3. (1996).
+        - Bejan, A.
+            "Largest eigenvalues and sample covariance matrices".
+            Tracy-Widom and Painleve II: Computational aspects and
+            realization in S-Plus with applications, M.Sc. dissertation,
+            Department of Statistics, The University of Warwick. (2005).
+        - Borot, G. and Nadal, C.
+            "Right tail expansion of Tracy-Widom beta laws".
+            Random Matrices: Theory and Applications. 01.03. (2012).
+    
     """
 
     def __init__(self, beta=1):
@@ -598,6 +628,11 @@ class ManovaSpectrumDistribution:
             It depends on beta, on the scale (sigma) and on the ratio.
         lambda_plus (float): upper bound of the support of the Manova spectrum distribution.
             It depends on beta, on the scale (sigma) and on the ratio.
+    
+    References:
+        - Erdos, L. and Farrell, B.
+            "Local Eigenvalue Density for General MANOVA Matrices".
+            Journal of Statistical Physics. 152.6 (2013): 1003-1032.
     
     """
 

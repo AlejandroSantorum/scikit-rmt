@@ -11,11 +11,9 @@ References:
         Tracy-Widom and Painleve II: Computational aspects and
         realization in S-Plus with applications, M.Sc. dissertation,
         Department of Statistics, The University of Warwick. (2005).
-
     - Borot, G. and Nadal, C.
         "Right tail expansion of Tracy-Widom beta laws".
         Random Matrices: Theory and Applications. 01.03. (2012).
-    
     - Yao-Yuan Mao.
         TracyWidom GitHUb repository. (2013).
         https://github.com/yymao/TracyWidom
@@ -140,7 +138,6 @@ class TW_Approximator(object):
             Tracy-Widom and Painleve II: Computational aspects and
             realization in S-Plus with applications, M.Sc. dissertation,
             Department of Statistics, The University of Warwick. (2005).
-
         - Borot, G. and Nadal, C.
             "Right tail expansion of Tracy-Widom beta laws".
             Random Matrices: Theory and Applications. 01.03. (2012).

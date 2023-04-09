@@ -61,6 +61,9 @@ class WishartEnsemble(_Ensemble):
             Foundations of Computational Mathematics. 9.4 (2008): 461-483.
         - Dumitriu, I. and Edelman, A. "Matrix Models for Beta Ensembles".
             Journal of Mathematical Physics. 43.11 (2002): 5830-5847.
+        - Bar, Z.D. and Silverstain, J.W.
+            Spectral Analysis of Large Dimensional Random Matrices.
+            2nd edition. Springer. (2010).
 
     """
 
