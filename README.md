@@ -1,4 +1,4 @@
-![scikit-rmt logo](https://raw.githubusercontent.com/AlejandroSantorum/scikit-rmt/feature/laws_distribution_classes/imgs/scikit-rmt_logo.png)
+![scikit-rmt logo](https://raw.githubusercontent.com/AlejandroSantorum/scikit-rmt/feature/laws_distribution_classes/imgs/scikit-rmt_logo_bigger.png)
 
 
 [![PyPI](https://img.shields.io/pypi/v/scikit-rmt?color=g)](https://pypi.org/project/scikit-rmt/)
