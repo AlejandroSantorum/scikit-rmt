@@ -155,6 +155,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from skrmt.ensemble.law import TracyWidomDistribution
 
+
 x = np.linspace(-5, 2, num=1000)
 
 fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12,4))
@@ -181,3 +182,68 @@ ax2.set_title("Cumulative distribution function")
 fig.suptitle("Tracy Widom Law", fontweight="bold")
 plt.show()
 
+
+##############################################################################
+# Spectral laws for Wigner matrices
+# ---------------------------------
+#
+# Another heavily studied type of random matrix are Wishart random matrices.
+# The spectrum of the Wishart Ensemble is characterized by the Marchenko-Pastur Law.
+#
+# Marchenko-Pastur Law
+# ====================
+#
+# The **Marchenko-Pastur Law** describes the asymptotic behavior of the spectrum
+# of a Wishart matrix. Consider the :math:`p \times p` Wishart matrix
+# :math:`\mathbf{M} = \sum_{i=1}^{n}\mathbf{x}_i \mathbf{x}_i^\top`, where
+# :math:`\mathbf{x}_i \sim N_p(\mathbf{0}, \sigma^2 \mathbf{I}_p)`. In the 
+# limit :math:`p,n \to \infty` with :math:`\lambda = p/n \in (0, 1]` fixed,
+# the (discrete) distribution of the eigenvalues of :math:`\mathbf{M}`
+#
+#   .. math:: F^{\mathbf{M}}(x) := \frac{1}{p} \#\{1 \leq i \leq p : \lambda_i(\mathbf{M}) \leq x\},
+#
+# converges weakly with probability 1 to 
+#
+#   .. math:: F^{\mathbf{M}}(x)  \underset{\substack{n,p \to \infty \\ p/n \to \lambda}}{\longrightarrow} \int_{-\infty}^{x}f_{\lambda}(t)dt \quad \forall x \in \mathbb{R},
+#
+# is the Marchenko-Pastur probability density function.
+#
+# A similar result is obtained if :math:`\lambda > 1`. In this case, the limiting
+# distribution has an additional mass probability point in the origin of
+# size :math:`1 - \frac{1}{\lambda}`.
+#
+# Below we show how we can use the class **MarchenkoPasturDistribution** from **scikit-rmt**
+# to compute, study and illustrate the PDF of the Marchenko-Pastur Law.
+
+import numpy as np
+import matplotlib.pyplot as plt
+from skrmt.ensemble.law import MarchenkoPasturDistribution
+
+
+x1 = np.linspace(0, 4, num=1000)
+x2 = np.linspace(0, 5, num=2000)
+
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12,4))
+
+for ratio in [0.2, 0.4, 0.6, 1.0, 1.4]:
+    mpl = MarchenkoPasturDistribution(beta=1, ratio=ratio, sigma=1.0)
+
+    y1 = mpl.pdf(x1)
+    y2 = mpl.pdf(x2)
+
+    ax1.plot(x1, y1, label=f"$\lambda$ = {ratio} ")
+    ax2.plot(x2, y2, label=f"$\lambda$ = {ratio} ")
+
+ax1.legend()
+ax1.set_ylim(0, 1.4)
+ax1.set_xlabel("x", fontweight="bold")
+ax1.set_ylabel("density", fontweight="bold")
+
+ax2.legend()
+ax2.set_ylim(0, 1.4)
+ax2.set_xlim(0, 1)
+ax2.set_xlabel("x", fontweight="bold")
+ax2.set_ylabel("density", fontweight="bold")
+
+fig.suptitle("Marchenko-Pastur probability density function (PDF)", fontweight="bold")
+plt.show()
