@@ -52,7 +52,7 @@ random matrix ensembles.
 #   .. math:: \mu_{sc}(dx) = \frac{1}{2\pi \rho} \sqrt{4\rho - x^2}\mathbf{1}_{|x| \le 2\sqrt{\rho}} dx.
 #
 # The previous equation can be re-formulated by using that the radius of the
-# semicircle is :math:`$R = 2\sqrt{\rho}$`:
+# semicircle is :math:`R = 2\sqrt{\rho}`:
 #
 #   .. math:: \mu_{sc}(dx) = \frac{2}{\pi R^2} \sqrt{R^2 - x^2}\mathbf{1}_{|x| \le R} dx.
 #
@@ -182,7 +182,6 @@ ax2.set_title("Cumulative distribution function")
 fig.suptitle("Tracy Widom Law", fontweight="bold")
 plt.show()
 
-
 ##############################################################################
 # Spectral laws for Wigner matrices
 # ---------------------------------
@@ -246,4 +245,58 @@ ax2.set_xlabel("x", fontweight="bold")
 ax2.set_ylabel("density", fontweight="bold")
 
 fig.suptitle("Marchenko-Pastur probability density function (PDF)", fontweight="bold")
+plt.show()
+
+##############################################################################
+# Spectral laws for the Manova ensemble
+# -------------------------------------
+#
+# Manova spectrum distribution
+# ============================
+#
+# The empirical density of eigenvalues of Manova Ensemble random matrix converges
+# almost surely to
+#
+#   .. math:: f_{M}(x) = (a+b)\frac{\sqrt{(\lambda_+ - x)(x - \lambda_-)}}{2 \pi x (1-x)} I_{[\lambda_- , \lambda_+]} (x),
+#
+# where :math:`a` and :math:`b` are the matrix parameters, and
+#
+#   .. math:: \lambda_{\pm} = \left( \sqrt{\frac{a}{a+b}\left( 1 - \frac{1}{a+b} \right)} \pm \sqrt{\frac{1}{a+b}\left(1 - \frac{a}{a+b} \right)} \right)^2, \quad \lambda_{\pm} \in (0,1).
+#
+# The support of :math:`f_M` is the compact interval :math:`(0,1)`.
+#
+# The class ManovaSpectrumDistribution can be used to analyze the PDF and CDF of the
+# spectrum of the Manova random matrices, as exemplified below.
+
+import numpy as np
+import matplotlib.pyplot as plt
+from skrmt.ensemble.law import ManovaSpectrumDistribution
+
+plt.rcParams['figure.dpi'] = 100
+
+x1 = np.linspace(0, 1, num=1000)
+x2 = np.linspace(0, 1, num=1000)
+
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12,4))
+
+for a in [1.0, 1.2, 1.4, 1.6]:
+    for b in [2.0]:
+        msd = ManovaSpectrumDistribution(beta=1, a=a, b=b)
+
+        y1 = msd.pdf(x1)
+        y2 = msd.pdf(x2)
+
+        ax1.plot(x1, y1, label=f"$a$ = {a}, $b$ = {b}")
+        ax2.plot(x2, y2, label=f"$a$ = {a}, $b$ = {b}")
+
+ax1.legend()
+ax1.set_xlabel("x", fontweight="bold")
+ax1.set_ylabel("density", fontweight="bold")
+
+ax2.legend()
+ax2.set_ylim(0, 4)
+ax2.set_xlabel("x", fontweight="bold")
+ax2.set_ylabel("density", fontweight="bold")
+
+fig.suptitle("Manova spectrum probability density function (PDF)", fontweight="bold")
 plt.show()
