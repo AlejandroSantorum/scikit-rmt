@@ -8,8 +8,7 @@ Gaussian Unitary Ensemble (GUE) and Gaussian Symplectic Ensemble (GSE).
 """
 
 import numpy as np
-from scipy import sparse
-from scipy import special
+from scipy import sparse, special
 import matplotlib.pyplot as plt
 
 from ._base_ensemble import _Ensemble
@@ -48,31 +47,35 @@ class GaussianEnsemble(_Ensemble):
             matrices are sampled in its tridiagonal form, which has the same
             eigenvalues than its standard form. Otherwise, it is sampled using
             its standard form.
+        sigma (float): scale (standard deviation) of the random entries of the
+            sampled matrix.
 
     References:
-        Albrecht, J. and Chan, C.P. and Edelman, A.
+        - Albrecht, J. and Chan, C.P. and Edelman, A.
             "Sturm sequences and random eigenvalue distributions".
             Foundations of Computational Mathematics. 9.4 (2008): 461-483.
-        Dumitriu, I. and Edelman, A. "Matrix Models for Beta Ensembles".
+        - Dumitriu, I. and Edelman, A. "Matrix Models for Beta Ensembles".
             Journal of Mathematical Physics. 43.11 (2002): 5830-5847.
 
     """
 
-    def __init__(self, beta, n, use_tridiagonal=False):
+    def __init__(self, beta, n, use_tridiagonal=False, sigma=1.0):
         """Constructor for GaussianEnsemble class.
 
         Initializes an instance of this class with the given parameters.
 
         Args:
+            beta (int, default=1): descriptive integer of the gaussian ensemble type.
+                For GOE beta=1, for GUE beta=2, for GSE beta=4.
             n (int): random matrix size. Gaussian ensemble matrices are
                 squared matrices. GOE and GUE are of size n times n,
                 and GSE are of size 2n times 2n.
-            beta (int, default=1): descriptive integer of the gaussian ensemble type.
-                For GOE beta=1, for GUE beta=2, for GSE beta=4.
             use_tridiagonal (bool, default=False): if set to True, Gaussian Ensemble
-            matrices are sampled in its tridiagonal form, which has the same
-            eigenvalues than its standard form. Otherwise, it is sampled using
-            its standard form.
+                matrices are sampled in its tridiagonal form, which has the same
+                eigenvalues than its standard form. Otherwise, it is sampled using
+                its standard form.
+            sigma (float, 1.0): scale (standard deviation) of the random entries of the
+                sampled matrix.
 
         """
         if beta not in [1,2,4]:
@@ -83,10 +86,11 @@ class GaussianEnsemble(_Ensemble):
         self.n = n
         self.beta = beta
         self.use_tridiagonal = use_tridiagonal
+        self.sigma = sigma
         self.matrix = self.sample()
 
 
-    def set_size(self, n, resample_mtx=False):
+    def set_size(self, n, resample_mtx=True):
         # pylint: disable=arguments-differ
         """Setter of matrix size.
 
@@ -96,7 +100,7 @@ class GaussianEnsemble(_Ensemble):
             n (int): new random matrix size. Gaussian ensemble matrices are
                 squared matrices. GOE and GUE are of size n times n, and
                 GSE are of size 2n times 2n.
-            resample_mtx (bool, default=False): If set to True, the ensemble matrix is
+            resample_mtx (bool, default=True): If set to True, the ensemble matrix is
                 resampled with the new dimensions.
 
         """
@@ -118,7 +122,7 @@ class GaussianEnsemble(_Ensemble):
             numpy array containing new matrix sampled.
 
         References:
-            Dumitriu, I. and Edelman, A. "Matrix Models for Beta Ensembles".
+            - Dumitriu, I. and Edelman, A. "Matrix Models for Beta Ensembles".
                 Journal of Mathematical Physics. 43.11 (2002): 5830-5847.
         """
         if self.use_tridiagonal:
@@ -133,7 +137,7 @@ class GaussianEnsemble(_Ensemble):
 
     def _sample_goe(self):
         # n by n matrix of random Gaussians
-        mtx = np.random.randn(self.n,self.n)
+        mtx = np.random.randn(self.n,self.n) * self.sigma
         # symmetrize matrix
         self.matrix = (mtx + mtx.transpose())/np.sqrt(2)
         return self.matrix
@@ -141,7 +145,7 @@ class GaussianEnsemble(_Ensemble):
     def _sample_gue(self):
         size = self.n
         # n by n random complex matrix
-        mtx = np.random.randn(size,size) + 1j*np.random.randn(size,size)
+        mtx = np.random.randn(size,size)*self.sigma + 1j*np.random.randn(size,size)*self.sigma
         # hermitian matrix
         self.matrix = (mtx + mtx.transpose().conj())/np.sqrt(2)
         return self.matrix
@@ -149,9 +153,9 @@ class GaussianEnsemble(_Ensemble):
     def _sample_gse(self):
         size = self.n
         # n by n random complex matrix
-        x_mtx = np.random.randn(size,size) + (0+1j)*np.random.randn(size,size)
+        x_mtx = np.random.randn(size,size)*self.sigma + 1j*np.random.randn(size,size)*self.sigma
         # another n by n random complex matrix
-        y_mtx = np.random.randn(size,size) + (0+1j)*np.random.randn(size,size)
+        y_mtx = np.random.randn(size,size)*self.sigma + 1j*np.random.randn(size,size)*self.sigma
         # [X Y; -conj(Y) conj(X)]
         mtx = np.block([
                        [x_mtx               , y_mtx],
@@ -172,13 +176,18 @@ class GaussianEnsemble(_Ensemble):
             numpy array containing new matrix sampled.
 
         References:
-            Albrecht, J. and Chan, C.P. and Edelman, A.
+            - Albrecht, J. and Chan, C.P. and Edelman, A.
                 "Sturm sequences and random eigenvalue distributions".
                 Foundations of Computational Mathematics. 9.4 (2008): 461-483.
-            Dumitriu, I. and Edelman, A. "Matrix Models for Beta Ensembles".
+            - Dumitriu, I. and Edelman, A. "Matrix Models for Beta Ensembles".
                 Journal of Mathematical Physics. 43.11 (2002): 5830-5847.
 
         '''
+        if self.sigma != 1.0:
+            raise ValueError("Error: cannot sample tridiagonal random matrix using non-unitary scale"
+                             f" (sigma = {self.sigma}).\n"
+                             "\t Set `sigma=1.0` (default) or deactivate tridiagonal sampling.")
+
         size = 2*self.n if self.beta==4 else self.n
         # sampling diagonal normals
         normals = (1/np.sqrt(2)) * np.random.normal(loc=0, scale=np.sqrt(2), size=size)
@@ -194,7 +203,7 @@ class GaussianEnsemble(_Ensemble):
         return self.matrix
 
     def eigvals(self):
-        """Calculates the random matrix eigenvalues.
+        """Computes the random matrix eigenvalues.
 
         Calculates the random matrix eigenvalues using numpy standard procedure.
         If the matrix ensemble is symmetric, a faster algorithm is used.
@@ -215,8 +224,8 @@ class GaussianEnsemble(_Ensemble):
         return super().eigval_hist(bins, interval=interval, density=density,
                                    norm_const=norm_const, avoid_img=avoid_img)
 
-    def plot_eigval_hist(self, bins, interval=None, density=False, norm_const=None, fig_path=None):
-        """Calculates and plots the histogram of the matrix eigenvalues
+    def plot_eigval_hist(self, bins=100, interval=None, density=False, norm_const=None, fig_path=None):
+        """Computes and plots the histogram of the matrix eigenvalues.
 
         Calculates and plots the histogram of the current sampled matrix eigenvalues.
         Gaussian (Hermite) ensemble and Wishart (Laguerre) ensemble have improved
@@ -224,7 +233,7 @@ class GaussianEnsemble(_Ensemble):
         is built using certain techniques to boost efficiency.
 
         Args:
-            bins (int or sequence): If bins is an integer, it defines the number of
+            bins (int or sequence, default=100): If bins is an integer, it defines the number of
                 equal-width bins in the range. If bins is a sequence, it defines the
                 bin edges, including the left edge of the first bin and the right
                 edge of the last bin; in this case, bins may be unequally spaced.
@@ -240,17 +249,20 @@ class GaussianEnsemble(_Ensemble):
                 to specify a normalization constant to observe eigenvalue spectrum, e.g.
                 1/sqrt(n/2) if you want to analyze Wigner's Semicircular Law.
             fig_path (string, default=None): path to save the created figure. If it is not
-                provided, the plot is shown are the end of the routine.
+                provided, the plot is shown at the end of the routine.
 
         References:
-            Albrecht, J. and Chan, C.P. and Edelman, A.
+            - Albrecht, J. and Chan, C.P. and Edelman, A.
                 "Sturm sequences and random eigenvalue distributions".
                 Foundations of Computational Mathematics. 9.4 (2008): 461-483.
-            Dumitriu, I. and Edelman, A.
+            - Dumitriu, I. and Edelman, A.
                 "Matrix Models for Beta Ensembles".
                 Journal of Mathematical Physics. 43.11 (2002): 5830-5847.
 
         """
+        if interval is None:
+            wsl_radius = 2*np.sqrt(self.beta)*self.sigma
+            interval = (-wsl_radius, wsl_radius)
         if self.use_tridiagonal:
             # pylint: disable=too-many-arguments
             if norm_const is None:
@@ -260,8 +272,7 @@ class GaussianEnsemble(_Ensemble):
                                                  interval=interval, density=density)
             width = bins[1]-bins[0]
             plt.bar(bins[:-1], observed, width=width, align='edge')
-            plt.title("Eigenvalue density histogram (matrix size: "+\
-                      str(len(self.matrix))+"x"+str(len(self.matrix))+")", fontweight="bold")
+            plt.title("Eigenvalue density histogram", fontweight="bold")
             plt.xlabel("x")
             plt.ylabel("density")
             # Saving plot or showing it
@@ -278,7 +289,7 @@ class GaussianEnsemble(_Ensemble):
                                      norm_const=norm_const, fig_path=fig_path)
 
     def eigval_pdf(self):
-        '''Calculates joint eigenvalue pdf.
+        '''Computes joint eigenvalue pdf.
 
         Calculates joint eigenvalue probability density function given the current
         random matrix (so its eigenvalues). This function depends on beta, i.e.,
@@ -288,7 +299,7 @@ class GaussianEnsemble(_Ensemble):
             real number. Value of the joint pdf of the current eigenvalues.
 
         References:
-            Dumitriu, I. and Edelman, A.
+            - Dumitriu, I. and Edelman, A.
                 "Matrix Models for Beta Ensembles".
                 Journal of Mathematical Physics. 43.11 (2002): 5830-5847.
 

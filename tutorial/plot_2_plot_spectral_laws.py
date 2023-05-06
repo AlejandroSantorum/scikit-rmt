@@ -1,5 +1,5 @@
 """
-Analyzing spectral laws 
+Plotting spectral laws 
 =======================
 
 In this section, we will briefly explain what is the spectral distribution
@@ -106,7 +106,7 @@ wre.plot_eigval_hist(bins=80, interval=(0.2, 2.2))
 
 ##############################################################################
 # Spectral laws
-# ------------------------------
+# --------------------------
 # 
 # Spectral laws define random matrix eigenvalue distribution when its size
 # goes to infinity. So the spectral laws describes the limiting behavior
@@ -150,7 +150,7 @@ from skrmt.ensemble import tracy_widom_law
 tracy_widom_law(ensemble='goe', n_size=100, times=10000, bins=80)
 
 ##############################################################################
-# Spectral Laws analytical expression
+# Spectral laws analytical expression
 # -----------------------------------
 # 
 # The spectral laws described so far have been proven to converge to certain

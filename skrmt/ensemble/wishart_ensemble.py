@@ -9,8 +9,7 @@ and Wishart Quaternion Ensemble.
 
 import numpy as np
 import matplotlib.pyplot as plt
-from scipy import special
-from scipy import sparse
+from scipy import sparse, special
 
 from ._base_ensemble import _Ensemble
 from .tridiagonal_utils import tridiag_eigval_hist
@@ -53,17 +52,22 @@ class WishartEnsemble(_Ensemble):
             matrices are sampled in its tridiagonal form, which has the same
             eigenvalues than its standard form. Otherwise, it is sampled using
             its standard form.
+        sigma (float): scale (standard deviation) of the random entries of the
+            sampled matrix.
 
     References:
-        Albrecht, J. and Chan, C.P. and Edelman, A.
+        - Albrecht, J. and Chan, C.P. and Edelman, A.
             "Sturm sequences and random eigenvalue distributions".
             Foundations of Computational Mathematics. 9.4 (2008): 461-483.
-        Dumitriu, I. and Edelman, A. "Matrix Models for Beta Ensembles".
+        - Dumitriu, I. and Edelman, A. "Matrix Models for Beta Ensembles".
             Journal of Mathematical Physics. 43.11 (2002): 5830-5847.
+        - Bar, Z.D. and Silverstain, J.W.
+            Spectral Analysis of Large Dimensional Random Matrices.
+            2nd edition. Springer. (2010).
 
     """
 
-    def __init__(self, beta, p, n, use_tridiagonal=False):
+    def __init__(self, beta, p, n, use_tridiagonal=False, sigma=1.0):
         """Constructor for WishartEnsemble class.
 
         Initializes an instance of this class with the given parameters.
@@ -76,8 +80,10 @@ class WishartEnsemble(_Ensemble):
             n (int): number of columns of the guassian matrix that generates
                 the matrix of the corresponding ensemble.
             use_tridiagonal (bool, default=False): if set to True, Wishart Ensemble
-            matrices are sampled in its tridiagonal form, which has the same
-            eigenvalues than its standard form.
+                matrices are sampled in its tridiagonal form, which has the same
+                eigenvalues than its standard form.
+            sigma (float, 1.0): scale (standard deviation) of the random entries of the
+                sampled matrix.
 
         """
         if beta not in [1,2,4]:
@@ -89,9 +95,10 @@ class WishartEnsemble(_Ensemble):
         self.n = n
         self.beta = beta
         self.use_tridiagonal = use_tridiagonal
+        self.sigma = sigma
         self.matrix = self.sample()
 
-    def set_size(self, p, n, resample_mtx=False):
+    def set_size(self, p, n, resample_mtx=True):
         # pylint: disable=arguments-differ
         """Setter of matrix size.
 
@@ -102,7 +109,7 @@ class WishartEnsemble(_Ensemble):
                 the matrix of the corresponding ensemble.
             n (int): number of columns of the guassian matrix that generates
                 the matrix of the corresponding ensemble.
-            resample_mtx (bool, default=False): If set to True, the ensemble matrix is
+            resample_mtx (bool, default=True): If set to True, the ensemble matrix is
                 resampled with the new dimensions.
 
         """
@@ -125,10 +132,21 @@ class WishartEnsemble(_Ensemble):
             numpy array containing new matrix sampled.
 
         References:
-            Dumitriu, I. and Edelman, A. "Matrix Models for Beta Ensembles".
+            - Dumitriu, I. and Edelman, A. "Matrix Models for Beta Ensembles".
                 Journal of Mathematical Physics. 43.11 (2002): 5830-5847.
         """
         if self.use_tridiagonal:
+            if self.p > self.n:  # check reference ("Matrix Models for Beta Ensembles"): page 5, table 1.
+                raise ValueError("Error: cannot use tridiagonal form if 'p' (degrees of freedom)"
+                                 " is greater than 'n' (sample size).\n"
+                                 f"\t Provided n={self.n} and p={self.p}."
+                                 " Set `use_tridiagonal=False` or increase sample size (`n`).")
+            
+            if self.sigma != 1.0:
+                raise ValueError("Error: cannot sample tridiagonal random matrix using non-unitary scale"
+                                f" (sigma = {self.sigma}).\n"
+                                "\t Set `sigma=1.0` (default) or deactivate tridiagonal sampling.")
+
             return self.sample_tridiagonal()
 
         if self.beta == 1:
@@ -142,7 +160,7 @@ class WishartEnsemble(_Ensemble):
         p_size = self.p
         n_size = self.n
         # p by n matrix of random Gaussians
-        mtx = np.random.randn(p_size,n_size)
+        mtx = np.random.randn(p_size,n_size) * self.sigma
         # symmetrize matrix
         self.matrix = np.matmul(mtx, mtx.transpose())
         return self.matrix
@@ -151,7 +169,7 @@ class WishartEnsemble(_Ensemble):
         p_size = self.p
         n_size = self.n
         # p by n random complex matrix of random Gaussians
-        mtx = np.random.randn(p_size,n_size) + (0+1j)*np.random.randn(p_size,n_size)
+        mtx = np.random.randn(p_size,n_size)*self.sigma + 1j*np.random.randn(p_size,n_size)*self.sigma
         # hermitian matrix
         self.matrix = np.matmul(mtx, mtx.transpose().conj())
         return self.matrix
@@ -160,9 +178,9 @@ class WishartEnsemble(_Ensemble):
         p_size = self.p
         n_size = self.n
         # p by n random complex matrix of random Gaussians
-        x_mtx = np.random.randn(p_size,n_size) + (0+1j)*np.random.randn(p_size,n_size)
+        x_mtx = np.random.randn(p_size,n_size)*self.sigma + 1j*np.random.randn(p_size,n_size)*self.sigma
         # p by n random complex matrix of random Gaussians
-        y_mtx = np.random.randn(p_size,n_size) + (0+1j)*np.random.randn(p_size,n_size)
+        y_mtx = np.random.randn(p_size,n_size)*self.sigma + 1j*np.random.randn(p_size,n_size)*self.sigma
         # [X Y; -conj(Y) conj(X)]
         mtx = np.block([
                         [x_mtx              , y_mtx],
@@ -183,23 +201,22 @@ class WishartEnsemble(_Ensemble):
             numpy array containing new matrix sampled.
 
         References:
-            Albrecht, J. and Chan, C.P. and Edelman, A.
+            - Albrecht, J. and Chan, C.P. and Edelman, A.
                 "Sturm sequences and random eigenvalue distributions".
                 Foundations of Computational Mathematics. 9.4 (2008): 461-483.
-            Dumitriu, I. and Edelman, A. "Matrix Models for Beta Ensembles".
+            - Dumitriu, I. and Edelman, A. "Matrix Models for Beta Ensembles".
                 Journal of Mathematical Physics. 43.11 (2002): 5830-5847.
 
         '''
-        mtx_size = 2*self.p if self.beta==4 else self.p
-        a_val = self.n*self.beta/ 2
+        a_val = self.n*self.beta/2
         # sampling chi-squares
-        dfs = np.arange(mtx_size)
+        dfs = np.arange(self.p)
         chisqs_diag = np.array([np.sqrt(np.random.chisquare(2*a_val - self.beta*df)) for df in dfs])
         dfs = np.flip(dfs)
         chisqs_offdiag = np.array([np.sqrt(np.random.chisquare(self.beta*df)) for df in dfs[:-1]])
         # calculating tridiagonal diagonals
         diag = np.array([chisqs_diag[0]**2]+[chisqs_diag[i+1]**2 + \
-                         chisqs_offdiag[i]**2 for i in range(mtx_size-1)])
+                         chisqs_offdiag[i]**2 for i in range(self.p-1)])
         offdiag = np.multiply(chisqs_offdiag, chisqs_diag[:-1])
         # inserting diagonals
         diagonals = [offdiag, diag, offdiag]
@@ -210,7 +227,7 @@ class WishartEnsemble(_Ensemble):
 
 
     def eigvals(self):
-        """Calculates the random matrix eigenvalues.
+        """Computes the random matrix eigenvalues.
 
         Calculates the random matrix eigenvalues using numpy standard procedure.
         If the matrix ensemble is symmetric, a faster algorithm is used.
@@ -230,8 +247,8 @@ class WishartEnsemble(_Ensemble):
 
         return super().eigval_hist(bins, interval, density, norm_const, avoid_img=avoid_img)
 
-    def plot_eigval_hist(self, bins, interval=None, density=False, norm_const=None, fig_path=None):
-        """Calculates and plots the histogram of the matrix eigenvalues
+    def plot_eigval_hist(self, bins=100, interval=None, density=False, norm_const=None, fig_path=None):
+        """Computes and plots the histogram of the matrix eigenvalues.
 
         Calculates and plots the histogram of the current sampled matrix eigenvalues.
         Gaussian (Hermite) ensemble and Wishart (Laguerre) ensemble have improved
@@ -239,7 +256,7 @@ class WishartEnsemble(_Ensemble):
         is built using certain techniques to boost efficiency.
 
         Args:
-            bins (int or sequence): If bins is an integer, it defines the number of
+            bins (int or sequence, default=100): If bins is an integer, it defines the number of
                 equal-width bins in the range. If bins is a sequence, it defines the
                 bin edges, including the left edge of the first bin and the right
                 edge of the last bin; in this case, bins may be unequally spaced.
@@ -255,13 +272,13 @@ class WishartEnsemble(_Ensemble):
                 to specify a normalization constant to observe eigenvalue spectrum, e.g.
                 1/sqrt(n/2) if you want to analyze Wigner's Semicircular Law.
             fig_path (string, default=None): path to save the created figure. If it is not
-                provided, the plot is shown are the end of the routine.
+                provided, the plot is shown at the end of the routine.
 
         References:
-            Albrecht, J. and Chan, C.P. and Edelman, A.
+            - Albrecht, J. and Chan, C.P. and Edelman, A.
                 "Sturm sequences and random eigenvalue distributions".
                 Foundations of Computational Mathematics. 9.4 (2008): 461-483.
-            Dumitriu, I. and Edelman, A.
+            - Dumitriu, I. and Edelman, A.
                 "Matrix Models for Beta Ensembles".
                 Journal of Mathematical Physics. 43.11 (2002): 5830-5847.
 
@@ -270,9 +287,10 @@ class WishartEnsemble(_Ensemble):
         if norm_const is None:
             norm_const = 1/self.n 
         if interval is None:
-            ratio = (2*self.p)/self.n if self.beta==4 else self.p/self.n
-            lambda_plus = self.beta * (1 + np.sqrt(ratio))**2
-            lambda_minus = self.beta * (1 - np.sqrt(ratio))**2
+            # calculating constants depending on matrix sizes
+            ratio = self.p/self.n
+            lambda_plus = self.beta * self.sigma**2 * (1 + np.sqrt(ratio))**2
+            lambda_minus = self.beta * self.sigma**2 * (1 - np.sqrt(ratio))**2
             interval = (lambda_minus, lambda_plus)
 
         if self.use_tridiagonal:
@@ -280,8 +298,7 @@ class WishartEnsemble(_Ensemble):
                                                  interval=interval, density=density)
             width = bins[1]-bins[0]
             plt.bar(bins[:-1], observed, width=width, align='edge')
-            plt.title("Eigenvalue density histogram (matrix size: "+\
-                      str(len(self.matrix))+"x"+str(len(self.matrix))+")", fontweight="bold")
+            plt.title("Eigenvalue density histogram", fontweight="bold")
             plt.xlabel("x")
             plt.ylabel("density")
             # Saving plot or showing it
@@ -294,7 +311,7 @@ class WishartEnsemble(_Ensemble):
             super().plot_eigval_hist(bins, interval, density, norm_const, fig_path)
 
     def eigval_pdf(self):
-        '''Calculates joint eigenvalue pdf.
+        '''Computes joint eigenvalue pdf.
 
         Calculates joint eigenvalue probability density function given the current
             random matrix (so its eigenvalues). This function depends on beta, i.e.,
@@ -304,7 +321,7 @@ class WishartEnsemble(_Ensemble):
             real number. Value of the joint pdf of the current eigenvalues.
 
         References:
-            Dumitriu, I. and Edelman, A. "Matrix Models for Beta Ensembles".
+            - Dumitriu, I. and Edelman, A. "Matrix Models for Beta Ensembles".
                 Journal of Mathematical Physics. 43.11 (2002): 5830-5847.
 
         '''

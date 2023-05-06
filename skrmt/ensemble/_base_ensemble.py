@@ -68,7 +68,7 @@ class _Ensemble(metaclass=ABCMeta):
         pass
 
     def eigval_hist(self, bins, interval=None, density=False, norm_const=None, avoid_img=False):
-        """Calculates the histogram of the matrix eigenvalues
+        """Calculates the histogram of the matrix eigenvalues.
 
         Calculates the histogram of the current sampled matrix eigenvalues. Some ensembles
         like Gaussian (Hermite) ensemble or Wishart (Laguerre) ensemble might have
@@ -111,10 +111,10 @@ class _Ensemble(metaclass=ABCMeta):
             ValueError if interval is not a tuple.
 
         References:
-            Albrecht, J. and Chan, C.P. and Edelman, A.
+            - Albrecht, J. and Chan, C.P. and Edelman, A.
                 "Sturm sequences and random eigenvalue distributions".
                 Foundations of Computational Mathematics. 9.4 (2008): 461-483.
-            Dumitriu, I. and Edelman, A.
+            - Dumitriu, I. and Edelman, A.
                 "Matrix Models for Beta Ensembles".
                 Journal of Mathematical Physics. 43.11 (2002): 5830-5847.
 
@@ -138,7 +138,7 @@ class _Ensemble(metaclass=ABCMeta):
 
 
     def plot_eigval_hist(self, bins, interval=None, density=False, norm_const=None, fig_path=None, avoid_img=False):
-        """Calculates and plots the histogram of the matrix eigenvalues
+        """Computes and plots the histogram of the matrix eigenvalues.
 
         Calculates and plots the histogram of the current sampled matrix eigenvalues.
         Some ensembles like Gaussian (Hermite) ensemble or Wishart (Laguerre) ensemble
@@ -169,13 +169,13 @@ class _Ensemble(metaclass=ABCMeta):
                 complex eigenvalues with really small imaginary part because of computing
                 rounding errors. E.g.: MANOVA Ensemble eigenvalues.
             fig_path (string, default=None): path to save the created figure. If it is not
-                provided, the plot is shown are the end of the routine.
+                provided, the plot is shown at the end of the routine.
 
         References:
-            Albrecht, J. and Chan, C.P. and Edelman, A.
+            - Albrecht, J. and Chan, C.P. and Edelman, A.
                 "Sturm sequences and random eigenvalue distributions".
                 Foundations of Computational Mathematics. 9.4 (2008): 461-483.
-            Dumitriu, I. and Edelman, A.
+            - Dumitriu, I. and Edelman, A.
                 "Matrix Models for Beta Ensembles".
                 Journal of Mathematical Physics. 43.11 (2002): 5830-5847.
 
@@ -189,8 +189,7 @@ class _Ensemble(metaclass=ABCMeta):
         width = bins[1]-bins[0]
         plt.bar(bins[:-1], observed, width=width, align='edge')
 
-        plt.title("Eigenvalue density histogram (matrix size: "+\
-                      str(len(self.matrix))+"x"+str(len(self.matrix))+")", fontweight="bold")
+        plt.title("Eigenvalue density histogram", fontweight="bold")
         plt.xlabel("x")
         plt.ylabel("density")
 

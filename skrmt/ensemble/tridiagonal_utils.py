@@ -32,22 +32,22 @@ def tridiag_eigval_neg(tridiag_mtx):
     return (sturm_seq<0).sum()
 
 
-def tridiag_eigval_hist(tridiag_mtx, bins=100, interval=(-2,2), density=False):
+def tridiag_eigval_hist(tridiag_mtx, interval, bins=100, density=False):
     """Computes efficiently eigenvalue histogram.
 
-    Computes the eigenvalue histogram of the given matrix, using the
+    Calculates the eigenvalue histogram of the given matrix, using the
     specified bins between the introduced interval. The given matrix has
     to be tridiagonal, so this function builds the histogram efficiently
     using Sturm sequences, avoiding to calculate eigenvalues.
 
     Args:
         tridiag_mtx (numpy array): tridiagonal matrix
+        interval (tuple): Delimiters (xmin, xmax) of the histogram. The lower and upper
+            range of the bins. Lower and upper outliers are ignored.
         bins (int or sequence, default=100): If bins is an integer, it defines the number of
             equal-width bins in the range. If bins is a sequence, it defines the
             bin edges, including the left edge of the first bin and the right
             edge of the last bin; in this case, bins may be unequally spaced.
-        interval (tuple, default=(-2,2)): Delimiters (xmin, xmax) of the histogram.
-            The lower and upper range of the bins. Lower and upper outliers are ignored.
         density (bool, default=False): If True, draw and return a probability
             density: each bin will display the bin's raw count divided by the total
             number of counts and the bin width, so that the area under the histogram
@@ -122,7 +122,7 @@ def householder_reduction(mtx, ret_iterations=False):
             ret_iterations is set to True.
 
     References:
-        R. Hildebrand. “Householder numerically with mathematica.” 2007.
+        - R. Hildebrand. “Householder numerically with mathematica.” 2007.
             http://buzzard.ups.edu/courses/2007spring/projects/hildebrand-paper-revised.pdf
     """
     n_size = len(mtx)

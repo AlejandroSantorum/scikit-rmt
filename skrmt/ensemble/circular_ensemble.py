@@ -66,11 +66,11 @@ class CircularEnsemble(_Ensemble):
             and CSE are of size 2n times 2n.
 
     References:
-        Killip, R. and Zozhan, R.
+        - Killip, R. and Zozhan, R.
             Matrix Models and Eigenvalue Statistics for Truncations of
             Classical Ensembles of Random Unitary Matrices.
             Communications in Mathematical Physics. 349 (2017): 991-1027.
-        "Circular ensemble". Wikipedia.
+        - "Circular ensemble". Wikipedia.
             en.wikipedia.org/wiki/Circular_ensemble
 
     """
@@ -123,11 +123,11 @@ class CircularEnsemble(_Ensemble):
             numpy array containing new matrix sampled.
 
         References:
-            Killip, R. and Zozhan, R.
+            - Killip, R. and Zozhan, R.
                 Matrix Models and Eigenvalue Statistics for Truncations of
                 Classical Ensembles of Random Unitary Matrices.
                 Communications in Mathematical Physics. 349 (2017): 991-1027.
-            "Circular ensemble". Wikipedia.
+            - "Circular ensemble". Wikipedia.
                 en.wikipedia.org/wiki/Circular_ensemble
 
         """
@@ -176,11 +176,11 @@ class CircularEnsemble(_Ensemble):
             numpy array containing J matrix.
 
         References:
-            Killip, R. and Zozhan, R.
+            - Killip, R. and Zozhan, R.
                 Matrix Models and Eigenvalue Statistics for Truncations of
                 Classical Ensembles of Random Unitary Matrices.
                 Communications in Mathematical Physics. 349 (2017): 991-1027.
-            "Circular ensemble". Wikipedia.
+            - "Circular ensemble". Wikipedia.
                 en.wikipedia.org/wiki/Circular_ensemble
         """
         size = 2*self.n
@@ -208,7 +208,7 @@ class CircularEnsemble(_Ensemble):
         return np.linalg.eigvals(self.matrix)
 
     def plot_eigval_hist(self, bins, interval=None, density=False, norm_const=None, fig_path=None):
-        """Calculates and plots the histogram of the matrix eigenvalues
+        """Computes and plots the histogram of the matrix eigenvalues.
 
         Calculates and plots the histogram of the current sampled matrix eigenvalues.
         It is important to underline that this function works with real and complex
@@ -232,10 +232,10 @@ class CircularEnsemble(_Ensemble):
                 to specify a normalization constant to observe eigenvalue spectrum, e.g.
                 1/sqrt(n/2) if you want to analyze Wigner's Semicircular Law.
             fig_path (string, default=None): path to save the created figure. If it is not
-                provided, the plot is shown are the end of the routine.
+                provided, the plot is shown at the end of the routine.
 
         References:
-            Killip, R. and Zozhan, R.
+            - Killip, R. and Zozhan, R.
                 Matrix Models and Eigenvalue Statistics for Truncations of
                 Classical Ensembles of Random Unitary Matrices.
                 Communications in Mathematical Physics. 349 (2017): 991-1027.
@@ -293,7 +293,7 @@ class CircularEnsemble(_Ensemble):
 
 
     def eigval_pdf(self):
-        '''Calculates joint eigenvalue pdf.
+        '''Computes joint eigenvalue pdf.
 
         Calculates joint eigenvalue probability density function given the
             current random matrix (so its eigenvalues). This function depends
@@ -303,11 +303,11 @@ class CircularEnsemble(_Ensemble):
             real number. Value of the joint pdf of the current eigenvalues.
 
         References:
-            Killip, R. and Zozhan, R.
+            - Killip, R. and Zozhan, R.
                 Matrix Models and Eigenvalue Statistics for Truncations of
                 Classical Ensembles of Random Unitary Matrices.
                 Communications in Mathematical Physics. 349 (2017): 991-1027.
-            "Circular ensemble". Wikipedia.
+            - "Circular ensemble". Wikipedia.
                 en.wikipedia.org/wiki/Circular_ensemble
 
         '''

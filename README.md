@@ -1,3 +1,6 @@
+![scikit-rmt logo](https://raw.githubusercontent.com/AlejandroSantorum/scikit-rmt/feature/laws_distribution_classes/imgs/scikit-rmt_logo_bigger.png)
+
+
 [![PyPI](https://img.shields.io/pypi/v/scikit-rmt?color=g)](https://pypi.org/project/scikit-rmt/)
 [![Documentation Status](https://readthedocs.org/projects/scikit-rmt/badge/?version=latest)](https://scikit-rmt.readthedocs.io/en/latest/?badge=latest)
 [![Build Status](https://travis-ci.com/AlejandroSantorum/scikit-rmt.svg?branch=main)](https://travis-ci.com/AlejandroSantorum/scikit-rmt)
