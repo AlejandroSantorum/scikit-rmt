@@ -194,6 +194,96 @@ tracy_widom_law(ensemble='goe', n_size=500, times=20000, bins=80, density=True, 
 <img src="imgs/twl_goe_pdf.png" width=450 height=320 alt="Tracy-Widom Law PDF">
 -->
 
+The proposed package **scikit-rmt** also provides support for **computing and analyzing** the **probability density function (PDF)** and **cumulative distribution function (CDF)** of the main random matrix ensembles. In particular, the following classes are implemented in the `ensemble.law` module:
+- `WignerSemicircleDistribution` in `skrmt.ensemble.law`.
+- `MarchenkoPasturDistribution` in `skrmt.ensemble.law`.
+- `TracyWidomDistribution` in `skrmt.ensemble.law`.
+- `ManovaSpectrumDistribution` in `skrmt.ensemble.law`.
+
+For example, `WignerSemicircleDistribution` can be used to plot the **Wigner's Semicircle Law PDF**:
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+from skrmt.ensemble.law import WignerSemicircleDistribution
+
+x1 = np.linspace(-5, 5, num=1000)
+x2 = np.linspace(-10, 10, num=2000)
+
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12,4))
+
+for sigma in [0.5, 1.0, 2.0, 4.0]:
+    wsd = WignerSemicircleDistribution(beta=1, center=0.0, sigma=sigma)
+
+    y1 = wsd.pdf(x1)
+    y2 = wsd.pdf(x2)
+
+    ax1.plot(x1, y1, label=f"$\sigma$ = {sigma} (R = ${wsd.radius}$)")
+    ax2.plot(x2, y2, label=f"$\sigma$ = {sigma} (R = ${wsd.radius}$)")
+
+ax1.legend()
+ax1.set_xlabel("x", fontweight="bold")
+ax1.set_xticks([-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5])
+ax1.set_ylabel("density", fontweight="bold")
+
+ax2.legend()
+ax2.set_xlabel("x", fontweight="bold")
+ax2.set_xticks([-10, -8, -6, -4, -2, 0, 2, 4, 6, 8, 10])
+ax2.set_ylabel("density", fontweight="bold")
+
+fig.suptitle("Wigner Semicircle probability density function (PDF)", fontweight="bold")
+plt.show()
+```
+![Wigner Semicircle Law PDF (Analytical)](https://raw.githubusercontent.com/AlejandroSantorum/scikit-rmt/main/imgs/wigner_scl_pdf.png)
+<!---
+<img src="imgs/wigner_scl_pdf.png" width=450 height=320 alt="Wigner Semicircle Law PDF (Analytical)">
+-->
+
+Similarly, `MarchenkoPasturDistribution` can be used to plot the **Marchenko-Pastur Law PDF**:
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+from skrmt.ensemble.law import MarchenkoPasturDistribution
+
+x1 = np.linspace(0, 4, num=1000)
+x2 = np.linspace(0, 5, num=2000)
+
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12,4))
+
+for ratio in [0.2, 0.4, 0.6, 1.0, 1.4]:
+    mpl = MarchenkoPasturDistribution(beta=1, ratio=ratio, sigma=1.0)
+
+    y1 = mpl.pdf(x1)
+    y2 = mpl.pdf(x2)
+
+    ax1.plot(x1, y1, label=f"$\lambda$ = {ratio} ")
+    ax2.plot(x2, y2, label=f"$\lambda$ = {ratio} ")
+
+ax1.legend()
+ax1.set_ylim(0, 1.4)
+ax1.set_xlabel("x", fontweight="bold")
+ax1.set_ylabel("density", fontweight="bold")
+
+ax2.legend()
+ax2.set_ylim(0, 1.4)
+ax2.set_xlim(0, 1)
+ax2.set_xlabel("x", fontweight="bold")
+ax2.set_ylabel("density", fontweight="bold")
+
+fig.suptitle("Marchenko-Pastur probability density function (PDF)", fontweight="bold")
+plt.show()
+```
+![Marchenko-Pastur Law PDF (Analytical)](https://raw.githubusercontent.com/AlejandroSantorum/scikit-rmt/main/imgs/mpl_pdf.png)
+<!---
+<img src="imgs/mpl_pdf.png" width=450 height=320 alt="Marchenko-Pastur Law PDF (Analytical)">
+-->
+
+In the following example, we show how we can plot the **PDF and CDF of the Tracy-Widom distribution** using the class `TracyWidomDistribution`:
+![Tracy-Widom Law PDF and CDF(Analytical)](https://raw.githubusercontent.com/AlejandroSantorum/scikit-rmt/main/imgs/twl_pdf_cdf.png)
+<!---
+<img src="imgs/twl_pdf_cdf.png" width=450 height=320 alt="Tracy-Widom Law PDF and CDF(Analytical)">
+-->
+
+
 The other module of this library implements **several covariance matrix estimators**:
 * Sample estimator.
 * Finite-sample optimal estimator (FSOpt estimator).
