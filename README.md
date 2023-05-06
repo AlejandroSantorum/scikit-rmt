@@ -278,6 +278,37 @@ plt.show()
 -->
 
 In the following example, we show how we can plot the **PDF and CDF of the Tracy-Widom distribution** using the class `TracyWidomDistribution`:
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+from skrmt.ensemble.law import TracyWidomDistribution
+
+x = np.linspace(-5, 2, num=1000)
+
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12,4))
+
+for beta in [1,2,4]:
+    twd = TracyWidomDistribution(beta=beta)
+
+    y_pdf = twd.pdf(x)
+    y_cdf = twd.cdf(x)
+
+    ax1.plot(x, y_pdf, label=f"$\\beta$ = {beta}")
+    ax2.plot(x, y_cdf, label=f"$\\beta$ = {beta}")
+
+ax1.legend()
+ax1.set_xlabel("x", fontweight="bold")
+ax1.set_ylabel("density", fontweight="bold")
+ax1.set_title("Probability density function")
+
+ax2.legend()
+ax2.set_xlabel("x", fontweight="bold")
+ax2.set_ylabel("distribution", fontweight="bold")
+ax2.set_title("Cumulative distribution function")
+
+fig.suptitle("Tracy Widom Law", fontweight="bold")
+plt.show()
+```
 ![Tracy-Widom Law PDF and CDF(Analytical)](https://raw.githubusercontent.com/AlejandroSantorum/scikit-rmt/main/imgs/twl_pdf_cdf.png)
 <!---
 <img src="imgs/twl_pdf_cdf.png" width=450 height=320 alt="Tracy-Widom Law PDF and CDF(Analytical)">
