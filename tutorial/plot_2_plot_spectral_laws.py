@@ -131,23 +131,23 @@ wre.plot_eigval_hist(bins=80, interval=(0.2, 2.2))
 ##############################################################################
 # We can easily analyze **Wigner's Semicircle Law** as follows.
 
-from skrmt.ensemble import wigner_semicircular_law
+from skrmt.ensemble import wigner_semicircle
 
-wigner_semicircular_law(ensemble='goe', n_size=2000, bins=80)
+wigner_semicircle(ensemble='goe', n_size=2000, bins=80)
 
 ##############################################################################
 # We can also study **Marchenko-Pastur Law** as by:
 
-from skrmt.ensemble import marchenko_pastur_law
+from skrmt.ensemble import marchenko_pastur
 
-marchenko_pastur_law(ensemble='wre', p_size=2000, n_size=6000, bins=80)
+marchenko_pastur(ensemble='wre', p_size=2000, n_size=6000, bins=80)
 
 ##############################################################################
 # Finally, **Tracy-Widom Law** can be represented using:
 
-from skrmt.ensemble import tracy_widom_law
+from skrmt.ensemble import tracy_widom
 
-tracy_widom_law(ensemble='goe', n_size=100, times=10000, bins=80)
+tracy_widom(ensemble='goe', n_size=100, times=10000, bins=80)
 
 ##############################################################################
 # Spectral laws analytical expression
@@ -164,9 +164,9 @@ tracy_widom_law(ensemble='goe', n_size=100, times=10000, bins=80)
 # Wigner Semicircle Law, supported on :math:`[-R, R]` and centered at :math:`(0,0)`
 # is :math:`f(x) = \frac{2}{\pi R^2} \sqrt{R^2 - x^2}`.
 
-from skrmt.ensemble import wigner_semicircular_law
+from skrmt.ensemble import wigner_semicircle
 
-wigner_semicircular_law(ensemble='goe', n_size=2000, bins=80, density=True, limit_pdf=True)
+wigner_semicircle(ensemble='goe', n_size=2000, bins=80, density=True, limit_pdf=True)
 
 ##############################################################################
 # The analytical probability function for the Wishart Ensemble known as
@@ -176,9 +176,9 @@ wigner_semicircular_law(ensemble='goe', n_size=2000, bins=80, density=True, limi
 # If :math:`\lambda > 1` then the limiting distribution has an additional
 # mass probability point in the origin of size :math:`1 - \frac{1}{\lambda}`.
 
-from skrmt.ensemble import marchenko_pastur_law
+from skrmt.ensemble import marchenko_pastur
 
-marchenko_pastur_law(ensemble='wre', p_size=2000, n_size=6000, bins=80, density=True, limit_pdf=True)
+marchenko_pastur(ensemble='wre', p_size=2000, n_size=6000, bins=80, density=True, limit_pdf=True)
 
 ##############################################################################
 # In the other hand, the Tracy-Widom Law has a complex analytical expression,
@@ -189,9 +189,9 @@ marchenko_pastur_law(ensemble='wre', p_size=2000, n_size=6000, bins=80, density=
 # The package scikit-rmt represents a precise
 # approximation of the theoretical Tracy-Widom pdf.
 
-from skrmt.ensemble import tracy_widom_law
+from skrmt.ensemble import tracy_widom
 
-tracy_widom_law(ensemble='goe', n_size=10, times=5000, bins=80, density=True, limit_pdf=True)
+tracy_widom(ensemble='goe', n_size=10, times=5000, bins=80, density=True, limit_pdf=True)
 
 ##############################################################################
 # Finally, the limiting distribution of the Manova Ensemble is not described
@@ -199,7 +199,7 @@ tracy_widom_law(ensemble='goe', n_size=10, times=5000, bins=80, density=True, li
 # provides functionality to show it on top of the empirical histogram of the
 # eigenvalue spectrum.
 
-from skrmt.ensemble import manova_spectrum_distr
+from skrmt.ensemble import manova_spectrum
 
-manova_spectrum_distr(ensemble='mre', m_size=1000, n1_size=3000, n2_size=3000,
-                      bins=80, density=True, limit_pdf=True)
+manova_spectrum(ensemble='mre', m_size=1000, n1_size=3000, n2_size=3000,
+                bins=80, density=True, limit_pdf=True)
