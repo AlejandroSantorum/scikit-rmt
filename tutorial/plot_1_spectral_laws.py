@@ -62,7 +62,8 @@ random matrix ensembles.
 # at rate :math:`O(n^{-1/2})`.
 #
 # The *probability density function* (PDF) of the Wigner's Semicircle Law can
-# be plotted using **scikit-rmt** with the **WignerSemicircleDistribution** class.
+# be studied and plotted using **scikit-rmt** with the
+# **WignerSemicircleDistribution** class.
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -97,7 +98,7 @@ fig.suptitle("Wigner Semicircle probability density function (PDF)", fontweight=
 plt.show()
 
 # Similarly, the *cumulative distribution function* (CDF) of the Wigner's Semicircle
-# Law can also be plotted using **WignerSemicircleDistribution** class.
+# Law can also be analyzed and plotted using **WignerSemicircleDistribution** class.
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -135,4 +136,48 @@ plt.show()
 # Tracy-Widom Law
 # ================
 #
-# 
+# The distribution of the largest eigenvalue of a Wigner matrix converges
+# asymptotically (i.e. in the limit of infinite matrix size) to the
+# **Tracy-Widom law**. The Tracy-Widom distribution can be defined as
+# the limit:
+#
+#   .. math:: F_2 (s) = \lim_{n \to \infty} \mathbb{P}\left( \sqrt{2} (\lambda_{max} - \sqrt{2 n}) n^{1/6} \le s \right).
+#
+# The shift :math:`\sqrt{2n}` is used to keep the distributions centered
+# at :math:`0`, and the factor :math:`\sqrt{2} n^{1/6}` is used because
+# the standard deviation of the distributions scales with :math:`O(n^{-1/6})`.
+#
+# The probability density function (PDF) and cumulative distribution function (CDF)
+# of the Tracy-Widom Law can be computed and graphically represented using the
+# **TracyWidomDistribution** class from **scikit-rmt**.
+
+import numpy as np
+import matplotlib.pyplot as plt
+from skrmt.ensemble.law import TracyWidomDistribution
+
+x = np.linspace(-5, 2, num=1000)
+
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12,4))
+
+for beta in [1,2,4]:
+    twd = TracyWidomDistribution(beta=beta)
+
+    y_pdf = twd.pdf(x)
+    y_cdf = twd.cdf(x)
+
+    ax1.plot(x, y_pdf, label=f"$\\beta$ = {beta}")
+    ax2.plot(x, y_cdf, label=f"$\\beta$ = {beta}")
+
+ax1.legend()
+ax1.set_xlabel("x", fontweight="bold")
+ax1.set_ylabel("density", fontweight="bold")
+ax1.set_title("Probability density function")
+
+ax2.legend()
+ax2.set_xlabel("x", fontweight="bold")
+ax2.set_ylabel("distribution", fontweight="bold")
+ax2.set_title("Cumulative distribution function")
+
+fig.suptitle("Tracy Widom Law", fontweight="bold")
+plt.show()
+
