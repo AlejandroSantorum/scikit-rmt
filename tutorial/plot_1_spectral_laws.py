@@ -14,7 +14,7 @@ random matrix ensembles.
 
 ##############################################################################
 # Spectral laws
-# --------------------------
+# -------------
 # 
 # Spectral laws define random matrix eigenvalue distribution when its size
 # goes to infinity. So the spectral laws describes the limiting behavior
@@ -40,11 +40,8 @@ random matrix ensembles.
 
 
 ##############################################################################
-# Spectral laws for Wigner matrices
-# ---------------------------------
-#
 # Wigner Semicircle Law
-# =====================
+# ---------------------
 #
 # **Wigner's Semicircle Law** characterizes the density of eigenvalues of
 # sufficiently large Wigner matrices with second moment :math:`\rho`.
@@ -132,9 +129,9 @@ ax2.set_ylabel("distribution", fontweight="bold")
 fig.suptitle("Wigner Semicircle cumulative distribution function (CDF)", fontweight="bold")
 plt.show()
 
-#
+##############################################################################
 # Tracy-Widom Law
-# ================
+# ---------------
 #
 # The distribution of the largest eigenvalue of a Wigner matrix converges
 # asymptotically (i.e. in the limit of infinite matrix size) to the
@@ -183,15 +180,11 @@ fig.suptitle("Tracy Widom Law", fontweight="bold")
 plt.show()
 
 ##############################################################################
-# Spectral laws for Wigner matrices
-# ---------------------------------
+# Marchenko-Pastur Law
+# --------------------
 #
 # Another heavily studied type of random matrix are Wishart random matrices.
 # The spectrum of the Wishart Ensemble is characterized by the Marchenko-Pastur Law.
-#
-# Marchenko-Pastur Law
-# ====================
-#
 # The **Marchenko-Pastur Law** describes the asymptotic behavior of the spectrum
 # of a Wishart matrix. Consider the :math:`p \times p` Wishart matrix
 # :math:`\mathbf{M} = \sum_{i=1}^{n}\mathbf{x}_i \mathbf{x}_i^\top`, where
@@ -248,11 +241,8 @@ fig.suptitle("Marchenko-Pastur probability density function (PDF)", fontweight="
 plt.show()
 
 ##############################################################################
-# Spectral laws for the Manova ensemble
-# -------------------------------------
-#
 # Manova spectrum distribution
-# ============================
+# ----------------------------
 #
 # The empirical density of eigenvalues of Manova Ensemble random matrix converges
 # almost surely to
