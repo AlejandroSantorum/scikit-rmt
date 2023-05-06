@@ -166,7 +166,7 @@ tracy_widom(ensemble='goe', n_size=100, times=10000, bins=80)
 
 from skrmt.ensemble import wigner_semicircle
 
-wigner_semicircle(ensemble='goe', n_size=2000, bins=80, density=True, limit_pdf=True)
+wigner_semicircle(ensemble='goe', n_size=2000, bins=80, density=True, plot_law_pdf=True)
 
 ##############################################################################
 # The analytical probability function for the Wishart Ensemble known as
@@ -178,7 +178,7 @@ wigner_semicircle(ensemble='goe', n_size=2000, bins=80, density=True, limit_pdf=
 
 from skrmt.ensemble import marchenko_pastur
 
-marchenko_pastur(ensemble='wre', p_size=2000, n_size=6000, bins=80, density=True, limit_pdf=True)
+marchenko_pastur(ensemble='wre', p_size=2000, n_size=6000, bins=80, density=True, plot_law_pdf=True)
 
 ##############################################################################
 # In the other hand, the Tracy-Widom Law has a complex analytical expression,
@@ -191,7 +191,7 @@ marchenko_pastur(ensemble='wre', p_size=2000, n_size=6000, bins=80, density=True
 
 from skrmt.ensemble import tracy_widom
 
-tracy_widom(ensemble='goe', n_size=10, times=5000, bins=80, density=True, limit_pdf=True)
+tracy_widom(ensemble='goe', n_size=10, times=5000, bins=80, density=True, plot_law_pdf=True)
 
 ##############################################################################
 # Finally, the limiting distribution of the Manova Ensemble is not described
@@ -202,4 +202,4 @@ tracy_widom(ensemble='goe', n_size=10, times=5000, bins=80, density=True, limit_
 from skrmt.ensemble import manova_spectrum
 
 manova_spectrum(ensemble='mre', m_size=1000, n1_size=3000, n2_size=3000,
-                bins=80, density=True, limit_pdf=True)
+                bins=80, density=True, plot_law_pdf=True)
