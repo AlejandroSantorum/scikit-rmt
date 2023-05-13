@@ -554,6 +554,113 @@ class MarchenkoPasturDistribution:
             plot_ylabel="cumulative distribution", savefig_path=savefig_path
         )
 
+    def plot_empirical_pdf(self, p_size=1000, n_size=3000, bins=100, interval=None,
+                           density=False, plot_law_pdf=False, savefig_path=None):
+        """Computes and plots Marchenko-Pastur empirical law using Wishart Ensemble random matrices.
+
+        Calculates and plots Marchenko-Pastur empirical law using Wishart Ensemble random matrices.
+        Wishart (Laguerre) ensemble has improved routines (using tridiagonal forms and Sturm
+        sequences) to avoid calculating the eigenvalues, so the histogram is built using certain
+        techniques to boost efficiency. This optimization is only used when the ratio p_size/n_size
+        is less or equal than 1.
+
+        Args:
+            p_size (int, default=1000): number of rows of the guassian matrix that generates
+                the matrix of the corresponding ensemble.
+            n_size (int, default=3000): number of columns of the guassian matrix that generates
+                the matrix of the corresponding ensemble.
+            bins (int or sequence, default=100): If bins is an integer, it defines the number
+                of equal-width bins in the range. If bins is a sequence, it defines the
+                bin edges, including the left edge of the first bin and the right
+                edge of the last bin; in this case, bins may be unequally spaced.
+            interval (tuple, default=None): Delimiters (xmin, xmax) of the histogram.
+                The lower and upper range of the bins. Lower and upper outliers are ignored.
+            density (bool, default=False): If True, draw and return a probability
+                density: each bin will display the bin's raw count divided by the total
+                number of counts and the bin width, so that the area under the histogram
+                integrates to 1. If set to False, the absolute frequencies of the eigenvalues
+                are returned.
+            plot_law_pdf (bool, default=False): If True, the limiting theoretical law is plotted.
+                If set to False, just the empirical histogram is shown. This parameter is only
+                considered when the argument 'density' is set also to True.
+            savefig_path (string, default=None): path to save the created figure. If it is not
+                provided, the plot is shown are the end of the routine.
+
+        References:
+            - Albrecht, J. and Chan, C.P. and Edelman, A.
+                "Sturm sequences and random eigenvalue distributions".
+                Foundations of Computational Mathematics. 9.4 (2008): 461-483.
+            - Dumitriu, I. and Edelman, A.
+                "Matrix Models for Beta Ensembles".
+                Journal of Mathematical Physics. 43.11 (2002): 5830-5847.
+
+        """
+        # pylint: disable=too-many-arguments
+        if n_size<1 or p_size<1:
+            raise ValueError("matrix size must be positive")
+        
+        if interval and interval[0] == 0:
+            print("Warning: setting the beginning of the interval to zero may generate numerical errors.")
+            print(f"Setting interval to (-0.01, {interval[1]})")
+            interval = (-0.01, interval[1])
+
+        use_tridiag_ratio = (self.ratio <= 1)
+        if not use_tridiag_ratio:
+            print("Warning: Cannot use tridiagonal histogramming if 'p' (degrees of freedom) is "
+                " greater than 'n' (sample size).\n"
+                f"\t Provided n={n_size} and p={p_size}. Tridiagonal histogramming is therefore deactivated.\n"
+                "\t It is adviced to increase sample size (`n`) to optimize and boost histogramming.")
+
+        # computing interval according to the matrix size ratio and support
+        if interval is None:
+            if self.ratio <= 1:
+                interval = (self.lambda_minus, self.lambda_plus)
+            else:
+                interval = (min(-0.05, self.lambda_minus), self.lambda_plus)
+        
+        use_tridiag_sigma = (self.sigma == 1.0)
+        if not use_tridiag_sigma:
+            print(f"Warning: The given scale is not the standard (sigma = {self.sigma}).\n"
+                "\t Tridiagonal histogramming is deactivated.\n"
+                "\t It is adviced to set sigma=1.0 to optimize and boost histogramming.")
+
+        ens = WishartEnsemble(beta=self.beta, p=p_size, n=n_size, sigma=self.sigma,
+                            use_tridiagonal=(use_tridiag_ratio and use_tridiag_sigma))
+
+        # Wigner eigenvalue normalization constant
+        norm_const = 1/n_size 
+
+        observed, bins = ens.eigval_hist(bins=bins, interval=interval,
+                                        density=density, norm_const=norm_const)
+        width = bins[1]-bins[0]
+        plt.bar(bins[:-1], observed, width=width, align='edge')
+
+        # Plotting theoretical graphic
+        if plot_law_pdf and density:
+            centers = np.array(_get_bins_centers_and_contour(bins))
+            pdf = self.pdf(centers)
+            plt.plot(centers, pdf, color='red', linewidth=2)
+
+        plt.title("Marchenko-Pastur Law - Empirical density histogram", fontweight="bold")
+        plt.xlabel("x")
+        plt.ylabel("probability density")
+        if self.ratio > 1:
+            if plot_law_pdf and density:
+                ylim_vals = pdf
+            else:
+                ylim_vals = observed
+            try:
+                plt.ylim(0, np.max(ylim_vals)+0.25*np.max(ylim_vals))
+            except ValueError:
+                second_highest_val = np.partition(ylim_vals.flatten(), -2)[-2]
+                plt.ylim(0, second_highest_val+0.25*second_highest_val)
+
+        # Saving plot or showing it
+        if savefig_path:
+            plt.savefig(savefig_path, dpi=1200)
+        else:
+            plt.show()
+
 
 
 class TracyWidomDistribution:
