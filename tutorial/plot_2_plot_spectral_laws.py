@@ -142,7 +142,7 @@ wsd.plot_empirical_pdf(n_size=2000, bins=80)
 from skrmt.ensemble.spectral_law import MarchenkoPasturDistribution
 
 mpd = MarchenkoPasturDistribution(ratio=1/3, beta=1)
-mpd.plot_empirical_pdf(p_size=2000, n_size=6000, bins=80)
+mpd.plot_empirical_pdf(n_size=6000, bins=80)
 
 ##############################################################################
 # Finally, **Tracy-Widom Law** can be represented using:
@@ -183,7 +183,7 @@ wsd.plot_empirical_pdf(n_size=2000, bins=80, density=True, plot_law_pdf=True)
 from skrmt.ensemble.spectral_law import MarchenkoPasturDistribution
 
 mpd = MarchenkoPasturDistribution(ratio=1/3, beta=1)
-mpd.plot_empirical_pdf(p_size=2000, n_size=6000, bins=80, density=True, plot_law_pdf=True)
+mpd.plot_empirical_pdf(n_size=6000, bins=80, density=True, plot_law_pdf=True)
 
 ##############################################################################
 # In the other hand, the Tracy-Widom Law has a complex analytical expression,
@@ -210,8 +210,6 @@ from skrmt.ensemble.spectral_law import ManovaSpectrumDistribution
 msd = ManovaSpectrumDistribution(a=1/3, b=1/3, beta=1)
 msd.plot_empirical_pdf(
     m_size=1000,
-    n1_size=3000,
-    n2_size=3000,
     bins=80,
     density=True,
     plot_law_pdf=True

@@ -414,7 +414,6 @@ class TestMarchenkoPasturDistribution:
         fig_name = "test_mpl_wre_absfreq.png"
         mpd = MarchenkoPasturDistribution(beta=1, ratio=1/3)
         mpd.plot_empirical_pdf(
-            p_size=40,
             n_size=100,
             bins=100,
             density=False,
@@ -427,7 +426,6 @@ class TestMarchenkoPasturDistribution:
         fig_name = "test_mpl_wce_absfreq.png"
         mpd = MarchenkoPasturDistribution(beta=2, ratio=1/3)
         mpd.plot_empirical_pdf(
-            p_size=40,
             n_size=100,
             bins=100,
             density=False,
@@ -440,7 +438,6 @@ class TestMarchenkoPasturDistribution:
         fig_name = "test_mpl_wqe_absfreq.png"
         mpd = MarchenkoPasturDistribution(beta=4, ratio=1/3)
         mpd.plot_empirical_pdf(
-            p_size=40,
             n_size=100,
             bins=100,
             density=False,
@@ -453,7 +450,6 @@ class TestMarchenkoPasturDistribution:
         fig_name = "test_mpl_wre_norm.png"
         mpd = MarchenkoPasturDistribution(beta=1, ratio=1/3)
         mpd.plot_empirical_pdf(
-            p_size=40,
             n_size=100,
             bins=100,
             density=True,
@@ -466,7 +462,6 @@ class TestMarchenkoPasturDistribution:
         fig_name = "test_mpl_wce_norm.png"
         mpd = MarchenkoPasturDistribution(beta=2, ratio=1/3)
         mpd.plot_empirical_pdf(
-            p_size=40,
             n_size=100,
             bins=100,
             density=True,
@@ -479,7 +474,6 @@ class TestMarchenkoPasturDistribution:
         fig_name = "test_mpl_wqe_norm.png"
         mpd = MarchenkoPasturDistribution(beta=4, ratio=1/3)
         mpd.plot_empirical_pdf(
-            p_size=40,
             n_size=100,
             bins=100,
             density=True,
@@ -492,7 +486,6 @@ class TestMarchenkoPasturDistribution:
         fig_name = "test_mpl_wre_theory.png"
         mpd = MarchenkoPasturDistribution(beta=1, ratio=1/3)
         mpd.plot_empirical_pdf(
-            p_size=40,
             n_size=100,
             bins=100,
             density=True,
@@ -505,7 +498,6 @@ class TestMarchenkoPasturDistribution:
         fig_name = "test_mpl_wce_theory.png"
         mpd = MarchenkoPasturDistribution(beta=2, ratio=1/3)
         mpd.plot_empirical_pdf(
-            p_size=40,
             n_size=100,
             bins=100,
             density=True,
@@ -518,7 +510,6 @@ class TestMarchenkoPasturDistribution:
         fig_name = "test_mpl_wqe_theory.png"
         mpd = MarchenkoPasturDistribution(beta=4, ratio=1/3)
         mpd.plot_empirical_pdf(
-            p_size=40,
             n_size=100,
             bins=100,
             density=True,
@@ -531,7 +522,6 @@ class TestMarchenkoPasturDistribution:
         fig_name = "test_mpl_wre_ratio_ge1.png"
         mpd = MarchenkoPasturDistribution(beta=1, ratio=1/3)
         mpd.plot_empirical_pdf(
-            p_size=200,
             n_size=100,
             bins=100,
             density=False,
@@ -544,7 +534,6 @@ class TestMarchenkoPasturDistribution:
         fig_name = "test_mpl_wre_theory_ratio_ge1.png"
         mpd = MarchenkoPasturDistribution(beta=1, ratio=1/3)
         mpd.plot_empirical_pdf(
-            p_size=200,
             n_size=100,
             bins=100,
             density=True,
@@ -557,7 +546,6 @@ class TestMarchenkoPasturDistribution:
         fig_name = "test_mpl_wre_interval.png"
         mpd = MarchenkoPasturDistribution(beta=1, ratio=1/3)
         mpd.plot_empirical_pdf(
-            p_size=200,
             n_size=100,
             bins=100,
             interval=(0,10),
@@ -915,8 +903,6 @@ class TestManovaSpectrumDistribution:
         msd = ManovaSpectrumDistribution(beta=1, a=3, b=3)
         msd.plot_empirical_pdf(
             m_size=40,
-            n1_size=100,
-            n2_size=100,
             bins=100,
             density=False,
             plot_law_pdf=False,
@@ -929,8 +915,6 @@ class TestManovaSpectrumDistribution:
         msd = ManovaSpectrumDistribution(beta=2, a=3, b=3)
         msd.plot_empirical_pdf(
             m_size=40,
-            n1_size=100,
-            n2_size=100,
             bins=100,
             density=False,
             plot_law_pdf=False,
@@ -943,8 +927,6 @@ class TestManovaSpectrumDistribution:
         msd = ManovaSpectrumDistribution(beta=4, a=3, b=3)
         msd.plot_empirical_pdf(
             m_size=40,
-            n1_size=100,
-            n2_size=100,
             bins=100,
             density=False,
             plot_law_pdf=False,
@@ -957,8 +939,6 @@ class TestManovaSpectrumDistribution:
         msd = ManovaSpectrumDistribution(beta=1, a=3, b=3)
         msd.plot_empirical_pdf(
             m_size=40,
-            n1_size=100,
-            n2_size=100,
             bins=100,
             density=True,
             plot_law_pdf=False,
@@ -971,8 +951,6 @@ class TestManovaSpectrumDistribution:
         msd = ManovaSpectrumDistribution(beta=2, a=3, b=3)
         msd.plot_empirical_pdf(
             m_size=40,
-            n1_size=100,
-            n2_size=100,
             bins=100,
             density=True,
             plot_law_pdf=False,
@@ -985,8 +963,6 @@ class TestManovaSpectrumDistribution:
         msd = ManovaSpectrumDistribution(beta=4, a=3, b=3)
         msd.plot_empirical_pdf(
             m_size=40,
-            n1_size=100,
-            n2_size=100,
             bins=100,
             density=True,
             plot_law_pdf=False,
@@ -999,8 +975,6 @@ class TestManovaSpectrumDistribution:
         msd = ManovaSpectrumDistribution(beta=1, a=3, b=3)
         msd.plot_empirical_pdf(
             m_size=40,
-            n1_size=100,
-            n2_size=100,
             bins=100,
             density=True,
             plot_law_pdf=True,
@@ -1013,8 +987,6 @@ class TestManovaSpectrumDistribution:
         msd = ManovaSpectrumDistribution(beta=2, a=3, b=3)
         msd.plot_empirical_pdf(
             m_size=40,
-            n1_size=100,
-            n2_size=100,
             bins=100,
             density=True,
             plot_law_pdf=True,
@@ -1027,8 +999,6 @@ class TestManovaSpectrumDistribution:
         msd = ManovaSpectrumDistribution(beta=4, a=3, b=3)
         msd.plot_empirical_pdf(
             m_size=40,
-            n1_size=100,
-            n2_size=100,
             bins=100,
             density=True,
             plot_law_pdf=True,
@@ -1041,8 +1011,6 @@ class TestManovaSpectrumDistribution:
         msd = ManovaSpectrumDistribution(beta=1, a=3, b=3)
         msd.plot_empirical_pdf(
             m_size=200,
-            n1_size=100,
-            n2_size=100,
             bins=100,
             density=False,
             plot_law_pdf=False,
@@ -1055,8 +1023,6 @@ class TestManovaSpectrumDistribution:
         msd = ManovaSpectrumDistribution(beta=1, a=3, b=3)
         msd.plot_empirical_pdf(
             m_size=1000,
-            n1_size=800,
-            n2_size=800,
             bins=100,
             density=True,
             plot_law_pdf=True,
@@ -1069,8 +1035,6 @@ class TestManovaSpectrumDistribution:
         msd = ManovaSpectrumDistribution(beta=1, a=3, b=3)
         msd.plot_empirical_pdf(
             m_size=200,
-            n1_size=100,
-            n2_size=100,
             bins=100,
             interval=(0,10),
             density=False,
@@ -1082,12 +1046,12 @@ class TestManovaSpectrumDistribution:
     def test_msd_plot_size_exception(self):
         with pytest.raises(ValueError):
             msd = ManovaSpectrumDistribution(beta=1, a=3, b=3)
-            msd.plot_empirical_pdf(m_size=0, n1_size=0)
+            msd.plot_empirical_pdf(m_size=0)
     
     def test_msd_plot_ensemble_exception(self):
         with pytest.raises(ValueError):
             msd = ManovaSpectrumDistribution(beta=0, a=3, b=3)
-            msd.plot_empirical_pdf(m_size=10, n1_size=10)
+            msd.plot_empirical_pdf(m_size=10)
 
 
 

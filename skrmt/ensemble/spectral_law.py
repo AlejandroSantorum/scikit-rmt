@@ -293,7 +293,7 @@ class WignerSemicircleDistribution:
         so the histogram is built using certain techniques to boost efficiency.
 
         Args:
-            n_size (int, default=1000): random matrix size n times n.
+            n_size (int, default=1000): random matrix size n times n. This is the sample size.
             bins (int or sequence, default=100): If bins is an integer, it defines the number
                 of equal-width bins in the range. If bins is a sequence, it defines the
                 bin edges, including the left edge of the first bin and the right
@@ -554,8 +554,8 @@ class MarchenkoPasturDistribution:
             plot_ylabel="cumulative distribution", savefig_path=savefig_path
         )
 
-    def plot_empirical_pdf(self, p_size=1000, n_size=3000, bins=100, interval=None,
-                           density=False, plot_law_pdf=False, savefig_path=None):
+    def plot_empirical_pdf(self, n_size=3000, bins=100, interval=None, density=False,
+                           plot_law_pdf=False, savefig_path=None):
         """Computes and plots Marchenko-Pastur empirical law using Wishart Ensemble random matrices.
 
         Calculates and plots Marchenko-Pastur empirical law using Wishart Ensemble random matrices.
@@ -565,10 +565,9 @@ class MarchenkoPasturDistribution:
         is less or equal than 1.
 
         Args:
-            p_size (int, default=1000): number of rows of the guassian matrix that generates
-                the matrix of the corresponding ensemble.
             n_size (int, default=3000): number of columns of the guassian matrix that generates
-                the matrix of the corresponding ensemble.
+                the matrix of the corresponding ensemble. This is the sample size. The number of
+                degrees of freedom is computed depending on this argument and on the given ratio.
             bins (int or sequence, default=100): If bins is an integer, it defines the number
                 of equal-width bins in the range. If bins is a sequence, it defines the
                 bin edges, including the left edge of the first bin and the right
@@ -596,7 +595,7 @@ class MarchenkoPasturDistribution:
 
         """
         # pylint: disable=too-many-arguments
-        if n_size<1 or p_size<1:
+        if n_size<1:
             raise ValueError("matrix size must be positive")
         
         if interval and interval[0] == 0:
@@ -605,10 +604,12 @@ class MarchenkoPasturDistribution:
             interval = (-0.01, interval[1])
 
         # calculating constants depending on matrix sizes
-        ratio = p_size/n_size
-        lambda_plus = self.beta * self.sigma**2 * (1 + np.sqrt(ratio))**2
-        lambda_minus = self.beta * self.sigma**2 * (1 - np.sqrt(ratio))**2
-        use_tridiag_ratio = (ratio <= 1)
+        p_size = round(self.ratio * n_size)
+        # computing an approximated ratio since p_size is rounded to the closest integer        
+        approx_ratio = p_size/n_size
+        lambda_plus = self.beta * self.sigma**2 * (1 + np.sqrt(approx_ratio))**2
+        lambda_minus = self.beta * self.sigma**2 * (1 - np.sqrt(approx_ratio))**2
+        use_tridiag_ratio = (approx_ratio <= 1)
         if not use_tridiag_ratio:
             print("Warning: Cannot use tridiagonal histogramming if 'p' (degrees of freedom) is "
                 " greater than 'n' (sample size).\n"
@@ -617,7 +618,7 @@ class MarchenkoPasturDistribution:
 
         # computing interval according to the matrix size ratio and support
         if interval is None:
-            if ratio <= 1:
+            if approx_ratio <= 1:
                 interval = (lambda_minus, lambda_plus)
             else:
                 interval = (min(-0.05, lambda_minus), lambda_plus)
@@ -642,15 +643,15 @@ class MarchenkoPasturDistribution:
         # Plotting theoretical graphic
         if plot_law_pdf and density:
             centers = np.array(_get_bins_centers_and_contour(bins))
-            # creating new instance with the updated ratio depending on the given matrix sizes
-            mpd = MarchenkoPasturDistribution(beta=self.beta, ratio=ratio, sigma=self.sigma)
+            # creating new instance with the approximated ratio depending on the given matrix sizes
+            mpd = MarchenkoPasturDistribution(beta=self.beta, ratio=approx_ratio, sigma=self.sigma)
             pdf = mpd.pdf(centers)
             plt.plot(centers, pdf, color='red', linewidth=2)
 
         plt.title("Marchenko-Pastur Law - Empirical density histogram", fontweight="bold")
         plt.xlabel("x")
         plt.ylabel("probability density")
-        if ratio > 1:
+        if approx_ratio > 1:
             if plot_law_pdf and density:
                 ylim_vals = pdf
             else:
@@ -832,7 +833,7 @@ class TracyWidomDistribution:
         largest eigenvalue is calcualted in order to simulate its density.
 
         Args:
-            n_size (int, default=100): random matrix size n times n.
+            n_size (int, default=100): random matrix size n times n. This is the sample size.
             times (int, default=1000): number of times to sample a random matrix.
             bins (int or sequence, default=100): If bins is an integer, it defines the number
                 of equal-width bins in the range. If bins is a sequence, it defines the
@@ -1089,19 +1090,17 @@ class ManovaSpectrumDistribution:
             plot_ylabel="cumulative distribution", savefig_path=savefig_path
         )
 
-    def plot_empirical_pdf(self, m_size=1000, n1_size=3000, n2_size=3000, bins=100, interval=None,
-                           density=False, plot_law_pdf=False, savefig_path=None):
+    def plot_empirical_pdf(self, m_size=1000, bins=100, interval=None, density=False,
+                           plot_law_pdf=False, savefig_path=None):
         """Computes and plots Manova spectrum empirical pdf and analytical distribution.
 
         Calculates and plots Manova spectrum empirical pdf using Manova Ensemble random matrices.
 
         Args:
             m_size (int, default=1000): number of rows of the two Wishart Ensemble matrices that
-                generates the matrix of the corresponding ensemble.
-            n1_size (int, default=3000): number of columns of the first Wishart Ensemble matrix
-                that generates the matrix of the corresponding ensemble.
-            n2_size (int, default=3000): number of columns of the second Wishart Ensemble matrix
-                that generates the matrix of the corresponding ensemble.    
+                generates the matrix of the corresponding ensemble. This is the number of degrees
+                of freedom. The sample size of the two matrices is computed from this value and the
+                ratios `a` and `b` given to instanciate this class.
             bins (int or sequence, default=100): If bins is an integer, it defines the number
                 of equal-width bins in the range. If bins is a sequence, it defines the
                 bin edges, including the left edge of the first bin and the right
@@ -1131,26 +1130,31 @@ class ManovaSpectrumDistribution:
                 Journal of Mathematical Physics. 43.11 (2002): 5830-5847.
 
         """
-        if m_size<1 or n1_size<1 or n2_size<1:
+        if m_size<1:
             raise ValueError("matrix size must be positive")
+        
+        n1_size = round(self.a * m_size)
+        n2_size = round(self.b * m_size)
         
         ens = ManovaEnsemble(beta=self.beta, m=m_size, n1=n1_size, n2=n2_size)
 
-        a = n1_size/m_size
-        b = n2_size/m_size
-        if a <= 1 or b <= 1:
+        # computing approximated ratios since the n1_size and n2_size parameters
+        # could have been rounded previously
+        approx_a = n1_size/m_size
+        approx_b = n2_size/m_size
+        if approx_a <= 1 or approx_b <= 1:
             print("Warning: sample size ('n1_size' or 'n2_size') too small compared \
                 to degrees of freedom ('m_size'). It may cause numerical instability.")
-        lambda_term1 = np.sqrt((a/(a+b)) * (1 - (1/(a+b))))
-        lambda_term2 = np.sqrt((1/(a+b)) * (1 - (a/(a+b))))
+        lambda_term1 = np.sqrt((approx_a/(approx_a+approx_b)) * (1 - (1/(approx_a+approx_b))))
+        lambda_term2 = np.sqrt((1/(approx_a+approx_b)) * (1 - (approx_a/(approx_a+approx_b))))
         lambda_minus = (lambda_term1 - lambda_term2)**2
         lambda_plus = (lambda_term1 + lambda_term2)**2
 
         if interval is None:
             interval = [lambda_minus, lambda_plus]
-            if a <= 1:
+            if approx_a <= 1:
                 interval[0] = min(-0.05, lambda_minus)
-            if b <= 1:
+            if approx_b <= 1:
                 interval[1] = max(lambda_plus, 1.05)
             interval = tuple(interval)
 
@@ -1162,15 +1166,15 @@ class ManovaSpectrumDistribution:
         # Plotting theoretical graphic
         if plot_law_pdf and density:
             centers = np.array(_get_bins_centers_and_contour(bins))
-            # creating new instance with the updated ratios depending on the given matrix sizes
-            msd = ManovaSpectrumDistribution(beta=self.beta, a=a, b=b)
+            # creating new instance with the approximated ratios depending on the given matrix sizes
+            msd = ManovaSpectrumDistribution(beta=self.beta, a=approx_a, b=approx_b)
             pdf = msd.pdf(centers)
             plt.plot(centers, pdf, color='red', linewidth=2)
 
         plt.title("Manova Spectrum - Empirical density histogram", fontweight="bold")
         plt.xlabel("x")
         plt.ylabel("probability density")
-        if a <= 1 or b <= 1:
+        if approx_a <= 1 or approx_b <= 1:
             if plot_law_pdf and density:
                 ylim_vals = pdf
             else:
