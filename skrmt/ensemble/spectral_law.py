@@ -115,6 +115,27 @@ def _plot_func(interval, func, bins=1000, plot_title=None, plot_ylabel=None, sav
         plt.show()
 
 
+def _get_bins_centers_and_contour(bins):
+    """Calculates the centers and contour of the given bins.
+
+    Computes the centers of the given bins. Also, the smallest and the largest bin
+    delimitiers are included to define the countour of the representation interval.
+
+    Args:
+        bins (list): list of numbers (floats) that specify each bin delimiter.
+
+    Returns:
+        list of numbers (floats) consisting in the list of bin centers and contour.
+    
+    """
+    centers = [bins[0]] # Adding initial contour
+    l = len(bins)
+    for i in range(l-1):
+        centers.append((bins[i]+bins[i+1])/2) # Adding centers
+    centers.append(bins[-1]) # Adding final contour
+    return centers
+
+
 class WignerSemicircleDistribution:
     """Wigner Semicircle Distribution class.
 
@@ -166,7 +187,7 @@ class WignerSemicircleDistribution:
         self.beta = beta
         self.center = center
         self.sigma = sigma
-        self.radius = 2.0 * np.sqrt(self.beta) * sigma
+        self.radius = 2.0 * np.sqrt(self.beta) * self.sigma
         self._gaussian_ens = None
     
     def rvs(self, size):
@@ -260,6 +281,93 @@ class WignerSemicircleDistribution:
             interval, func=self.cdf, bins=bins, 
             plot_ylabel="cumulative distribution", savefig_path=savefig_path
         )
+    
+
+    def plot_empirical_pdf(self, n_size=1000, bins=100, interval=None, density=False,
+                           plot_law_pdf=False, savefig_path=None):
+        """Computes and plots Wigner's semicircle empirical law using Gaussian Ensemble.
+
+        Calculates and plots Wigner's semicircle empirical law using Gaussian Ensemble
+        random matrices. Gaussian (Hermite) ensemble has improved routines (using
+        tridiagonal forms and Sturm sequences) to avoid calculating the eigenvalues,
+        so the histogram is built using certain techniques to boost efficiency.
+
+        Args:
+            n_size (int, default=1000): random matrix size n times n.
+            bins (int or sequence, default=100): If bins is an integer, it defines the number
+                of equal-width bins in the range. If bins is a sequence, it defines the
+                bin edges, including the left edge of the first bin and the right
+                edge of the last bin; in this case, bins may be unequally spaced.
+            interval (tuple, default=None): Delimiters (xmin, xmax) of the histogram.
+                The lower and upper range of the bins. Lower and upper outliers are ignored.
+            density (bool, default=False): If True, draw and return a probability
+                density: each bin will display the bin's raw count divided by the total
+                number of counts and the bin width, so that the area under the histogram
+                integrates to 1. If set to False, the absolute frequencies of the eigenvalues
+                are returned.
+            plot_law_pdf (bool, default=False): If True, the theoretical law is plotted.
+                If set to False, just the empirical histogram is shown. This parameter is only
+                considered when the argument 'density' is set also to True.
+            savefig_path (string, default=None): path to save the created figure. If it is not
+                provided, the plot is shown are the end of the routine.
+
+        References:
+            - Albrecht, J. and Chan, C.P. and Edelman, A.
+                "Sturm sequences and random eigenvalue distributions".
+                Foundations of Computational Mathematics. 9.4 (2008): 461-483.
+            - Dumitriu, I. and Edelman, A.
+                "Matrix Models for Beta Ensembles".
+                Journal of Mathematical Physics. 43.11 (2002): 5830-5847.
+
+        """
+        # pylint: disable=too-many-arguments
+        if n_size<1:
+            raise ValueError("matrix size must be positive")
+
+        if self.center != 0.0:
+            print(f"Warning: The given center is not 0.0 (center = {self.center}).\n"
+                  "\t It is only available the centered empirical Wigner's semicircle law.")
+        
+        use_tridiag = (self.sigma == 1.0)
+        if not use_tridiag:
+            print(f"Warning: The given scale is not the standard (sigma = {self.sigma}).\n"
+                "\t Tridiagonal histogramming is deactivated.\n"
+                "\t It is adviced to set sigma=1.0 to optimize and boost histogramming.")
+
+        ens = GaussianEnsemble(beta=self.beta, n=n_size, sigma=self.sigma, use_tridiagonal=use_tridiag)
+
+        # default plotting interval in case it's not provided
+        if interval is None:
+            interval = (-self.radius, self.radius)
+
+        # Wigner eigenvalue normalization constant
+        if use_tridiag:
+            norm_const = 1/np.sqrt(n_size) if self.beta==4 else 1/np.sqrt(n_size/2)
+        else:
+            norm_const = 1/np.sqrt(n_size)
+
+        observed, bins = ens.eigval_hist(bins=bins, interval=interval,
+                                        density=density, norm_const=norm_const)
+        width = bins[1]-bins[0]
+        plt.bar(bins[:-1], observed, width=width, align='edge')
+
+        # Plotting Wigner Semicircle Law pdf
+        if plot_law_pdf and density:
+            centers = np.asarray(_get_bins_centers_and_contour(bins))
+            pdf = self.pdf(centers)
+            plt.plot(centers, pdf, color='red', linewidth=2)
+        elif plot_law_pdf and not density:
+            print("Warning: Wigner's Semicircle Law PDF is only plotted when density is True.")
+
+        plt.title("Wigner Semicircle Law - Empirical density histogram", fontweight="bold")
+        plt.xlabel("x")
+        plt.ylabel("probability density")
+
+        # Saving plot or showing it
+        if savefig_path:
+            plt.savefig(savefig_path, dpi=1200)
+        else:
+            plt.show()
 
 
 
