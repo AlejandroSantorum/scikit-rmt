@@ -131,23 +131,26 @@ wre.plot_eigval_hist(bins=80, interval=(0.2, 2.2))
 ##############################################################################
 # We can easily analyze **Wigner's Semicircle Law** as follows.
 
-from skrmt.ensemble import wigner_semicircle
+from skrmt.ensemble.spectral_law import WignerSemicircleDistribution
 
-wigner_semicircle(ensemble='goe', n_size=2000, bins=80)
+wsd = WignerSemicircleDistribution(beta=1)
+wsd.plot_empirical_pdf(n_size=2000, bins=80)
 
 ##############################################################################
 # We can also study **Marchenko-Pastur Law** as by:
 
-from skrmt.ensemble import marchenko_pastur
+from skrmt.ensemble.spectral_law import MarchenkoPasturDistribution
 
-marchenko_pastur(ensemble='wre', p_size=2000, n_size=6000, bins=80)
+mpd = MarchenkoPasturDistribution(ratio=1/3, beta=1)
+mpd.plot_empirical_pdf(p_size=2000, n_size=6000, bins=80)
 
 ##############################################################################
 # Finally, **Tracy-Widom Law** can be represented using:
 
-from skrmt.ensemble import tracy_widom
+from skrmt.ensemble.spectral_law import TracyWidomDistribution
 
-tracy_widom(ensemble='goe', n_size=100, times=10000, bins=80)
+twd = TracyWidomDistribution(beta=1)
+twd.plot_empirical_pdf(n_size=100, times=10000, bins=80)
 
 ##############################################################################
 # Spectral laws analytical expression
@@ -164,9 +167,10 @@ tracy_widom(ensemble='goe', n_size=100, times=10000, bins=80)
 # Wigner Semicircle Law, supported on :math:`[-R, R]` and centered at :math:`(0,0)`
 # is :math:`f(x) = \frac{2}{\pi R^2} \sqrt{R^2 - x^2}`.
 
-from skrmt.ensemble import wigner_semicircle
+from skrmt.ensemble.spectral_law import WignerSemicircleDistribution
 
-wigner_semicircle(ensemble='goe', n_size=2000, bins=80, density=True, plot_law_pdf=True)
+wsd = WignerSemicircleDistribution(beta=1)
+wsd.plot_empirical_pdf(n_size=2000, bins=80, density=True, plot_law_pdf=True)
 
 ##############################################################################
 # The analytical probability function for the Wishart Ensemble known as
@@ -176,9 +180,10 @@ wigner_semicircle(ensemble='goe', n_size=2000, bins=80, density=True, plot_law_p
 # If :math:`\lambda > 1` then the limiting distribution has an additional
 # mass probability point in the origin of size :math:`1 - \frac{1}{\lambda}`.
 
-from skrmt.ensemble import marchenko_pastur
+from skrmt.ensemble.spectral_law import MarchenkoPasturDistribution
 
-marchenko_pastur(ensemble='wre', p_size=2000, n_size=6000, bins=80, density=True, plot_law_pdf=True)
+mpd = MarchenkoPasturDistribution(ratio=1/3, beta=1)
+mpd.plot_empirical_pdf(p_size=2000, n_size=6000, bins=80, density=True, plot_law_pdf=True)
 
 ##############################################################################
 # In the other hand, the Tracy-Widom Law has a complex analytical expression,
@@ -189,9 +194,10 @@ marchenko_pastur(ensemble='wre', p_size=2000, n_size=6000, bins=80, density=True
 # The package scikit-rmt represents a precise
 # approximation of the theoretical Tracy-Widom pdf.
 
-from skrmt.ensemble import tracy_widom
+from skrmt.ensemble.spectral_law import TracyWidomDistribution
 
-tracy_widom(ensemble='goe', n_size=10, times=5000, bins=80, density=True, plot_law_pdf=True)
+twd = TracyWidomDistribution(beta=1)
+twd.plot_empirical_pdf(n_size=10, times=5000, bins=80, density=True, plot_law_pdf=True)
 
 ##############################################################################
 # Finally, the limiting distribution of the Manova Ensemble is not described
@@ -199,7 +205,14 @@ tracy_widom(ensemble='goe', n_size=10, times=5000, bins=80, density=True, plot_l
 # provides functionality to show it on top of the empirical histogram of the
 # eigenvalue spectrum.
 
-from skrmt.ensemble import manova_spectrum
+from skrmt.ensemble.spectral_law import ManovaSpectrumDistribution
 
-manova_spectrum(ensemble='mre', m_size=1000, n1_size=3000, n2_size=3000,
-                bins=80, density=True, plot_law_pdf=True)
+msd = ManovaSpectrumDistribution(a=1/3, b=1/3, beta=1)
+msd.plot_empirical_pdf(
+    m_size=1000,
+    n1_size=3000,
+    n2_size=3000,
+    bins=80,
+    density=True,
+    plot_law_pdf=True
+)
