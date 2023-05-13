@@ -164,7 +164,125 @@ class TestWignerSemicircleDistribution:
             wsd = WignerSemicircleDistribution(beta=1)
             wsd.plot_pdf(interval=1)
 
+    def test_wsd_plot_goe_abs_freq(self):
+        fig_name = "test_wsl_goe_absfreq.png"
+        wsd = WignerSemicircleDistribution(beta=1)
+        wsd.plot_empirical_pdf(
+            n_size=100,
+            bins=100,
+            density=False,
+            plot_law_pdf=False,
+            savefig_path=TMP_DIR_PATH+"/"+fig_name
+        )
+        assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name)) == True
     
+    def test_wsd_plot_gue_abs_freq(self):
+        fig_name = "test_wsl_gue_absfreq.png"
+        wsd = WignerSemicircleDistribution(beta=2)
+        wsd.plot_empirical_pdf(
+            n_size=100,
+            bins=100,
+            density=False,
+            plot_law_pdf=False,
+            savefig_path=TMP_DIR_PATH+"/"+fig_name
+        )
+        assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name)) == True
+    
+    def test_wsd_plot_gse_abs_freq(self):
+        fig_name = "test_wsl_gse_absfreq.png"
+        wsd = WignerSemicircleDistribution(beta=4)
+        wsd.plot_empirical_pdf(
+            n_size=50,
+            bins=100,
+            density=False,
+            plot_law_pdf=False,
+            savefig_path=TMP_DIR_PATH+"/"+fig_name
+        )
+        assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name)) == True
+    
+    def test_wsd_plot_goe_normalized(self):
+        fig_name = "test_wsl_goe_norm.png"
+        wsd = WignerSemicircleDistribution(beta=1)
+        wsd.plot_empirical_pdf(
+            n_size=100,
+            bins=100,
+            density=True,
+            plot_law_pdf=False,
+            savefig_path=TMP_DIR_PATH+"/"+fig_name
+        )
+        assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name)) == True
+    
+    def test_wsd_plot_gue_normalized(self):
+        fig_name = "test_wsl_gue_norm.png"
+        wsd = WignerSemicircleDistribution(beta=2)
+        wsd.plot_empirical_pdf(
+            n_size=100,
+            bins=100,
+            density=True,
+            plot_law_pdf=False,
+            savefig_path=TMP_DIR_PATH+"/"+fig_name
+        )
+        assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name)) == True
+    
+    def test_wsd_plot_gse_normalized(self):
+        fig_name = "test_wsl_gse_norm.png"
+        wsd = WignerSemicircleDistribution(beta=4)
+        wsd.plot_empirical_pdf(
+            n_size=50,
+            bins=100,
+            density=True,
+            plot_law_pdf=False,
+            savefig_path=TMP_DIR_PATH+"/"+fig_name
+        )
+        assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name)) == True
+    
+    def test_wsd_plot_goe_theoretical(self):
+        fig_name = "test_wsl_goe_theory.png"
+        wsd = WignerSemicircleDistribution(beta=1)
+        wsd.plot_empirical_pdf(
+            n_size=100,
+            bins=100,
+            density=True,
+            plot_law_pdf=True,
+            savefig_path=TMP_DIR_PATH+"/"+fig_name
+        )
+        assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name)) == True
+    
+    def test_wsd_plot_gue_theoretical(self):
+        fig_name = "test_wsl_gue_theory.png"
+        wsd = WignerSemicircleDistribution(beta=2)
+        wsd.plot_empirical_pdf(
+            n_size=100,
+            bins=100,
+            density=True,
+            plot_law_pdf=True,
+            savefig_path=TMP_DIR_PATH+"/"+fig_name
+        )
+        assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name)) == True
+    
+    def test_wsd_plot_gse_theoretical(self):
+        fig_name = "test_wsl_gse_theory.png"
+        wsd = WignerSemicircleDistribution(beta=4)
+        wsd.plot_empirical_pdf(
+            n_size=50,
+            bins=100,
+            density=True,
+            plot_law_pdf=True,
+            savefig_path=TMP_DIR_PATH+"/"+fig_name
+        )
+        assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name)) == True
+    
+    def test_wsd_plot_size_exception(self):
+        with pytest.raises(ValueError):
+            wsd = WignerSemicircleDistribution(beta=1)
+            wsd.plot_empirical_pdf(n_size=0)
+    
+    def test_wsd_plot_ensemble_exception(self):
+        with pytest.raises(ValueError):
+            wsd = WignerSemicircleDistribution(beta=0)
+            wsd.plot_empirical_pdf()
+    
+
 
 class TestMarchenkoPasturDistribution:
 
@@ -292,6 +410,173 @@ class TestMarchenkoPasturDistribution:
         mpd.plot_cdf(interval=(-1,10), savefig_path=TMP_DIR_PATH+"/"+fig_name)
         assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name)) == True
 
+    def test_mpd_plot_wre_abs_freq(self):
+        fig_name = "test_mpl_wre_absfreq.png"
+        mpd = MarchenkoPasturDistribution(beta=1, ratio=1/3)
+        mpd.plot_empirical_pdf(
+            p_size=40,
+            n_size=100,
+            bins=100,
+            density=False,
+            plot_law_pdf=False,
+            savefig_path=TMP_DIR_PATH+"/"+fig_name
+        )
+        assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name)) == True
+
+    def test_mpd_plot_wce_abs_freq(self):
+        fig_name = "test_mpl_wce_absfreq.png"
+        mpd = MarchenkoPasturDistribution(beta=2, ratio=1/3)
+        mpd.plot_empirical_pdf(
+            p_size=40,
+            n_size=100,
+            bins=100,
+            density=False,
+            plot_law_pdf=False,
+            savefig_path=TMP_DIR_PATH+"/"+fig_name
+        )
+        assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name)) == True
+    
+    def test_mpd_plot_wqe_abs_freq(self):
+        fig_name = "test_mpl_wqe_absfreq.png"
+        mpd = MarchenkoPasturDistribution(beta=4, ratio=1/3)
+        mpd.plot_empirical_pdf(
+            p_size=40,
+            n_size=100,
+            bins=100,
+            density=False,
+            plot_law_pdf=False,
+            savefig_path=TMP_DIR_PATH+"/"+fig_name
+        )
+        assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name)) == True
+    
+    def test_mpd_plot_wre_normalized(self):
+        fig_name = "test_mpl_wre_norm.png"
+        mpd = MarchenkoPasturDistribution(beta=1, ratio=1/3)
+        mpd.plot_empirical_pdf(
+            p_size=40,
+            n_size=100,
+            bins=100,
+            density=True,
+            plot_law_pdf=False,
+            savefig_path=TMP_DIR_PATH+"/"+fig_name
+        )
+        assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name)) == True
+
+    def test_mpd_plot_wce_normalized(self):
+        fig_name = "test_mpl_wce_norm.png"
+        mpd = MarchenkoPasturDistribution(beta=2, ratio=1/3)
+        mpd.plot_empirical_pdf(
+            p_size=40,
+            n_size=100,
+            bins=100,
+            density=True,
+            plot_law_pdf=False,
+            savefig_path=TMP_DIR_PATH+"/"+fig_name
+        )
+        assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name)) == True
+    
+    def test_mpd_plot_wqe_normalized(self):
+        fig_name = "test_mpl_wqe_norm.png"
+        mpd = MarchenkoPasturDistribution(beta=4, ratio=1/3)
+        mpd.plot_empirical_pdf(
+            p_size=40,
+            n_size=100,
+            bins=100,
+            density=True,
+            plot_law_pdf=False,
+            savefig_path=TMP_DIR_PATH+"/"+fig_name
+        )
+        assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name)) == True
+    
+    def test_mpd_plot_wre_theoretical(self):
+        fig_name = "test_mpl_wre_theory.png"
+        mpd = MarchenkoPasturDistribution(beta=1, ratio=1/3)
+        mpd.plot_empirical_pdf(
+            p_size=40,
+            n_size=100,
+            bins=100,
+            density=True,
+            plot_law_pdf=True,
+            savefig_path=TMP_DIR_PATH+"/"+fig_name
+        )
+        assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name)) == True
+
+    def test_mpd_plot_wce_theoretical(self):
+        fig_name = "test_mpl_wce_theory.png"
+        mpd = MarchenkoPasturDistribution(beta=2, ratio=1/3)
+        mpd.plot_empirical_pdf(
+            p_size=40,
+            n_size=100,
+            bins=100,
+            density=True,
+            plot_law_pdf=True,
+            savefig_path=TMP_DIR_PATH+"/"+fig_name
+        )
+        assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name)) == True
+    
+    def test_mpd_plot_wqe_theoretical(self):
+        fig_name = "test_mpl_wqe_theory.png"
+        mpd = MarchenkoPasturDistribution(beta=4, ratio=1/3)
+        mpd.plot_empirical_pdf(
+            p_size=40,
+            n_size=100,
+            bins=100,
+            density=True,
+            plot_law_pdf=True,
+            savefig_path=TMP_DIR_PATH+"/"+fig_name
+        )
+        assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name)) == True
+    
+    def test_mpd_plot_wre_ratio_ge1(self):
+        fig_name = "test_mpl_wre_ratio_ge1.png"
+        mpd = MarchenkoPasturDistribution(beta=1, ratio=1/3)
+        mpd.plot_empirical_pdf(
+            p_size=200,
+            n_size=100,
+            bins=100,
+            density=False,
+            plot_law_pdf=False,
+            savefig_path=TMP_DIR_PATH+"/"+fig_name
+        )
+        assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name)) == True
+    
+    def test_mpd_plot_wre_theoretical_ratio_ge1(self):
+        fig_name = "test_mpl_wre_theory_ratio_ge1.png"
+        mpd = MarchenkoPasturDistribution(beta=1, ratio=1/3)
+        mpd.plot_empirical_pdf(
+            p_size=200,
+            n_size=100,
+            bins=100,
+            density=True,
+            plot_law_pdf=True,
+            savefig_path=TMP_DIR_PATH+"/"+fig_name
+        )
+        assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name)) == True
+    
+    def test_mpd_plot_wre_interval(self):
+        fig_name = "test_mpl_wre_interval.png"
+        mpd = MarchenkoPasturDistribution(beta=1, ratio=1/3)
+        mpd.plot_empirical_pdf(
+            p_size=200,
+            n_size=100,
+            bins=100,
+            interval=(0,10),
+            density=False,
+            plot_law_pdf=False,
+            savefig_path=TMP_DIR_PATH+"/"+fig_name
+        )
+        assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name)) == True
+    
+    def test_mpd_plot_mpl_size_exception(self):
+        with pytest.raises(ValueError):
+            mpd = MarchenkoPasturDistribution(beta=1, ratio=1/3)
+            mpd.plot_empirical_pdf(n_size=0)
+    
+    def test_mpd_plot_mpl_ensemble_exception(self):
+        with pytest.raises(ValueError):
+            mpd = MarchenkoPasturDistribution(beta=0, ratio=1/3)
+            mpd.plot_empirical_pdf()
+
 
 
 class TestTracyWidomDistribution:
@@ -386,6 +671,133 @@ class TestTracyWidomDistribution:
         twd = TracyWidomDistribution()
         twd.plot_cdf(interval=(-5,5), savefig_path=TMP_DIR_PATH+"/"+fig_name)
         assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name)) == True
+    
+    def test_twd_plot_goe_abs_freq(self):
+        fig_name = "test_twl_goe_abs_freq.png"
+        twd = TracyWidomDistribution(beta=1)
+        twd.plot_empirical_pdf(
+            n_size=50,
+            times=100,
+            bins=100,
+            density=False,
+            plot_law_pdf=False,
+            savefig_path=TMP_DIR_PATH+"/"+fig_name
+        )
+        assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name)) == True
+    
+    def test_twd_plot_gue_abs_freq(self):
+        fig_name = "test_twl_gue_abs_freq.png"
+        twd = TracyWidomDistribution(beta=2)
+        twd.plot_empirical_pdf(
+            n_size=50,
+            times=100,
+            bins=100,
+            density=False,
+            plot_law_pdf=False,
+            savefig_path=TMP_DIR_PATH+"/"+fig_name
+        )
+        assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name)) == True
+    
+    def test_twd_plot_gse_abs_freq(self):
+        fig_name = "test_twl_gse_abs_freq.png"
+        twd = TracyWidomDistribution(beta=4)
+        twd.plot_empirical_pdf(
+            n_size=25,
+            times=100,
+            bins=100,
+            density=False,
+            plot_law_pdf=False,
+            savefig_path=TMP_DIR_PATH+"/"+fig_name
+        )
+        assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name)) == True
+    
+    def test_twd_plot_goe_normalized(self):
+        fig_name = "test_twl_goe_normalized.png"
+        twd = TracyWidomDistribution(beta=1)
+        twd.plot_empirical_pdf(
+            n_size=50,
+            times=100,
+            bins=100,
+            density=True,
+            plot_law_pdf=False,
+            savefig_path=TMP_DIR_PATH+"/"+fig_name
+        )
+        assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name)) == True
+    
+    def test_twd_plot_gue_normalized(self):
+        fig_name = "test_twl_gue_normalized.png"
+        twd = TracyWidomDistribution(beta=2)
+        twd.plot_empirical_pdf(
+            n_size=50,
+            times=100,
+            bins=100,
+            density=True,
+            plot_law_pdf=False,
+            savefig_path=TMP_DIR_PATH+"/"+fig_name
+        )
+        assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name)) == True
+    
+    def test_twd_plot_gse_normalized(self):
+        fig_name = "test_twl_gse_normalized.png"
+        twd = TracyWidomDistribution(beta=4)
+        twd.plot_empirical_pdf(
+            n_size=25,
+            times=100,
+            bins=100,
+            density=True,
+            plot_law_pdf=False,
+            savefig_path=TMP_DIR_PATH+"/"+fig_name
+        )
+        assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name)) == True
+    
+    def test_twd_plot_goe_theoretical(self):
+        fig_name = "test_twl_goe_theory.png"
+        twd = TracyWidomDistribution(beta=1)
+        twd.plot_empirical_pdf(
+            n_size=50,
+            times=100,
+            bins=100,
+            density=True,
+            plot_law_pdf=True,
+            savefig_path=TMP_DIR_PATH+"/"+fig_name
+        )
+        assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name)) == True
+    
+    def test_twd_plot_gue_theoretical(self):
+        fig_name = "test_twl_gue_theory.png"
+        twd = TracyWidomDistribution(beta=2)
+        twd.plot_empirical_pdf(
+            n_size=50,
+            times=100,
+            bins=100,
+            density=True,
+            plot_law_pdf=True,
+            savefig_path=TMP_DIR_PATH+"/"+fig_name
+        )
+        assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name)) == True
+    
+    def test_twd_plot_gse_theoretical(self):
+        fig_name = "test_twl_gse_theory.png"
+        twd = TracyWidomDistribution(beta=4)
+        twd.plot_empirical_pdf(
+            n_size=25,
+            times=100,
+            bins=100,
+            density=True,
+            plot_law_pdf=True,
+            savefig_path=TMP_DIR_PATH+"/"+fig_name
+        )
+        assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name)) == True
+    
+    def test_twd_plot_size_exception(self):
+        with pytest.raises(ValueError):
+            twd = TracyWidomDistribution(beta=1)
+            twd.plot_empirical_pdf(n_size=0)
+    
+    def test_twd_plot_ensemble_exception(self):
+        with pytest.raises(ValueError):
+            twd = TracyWidomDistribution(beta=0)
+            twd.plot_empirical_pdf(n_size=10)
 
 
 
@@ -497,6 +909,185 @@ class TestManovaSpectrumDistribution:
         msd = ManovaSpectrumDistribution(a=3, b=3)
         msd.plot_cdf(interval=(-1,2), savefig_path=TMP_DIR_PATH+"/"+fig_name)
         assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name)) == True
+    
+    def test_msd_plot_mre_abs_freq(self):
+        fig_name = "test_msd_mre_absfreq.png"
+        msd = ManovaSpectrumDistribution(beta=1, a=3, b=3)
+        msd.plot_empirical_pdf(
+            m_size=40,
+            n1_size=100,
+            n2_size=100,
+            bins=100,
+            density=False,
+            plot_law_pdf=False,
+            savefig_path=TMP_DIR_PATH+"/"+fig_name
+        )
+        assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name)) == True
+
+    def test_msd_plot_mce_abs_freq(self):
+        fig_name = "test_msd_mce_absfreq.png"
+        msd = ManovaSpectrumDistribution(beta=2, a=3, b=3)
+        msd.plot_empirical_pdf(
+            m_size=40,
+            n1_size=100,
+            n2_size=100,
+            bins=100,
+            density=False,
+            plot_law_pdf=False,
+            savefig_path=TMP_DIR_PATH+"/"+fig_name
+        )
+        assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name)) == True
+    
+    def test_msd_plot_mqe_abs_freq(self):
+        fig_name = "test_msd_mqe_absfreq.png"
+        msd = ManovaSpectrumDistribution(beta=4, a=3, b=3)
+        msd.plot_empirical_pdf(
+            m_size=40,
+            n1_size=100,
+            n2_size=100,
+            bins=100,
+            density=False,
+            plot_law_pdf=False,
+            savefig_path=TMP_DIR_PATH+"/"+fig_name
+        )
+        assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name)) == True
+    
+    def test_msd_plot_mre_normalized(self):
+        fig_name = "test_msd_mre_norm.png"
+        msd = ManovaSpectrumDistribution(beta=1, a=3, b=3)
+        msd.plot_empirical_pdf(
+            m_size=40,
+            n1_size=100,
+            n2_size=100,
+            bins=100,
+            density=True,
+            plot_law_pdf=False,
+            savefig_path=TMP_DIR_PATH+"/"+fig_name
+        )
+        assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name)) == True
+
+    def test_msd_plot_mce_normalized(self):
+        fig_name = "test_msd_mce_norm.png"
+        msd = ManovaSpectrumDistribution(beta=2, a=3, b=3)
+        msd.plot_empirical_pdf(
+            m_size=40,
+            n1_size=100,
+            n2_size=100,
+            bins=100,
+            density=True,
+            plot_law_pdf=False,
+            savefig_path=TMP_DIR_PATH+"/"+fig_name
+        )
+        assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name)) == True
+    
+    def test_msd_plot_mqe_normalized(self):
+        fig_name = "test_msd_mqe_norm.png"
+        msd = ManovaSpectrumDistribution(beta=4, a=3, b=3)
+        msd.plot_empirical_pdf(
+            m_size=40,
+            n1_size=100,
+            n2_size=100,
+            bins=100,
+            density=True,
+            plot_law_pdf=False,
+            savefig_path=TMP_DIR_PATH+"/"+fig_name
+        )
+        assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name)) == True
+    
+    def test_msd_plot_mre_theoretical(self):
+        fig_name = "test_msd_mre_theory.png"
+        msd = ManovaSpectrumDistribution(beta=1, a=3, b=3)
+        msd.plot_empirical_pdf(
+            m_size=40,
+            n1_size=100,
+            n2_size=100,
+            bins=100,
+            density=True,
+            plot_law_pdf=True,
+            savefig_path=TMP_DIR_PATH+"/"+fig_name
+        )
+        assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name)) == True
+
+    def test_msd_plot_mce_theoretical(self):
+        fig_name = "test_msd_mce_theory.png"
+        msd = ManovaSpectrumDistribution(beta=2, a=3, b=3)
+        msd.plot_empirical_pdf(
+            m_size=40,
+            n1_size=100,
+            n2_size=100,
+            bins=100,
+            density=True,
+            plot_law_pdf=True,
+            savefig_path=TMP_DIR_PATH+"/"+fig_name
+        )
+        assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name)) == True
+    
+    def test_msd_plot_mqe_theoretical(self):
+        fig_name = "test_msd_mqe_theory.png"
+        msd = ManovaSpectrumDistribution(beta=4, a=3, b=3)
+        msd.plot_empirical_pdf(
+            m_size=40,
+            n1_size=100,
+            n2_size=100,
+            bins=100,
+            density=True,
+            plot_law_pdf=True,
+            savefig_path=TMP_DIR_PATH+"/"+fig_name
+        )
+        assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name)) == True
+    
+    def test_msd_plot_mre_ratio_ge1(self):
+        fig_name = "test_msd_mre_ratio_ge1.png"
+        msd = ManovaSpectrumDistribution(beta=1, a=3, b=3)
+        msd.plot_empirical_pdf(
+            m_size=200,
+            n1_size=100,
+            n2_size=100,
+            bins=100,
+            density=False,
+            plot_law_pdf=False,
+            savefig_path=TMP_DIR_PATH+"/"+fig_name
+        )
+        assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name)) == True
+    
+    def test_msd_plot_msd_mre_theoretical_ratio_ge1(self):
+        fig_name = "test_msd_wre_theory_ratio_ge1.png"
+        msd = ManovaSpectrumDistribution(beta=1, a=3, b=3)
+        msd.plot_empirical_pdf(
+            m_size=1000,
+            n1_size=800,
+            n2_size=800,
+            bins=100,
+            density=True,
+            plot_law_pdf=True,
+            savefig_path=TMP_DIR_PATH+"/"+fig_name
+        )
+        assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name)) == True
+    
+    def test_msd_plot_mre_interval(self):
+        fig_name = "test_msd_mre_interval.png"
+        msd = ManovaSpectrumDistribution(beta=1, a=3, b=3)
+        msd.plot_empirical_pdf(
+            m_size=200,
+            n1_size=100,
+            n2_size=100,
+            bins=100,
+            interval=(0,10),
+            density=False,
+            plot_law_pdf=False,
+            savefig_path=TMP_DIR_PATH+"/"+fig_name
+        )
+        assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name)) == True
+    
+    def test_msd_plot_size_exception(self):
+        with pytest.raises(ValueError):
+            msd = ManovaSpectrumDistribution(beta=1, a=3, b=3)
+            msd.plot_empirical_pdf(m_size=0, n1_size=0)
+    
+    def test_msd_plot_ensemble_exception(self):
+        with pytest.raises(ValueError):
+            msd = ManovaSpectrumDistribution(beta=0, a=3, b=3)
+            msd.plot_empirical_pdf(m_size=10, n1_size=10)
 
 
 
