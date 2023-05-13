@@ -604,7 +604,11 @@ class MarchenkoPasturDistribution:
             print(f"Setting interval to (-0.01, {interval[1]})")
             interval = (-0.01, interval[1])
 
-        use_tridiag_ratio = (self.ratio <= 1)
+        # calculating constants depending on matrix sizes
+        ratio = p_size/n_size
+        lambda_plus = self.beta * self.sigma**2 * (1 + np.sqrt(ratio))**2
+        lambda_minus = self.beta * self.sigma**2 * (1 - np.sqrt(ratio))**2
+        use_tridiag_ratio = (ratio <= 1)
         if not use_tridiag_ratio:
             print("Warning: Cannot use tridiagonal histogramming if 'p' (degrees of freedom) is "
                 " greater than 'n' (sample size).\n"
@@ -613,10 +617,10 @@ class MarchenkoPasturDistribution:
 
         # computing interval according to the matrix size ratio and support
         if interval is None:
-            if self.ratio <= 1:
-                interval = (self.lambda_minus, self.lambda_plus)
+            if ratio <= 1:
+                interval = (lambda_minus, lambda_plus)
             else:
-                interval = (min(-0.05, self.lambda_minus), self.lambda_plus)
+                interval = (min(-0.05, lambda_minus), lambda_plus)
         
         use_tridiag_sigma = (self.sigma == 1.0)
         if not use_tridiag_sigma:
@@ -638,13 +642,15 @@ class MarchenkoPasturDistribution:
         # Plotting theoretical graphic
         if plot_law_pdf and density:
             centers = np.array(_get_bins_centers_and_contour(bins))
-            pdf = self.pdf(centers)
+            # creating new instance with the updated ratio depending on the given matrix sizes
+            mpd = MarchenkoPasturDistribution(beta=self.beta, ratio=ratio, sigma=self.sigma)
+            pdf = mpd.pdf(centers)
             plt.plot(centers, pdf, color='red', linewidth=2)
 
         plt.title("Marchenko-Pastur Law - Empirical density histogram", fontweight="bold")
         plt.xlabel("x")
         plt.ylabel("probability density")
-        if self.ratio > 1:
+        if ratio > 1:
             if plot_law_pdf and density:
                 ylim_vals = pdf
             else:
@@ -1082,3 +1088,101 @@ class ManovaSpectrumDistribution:
             interval, func=self.cdf, bins=bins, 
             plot_ylabel="cumulative distribution", savefig_path=savefig_path
         )
+
+    def plot_empirical_pdf(self, m_size=1000, n1_size=3000, n2_size=3000, bins=100, interval=None,
+                           density=False, plot_law_pdf=False, savefig_path=None):
+        """Computes and plots Manova spectrum empirical pdf and analytical distribution.
+
+        Calculates and plots Manova spectrum empirical pdf using Manova Ensemble random matrices.
+
+        Args:
+            m_size (int, default=1000): number of rows of the two Wishart Ensemble matrices that
+                generates the matrix of the corresponding ensemble.
+            n1_size (int, default=3000): number of columns of the first Wishart Ensemble matrix
+                that generates the matrix of the corresponding ensemble.
+            n2_size (int, default=3000): number of columns of the second Wishart Ensemble matrix
+                that generates the matrix of the corresponding ensemble.    
+            bins (int or sequence, default=100): If bins is an integer, it defines the number
+                of equal-width bins in the range. If bins is a sequence, it defines the
+                bin edges, including the left edge of the first bin and the right
+                edge of the last bin; in this case, bins may be unequally spaced.
+            interval (tuple, default=None): Delimiters (xmin, xmax) of the histogram.
+                The lower and upper range of the bins. Lower and upper outliers are ignored.
+            density (bool, default=False): If True, draw and return a probability
+                density: each bin will display the bin's raw count divided by the total
+                number of counts and the bin width, so that the area under the histogram
+                integrates to 1. If set to False, the absolute frequencies of the eigenvalues
+                are returned.
+            plot_law_pdf (bool, default=False): If True, the limiting theoretical law is plotted.
+                If set to False, just the empirical histogram is shown. This parameter is only
+                considered when the argument 'density' is set also to True.
+            savefig_path (string, default=None): path to save the created figure. If it is not
+                provided, the plot is shown are the end of the routine.
+
+        References:
+            - Laszlo, L. and Farrel, B.
+                "Local Eigenvalue Density for General MANOVA Matrices".
+                Journal of Statistical Physics. 152.6 (2013): 1003-1032.
+            - Albrecht, J. and Chan, C.P. and Edelman, A.
+                "Sturm sequences and random eigenvalue distributions".
+                Foundations of Computational Mathematics. 9.4 (2008): 461-483.
+            - Dumitriu, I. and Edelman, A.
+                "Matrix Models for Beta Ensembles".
+                Journal of Mathematical Physics. 43.11 (2002): 5830-5847.
+
+        """
+        if m_size<1 or n1_size<1 or n2_size<1:
+            raise ValueError("matrix size must be positive")
+        
+        ens = ManovaEnsemble(beta=self.beta, m=m_size, n1=n1_size, n2=n2_size)
+
+        a = n1_size/m_size
+        b = n2_size/m_size
+        if a <= 1 or b <= 1:
+            print("Warning: sample size ('n1_size' or 'n2_size') too small compared \
+                to degrees of freedom ('m_size'). It may cause numerical instability.")
+        lambda_term1 = np.sqrt((a/(a+b)) * (1 - (1/(a+b))))
+        lambda_term2 = np.sqrt((1/(a+b)) * (1 - (a/(a+b))))
+        lambda_minus = (lambda_term1 - lambda_term2)**2
+        lambda_plus = (lambda_term1 + lambda_term2)**2
+
+        if interval is None:
+            interval = [lambda_minus, lambda_plus]
+            if a <= 1:
+                interval[0] = min(-0.05, lambda_minus)
+            if b <= 1:
+                interval[1] = max(lambda_plus, 1.05)
+            interval = tuple(interval)
+
+        observed, bins = ens.eigval_hist(bins=bins, interval=interval, density=density, avoid_img=True)
+
+        width = bins[1]-bins[0]
+        plt.bar(bins[:-1], observed, width=width, align='edge')
+
+        # Plotting theoretical graphic
+        if plot_law_pdf and density:
+            centers = np.array(_get_bins_centers_and_contour(bins))
+            # creating new instance with the updated ratios depending on the given matrix sizes
+            msd = ManovaSpectrumDistribution(beta=self.beta, a=a, b=b)
+            pdf = msd.pdf(centers)
+            plt.plot(centers, pdf, color='red', linewidth=2)
+
+        plt.title("Manova Spectrum - Empirical density histogram", fontweight="bold")
+        plt.xlabel("x")
+        plt.ylabel("probability density")
+        if a <= 1 or b <= 1:
+            if plot_law_pdf and density:
+                ylim_vals = pdf
+            else:
+                ylim_vals = observed
+            try:
+                plt.ylim(0, np.max(ylim_vals) + 0.25*np.max(ylim_vals))
+            except ValueError:
+                second_highest_val = np.partition(ylim_vals.flatten(), -2)[-2]
+                plt.ylim(0, second_highest_val + 0.25*second_highest_val)
+
+        # Saving plot or showing it
+        if savefig_path:
+            plt.savefig(savefig_path, dpi=1200)
+        else:
+            plt.show()
