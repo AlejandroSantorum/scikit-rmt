@@ -559,7 +559,7 @@ class MarchenkoPasturDistribution:
         """Computes and plots Marchenko-Pastur empirical law using Wishart Ensemble random matrices.
 
         Calculates and plots Marchenko-Pastur empirical law using Wishart Ensemble random matrices.
-        The size of the sampled matrix will depend on the `n_size` (:math:`n`) parameter and in the
+        The size of the sampled matrix will depend on the `n_size` (:math:`n`) parameter and on the
         ratio :math:`\lambda` given when instantiating this class, unless the parameter `p_size` (:math:`p`)
         is also given. In this last case, the ratio :math:`\lambda` for the empirical pdf plotting is
         computed as :math:`\lambda = p/n`. If only the sample size :math:`n` is provided, the number
@@ -614,12 +614,11 @@ class MarchenkoPasturDistribution:
             interval = (-0.01, interval[1])
 
         # calculating constants depending on matrix sizes
-        if p_size is not None:
-            approx_ratio = p_size/n_size
-        else:
+        if p_size is None:
             p_size = round(self.ratio * n_size)
-            # computing an approximated ratio since p_size is rounded to the closest integer        
-            approx_ratio = p_size/n_size
+
+        # computing an approximated ratio since p_size is rounded to the closest integer        
+        approx_ratio = p_size/n_size
         lambda_plus = self.beta * self.sigma**2 * (1 + np.sqrt(approx_ratio))**2
         lambda_minus = self.beta * self.sigma**2 * (1 - np.sqrt(approx_ratio))**2
         use_tridiag_ratio = (approx_ratio <= 1)
@@ -649,7 +648,7 @@ class MarchenkoPasturDistribution:
         norm_const = 1/n_size 
 
         observed, bins = ens.eigval_hist(bins=bins, interval=interval,
-                                        density=density, norm_const=norm_const)
+                                         density=density, norm_const=norm_const)
         width = bins[1]-bins[0]
         plt.bar(bins[:-1], observed, width=width, align='edge')
 
@@ -1103,17 +1102,33 @@ class ManovaSpectrumDistribution:
             plot_ylabel="cumulative distribution", savefig_path=savefig_path
         )
 
-    def plot_empirical_pdf(self, m_size=1000, bins=100, interval=None, density=False,
-                           plot_law_pdf=False, savefig_path=None):
+    def plot_empirical_pdf(self, m_size=1000, n1_size=None, n2_size=None, bins=100, interval=None,
+                           density=False, plot_law_pdf=False, savefig_path=None):
         """Computes and plots Manova spectrum empirical pdf and analytical distribution.
 
         Calculates and plots Manova spectrum empirical pdf using Manova Ensemble random matrices.
+        The size of the sampeld matrices will depend on the `m_size` (:math:`m`) parameter (no. of
+        degrees of freedom) and on the ratios :math:`a` and :math:`b` given when instantiating this
+        class, unless the parameters `n1_size` (:math:`n_1`) and/or `n2_size` (:math:`n_2`) are also
+        given. In this last case, the new ratio :math:`a` for the empirical pdf plotting is computed
+        as :math:`a = n_1/m`, and the new ratio :math:`b` is calculated as :math:`b = n_2/m`. If only
+        the number of degrees of freedom :math:`m` is provided, the sample sizes :math:`n_1` and :math:`n_2`
+        are computed as :math:`n_1 = [a * m]` and :math:`n_2 = [b * m]` respectively.
 
         Args:
             m_size (int, default=1000): number of rows of the two Wishart Ensemble matrices that
                 generates the matrix of the corresponding ensemble. This is the number of degrees
-                of freedom. The sample size of the two matrices is computed from this value and the
-                ratios `a` and `b` given to instanciate this class.
+                of freedom (:math:`m`). The sample sizes (:math:`n_1` and :math:`n_2`) of the two
+                matrices are computed from this value and the ratios :math:`a` and :math:`b` given
+                to instantiate this class.
+            n1_size (int, default=None): number of columns of the first Wishart Ensemble matrix
+                that generates the matrix of the corresponding ensemble (:math:`n_1`). If provided,
+                the ratio :math:`a` is ignored (but not replaced) and the new ratio :math:`a = n_1/m`
+                is used instead to plot the empirical pdf.
+            n2_size (int, default=None): number of columns of the second Wishart Ensemble matrix
+                that generates the matrix of the corresponding ensemble (:math:`n_2`). If provided,
+                the ratio :math:`b` is ignored (but not replaced) and the new ratio :math:`b = n_2/m`
+                is used instead to plot the empirical pdf.
             bins (int or sequence, default=100): If bins is an integer, it defines the number
                 of equal-width bins in the range. If bins is a sequence, it defines the
                 bin edges, including the left edge of the first bin and the right
@@ -1143,12 +1158,15 @@ class ManovaSpectrumDistribution:
                 Journal of Mathematical Physics. 43.11 (2002): 5830-5847.
 
         """
-        if m_size<1:
+        if m_size<1 or (n1_size is not None and n1_size<1) or (n2_size is not None and n2_size<1):
             raise ValueError("matrix size must be positive")
+
+        if n1_size is None:
+            n1_size = round(self.a * m_size)
         
-        n1_size = round(self.a * m_size)
-        n2_size = round(self.b * m_size)
-        
+        if n2_size is None:
+            n2_size = round(self.b * m_size)
+
         ens = ManovaEnsemble(beta=self.beta, m=m_size, n1=n1_size, n2=n2_size)
 
         # computing approximated ratios since the n1_size and n2_size parameters
@@ -1156,8 +1174,8 @@ class ManovaSpectrumDistribution:
         approx_a = n1_size/m_size
         approx_b = n2_size/m_size
         if approx_a <= 1 or approx_b <= 1:
-            print("Warning: sample size ('n1_size' or 'n2_size') too small compared \
-                to degrees of freedom ('m_size'). It may cause numerical instability.")
+            print("Warning: sample size ('n1_size' or 'n2_size') too small compared "
+                  "to degrees of freedom ('m_size'). It may cause numerical instability.")
         lambda_term1 = np.sqrt((approx_a/(approx_a+approx_b)) * (1 - (1/(approx_a+approx_b))))
         lambda_term2 = np.sqrt((1/(approx_a+approx_b)) * (1 - (approx_a/(approx_a+approx_b))))
         lambda_minus = (lambda_term1 - lambda_term2)**2
