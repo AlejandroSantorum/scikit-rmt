@@ -555,6 +555,45 @@ class TestMarchenkoPasturDistribution:
         )
         assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name)) == True
     
+    def test_mpd_plot_wre_emppdf_p_size(self):
+        fig_name = "test_mpd_wre_emppdf_p_size.png"
+        mpd = MarchenkoPasturDistribution(beta=1, ratio=1/3)
+        mpd.plot_empirical_pdf(
+            p_size=50,
+            n_size=100,
+            bins=100,
+            density=False,
+            plot_law_pdf=False,
+            savefig_path=TMP_DIR_PATH+"/"+fig_name
+        )
+        assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name)) == True
+    
+    def test_mpd_plot_wce_emppdf_p_size(self):
+        fig_name = "test_mpd_wce_emppdf_p_size.png"
+        mpd = MarchenkoPasturDistribution(beta=2, ratio=1/3)
+        mpd.plot_empirical_pdf(
+            p_size=50,
+            n_size=100,
+            bins=100,
+            density=False,
+            plot_law_pdf=False,
+            savefig_path=TMP_DIR_PATH+"/"+fig_name
+        )
+        assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name)) == True
+    
+    def test_mpd_plot_wqe_emppdf_p_size(self):
+        fig_name = "test_mpd_wqe_emppdf_p_size.png"
+        mpd = MarchenkoPasturDistribution(beta=4, ratio=1/3)
+        mpd.plot_empirical_pdf(
+            p_size=50,
+            n_size=100,
+            bins=100,
+            density=False,
+            plot_law_pdf=False,
+            savefig_path=TMP_DIR_PATH+"/"+fig_name
+        )
+        assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name)) == True
+    
     def test_mpd_plot_mpl_size_exception(self):
         with pytest.raises(ValueError):
             mpd = MarchenkoPasturDistribution(beta=1, ratio=1/3)
