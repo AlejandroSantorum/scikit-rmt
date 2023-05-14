@@ -409,13 +409,13 @@ class MarchenkoPasturDistribution:
         Initializes an instance of this class with the given parameters.
 
         Args:
-            ratio (float): random matrix size ratio. This is the ratio between the
-                number of degrees of freedom 'p' and the sample size 'n'. The value
-                of ratio = p/n.
-            beta (int, default=1): descriptive integer of the Wishart ensemble type.
+            ratio (float): random matrix size ratio (:math:`\lambda`). This is the ratio
+                between the number of degrees of freedom :math:`p` and the sample size :math:`n`.
+                The value of ratio is computed as :math:`\lambda = p/n`.
+            beta (int, default=1): descriptive integer of the Wishart ensemble type (:math:`\beta`).
                 For WRE beta=1, for WCE beta=2, for WQE beta=4.
-            sigma (float, default=1.0): scale of the distribution. This value also corresponds
-                to the standard deviation of the random entries of the sampled matrix.
+            sigma (float, default=1.0): scale of the distribution (:math:`\sigma`). This value also
+                corresponds to the standard deviation of the random entries of the sampled matrix.
         
         """
         if beta not in [1,2,4]:
@@ -435,7 +435,7 @@ class MarchenkoPasturDistribution:
         """Samples ranfom variates following this distribution.
 
         Args:
-            size (int): sample size.
+            size (int): sample size :math:`n`.
         
         Returns:
             numpy array with the generated samples.
@@ -554,11 +554,16 @@ class MarchenkoPasturDistribution:
             plot_ylabel="cumulative distribution", savefig_path=savefig_path
         )
 
-    def plot_empirical_pdf(self, n_size=3000, bins=100, interval=None, density=False,
-                           plot_law_pdf=False, savefig_path=None):
+    def plot_empirical_pdf(self, n_size=3000, p_size=None, bins=100, interval=None,
+                           density=False, plot_law_pdf=False, savefig_path=None):
         """Computes and plots Marchenko-Pastur empirical law using Wishart Ensemble random matrices.
 
         Calculates and plots Marchenko-Pastur empirical law using Wishart Ensemble random matrices.
+        The size of the sampled matrix will depend on the `n_size` (:math:`n`) parameter and in the
+        ratio :math:`\lambda` given when instantiating this class, unless the parameter `p_size` (:math:`p`)
+        is also given. In this last case, the ratio :math:`\lambda` for the empirical pdf plotting is
+        computed as :math:`\lambda = p/n`. If only the sample size :math:`n` is provided, the number
+        of degrees of freedom :math:`p` is computed as :math:`[\lambda * n]`.
         Wishart (Laguerre) ensemble has improved routines (using tridiagonal forms and Sturm
         sequences) to avoid calculating the eigenvalues, so the histogram is built using certain
         techniques to boost efficiency. This optimization is only used when the ratio p_size/n_size
@@ -567,7 +572,12 @@ class MarchenkoPasturDistribution:
         Args:
             n_size (int, default=3000): number of columns of the guassian matrix that generates
                 the matrix of the corresponding ensemble. This is the sample size. The number of
-                degrees of freedom is computed depending on this argument and on the given ratio.
+                degrees of freedom is computed depending on this argument and on the given ratio,
+                unless the argument `p_size` is also provided, which in this case the ratio is
+                re-computed as ratio=p_size/n_size.
+            p_size (int, default=None): number of rows of the guassian matrix that generates
+                the matrix of the corresponding ensemble. If provided, the current ratio is ignored
+                (but not replaced) and the new ratio=p_size/n_size is used instead.
             bins (int or sequence, default=100): If bins is an integer, it defines the number
                 of equal-width bins in the range. If bins is a sequence, it defines the
                 bin edges, including the left edge of the first bin and the right
@@ -595,7 +605,7 @@ class MarchenkoPasturDistribution:
 
         """
         # pylint: disable=too-many-arguments
-        if n_size<1:
+        if n_size<1 or (p_size is not None and p_size<1):
             raise ValueError("matrix size must be positive")
         
         if interval and interval[0] == 0:
@@ -604,9 +614,12 @@ class MarchenkoPasturDistribution:
             interval = (-0.01, interval[1])
 
         # calculating constants depending on matrix sizes
-        p_size = round(self.ratio * n_size)
-        # computing an approximated ratio since p_size is rounded to the closest integer        
-        approx_ratio = p_size/n_size
+        if p_size is not None:
+            approx_ratio = p_size/n_size
+        else:
+            p_size = round(self.ratio * n_size)
+            # computing an approximated ratio since p_size is rounded to the closest integer        
+            approx_ratio = p_size/n_size
         lambda_plus = self.beta * self.sigma**2 * (1 + np.sqrt(approx_ratio))**2
         lambda_minus = self.beta * self.sigma**2 * (1 - np.sqrt(approx_ratio))**2
         use_tridiag_ratio = (approx_ratio <= 1)
