@@ -1082,6 +1082,49 @@ class TestManovaSpectrumDistribution:
         )
         assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name)) == True
     
+    def test_msd_plot_mre_emppdf_n1_size(self):
+        fig_name = "test_msd_mre_emppdf_n1_size.png"
+        mpd = ManovaSpectrumDistribution(beta=1, a=3, b=3)
+        mpd.plot_empirical_pdf(
+            m_size=200,
+            n1_size=500,
+            bins=100,
+            interval=(0,10),
+            density=False,
+            plot_law_pdf=False,
+            savefig_path=TMP_DIR_PATH+"/"+fig_name
+        )
+        assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name)) == True
+    
+    def test_msd_plot_mre_emppdf_n2_size(self):
+        fig_name = "test_msd_mre_emppdf_n2_size.png"
+        mpd = ManovaSpectrumDistribution(beta=1, a=3, b=3)
+        mpd.plot_empirical_pdf(
+            m_size=200,
+            n2_size=500,
+            bins=100,
+            interval=(0,10),
+            density=False,
+            plot_law_pdf=False,
+            savefig_path=TMP_DIR_PATH+"/"+fig_name
+        )
+        assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name)) == True
+    
+    def test_msd_plot_mre_emppdf_n1n2_size(self):
+        fig_name = "test_msd_mre_emppdf_n1n2_size.png"
+        mpd = ManovaSpectrumDistribution(beta=1, a=3, b=3)
+        mpd.plot_empirical_pdf(
+            m_size=200,
+            n1_size=500,
+            n2_size=600,
+            bins=100,
+            interval=(0,10),
+            density=False,
+            plot_law_pdf=False,
+            savefig_path=TMP_DIR_PATH+"/"+fig_name
+        )
+        assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name)) == True
+    
     def test_msd_plot_size_exception(self):
         with pytest.raises(ValueError):
             msd = ManovaSpectrumDistribution(beta=1, a=3, b=3)
