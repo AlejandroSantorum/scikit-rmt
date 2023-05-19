@@ -594,6 +594,30 @@ class TestMarchenkoPasturDistribution:
         )
         assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name)) == True
     
+    def test_mpd_plot_wre_emppdf_ratio_g_1(self):
+        fig_name = "test_mpd_plot_wre_emppdf_ratio_g_1.png"
+        mpd = MarchenkoPasturDistribution(beta=1, ratio=2)
+        mpd.plot_empirical_pdf(
+            n_size=50,
+            bins=100,
+            density=False,
+            plot_law_pdf=False,
+            savefig_path=TMP_DIR_PATH+"/"+fig_name
+        )
+        assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name)) == True
+    
+    def test_mpd_plot_wre_emppdf_ratio_g_1_density(self):
+        fig_name = "test_mpd_plot_wre_emppdf_ratio_g_1_density.png"
+        mpd = MarchenkoPasturDistribution(beta=1, ratio=2)
+        mpd.plot_empirical_pdf(
+            n_size=50,
+            bins=100,
+            density=True,
+            plot_law_pdf=True,
+            savefig_path=TMP_DIR_PATH+"/"+fig_name
+        )
+        assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name)) == True
+    
     def test_mpd_plot_mpl_size_exception(self):
         with pytest.raises(ValueError):
             mpd = MarchenkoPasturDistribution(beta=1, ratio=1/3)
@@ -1081,6 +1105,33 @@ class TestManovaSpectrumDistribution:
             savefig_path=TMP_DIR_PATH+"/"+fig_name
         )
         assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name)) == True
+    
+    def test_msd_plot_mre_a_le_1_b_le_1(self):
+        fig_name = "test_msd_plot_mre_a_le_1_b_le_1.png"
+        msd = ManovaSpectrumDistribution(beta=1, a=0.9, b=0.9)
+        msd.plot_empirical_pdf(
+            m_size=200,
+            bins=100,
+            interval=(0,10),
+            density=False,
+            plot_law_pdf=False,
+            savefig_path=TMP_DIR_PATH+"/"+fig_name
+        )
+        assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name)) == True
+    
+    def test_msd_plot_mre_a_le_1_b_le_1_density(self):
+        fig_name = "test_msd_plot_mre_a_le_1_b_le_1_density.png"
+        msd = ManovaSpectrumDistribution(beta=1, a=0.9, b=0.9)
+        msd.plot_empirical_pdf(
+            m_size=200,
+            bins=100,
+            interval=(0,10),
+            density=True,
+            plot_law_pdf=True,
+            savefig_path=TMP_DIR_PATH+"/"+fig_name
+        )
+        assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name)) == True
+
     
     def test_msd_plot_mre_emppdf_n1_size(self):
         fig_name = "test_msd_mre_emppdf_n1_size.png"
