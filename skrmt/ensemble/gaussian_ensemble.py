@@ -288,7 +288,7 @@ class GaussianEnsemble(_Ensemble):
             super().plot_eigval_hist(bins, interval=interval, density=density,
                                      norm_const=norm_const, fig_path=fig_path)
 
-    def eigval_pdf(self):
+    def joint_eigval_pdf(self):
         '''Computes joint eigenvalue pdf.
 
         Calculates joint eigenvalue probability density function given the current

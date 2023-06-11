@@ -292,7 +292,7 @@ class CircularEnsemble(_Ensemble):
             plt.show()
 
 
-    def eigval_pdf(self):
+    def joint_eigval_pdf(self):
         '''Computes joint eigenvalue pdf.
 
         Calculates joint eigenvalue probability density function given the

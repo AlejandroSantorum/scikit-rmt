@@ -115,20 +115,20 @@ def test_wre_build_tridiagonal():
     assert_almost_equal(wre.matrix, np.dot(mtx, mtx.transpose()), decimal=7)
 
 
-def test_beta1_eigval_pdf():
+def test_beta1_joint_eigval_pdf():
     '''Testing joint eigenvalue pdf
     '''
     p_size, n_size = 3, 5
     wre = WishartEnsemble(beta=1, p=p_size, n=n_size)
 
     wre.matrix = np.zeros((p_size,p_size))
-    assert wre.eigval_pdf() == 0.0
+    assert wre.joint_eigval_pdf() == 0.0
 
     wre.matrix = np.eye(p_size)
-    assert wre.eigval_pdf() == 0.0
+    assert wre.joint_eigval_pdf() == 0.0
 
     wre.matrix = 10*np.eye(p_size)
-    assert wre.eigval_pdf() == 0.0
+    assert wre.joint_eigval_pdf() == 0.0
 
 
 def test_wre_tridiag_hist():

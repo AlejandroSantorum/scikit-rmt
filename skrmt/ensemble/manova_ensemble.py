@@ -249,7 +249,7 @@ class ManovaEnsemble(_Ensemble):
         return super().plot_eigval_hist(bins, interval, density,
                                         norm_const=norm_const, avoid_img=True, fig_path=fig_path)
 
-    def eigval_pdf(self):
+    def joint_eigval_pdf(self):
         '''Computes joint eigenvalue pdf.
 
         Calculates joint eigenvalue probability density function given the current

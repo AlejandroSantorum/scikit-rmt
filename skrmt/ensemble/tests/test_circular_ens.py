@@ -73,20 +73,20 @@ def test_coe_eigvals():
 
 
 
-def test_beta1_eigval_pdf():
+def test_beta1_joint_eigval_pdf():
     '''Testing joint eigenvalue pdf
     '''
     n_size = 3
     coe = CircularEnsemble(beta=1, n=n_size)
 
     coe.matrix = np.zeros((n_size,n_size))
-    assert coe.eigval_pdf() == 0.0
+    assert coe.joint_eigval_pdf() == 0.0
 
     coe.matrix = np.eye(n_size)
-    assert coe.eigval_pdf() == 0.0
+    assert coe.joint_eigval_pdf() == 0.0
 
     coe.matrix = 10*np.eye(n_size)
-    assert coe.eigval_pdf() == 0.0
+    assert coe.joint_eigval_pdf() == 0.0
 
 
 ##########################################
