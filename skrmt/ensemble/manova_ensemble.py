@@ -249,15 +249,20 @@ class ManovaEnsemble(_Ensemble):
         return super().plot_eigval_hist(bins, interval, density,
                                         norm_const=norm_const, avoid_img=True, fig_path=fig_path)
 
-    def joint_eigval_pdf(self):
+    def joint_eigval_pdf(self, eigvals=None):
         '''Computes joint eigenvalue pdf.
 
-        Calculates joint eigenvalue probability density function given the current
-            random matrix (so its eigenvalues). This function depends on beta, i.e.,
-            in the sub-Manova ensemble.
+        Calculates joint eigenvalue probability density function given an array of
+        eigenvalues. If the array of eigenvalues is not provided, the current random
+        matrix sample (so its eigenvalues) is used. This function depends on beta,
+        i.e., in the sub-Manova ensemble.
+
+        Args:
+            eigvals (np.ndarray, default=None): numpy array with the values (eigenvalues)
+                to evaluate the joint pdf in.
 
         Returns:
-            real number. Value of the joint pdf of the current eigenvalues.
+            real number. Value of the joint pdf of the eigenvalues.
 
         References:
             - Dumitriu, I. and Edelman, A. "Matrix Models for Beta Ensembles".
@@ -269,6 +274,11 @@ class ManovaEnsemble(_Ensemble):
         a2 = self.beta*self.n2/2
         p = 1 + self.beta/2*(self.m - 1)
 
+        if eigvals is None:
+            # calculating eigenvalues
+            eigvals = self.eigvals()
+            n_eigvals = len(eigvals)
+
         # calculating Jacobi eigval pdf constant depeding on beta
         const_beta = 1
         for j in range(self.m):
@@ -277,9 +287,7 @@ class ManovaEnsemble(_Ensemble):
                           (special.gamma(1 + self.beta*j/2) * \
                             special.gamma(a1 - self.beta/2*(self.m - j)) * \
                               special.gamma(a2 - self.beta/2*(self.m - j)))
-        # calculating eigenvalues
-        eigvals = np.linalg.eigvals(self.matrix)
-        n_eigvals = len(eigvals)
+
         # calculating first prod
         prod1 = 1
         for j in range(n_eigvals):
