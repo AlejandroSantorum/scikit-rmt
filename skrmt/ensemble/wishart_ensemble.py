@@ -332,7 +332,6 @@ class WishartEnsemble(_Ensemble):
         '''
         if eigvals is None:
             # calculating eigenvalues
-            # eigvals = np.linalg.eigvals(self.matrix)
             eigvals = self.eigvals()
             n_eigvals = len(eigvals)
 
