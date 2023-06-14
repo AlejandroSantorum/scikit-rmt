@@ -333,7 +333,7 @@ class WishartEnsemble(_Ensemble):
         if eigvals is None:
             # calculating eigenvalues
             eigvals = self.eigvals()
-            n_eigvals = len(eigvals)
+        n_eigvals = len(eigvals)
 
         a_val = self.beta*self.n/2
         p_aux = 1 + self.beta/2*(self.p - 1)

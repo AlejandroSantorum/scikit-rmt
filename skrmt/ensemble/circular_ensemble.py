@@ -319,7 +319,7 @@ class CircularEnsemble(_Ensemble):
         if eigvals is None:
             # calculating eigenvalues
             eigvals = self.eigvals()
-            n_eigvals = len(eigvals)
+        n_eigvals = len(eigvals)
 
         # calculating Circular eigval pdf constant depeding on beta
         const_beta = (2*np.pi)**self.n * \
