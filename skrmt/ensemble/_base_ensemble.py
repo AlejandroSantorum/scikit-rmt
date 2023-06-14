@@ -61,7 +61,7 @@ class _Ensemble(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def eigval_pdf(self):
+    def joint_eigval_pdf(self):
         # pylint: disable=unnecessary-pass
         # pylint: disable=missing-function-docstring
         # this will be commented at inherited classes
