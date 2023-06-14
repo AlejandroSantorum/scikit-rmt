@@ -288,15 +288,20 @@ class GaussianEnsemble(_Ensemble):
             super().plot_eigval_hist(bins, interval=interval, density=density,
                                      norm_const=norm_const, fig_path=fig_path)
 
-    def joint_eigval_pdf(self):
+    def joint_eigval_pdf(self, eigvals=None):
         '''Computes joint eigenvalue pdf.
 
-        Calculates joint eigenvalue probability density function given the current
-        random matrix (so its eigenvalues). This function depends on beta, i.e.,
-        in the sub-Gaussian ensemble.
+        Calculates joint eigenvalue probability density function given an array of
+        eigenvalues. If the array of eigenvalues is not provided, the current random
+        matrix sample (so its eigenvalues) is used. This function depends on beta,
+        i.e., in the sub-Gaussian ensemble.
+
+        Args:
+            eigvals (np.ndarray, default=None): numpy array with the values (eigenvalues)
+                to evaluate the joint pdf in.
 
         Returns:
-            real number. Value of the joint pdf of the current eigenvalues.
+            real number. Value of the joint pdf of the eigenvalues.
 
         References:
             - Dumitriu, I. and Edelman, A.
@@ -304,13 +309,14 @@ class GaussianEnsemble(_Ensemble):
                 Journal of Mathematical Physics. 43.11 (2002): 5830-5847.
 
         '''
+        if eigvals is None:
+            # calculating eigenvalues
+            eigvals = self.eigvals()
+            n_eigvals = len(eigvals)
         # calculating Hermite eigval pdf constant depeding on beta
         const_beta = (2*np.pi)**(-self.n/2)
         for j in range(self.n):
             const_beta *= special.gamma(1 + self.beta/2)/special.gamma(1 + self.beta*j/2)
-        # calculating eigenvalues
-        eigvals = self.eigvals()
-        n_eigvals = len(eigvals)
         # calculating prod
         pdf = 1
         for j in range(n_eigvals):
