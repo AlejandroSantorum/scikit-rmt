@@ -292,15 +292,20 @@ class CircularEnsemble(_Ensemble):
             plt.show()
 
 
-    def joint_eigval_pdf(self):
+    def joint_eigval_pdf(self, eigvals=None):
         '''Computes joint eigenvalue pdf.
 
-        Calculates joint eigenvalue probability density function given the
-            current random matrix (so its eigenvalues). This function depends
-            on beta, i.e., in the sub-Circular ensemble.
+        Calculates joint eigenvalue probability density function given an array of
+        eigenvalues. If the array of eigenvalues is not provided, the current random
+        matrix sample (so its eigenvalues) is used. This function depends on beta,
+        i.e., in the sub-Circular ensemble.
+
+        Args:
+            eigvals (np.ndarray, default=None): numpy array with the values (eigenvalues)
+                to evaluate the joint pdf in.
 
         Returns:
-            real number. Value of the joint pdf of the current eigenvalues.
+            real number. Value of the joint pdf of the eigenvalues.
 
         References:
             - Killip, R. and Zozhan, R.
@@ -311,12 +316,16 @@ class CircularEnsemble(_Ensemble):
                 en.wikipedia.org/wiki/Circular_ensemble
 
         '''
+        if eigvals is None:
+            # calculating eigenvalues
+            # eigvals = np.linalg.eigvals(self.matrix)
+            eigvals = self.eigvals()
+            n_eigvals = len(eigvals)
+
         # calculating Circular eigval pdf constant depeding on beta
         const_beta = (2*np.pi)**self.n * \
                      special.gamma(1 + self.n*self.beta/2)/(special.gamma(1 + self.beta/2)**self.n)
-        # calculating eigenvalues
-        eigvals = np.linalg.eigvals(self.matrix)
-        n_eigvals = len(eigvals)
+
         # calculating prod
         pdf = 1
         for k in range(n_eigvals):
