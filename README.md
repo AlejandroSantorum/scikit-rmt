@@ -154,6 +154,12 @@ tries to illustrate it.
 <img src="imgs/gauss_tridiag_sim.png" width=820 height=370 alt="Speed up by tridigonal forms">
 -->
 
+On the other hand, for all the supported ensembles, the **joint eigenvalue probability density function** can be computed by using the class method `joint_eigval_pdf(eigvals=None)`. By default, the method computes the joint eigenvalue PDF of the eigenvalues of the sampled random matrix. However, the method can be called using a pre-computed array of eigenvalues, and the joint eigenvalue PDF of these eigenvalues is returned. AS an example, we can simulate sampling and histogramming many eigenvalues of GOE random matrices of size 2x2, as well as illustrating the joint eigenvalue PDF for GOE matrices 2x2. This simulation is shown in the figure below.
+![Joint Eigenvalue PDF for GOE](https://raw.githubusercontent.com/AlejandroSantorum/scikit-rmt/main/imgs/goe_joint_eigval_pdf.png)
+<!---
+<img src="imgs/goe_joint_eigval_pdf.png" width=820 height=370 alt="Joint Eigenvalue PDF for GOE">
+-->
+
 In addition, several spectral laws can be analyzed using this library, such as Wigner's Semicircle Law,
 Marchenko-Pastur Law and Tracy-Widom Law. The analytical probability density function can also be plotted
 by using the `limit_pdf` argument.
