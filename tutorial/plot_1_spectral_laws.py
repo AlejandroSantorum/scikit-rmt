@@ -64,7 +64,7 @@ random matrix ensembles.
 
 import numpy as np
 import matplotlib.pyplot as plt
-from skrmt.ensemble.law import WignerSemicircleDistribution
+from skrmt.ensemble.spectral_law import WignerSemicircleDistribution
 
 
 x1 = np.linspace(-5, 5, num=1000)
@@ -99,7 +99,7 @@ plt.show()
 
 import numpy as np
 import matplotlib.pyplot as plt
-from skrmt.ensemble.law import WignerSemicircleDistribution
+from skrmt.ensemble.spectral_law import WignerSemicircleDistribution
 
 
 x1 = np.linspace(-5, 5, num=2000)
@@ -150,7 +150,7 @@ plt.show()
 
 import numpy as np
 import matplotlib.pyplot as plt
-from skrmt.ensemble.law import TracyWidomDistribution
+from skrmt.ensemble.spectral_law import TracyWidomDistribution
 
 
 x = np.linspace(-5, 2, num=1000)
@@ -209,7 +209,7 @@ plt.show()
 
 import numpy as np
 import matplotlib.pyplot as plt
-from skrmt.ensemble.law import MarchenkoPasturDistribution
+from skrmt.ensemble.spectral_law import MarchenkoPasturDistribution
 
 
 x1 = np.linspace(0, 4, num=1000)
@@ -260,7 +260,7 @@ plt.show()
 
 import numpy as np
 import matplotlib.pyplot as plt
-from skrmt.ensemble.law import ManovaSpectrumDistribution
+from skrmt.ensemble.spectral_law import ManovaSpectrumDistribution
 
 plt.rcParams['figure.dpi'] = 100
 

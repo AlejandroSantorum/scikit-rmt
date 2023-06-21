@@ -115,6 +115,27 @@ def _plot_func(interval, func, bins=1000, plot_title=None, plot_ylabel=None, sav
         plt.show()
 
 
+def _get_bins_centers_and_contour(bins):
+    """Calculates the centers and contour of the given bins.
+
+    Computes the centers of the given bins. Also, the smallest and the largest bin
+    delimitiers are included to define the countour of the representation interval.
+
+    Args:
+        bins (list): list of numbers (floats) that specify each bin delimiter.
+
+    Returns:
+        list of numbers (floats) consisting in the list of bin centers and contour.
+    
+    """
+    centers = [bins[0]] # Adding initial contour
+    l = len(bins)
+    for i in range(l-1):
+        centers.append((bins[i]+bins[i+1])/2) # Adding centers
+    centers.append(bins[-1]) # Adding final contour
+    return centers
+
+
 class WignerSemicircleDistribution:
     """Wigner Semicircle Distribution class.
 
@@ -166,7 +187,7 @@ class WignerSemicircleDistribution:
         self.beta = beta
         self.center = center
         self.sigma = sigma
-        self.radius = 2.0 * np.sqrt(self.beta) * sigma
+        self.radius = 2.0 * np.sqrt(self.beta) * self.sigma
         self._gaussian_ens = None
     
     def rvs(self, size):
@@ -260,6 +281,93 @@ class WignerSemicircleDistribution:
             interval, func=self.cdf, bins=bins, 
             plot_ylabel="cumulative distribution", savefig_path=savefig_path
         )
+    
+
+    def plot_empirical_pdf(self, n_size=1000, bins=100, interval=None, density=False,
+                           plot_law_pdf=False, savefig_path=None):
+        """Computes and plots Wigner's semicircle empirical law using Gaussian Ensemble.
+
+        Calculates and plots Wigner's semicircle empirical law using Gaussian Ensemble
+        random matrices. Gaussian (Hermite) ensemble has improved routines (using
+        tridiagonal forms and Sturm sequences) to avoid calculating the eigenvalues,
+        so the histogram is built using certain techniques to boost efficiency.
+
+        Args:
+            n_size (int, default=1000): random matrix size n times n. This is the sample size.
+            bins (int or sequence, default=100): If bins is an integer, it defines the number
+                of equal-width bins in the range. If bins is a sequence, it defines the
+                bin edges, including the left edge of the first bin and the right
+                edge of the last bin; in this case, bins may be unequally spaced.
+            interval (tuple, default=None): Delimiters (xmin, xmax) of the histogram.
+                The lower and upper range of the bins. Lower and upper outliers are ignored.
+            density (bool, default=False): If True, draw and return a probability
+                density: each bin will display the bin's raw count divided by the total
+                number of counts and the bin width, so that the area under the histogram
+                integrates to 1. If set to False, the absolute frequencies of the eigenvalues
+                are returned.
+            plot_law_pdf (bool, default=False): If True, the theoretical law is plotted.
+                If set to False, just the empirical histogram is shown. This parameter is only
+                considered when the argument 'density' is set also to True.
+            savefig_path (string, default=None): path to save the created figure. If it is not
+                provided, the plot is shown are the end of the routine.
+
+        References:
+            - Albrecht, J. and Chan, C.P. and Edelman, A.
+                "Sturm sequences and random eigenvalue distributions".
+                Foundations of Computational Mathematics. 9.4 (2008): 461-483.
+            - Dumitriu, I. and Edelman, A.
+                "Matrix Models for Beta Ensembles".
+                Journal of Mathematical Physics. 43.11 (2002): 5830-5847.
+
+        """
+        # pylint: disable=too-many-arguments
+        if n_size<1:
+            raise ValueError("matrix size must be positive")
+
+        if self.center != 0.0:
+            print(f"Warning: The given center is not 0.0 (center = {self.center}).\n"
+                  "\t It is only available the centered empirical Wigner's semicircle law.")
+        
+        use_tridiag = (self.sigma == 1.0)
+        if not use_tridiag:
+            print(f"Warning: The given scale is not the standard (sigma = {self.sigma}).\n"
+                "\t Tridiagonal histogramming is deactivated.\n"
+                "\t It is adviced to set sigma=1.0 to optimize and boost histogramming.")
+
+        ens = GaussianEnsemble(beta=self.beta, n=n_size, sigma=self.sigma, use_tridiagonal=use_tridiag)
+
+        # default plotting interval in case it's not provided
+        if interval is None:
+            interval = (-self.radius, self.radius)
+
+        # Wigner eigenvalue normalization constant
+        if use_tridiag:
+            norm_const = 1/np.sqrt(n_size) if self.beta==4 else 1/np.sqrt(n_size/2)
+        else:
+            norm_const = 1/np.sqrt(n_size)
+
+        observed, bins = ens.eigval_hist(bins=bins, interval=interval,
+                                        density=density, norm_const=norm_const)
+        width = bins[1]-bins[0]
+        plt.bar(bins[:-1], observed, width=width, align='edge')
+
+        # Plotting Wigner Semicircle Law pdf
+        if plot_law_pdf and density:
+            centers = np.asarray(_get_bins_centers_and_contour(bins))
+            pdf = self.pdf(centers)
+            plt.plot(centers, pdf, color='red', linewidth=2)
+        elif plot_law_pdf and not density:
+            print("Warning: Wigner's Semicircle Law PDF is only plotted when density is True.")
+
+        plt.title("Wigner Semicircle Law - Empirical density histogram", fontweight="bold")
+        plt.xlabel("x")
+        plt.ylabel("probability density")
+
+        # Saving plot or showing it
+        if savefig_path:
+            plt.savefig(savefig_path, dpi=1200)
+        else:
+            plt.show()
 
 
 
@@ -301,13 +409,13 @@ class MarchenkoPasturDistribution:
         Initializes an instance of this class with the given parameters.
 
         Args:
-            ratio (float): random matrix size ratio. This is the ratio between the
-                number of degrees of freedom 'p' and the sample size 'n'. The value
-                of ratio = p/n.
-            beta (int, default=1): descriptive integer of the Wishart ensemble type.
+            ratio (float): random matrix size ratio (:math:`\lambda`). This is the ratio
+                between the number of degrees of freedom :math:`p` and the sample size :math:`n`.
+                The value of ratio is computed as :math:`\lambda = p/n`.
+            beta (int, default=1): descriptive integer of the Wishart ensemble type (:math:`\beta`).
                 For WRE beta=1, for WCE beta=2, for WQE beta=4.
-            sigma (float, default=1.0): scale of the distribution. This value also corresponds
-                to the standard deviation of the random entries of the sampled matrix.
+            sigma (float, default=1.0): scale of the distribution (:math:`\sigma`). This value also
+                corresponds to the standard deviation of the random entries of the sampled matrix.
         
         """
         if beta not in [1,2,4]:
@@ -327,7 +435,7 @@ class MarchenkoPasturDistribution:
         """Samples ranfom variates following this distribution.
 
         Args:
-            size (int): sample size.
+            size (int): sample size :math:`n`.
         
         Returns:
             numpy array with the generated samples.
@@ -445,6 +553,132 @@ class MarchenkoPasturDistribution:
             interval, func=self.cdf, bins=bins, 
             plot_ylabel="cumulative distribution", savefig_path=savefig_path
         )
+
+    def plot_empirical_pdf(self, n_size=3000, p_size=None, bins=100, interval=None,
+                           density=False, plot_law_pdf=False, savefig_path=None):
+        """Computes and plots Marchenko-Pastur empirical law using Wishart Ensemble random matrices.
+
+        Calculates and plots Marchenko-Pastur empirical law using Wishart Ensemble random matrices.
+        The size of the sampled matrix will depend on the `n_size` (:math:`n`) parameter and on the
+        ratio :math:`\lambda` given when instantiating this class, unless the parameter `p_size` (:math:`p`)
+        is also given. In this last case, the ratio :math:`\lambda` for the empirical pdf plotting is
+        computed as :math:`\lambda = p/n`. If only the sample size :math:`n` is provided, the number
+        of degrees of freedom :math:`p` is computed as :math:`[\lambda * n]`.
+        Wishart (Laguerre) ensemble has improved routines (using tridiagonal forms and Sturm
+        sequences) to avoid calculating the eigenvalues, so the histogram is built using certain
+        techniques to boost efficiency. This optimization is only used when the ratio p_size/n_size
+        is less or equal than 1.
+
+        Args:
+            n_size (int, default=3000): number of columns of the guassian matrix that generates
+                the matrix of the corresponding ensemble. This is the sample size. The number of
+                degrees of freedom is computed depending on this argument and on the given ratio,
+                unless the argument `p_size` is also provided, which in this case the ratio is
+                re-computed as ratio=p_size/n_size.
+            p_size (int, default=None): number of rows of the guassian matrix that generates
+                the matrix of the corresponding ensemble. If provided, the current ratio is ignored
+                (but not replaced) and the new ratio=p_size/n_size is used instead.
+            bins (int or sequence, default=100): If bins is an integer, it defines the number
+                of equal-width bins in the range. If bins is a sequence, it defines the
+                bin edges, including the left edge of the first bin and the right
+                edge of the last bin; in this case, bins may be unequally spaced.
+            interval (tuple, default=None): Delimiters (xmin, xmax) of the histogram.
+                The lower and upper range of the bins. Lower and upper outliers are ignored.
+            density (bool, default=False): If True, draw and return a probability
+                density: each bin will display the bin's raw count divided by the total
+                number of counts and the bin width, so that the area under the histogram
+                integrates to 1. If set to False, the absolute frequencies of the eigenvalues
+                are returned.
+            plot_law_pdf (bool, default=False): If True, the limiting theoretical law is plotted.
+                If set to False, just the empirical histogram is shown. This parameter is only
+                considered when the argument 'density' is set also to True.
+            savefig_path (string, default=None): path to save the created figure. If it is not
+                provided, the plot is shown are the end of the routine.
+
+        References:
+            - Albrecht, J. and Chan, C.P. and Edelman, A.
+                "Sturm sequences and random eigenvalue distributions".
+                Foundations of Computational Mathematics. 9.4 (2008): 461-483.
+            - Dumitriu, I. and Edelman, A.
+                "Matrix Models for Beta Ensembles".
+                Journal of Mathematical Physics. 43.11 (2002): 5830-5847.
+
+        """
+        # pylint: disable=too-many-arguments
+        if n_size<1 or (p_size is not None and p_size<1):
+            raise ValueError("matrix size must be positive")
+        
+        if interval and interval[0] == 0:
+            print("Warning: setting the beginning of the interval to zero may generate numerical errors.")
+            print(f"Setting interval to (-0.01, {interval[1]})")
+            interval = (-0.01, interval[1])
+
+        # calculating constants depending on matrix sizes
+        if p_size is None:
+            p_size = round(self.ratio * n_size)
+
+        # computing an approximated ratio since p_size is rounded to the closest integer        
+        approx_ratio = p_size/n_size
+        lambda_plus = self.beta * self.sigma**2 * (1 + np.sqrt(approx_ratio))**2
+        lambda_minus = self.beta * self.sigma**2 * (1 - np.sqrt(approx_ratio))**2
+        use_tridiag_ratio = (approx_ratio <= 1)
+        if not use_tridiag_ratio:
+            print("Warning: Cannot use tridiagonal histogramming if 'p' (degrees of freedom) is "
+                " greater than 'n' (sample size).\n"
+                f"\t Provided n={n_size} and p={p_size}. Tridiagonal histogramming is therefore deactivated.\n"
+                "\t It is adviced to increase sample size (`n`) to optimize and boost histogramming.")
+
+        # computing interval according to the matrix size ratio and support
+        if interval is None:
+            if approx_ratio <= 1:
+                interval = (lambda_minus, lambda_plus)
+            else:
+                interval = (min(-0.05, lambda_minus), lambda_plus)
+        
+        use_tridiag_sigma = (self.sigma == 1.0)
+        if not use_tridiag_sigma:
+            print(f"Warning: The given scale is not the standard (sigma = {self.sigma}).\n"
+                "\t Tridiagonal histogramming is deactivated.\n"
+                "\t It is adviced to set sigma=1.0 to optimize and boost histogramming.")
+
+        ens = WishartEnsemble(beta=self.beta, p=p_size, n=n_size, sigma=self.sigma,
+                            use_tridiagonal=(use_tridiag_ratio and use_tridiag_sigma))
+
+        # Wigner eigenvalue normalization constant
+        norm_const = 1/n_size 
+
+        observed, bins = ens.eigval_hist(bins=bins, interval=interval,
+                                         density=density, norm_const=norm_const)
+        width = bins[1]-bins[0]
+        plt.bar(bins[:-1], observed, width=width, align='edge')
+
+        # Plotting theoretical graphic
+        if plot_law_pdf and density:
+            centers = np.array(_get_bins_centers_and_contour(bins))
+            # creating new instance with the approximated ratio depending on the given matrix sizes
+            mpd = MarchenkoPasturDistribution(beta=self.beta, ratio=approx_ratio, sigma=self.sigma)
+            pdf = mpd.pdf(centers)
+            plt.plot(centers, pdf, color='red', linewidth=2)
+
+        plt.title("Marchenko-Pastur Law - Empirical density histogram", fontweight="bold")
+        plt.xlabel("x")
+        plt.ylabel("probability density")
+        if approx_ratio > 1:
+            if plot_law_pdf and density:
+                ylim_vals = pdf
+            else:
+                ylim_vals = observed
+            try:
+                plt.ylim(0, np.max(ylim_vals)+0.25*np.max(ylim_vals))
+            except ValueError:
+                second_highest_val = np.partition(ylim_vals.flatten(), -2)[-2]
+                plt.ylim(0, second_highest_val+0.25*second_highest_val)
+
+        # Saving plot or showing it
+        if savefig_path:
+            plt.savefig(savefig_path, dpi=1200)
+        else:
+            plt.show()
 
 
 
@@ -600,6 +834,92 @@ class TracyWidomDistribution:
             interval, func=self.cdf, bins=bins, 
             plot_ylabel="cumulative distribution", savefig_path=savefig_path
         )
+
+    def plot_empirical_pdf(self, n_size=100, times=1000, bins=100, interval=None,
+                           density=False, plot_law_pdf=False, savefig_path=None):
+        """Computes and plots Tracy-Widom empirical law using Gaussian Ensemble.
+
+        Calculates and plots Tracy-Widom empirical law using Gaussian Ensemble random matrices.
+        Because we need to obtain the largest eigenvalue of each sampled random matrix,
+        we need to sample a certain amount them. For each random matrix sammpled, its
+        largest eigenvalue is calcualted in order to simulate its density.
+
+        Args:
+            n_size (int, default=100): random matrix size n times n. This is the sample size.
+            times (int, default=1000): number of times to sample a random matrix.
+            bins (int or sequence, default=100): If bins is an integer, it defines the number
+                of equal-width bins in the range. If bins is a sequence, it defines the
+                bin edges, including the left edge of the first bin and the right
+                edge of the last bin; in this case, bins may be unequally spaced.
+            interval (tuple, default=None): Delimiters (xmin, xmax) of the histogram.
+                The lower and upper range of the bins. Lower and upper outliers are ignored.
+            density (bool, default=False): If True, draw and return a probability
+                density: each bin will display the bin's raw count divided by the total
+                number of counts and the bin width, so that the area under the histogram
+                integrates to 1. If set to False, the absolute frequencies of the eigenvalues
+                are returned.
+            plot_law_pdf (bool, default=False): If True, the limiting theoretical law is plotted.
+                If set to False, just the empirical histogram is shown. This parameter is only
+                considered when the argument 'density' is set also to True.
+            savefig_path (string, default=None): path to save the created figure. If it is not
+                provided, the plot is shown are the end of the routine.
+
+        References:
+            - Albrecht, J. and Chan, C.P. and Edelman, A.
+                "Sturm sequences and random eigenvalue distributions".
+                Foundations of Computational Mathematics. 9.4 (2008): 461-483.
+            - Dumitriu, I. and Edelman, A.
+                "Matrix Models for Beta Ensembles".
+                Journal of Mathematical Physics. 43.11 (2002): 5830-5847.
+
+        """
+        # pylint: disable=too-many-arguments
+        if n_size<1 or times<1:
+            raise ValueError("matrix size or number of repetitions must be positive")
+
+        ens = GaussianEnsemble(beta=self.beta, n=n_size, use_tridiagonal=False)
+
+        eigvals = []
+        for _ in range(times):
+            eigvals.append(ens.eigvals().max())
+            ens.sample()
+        eigvals = np.asarray(eigvals)
+
+        # Tracy-Widom eigenvalue distr. normalization constants
+        eigval_scale = 1.0
+        size_scale = 1.0
+        if self.beta == 2:
+            eigval_scale = 1/np.sqrt(2)
+        elif self.beta == 4:
+            eigval_scale = size_scale = 1/np.sqrt(2)
+            n_size *= 2
+        eigvals = size_scale*(n_size**(1/6))*(eigval_scale*eigvals - (2.0*np.sqrt(n_size)))
+
+        if interval is None:
+            xmin=eigvals.min()
+            xmax=eigvals.max()
+            interval=(xmin, xmax)
+
+        # using numpy to obtain histogram in the given interval and no. of bins
+        observed, bins = np.histogram(eigvals, bins=bins, range=interval, density=density)
+        width = bins[1]-bins[0]
+        plt.bar(bins[:-1], observed, width=width, align='edge')
+
+        # Plotting theoretical graphic
+        if plot_law_pdf and density:
+            centers = _get_bins_centers_and_contour(bins)
+            pdf = self.pdf(centers)
+            plt.plot(centers, pdf, color='red', linewidth=2)
+
+        plt.title("Tracy-Widom Law - Empirical density histogram", fontweight="bold")
+        plt.xlabel("x")
+        plt.ylabel("probability density")
+
+        # Saving plot or showing it
+        if savefig_path:
+            plt.savefig(savefig_path, dpi=1200)
+        else:
+            plt.show()
 
 
 
@@ -781,3 +1101,123 @@ class ManovaSpectrumDistribution:
             interval, func=self.cdf, bins=bins, 
             plot_ylabel="cumulative distribution", savefig_path=savefig_path
         )
+
+    def plot_empirical_pdf(self, m_size=1000, n1_size=None, n2_size=None, bins=100, interval=None,
+                           density=False, plot_law_pdf=False, savefig_path=None):
+        """Computes and plots Manova spectrum empirical pdf and analytical distribution.
+
+        Calculates and plots Manova spectrum empirical pdf using Manova Ensemble random matrices.
+        The size of the sampeld matrices will depend on the `m_size` (:math:`m`) parameter (no. of
+        degrees of freedom) and on the ratios :math:`a` and :math:`b` given when instantiating this
+        class, unless the parameters `n1_size` (:math:`n_1`) and/or `n2_size` (:math:`n_2`) are also
+        given. In this last case, the new ratio :math:`a` for the empirical pdf plotting is computed
+        as :math:`a = n_1/m`, and the new ratio :math:`b` is calculated as :math:`b = n_2/m`. If only
+        the number of degrees of freedom :math:`m` is provided, the sample sizes :math:`n_1` and :math:`n_2`
+        are computed as :math:`n_1 = [a * m]` and :math:`n_2 = [b * m]` respectively.
+
+        Args:
+            m_size (int, default=1000): number of rows of the two Wishart Ensemble matrices that
+                generates the matrix of the corresponding ensemble. This is the number of degrees
+                of freedom (:math:`m`). The sample sizes (:math:`n_1` and :math:`n_2`) of the two
+                matrices are computed from this value and the ratios :math:`a` and :math:`b` given
+                to instantiate this class.
+            n1_size (int, default=None): number of columns of the first Wishart Ensemble matrix
+                that generates the matrix of the corresponding ensemble (:math:`n_1`). If provided,
+                the ratio :math:`a` is ignored (but not replaced) and the new ratio :math:`a = n_1/m`
+                is used instead to plot the empirical pdf.
+            n2_size (int, default=None): number of columns of the second Wishart Ensemble matrix
+                that generates the matrix of the corresponding ensemble (:math:`n_2`). If provided,
+                the ratio :math:`b` is ignored (but not replaced) and the new ratio :math:`b = n_2/m`
+                is used instead to plot the empirical pdf.
+            bins (int or sequence, default=100): If bins is an integer, it defines the number
+                of equal-width bins in the range. If bins is a sequence, it defines the
+                bin edges, including the left edge of the first bin and the right
+                edge of the last bin; in this case, bins may be unequally spaced.
+            interval (tuple, default=None): Delimiters (xmin, xmax) of the histogram.
+                The lower and upper range of the bins. Lower and upper outliers are ignored.
+            density (bool, default=False): If True, draw and return a probability
+                density: each bin will display the bin's raw count divided by the total
+                number of counts and the bin width, so that the area under the histogram
+                integrates to 1. If set to False, the absolute frequencies of the eigenvalues
+                are returned.
+            plot_law_pdf (bool, default=False): If True, the limiting theoretical law is plotted.
+                If set to False, just the empirical histogram is shown. This parameter is only
+                considered when the argument 'density' is set also to True.
+            savefig_path (string, default=None): path to save the created figure. If it is not
+                provided, the plot is shown are the end of the routine.
+
+        References:
+            - Laszlo, L. and Farrel, B.
+                "Local Eigenvalue Density for General MANOVA Matrices".
+                Journal of Statistical Physics. 152.6 (2013): 1003-1032.
+            - Albrecht, J. and Chan, C.P. and Edelman, A.
+                "Sturm sequences and random eigenvalue distributions".
+                Foundations of Computational Mathematics. 9.4 (2008): 461-483.
+            - Dumitriu, I. and Edelman, A.
+                "Matrix Models for Beta Ensembles".
+                Journal of Mathematical Physics. 43.11 (2002): 5830-5847.
+
+        """
+        if m_size<1 or (n1_size is not None and n1_size<1) or (n2_size is not None and n2_size<1):
+            raise ValueError("matrix size must be positive")
+
+        if n1_size is None:
+            n1_size = round(self.a * m_size)
+        
+        if n2_size is None:
+            n2_size = round(self.b * m_size)
+
+        ens = ManovaEnsemble(beta=self.beta, m=m_size, n1=n1_size, n2=n2_size)
+
+        # computing approximated ratios since the n1_size and n2_size parameters
+        # could have been rounded previously
+        approx_a = n1_size/m_size
+        approx_b = n2_size/m_size
+        if approx_a <= 1 or approx_b <= 1:
+            print("Warning: sample size ('n1_size' or 'n2_size') too small compared "
+                  "to degrees of freedom ('m_size'). It may cause numerical instability.")
+        lambda_term1 = np.sqrt((approx_a/(approx_a+approx_b)) * (1 - (1/(approx_a+approx_b))))
+        lambda_term2 = np.sqrt((1/(approx_a+approx_b)) * (1 - (approx_a/(approx_a+approx_b))))
+        lambda_minus = (lambda_term1 - lambda_term2)**2
+        lambda_plus = (lambda_term1 + lambda_term2)**2
+
+        if interval is None:
+            interval = [lambda_minus, lambda_plus]
+            if approx_a <= 1:
+                interval[0] = min(-0.05, lambda_minus)
+            if approx_b <= 1:
+                interval[1] = max(lambda_plus, 1.05)
+            interval = tuple(interval)
+
+        observed, bins = ens.eigval_hist(bins=bins, interval=interval, density=density, avoid_img=True)
+
+        width = bins[1]-bins[0]
+        plt.bar(bins[:-1], observed, width=width, align='edge')
+
+        # Plotting theoretical graphic
+        if plot_law_pdf and density:
+            centers = np.array(_get_bins_centers_and_contour(bins))
+            # creating new instance with the approximated ratios depending on the given matrix sizes
+            msd = ManovaSpectrumDistribution(beta=self.beta, a=approx_a, b=approx_b)
+            pdf = msd.pdf(centers)
+            plt.plot(centers, pdf, color='red', linewidth=2)
+
+        plt.title("Manova Spectrum - Empirical density histogram", fontweight="bold")
+        plt.xlabel("x")
+        plt.ylabel("probability density")
+        if approx_a <= 1 or approx_b <= 1:
+            if plot_law_pdf and density:
+                ylim_vals = pdf
+            else:
+                ylim_vals = observed
+            try:
+                plt.ylim(0, np.max(ylim_vals) + 0.25*np.max(ylim_vals))
+            except ValueError:
+                second_highest_val = np.partition(ylim_vals.flatten(), -2)[-2]
+                plt.ylim(0, second_highest_val + 0.25*second_highest_val)
+
+        # Saving plot or showing it
+        if savefig_path:
+            plt.savefig(savefig_path, dpi=1200)
+        else:
+            plt.show()

@@ -72,21 +72,20 @@ def test_coe_eigvals():
     assert_array_equal(vals.imag, 0.0)
 
 
-
-def test_beta1_eigval_pdf():
+def test_beta1_joint_eigval_pdf():
     '''Testing joint eigenvalue pdf
     '''
     n_size = 3
     coe = CircularEnsemble(beta=1, n=n_size)
 
     coe.matrix = np.zeros((n_size,n_size))
-    assert coe.eigval_pdf() == 0.0
+    assert coe.joint_eigval_pdf() == 0.0
 
     coe.matrix = np.eye(n_size)
-    assert coe.eigval_pdf() == 0.0
+    assert coe.joint_eigval_pdf() == 0.0
 
     coe.matrix = 10*np.eye(n_size)
-    assert coe.eigval_pdf() == 0.0
+    assert coe.joint_eigval_pdf() == 0.0
 
 
 ##########################################
@@ -140,6 +139,22 @@ def test_cue_eigvals():
     assert_almost_equal(mods, 1.0, decimal=12)
 
 
+def test_beta2_joint_eigval_pdf():
+    '''Testing joint eigenvalue pdf
+    '''
+    n_size = 3
+    cue = CircularEnsemble(beta=2, n=n_size)
+
+    cue.matrix = np.zeros((n_size,n_size))
+    assert cue.joint_eigval_pdf() == 0.0
+
+    cue.matrix = np.eye(n_size)
+    assert cue.joint_eigval_pdf() == 0.0
+
+    cue.matrix = 10*np.eye(n_size)
+    assert cue.joint_eigval_pdf() == 0.0
+
+
 ##########################################
 ### Circular Symplectic Ensemble = CSE
 
@@ -181,3 +196,19 @@ def test_cse_set_size():
     cse.set_size(n2_size, resample_mtx=True)
     assert cse.n == n2_size
     assert cse.matrix.shape == (2*n2_size,2*n2_size)
+
+
+def test_beta4_joint_eigval_pdf():
+    '''Testing joint eigenvalue pdf
+    '''
+    n_size = 3
+    cse = CircularEnsemble(beta=4, n=n_size)
+
+    cse.matrix = np.zeros((n_size,n_size))
+    assert cse.joint_eigval_pdf() == 0.0
+
+    cse.matrix = np.eye(n_size)
+    assert cse.joint_eigval_pdf() == 0.0
+
+    cse.matrix = 10*np.eye(n_size)
+    assert cse.joint_eigval_pdf() == 0.0

@@ -93,20 +93,20 @@ def test_goe_build_tridiagonal():
         assert chisqs[i] == goe.matrix[i+1][i]
 
 
-def test_beta1_eigval_pdf():
+def test_beta1_joint_eigval_pdf():
     '''Testing joint eigenvalue pdf
     '''
     n_size = 3
     goe = GaussianEnsemble(beta=1, n=n_size)
 
     goe.matrix = np.zeros((n_size,n_size))
-    assert goe.eigval_pdf() == 0.0
+    assert goe.joint_eigval_pdf() == 0.0
 
     goe.matrix = np.eye(n_size)
-    assert goe.eigval_pdf() == 0.0
+    assert goe.joint_eigval_pdf() == 0.0
 
     goe.matrix = 10*np.eye(n_size)
-    assert goe.eigval_pdf() == 0.0
+    assert goe.joint_eigval_pdf() == 0.0
 
 
 def test_goe_tridiag_hist():

@@ -60,7 +60,7 @@ pip3 install scikit-rmt
 ```
 
 ### Global installation
-Just install it using `pip`or `pip3`.
+Just install it using `pip` or `pip3`.
 ```bash
 pip install scikit-rmt
 ```
@@ -70,6 +70,33 @@ pip install scikit-rmt
 * [numpy](https://github.com/numpy/numpy) - The fundamental package for scientific computing with Python
 * [matplotlib](https://github.com/matplotlib/matplotlib) - Plotting with Python
 * [scipy](https://github.com/scipy/scipy) - Scientific computation in Python
+
+Check the pinned versions in the [requirements.txt](requirements.txt) file.
+
+----------------
+## Main features
+*scikit-rmt* provides support to analyze, study and simulate Random Matrix Theory properties and results:
+* **Sampling** of the following random matrix ensembles:
+   * Gaussian Ensemble (GOE, GUE and GSE; for beta=1, 2 and 4 respectively): class `GaussianEnsemble`.
+   * Wishart Ensemble (WRE, WCE and WQE; for beta=1, 2 and 4 respectively): class `WishartEnsemble`.
+   * Manova Ensemble (MRE, MCE and MQE; for beta=1, 2 and 4 respectively): class `ManovaEnsemble`.
+   * Circular Ensemble (COE, CUE, CSE; for beta=1, 2 and 4 respectively): class `CircularEnsemble`.
+* **Eigenvalue computation** for the previous ensembles using the class method `eigvals`.
+* Computation of the **joint eigenvalue probability density function** given the random matrix eigenvalues, using the class method `joint_eigval_pdf`.
+* Computation of the **empirical spectral histogram** by executing the class method `eigval_hist`.
+* **Plotting of the empirical spectral histogram** using the class method `plot_eigval_hist`.
+* Computation and plotting of the following **spectral laws** (`spectral_law` sub-module), including the calculation and plotting of the corresponding probability density functions (PDFs) and cumulative distribution functions (CDFs):
+   * **Wigner Semicircle law**: describes the limiting distribution of the eigenvalues of Wigner matrices (in particular, random matrices from the Gaussian Ensemble). Implemented by class `WignerSemicircleDistribution`.
+   * **Tracy-Widom law**: describes the limiting distribution of the largest eigenvalue of Wigner matrices (in particular, random matrices from the Gaussian Ensemble). Implemented by class `TracyWidomDistribution`.
+   * **Marchenko-Pastur law**: describes the limiting distribution of the eigenvalues of Wishart matrices (random matrices from the Wishart Ensemble). Implemented by class `MarchenkoPasturDistribution`.
+   * **Manova Spectrum law**: introduced and proved by K. W. Wachter (1980), it describes the limiting distribution of the eigenvalues of Manova matrices (random matrices from the Manova Ensemble). Implemented by class `ManovaSpectrumDistribution`.
+* **Covariance matrix estimation** using different matrix smoothing and estimation methods (`covariance` module).
+   * Estimation of sample covariance matrix using `sample_estimator` function.
+   * Finite-sample Optimal (FSOpt) estimator by `fsopt_estimator` function.
+   * Empirical Bayesian estimator by `empirical_bayesian_estimator` function. Haff in *"Estimation of a covariance matrix under Stein’s loss"* (1985).
+   * Minimax estimator by `minimax_estimator` function 
+   * Linear shrinkage estimator by `linear_shrinkage_estimator` function. Ledoit and Wolf in *"A well-conditioned estimator for large-dimensional covariance matrices"* (2004).
+   * Analytical shrinkage estimator by `analytical_shrinkage_estimator` function. Ledoit and Wolf in *"Analytical nonlinear shrinkage of large-dimensional covariance matrices"* (2020).
 
 
 -----------------
@@ -125,6 +152,12 @@ tries to illustrate it.
 ![Speed up by tridigonal forms](https://raw.githubusercontent.com/AlejandroSantorum/scikit-rmt/main/imgs/gauss_tridiag_sim.png)
 <!---
 <img src="imgs/gauss_tridiag_sim.png" width=820 height=370 alt="Speed up by tridigonal forms">
+-->
+
+On the other hand, for all the supported ensembles, the **joint eigenvalue probability density function** can be computed by using the class method `joint_eigval_pdf(eigvals=None)`. By default, the method computes the joint eigenvalue PDF of the eigenvalues of the sampled random matrix. However, the method can be called using a pre-computed array of eigenvalues, and the joint eigenvalue PDF of these eigenvalues is returned. AS an example, we can simulate sampling and histogramming many eigenvalues of GOE random matrices of size 2x2, as well as illustrating the joint eigenvalue PDF for GOE matrices 2x2. This simulation is shown in the figure below.
+![Joint Eigenvalue PDF for GOE](https://raw.githubusercontent.com/AlejandroSantorum/scikit-rmt/main/imgs/goe_joint_eigval_pdf.png)
+<!---
+<img src="imgs/goe_joint_eigval_pdf.png" width=820 height=370 alt="Joint Eigenvalue PDF for GOE">
 -->
 
 In addition, several spectral laws can be analyzed using this library, such as Wigner's Semicircle Law,
