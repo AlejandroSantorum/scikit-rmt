@@ -58,7 +58,6 @@ class TestWignerSemicircleDistribution:
         assert wsd.center == 0.0
         assert wsd.sigma == sigma
         assert wsd.radius == 2.0 * np.sqrt(beta) * sigma
-        assert wsd._gaussian_ens is None
     
     def test_wsd_init_raise(self):
         '''Testing WignerSemicircleDistribution init raising exception
