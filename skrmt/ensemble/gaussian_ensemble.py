@@ -140,6 +140,8 @@ class GaussianEnsemble(_Ensemble):
         mtx = np.random.randn(self.n,self.n) * self.sigma
         # symmetrize matrix
         self.matrix = (mtx + mtx.transpose())/np.sqrt(2)
+        # setting array of eigenvalues to None to force re-computing them
+        self._eigvals = None
         return self.matrix
 
     def _sample_gue(self):
@@ -148,6 +150,8 @@ class GaussianEnsemble(_Ensemble):
         mtx = np.random.randn(size,size)*self.sigma + 1j*np.random.randn(size,size)*self.sigma
         # hermitian matrix
         self.matrix = (mtx + mtx.transpose().conj())/np.sqrt(2)
+        # setting array of eigenvalues to None to force re-computing them
+        self._eigvals = None
         return self.matrix
 
     def _sample_gse(self):
@@ -163,6 +167,8 @@ class GaussianEnsemble(_Ensemble):
                         ])
         # hermitian matrix
         self.matrix = (mtx + mtx.transpose().conj())/np.sqrt(2)
+        # setting array of eigenvalues to None to force re-computing them
+        self._eigvals = None
         return self.matrix
 
     def sample_tridiagonal(self):
@@ -200,6 +206,8 @@ class GaussianEnsemble(_Ensemble):
         mtx = sparse.diags(diagonals, [-1, 0, 1])
         # converting to numpy array
         self.matrix = mtx.toarray()
+        # setting array of eigenvalues to None to force re-computing them
+        self._eigvals = None
         return self.matrix
 
     def eigvals(self):
@@ -212,7 +220,11 @@ class GaussianEnsemble(_Ensemble):
             numpy array with the calculated eigenvalues.
 
         """
-        return np.linalg.eigvalsh(self.matrix)
+        if self._eigvals is not None:
+            return self._eigvals
+
+        self._eigvals = np.linalg.eigvalsh(self.matrix)
+        return self._eigvals
 
     def eigval_hist(self, bins, interval=None, density=False, norm_const=None, avoid_img=False):
         if self.use_tridiagonal:

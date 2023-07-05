@@ -152,6 +152,8 @@ class ManovaEnsemble(_Ensemble):
         a2_mtx = a1_mtx + np.matmul(y_mtx, y_mtx.transpose())
         # A = (X * X') / (X * X' + Y * Y') = (X * X') * (X * X' + Y * Y')^(-1)
         self.matrix = np.matmul(a1_mtx, np.linalg.inv(a2_mtx))
+        # setting array of eigenvalues to None to force re-computing them
+        self._eigvals = None
         return self.matrix
 
     def _sample_mce(self):
@@ -168,6 +170,8 @@ class ManovaEnsemble(_Ensemble):
         a2_mtx = a1_mtx + np.matmul(y_mtx, y_mtx.transpose().conj())
         # A = (X * X') / (X * X' + Y * Y') = (X * X') * (X * X' + Y * Y')^(-1)
         self.matrix = np.matmul(a1_mtx, np.linalg.inv(a2_mtx))
+        # setting array of eigenvalues to None to force re-computing them
+        self._eigvals = None
         return self.matrix
 
     def _sample_mqe(self):
@@ -198,6 +202,8 @@ class ManovaEnsemble(_Ensemble):
         a2_mtx = a1_mtx + np.matmul(y_mtx, y_mtx.transpose().conj())
         # A = (X * X') / (X * X' + Y * Y') = (X * X') * (X * X' + Y * Y')^(-1)
         self.matrix = np.matmul(a1_mtx, np.linalg.inv(a2_mtx))
+        # setting array of eigenvalues to None to force re-computing them
+        self._eigvals = None
         return self.matrix
 
     def eigvals(self):
@@ -210,7 +216,11 @@ class ManovaEnsemble(_Ensemble):
             numpy array with the calculated eigenvalues.
 
         """
-        return np.linalg.eigvals(self.matrix)
+        if self._eigvals is not None:
+            return self._eigvals
+
+        self._eigvals = np.linalg.eigvals(self.matrix)
+        return self._eigvals
 
     def plot_eigval_hist(self, bins, interval=(0,1), density=False, norm_const=None, fig_path=None):
         """Computes and plots the histogram of the matrix eigenvalues

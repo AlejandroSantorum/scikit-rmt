@@ -163,6 +163,8 @@ class WishartEnsemble(_Ensemble):
         mtx = np.random.randn(p_size,n_size) * self.sigma
         # symmetrize matrix
         self.matrix = np.matmul(mtx, mtx.transpose())
+        # setting array of eigenvalues to None to force re-computing them
+        self._eigvals = None
         return self.matrix
 
     def _sample_wce(self):
@@ -172,6 +174,8 @@ class WishartEnsemble(_Ensemble):
         mtx = np.random.randn(p_size,n_size)*self.sigma + 1j*np.random.randn(p_size,n_size)*self.sigma
         # hermitian matrix
         self.matrix = np.matmul(mtx, mtx.transpose().conj())
+        # setting array of eigenvalues to None to force re-computing them
+        self._eigvals = None
         return self.matrix
 
     def _sample_wqe(self):
@@ -188,6 +192,8 @@ class WishartEnsemble(_Ensemble):
                     ])
         # hermitian matrix
         self.matrix = np.matmul(mtx, mtx.transpose().conj())
+        # setting array of eigenvalues to None to force re-computing them
+        self._eigvals = None
         return self.matrix
 
     def sample_tridiagonal(self):
@@ -223,6 +229,8 @@ class WishartEnsemble(_Ensemble):
         mtx = sparse.diags(diagonals, [-1, 0, 1])
         # converting to numpy array
         self.matrix = mtx.toarray()
+        # setting array of eigenvalues to None to force re-computing them
+        self._eigvals = None
         return self.matrix
 
 
@@ -236,7 +244,11 @@ class WishartEnsemble(_Ensemble):
             numpy array with the calculated eigenvalues.
 
         """
-        return np.linalg.eigvalsh(self.matrix)
+        if self._eigvals is not None:
+            return self._eigvals
+
+        self._eigvals = np.linalg.eigvalsh(self.matrix)
+        return self._eigvals
 
     def eigval_hist(self, bins, interval=None, density=False, norm_const=None, avoid_img=False):
         if self.use_tridiagonal:
