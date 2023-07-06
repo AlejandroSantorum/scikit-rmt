@@ -275,29 +275,41 @@ class CircularEnsemble(_Ensemble):
             rang = (interval, interval)
             extent = [interval[0], interval[1], interval[0], interval[1]]
 
-        fig, axes = plt.subplots(nrows=1, ncols=2)
-        fig.set_figheight(5)
-        fig.set_figwidth(13)
-        fig.subplots_adjust(hspace=.5)
+        fig, axes = plt.subplots(nrows=1, ncols=3, width_ratios=[1, 1, 1], figsize=(22, 6))
+        # fig.set_figheight(6)
+        # fig.set_figwidth(22)
+        fig.subplots_adjust(hspace=.5, wspace=.3)
 
         axes[0].set_xlim(rang[0][0], rang[0][1])
         axes[0].set_ylim(rang[1][0], rang[1][1])
         axes[0].plot(xvals, yvals, 'o')
-        axes[0].set_title('Eigenvalue plot')
-        axes[0].set_xlabel('real')
-        axes[0].set_ylabel('imaginary')
+        axes[0].set_title('Eigenvalue plot', fontsize=15)
+        axes[0].set_xlabel('real', fontsize=14)
+        axes[0].set_ylabel('imaginary', fontsize=14)
 
         h2d,_,_,img = axes[1].hist2d(xvals, yvals, range=rang,
                                    cmap=plt.cm.get_cmap('nipy_spectral'))
-        fig.colorbar(img, ax=axes[1])
+        fig.colorbar(img, ax=axes[1], fraction=0.046, pad=0.03)
         axes[1].cla()
-        axes[1].imshow(h2d.transpose(), origin='lower', interpolation="bilinear", extent=extent)
-        axes[1].set_title('Heatmap eigenvalue plot')
-        axes[1].set_xlabel('real')
-        axes[1].set_ylabel('imaginary')
+        axes[1].imshow(h2d.transpose(), origin="lower", interpolation="bilinear", extent=extent)
+        axes[1].set_title('Heatmap eigenvalue plot', fontsize=15)
+        axes[1].set_xlabel('real', fontsize=14)
+        axes[1].set_ylabel('imaginary', fontsize=14)
 
-        plt.suptitle("matrix size: "+\
-                      str(len(self.matrix))+"x"+str(len(self.matrix)), fontweight="bold")
+        eigvals_angles = np.angle(eigvals)
+        observed, bin_edges = np.histogram(eigvals_angles, bins=bins, density=density)
+        width = bin_edges[1]-bin_edges[0]
+        axes[2].bar(bin_edges[:-1], observed, width=width, align="edge")
+        axes[2].set_title("Distribution of imaginary eigenvalues angles", fontsize=15)
+        axes[2].set_xlabel(r"angle $\theta$ (radians)", fontsize=14)
+        axes[2].set_xticks([-np.pi, -np.pi/2, 0, np.pi/2, np.pi])
+        axes[2].set_xticklabels([r"$-\pi$", r"$-\frac{\pi}{2}$", "0", r"$\frac{\pi}{2}$", r"$-\pi$"])
+        if density:
+            axes[2].set_ylabel("eigenvalue frequency", fontsize=14)
+        else:
+            axes[2].set_ylabel("eigenvalue count", fontsize=14)
+
+        plt.suptitle(f"Matrix size: {len(self.matrix)}x{len(self.matrix)}", fontsize=16, fontweight="bold")
 
         # Saving plot or showing it
         if fig_path:
