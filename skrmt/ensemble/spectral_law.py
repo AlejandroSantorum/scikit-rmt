@@ -279,12 +279,12 @@ class WignerSemicircleDistribution:
 
     def plot_empirical_pdf(self, n_size=1000, bins=100, interval=None, density=False,
                            plot_law_pdf=False, savefig_path=None):
-        """Computes and plots Wigner's semicircle empirical law using Gaussian Ensemble.
+        """Computes and plots Wigner's semicircle empirical law.
 
-        Calculates and plots Wigner's semicircle empirical law using Gaussian Ensemble
-        random matrices. Gaussian (Hermite) ensemble has improved routines (using
-        tridiagonal forms and Sturm sequences) to avoid calculating the eigenvalues,
-        so the histogram is built using certain techniques to boost efficiency.
+        Calculates and plots Wigner's semicircle empirical law using random samples generated
+        using the relationship between the Wigner Semicircle law and the Beta distribution:
+        the Wigner's Semicircle distribution it is a scaled Beta distribution with parameters
+        :math:`\alpha = \beta = 3/2`.
 
         Args:
             n_size (int, default=1000): number of random samples that can be interpreted as
