@@ -188,10 +188,10 @@ class WignerSemicircleDistribution:
         self.center = center
         self.sigma = sigma
         self.radius = 2.0 * np.sqrt(self.beta) * self.sigma
-        self._gaussian_ens = None
     
     def rvs(self, size):
         """Samples ranfom variates following this distribution.
+        This uses the relationship between Wigner Semicircle law and Beta distribution.
 
         Args:
             size (int): sample size.
@@ -201,16 +201,10 @@ class WignerSemicircleDistribution:
         """
         if size <= 0:
             raise ValueError(f"Error: invalid sample size. It has to be positive. Provided size = {size}.")
-        
-        if not self._gaussian_ens:
-            self._gaussian_ens = GaussianEnsemble(beta=self.beta, n=size, use_tridiagonal=False, sigma=self.sigma)
-        else:
-            self._gaussian_ens.set_size(size, resample_mtx=True)
-        
-        _eigval_norm_const = 1/np.sqrt(size)
-        if self.beta == 4:
-            return _eigval_norm_const * self._gaussian_ens.eigvals()[::2]
-        return _eigval_norm_const * self._gaussian_ens.eigvals()
+
+        # Use relationship with beta distribution
+        beta_samples = np.random.beta(1.5, 1.5, size=size)
+        return self.center + 2*self.radius*beta_samples - self.radius
 
     def pdf(self, x):
         """Computes PDF of the Wigner Semicircle Law.
@@ -285,15 +279,16 @@ class WignerSemicircleDistribution:
 
     def plot_empirical_pdf(self, n_size=1000, bins=100, interval=None, density=False,
                            plot_law_pdf=False, savefig_path=None):
-        """Computes and plots Wigner's semicircle empirical law using Gaussian Ensemble.
+        """Computes and plots Wigner's semicircle empirical law.
 
-        Calculates and plots Wigner's semicircle empirical law using Gaussian Ensemble
-        random matrices. Gaussian (Hermite) ensemble has improved routines (using
-        tridiagonal forms and Sturm sequences) to avoid calculating the eigenvalues,
-        so the histogram is built using certain techniques to boost efficiency.
+        Calculates and plots Wigner's semicircle empirical law using random samples generated
+        using the relationship between the Wigner Semicircle law and the Beta distribution:
+        the Wigner's Semicircle distribution it is a scaled Beta distribution with parameters
+        :math:`\alpha = \beta = 3/2`.
 
         Args:
-            n_size (int, default=1000): random matrix size n times n. This is the sample size.
+            n_size (int, default=1000): number of random samples that can be interpreted as
+                random eigenvalues of a Wigner matrix. This is the sample size.
             bins (int or sequence, default=100): If bins is an integer, it defines the number
                 of equal-width bins in the range. If bins is a sequence, it defines the
                 bin edges, including the left edge of the first bin and the right
@@ -324,30 +319,9 @@ class WignerSemicircleDistribution:
         if n_size<1:
             raise ValueError("matrix size must be positive")
 
-        if self.center != 0.0:
-            print(f"Warning: The given center is not 0.0 (center = {self.center}).\n"
-                  "\t It is only available the centered empirical Wigner's semicircle law.")
-        
-        use_tridiag = (self.sigma == 1.0)
-        if not use_tridiag:
-            print(f"Warning: The given scale is not the standard (sigma = {self.sigma}).\n"
-                "\t Tridiagonal histogramming is deactivated.\n"
-                "\t It is adviced to set sigma=1.0 to optimize and boost histogramming.")
+        random_samples = self.rvs(size=n_size)
+        observed, bins = np.histogram(random_samples, bins=bins, range=interval, density=density)
 
-        ens = GaussianEnsemble(beta=self.beta, n=n_size, sigma=self.sigma, use_tridiagonal=use_tridiag)
-
-        # default plotting interval in case it's not provided
-        if interval is None:
-            interval = (-self.radius, self.radius)
-
-        # Wigner eigenvalue normalization constant
-        if use_tridiag:
-            norm_const = 1/np.sqrt(n_size) if self.beta==4 else 1/np.sqrt(n_size/2)
-        else:
-            norm_const = 1/np.sqrt(n_size)
-
-        observed, bins = ens.eigval_hist(bins=bins, interval=interval,
-                                        density=density, norm_const=norm_const)
         width = bins[1]-bins[0]
         plt.bar(bins[:-1], observed, width=width, align='edge')
 
@@ -359,7 +333,7 @@ class WignerSemicircleDistribution:
         elif plot_law_pdf and not density:
             print("Warning: Wigner's Semicircle Law PDF is only plotted when density is True.")
 
-        plt.title("Wigner Semicircle Law - Empirical density histogram", fontweight="bold")
+        plt.title("Wigner Semicircle Law - Eigenvalue histogram", fontweight="bold")
         plt.xlabel("x")
         plt.ylabel("probability density")
 

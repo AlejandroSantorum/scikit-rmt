@@ -26,12 +26,17 @@ class _Ensemble(metaclass=ABCMeta):
     Attributes:
         matrix (numpy array): instance of the random matrix ensemble
             of size n times n.
-
+        _eigvals (numpy array): array of computed eigenvalues. This array
+            is None until the method `eigvals` is called. The computed
+            eigenvalues are cached in the attribute _eigvals to avoid
+            re-computing them. The eigenvalues are re-calculated again
+            if the matrix sample changes.
     """
 
     @abstractmethod
     def __init__(self):
         self.matrix = None
+        self._eigvals = None
 
     @abstractmethod
     def sample(self):

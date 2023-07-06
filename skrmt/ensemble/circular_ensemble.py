@@ -143,11 +143,15 @@ class CircularEnsemble(_Ensemble):
         u_mtx = _sample_haar_mtx(self.n)
         # mapping to Circular Orthogonal Ensemble
         self.matrix = np.matmul(u_mtx.transpose(), u_mtx)
+        # setting array of eigenvalues to None to force re-computing them
+        self._eigvals = None
         return self.matrix
 
     def _sample_cue(self):
         # sampling unitary Haar-distributed matrix
         self.matrix = _sample_haar_mtx(self.n)
+        # setting array of eigenvalues to None to force re-computing them
+        self._eigvals = None
         return self.matrix
 
     def _sample_cse(self):
@@ -160,6 +164,8 @@ class CircularEnsemble(_Ensemble):
         u_r_mtx = np.matmul(u_r_aux, j_mtx.transpose())
         # A = U^R * U
         self.matrix = np.matmul(u_r_mtx, u_mtx)
+        # setting array of eigenvalues to None to force re-computing them
+        self._eigvals = None
         return self.matrix
 
     def _build_j_mtx(self):
@@ -203,9 +209,17 @@ class CircularEnsemble(_Ensemble):
             numpy array with the calculated eigenvalues.
 
         """
+        if self._eigvals is not None:
+            return self._eigvals
+
         if self.beta == 1:
-            return np.linalg.eigvalsh(self.matrix)
-        return np.linalg.eigvals(self.matrix)
+            # using eigvalsh because it's known all eigenvalues are real
+            self._eigvals = np.linalg.eigvalsh(self.matrix)
+        else:
+            # using eigvals since some eigenvalues could be imaginary
+            self._eigvals = np.linalg.eigvals(self.matrix)
+
+        return self._eigvals
 
     def plot_eigval_hist(self, bins, interval=None, density=False, norm_const=None, fig_path=None):
         """Computes and plots the histogram of the matrix eigenvalues.
