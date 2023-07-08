@@ -277,7 +277,7 @@ class WignerSemicircleDistribution:
         )
     
 
-    def plot_empirical_pdf(self, n_size=1000, bins=100, interval=None, density=False,
+    def plot_empirical_pdf(self, n_size=10000, bins=100, interval=None, density=False,
                            plot_law_pdf=False, savefig_path=None):
         """Computes and plots Wigner's semicircle empirical law.
 
@@ -318,6 +318,9 @@ class WignerSemicircleDistribution:
         # pylint: disable=too-many-arguments
         if n_size<1:
             raise ValueError("matrix size must be positive")
+        
+        if interval is None:
+            interval = (-self.radius, self.radius)
 
         random_samples = self.rvs(size=n_size)
         observed, bins = np.histogram(random_samples, bins=bins, range=interval, density=density)
