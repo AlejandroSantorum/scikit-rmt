@@ -287,7 +287,7 @@ class GaussianEnsemble(_Ensemble):
             interval = (-wsl_radius, wsl_radius)
         
         if norm_const is None:
-                norm_const = self.eigval_norm_const
+            norm_const = self.eigval_norm_const
 
         if self.use_tridiagonal:
             # pylint: disable=too-many-arguments
@@ -311,7 +311,7 @@ class GaussianEnsemble(_Ensemble):
                 bins=bins,
                 interval=interval,
                 density=density,
-                norm_const=self.eigval_norm_const,
+                norm_const=norm_const,
                 fig_path=fig_path
             )
 

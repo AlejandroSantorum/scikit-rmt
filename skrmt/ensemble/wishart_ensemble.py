@@ -96,7 +96,10 @@ class WishartEnsemble(_Ensemble):
         self.beta = beta
         self.use_tridiagonal = use_tridiagonal
         self.sigma = sigma
+        self._eigvals = None
         self.matrix = self.sample()
+        # default eigenvalue normalization constant
+        self.eigval_norm_const = 1/self.n
 
     def set_size(self, p, n, resample_mtx=True):
         # pylint: disable=arguments-differ
@@ -234,7 +237,7 @@ class WishartEnsemble(_Ensemble):
         return self.matrix
 
 
-    def eigvals(self):
+    def eigvals(self, normalize=False):
         """Computes the random matrix eigenvalues.
 
         Calculates the random matrix eigenvalues using numpy standard procedure.
@@ -244,11 +247,14 @@ class WishartEnsemble(_Ensemble):
             numpy array with the calculated eigenvalues.
 
         """
-        if self._eigvals is not None:
-            return self._eigvals
+        norm_const = self.eigval_norm_const if normalize else 1.0
 
+        if self._eigvals is not None:
+            return norm_const * self._eigvals
+
+        # always storing non-normalized eigenvalues
         self._eigvals = np.linalg.eigvalsh(self.matrix)
-        return self._eigvals
+        return norm_const * self._eigvals
 
     def eigval_hist(self, bins, interval=None, density=False, norm_const=None, avoid_img=False):
         if self.use_tridiagonal:
@@ -297,7 +303,8 @@ class WishartEnsemble(_Ensemble):
         """
         # pylint: disable=too-many-arguments
         if norm_const is None:
-            norm_const = 1/self.n 
+            norm_const = self.eigval_norm_const
+
         if interval is None:
             # calculating constants depending on matrix sizes
             ratio = self.p/self.n
@@ -320,7 +327,13 @@ class WishartEnsemble(_Ensemble):
                 plt.show()
 
         else:
-            super().plot_eigval_hist(bins, interval, density, norm_const, fig_path)
+            super().plot_eigval_hist(
+                bins=bins,
+                interval=interval,
+                density=density,
+                norm_const=norm_const,
+                fig_path=fig_path
+            )
 
     def joint_eigval_pdf(self, eigvals=None):
         '''Computes joint eigenvalue pdf.
