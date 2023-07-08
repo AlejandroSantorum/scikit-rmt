@@ -46,6 +46,21 @@ def test_init_exception():
         _ = _Ensemble()
 
 
+def test_base_set_eigval_norm_const():
+    """Testing setting a custom eigenvalue normalization constant
+    """
+    goe = GaussianEnsemble(beta=1, n=10, use_tridiagonal=False)
+
+    assert goe.eigval_norm_const is not None
+
+    goe.set_eigval_norm_const(100.0)
+    assert goe.eigval_norm_const == 100.0
+
+    goe.set_eigval_norm_const(0.1)
+    assert goe.eigval_norm_const == 0.1
+
+
+
 def test_base_ens_plot():
         '''Testing WignerSemicircleDistribution plot pdf
         '''

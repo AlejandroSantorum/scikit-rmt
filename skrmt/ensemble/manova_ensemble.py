@@ -91,8 +91,6 @@ class ManovaEnsemble(_Ensemble):
         self.beta = beta
         self._eigvals = None
         self.matrix = self.sample()
-        # default eigenvalue normalization constant
-        self.eigval_norm_const = 1.0
 
     def set_size(self, m, n1, n2, resample_mtx=True):
         # pylint: disable=arguments-differ

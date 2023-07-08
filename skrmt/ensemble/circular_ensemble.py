@@ -94,8 +94,6 @@ class CircularEnsemble(_Ensemble):
         self.beta = beta
         self._eigvals = None
         self.matrix = self.sample()
-        # default eigenvalue normalization constant
-        self.eigval_norm_const = 1.0
 
     def set_size(self, n, resample_mtx=False):
         # pylint: disable=arguments-differ

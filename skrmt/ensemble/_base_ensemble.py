@@ -37,6 +37,8 @@ class _Ensemble(metaclass=ABCMeta):
     def __init__(self):
         self.matrix = None
         self._eigvals = None
+        # default eigenvalue normalization constant
+        self.eigval_norm_const = 1.0
 
     @abstractmethod
     def sample(self):
@@ -57,6 +59,19 @@ class _Ensemble(metaclass=ABCMeta):
         # pylint: disable=missing-function-docstring
         # this will be commented at inherited classes
         pass
+
+    def set_eigval_norm_const(self, eigval_norm_const):
+        """Sets a custom eigenvalue normalization constant.
+
+        This updates the normalization constant applied to the computed eigenvalues.
+        Eigenvalue normalization is useful because normalized eigenvalues always have
+        the same support independently of the sample size.
+
+        Args:
+            eigval_norm_const (float): new eigenvalue normalization constant.
+        """
+        # pylint: disable=unnecessary-pass
+        self.eigval_norm_const = eigval_norm_const
 
     @abstractmethod
     def eigvals(self, normalize=False):
