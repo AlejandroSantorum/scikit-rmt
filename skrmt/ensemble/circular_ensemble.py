@@ -92,7 +92,10 @@ class CircularEnsemble(_Ensemble):
         # pylint: disable=invalid-name
         self.n = n
         self.beta = beta
+        self._eigvals = None
         self.matrix = self.sample()
+        # default eigenvalue normalization constant
+        self.eigval_norm_const = 1.0
 
     def set_size(self, n, resample_mtx=False):
         # pylint: disable=arguments-differ
@@ -199,7 +202,7 @@ class CircularEnsemble(_Ensemble):
         j_mtx[inds+1, inds] = 1
         return j_mtx
 
-    def eigvals(self):
+    def eigvals(self, normalize=False):
         """Calculates the random matrix eigenvalues.
 
         Calculates the random matrix eigenvalues using numpy standard procedure.
@@ -209,8 +212,9 @@ class CircularEnsemble(_Ensemble):
             numpy array with the calculated eigenvalues.
 
         """
+        norm_const = self.eigval_norm_const if normalize else 1.0
         if self._eigvals is not None:
-            return self._eigvals
+            return norm_const * self._eigvals
 
         if self.beta == 1:
             # using eigvalsh because it's known all eigenvalues are real
@@ -219,7 +223,7 @@ class CircularEnsemble(_Ensemble):
             # using eigvals since some eigenvalues could be imaginary
             self._eigvals = np.linalg.eigvals(self.matrix)
 
-        return self._eigvals
+        return norm_const * self._eigvals
 
     def plot_eigval_hist(self, bins, interval=None, density=False, norm_const=None, fig_path=None):
         """Computes and plots the histogram of the matrix eigenvalues.
@@ -258,7 +262,11 @@ class CircularEnsemble(_Ensemble):
         # pylint: disable=too-many-arguments
         # pylint: disable=too-many-locals
         if self.beta == 1:
-            return super().plot_eigval_hist(bins, interval, density, norm_const, fig_path)
+            if norm_const is None:
+                norm_const = self.eigval_norm_const
+            return super().plot_eigval_hist(
+                bins=bins, interval=interval, density=density, norm_const=norm_const, fig_path=fig_path
+            )
 
         if (interval is not None) and not isinstance(interval, tuple):
             raise ValueError("interval argument must be a tuple (or None)")
