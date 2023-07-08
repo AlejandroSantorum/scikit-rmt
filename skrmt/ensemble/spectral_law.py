@@ -423,11 +423,10 @@ class MarchenkoPasturDistribution:
             self._wishart_ens = WishartEnsemble(beta=self.beta, p=size, n=_n, use_tridiagonal=False, sigma=self.sigma)
         else:
             self._wishart_ens.set_size(p=size, n=_n, resample_mtx=True)
-        
-        _eigval_norm_const = 1/_n 
+
         if self.beta == 4:
-            return _eigval_norm_const * self._wishart_ens.eigvals()[::2]
-        return _eigval_norm_const * self._wishart_ens.eigvals()
+            return _eigval_norm_const * self._wishart_ens.eigvals(normalize=True)[::2]
+        return _eigval_norm_const * self._wishart_ens.eigvals(normalize=True)
 
     def pdf(self, x):
         """Computes PDF of the Marchenko-Pastur Law.
@@ -729,7 +728,7 @@ class TracyWidomDistribution:
 
         max_eigvals = []
         for _ in range(size):
-            max_eigvals.append(self._gaussian_ens.eigvals().max())
+            max_eigvals.append(self._gaussian_ens.eigvals(normalize=False).max())
             self._gaussian_ens.sample()
         max_eigvals = np.asarray(max_eigvals)
 
@@ -855,7 +854,7 @@ class TracyWidomDistribution:
 
         eigvals = []
         for _ in range(times):
-            eigvals.append(ens.eigvals().max())
+            eigvals.append(ens.eigvals(normalize=False).max())
             ens.sample()
         eigvals = np.asarray(eigvals)
 
