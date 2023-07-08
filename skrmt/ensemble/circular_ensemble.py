@@ -225,7 +225,7 @@ class CircularEnsemble(_Ensemble):
 
         return norm_const * self._eigvals
 
-    def plot_eigval_hist(self, bins, interval=None, density=False, norm_const=None, fig_path=None):
+    def plot_eigval_hist(self, bins, interval=None, density=False, normalize=None, fig_path=None):
         """Computes and plots the histogram of the matrix eigenvalues.
 
         Calculates and plots the histogram of the current sampled matrix eigenvalues.
@@ -245,10 +245,10 @@ class CircularEnsemble(_Ensemble):
                 number of counts and the bin width, so that the area under the histogram
                 integrates to 1. If set to False, the absolute frequencies of the eigenvalues
                 are returned.
-            norm_const (float, default=None): Eigenvalue normalization constant. By default,
-                it is set to None, so eigenvalues are not normalized. However, it is advisable
-                to specify a normalization constant to observe eigenvalue spectrum, e.g.
-                1/sqrt(n/2) if you want to analyze Wigner's Semicircular Law.
+            normalize (bool, default=False): Whether to normalize the computed eigenvalues
+                by the default normalization constant (see references). Defaults to False, i.e.,
+                no normalization. Normalization makes the eigenvalues to be in the same support
+                independently of the sample size.
             fig_path (string, default=None): path to save the created figure. If it is not
                 provided, the plot is shown at the end of the routine.
 
@@ -262,10 +262,8 @@ class CircularEnsemble(_Ensemble):
         # pylint: disable=too-many-arguments
         # pylint: disable=too-many-locals
         if self.beta == 1:
-            if norm_const is None:
-                norm_const = self.eigval_norm_const
             return super().plot_eigval_hist(
-                bins=bins, interval=interval, density=density, norm_const=norm_const, fig_path=fig_path
+                bins=bins, interval=interval, density=density, normalize=normalize, fig_path=fig_path
             )
 
         if (interval is not None) and not isinstance(interval, tuple):
