@@ -89,7 +89,10 @@ class ManovaEnsemble(_Ensemble):
         self.n1 = n1
         self.n2 = n2
         self.beta = beta
+        self._eigvals = None
         self.matrix = self.sample()
+        # default eigenvalue normalization constant
+        self.eigval_norm_const = 1.0
 
     def set_size(self, m, n1, n2, resample_mtx=True):
         # pylint: disable=arguments-differ
@@ -206,7 +209,7 @@ class ManovaEnsemble(_Ensemble):
         self._eigvals = None
         return self.matrix
 
-    def eigvals(self):
+    def eigvals(self, normalize=False):
         """Computes the random matrix eigenvalues.
 
         Calculates the random matrix eigenvalues using numpy standard procedure.
@@ -216,11 +219,14 @@ class ManovaEnsemble(_Ensemble):
             numpy array with the calculated eigenvalues.
 
         """
-        if self._eigvals is not None:
-            return self._eigvals
+        norm_const = self.eigval_norm_const if normalize else 1.0
 
+        if self._eigvals is not None:
+            return norm_const * self._eigvals
+
+        # always storing non-normalized eigenvalues
         self._eigvals = np.linalg.eigvals(self.matrix)
-        return self._eigvals
+        return norm_const * self._eigvals
 
     def plot_eigval_hist(self, bins, interval=(0,1), density=False, norm_const=None, fig_path=None):
         """Computes and plots the histogram of the matrix eigenvalues
@@ -256,8 +262,14 @@ class ManovaEnsemble(_Ensemble):
 
         """
         # pylint: disable=too-many-arguments
-        return super().plot_eigval_hist(bins, interval, density,
-                                        norm_const=norm_const, avoid_img=True, fig_path=fig_path)
+        return super().plot_eigval_hist(
+            bins=bins,
+            interval=interval,
+            density=density,
+            norm_const=norm_const,
+            avoid_img=True,
+            fig_path=fig_path
+        )
 
     def joint_eigval_pdf(self, eigvals=None):
         '''Computes joint eigenvalue pdf.
