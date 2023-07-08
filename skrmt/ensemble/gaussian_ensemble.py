@@ -87,7 +87,14 @@ class GaussianEnsemble(_Ensemble):
         self.beta = beta
         self.use_tridiagonal = use_tridiagonal
         self.sigma = sigma
+        self._eigvals = None
         self.matrix = self.sample()
+
+        # default eigenvalue normalization constant
+        if self.use_tridiagonal:
+            self.eigval_norm_const = 1/np.sqrt(self.n) if self.beta==4 else 1/np.sqrt(self.n/2)
+        else:
+            self.eigval_norm_const = 1/np.sqrt(self.n)
 
 
     def set_size(self, n, resample_mtx=True):
@@ -210,7 +217,7 @@ class GaussianEnsemble(_Ensemble):
         self._eigvals = None
         return self.matrix
 
-    def eigvals(self):
+    def eigvals(self, normalize=False):
         """Computes the random matrix eigenvalues.
 
         Calculates the random matrix eigenvalues using numpy standard procedure.
@@ -220,11 +227,14 @@ class GaussianEnsemble(_Ensemble):
             numpy array with the calculated eigenvalues.
 
         """
-        if self._eigvals is not None:
-            return self._eigvals
+        norm_const = self.eigval_norm_const if normalize else 1.0
 
+        if self._eigvals is not None:
+            return norm_const * self._eigvals
+
+        # always storing non-normalized eigenvalues
         self._eigvals = np.linalg.eigvalsh(self.matrix)
-        return self._eigvals
+        return norm_const * self._eigvals
 
     def eigval_hist(self, bins, interval=None, density=False, norm_const=None, avoid_img=False):
         if self.use_tridiagonal:
@@ -275,10 +285,12 @@ class GaussianEnsemble(_Ensemble):
         if interval is None:
             wsl_radius = 2*np.sqrt(self.beta)*self.sigma
             interval = (-wsl_radius, wsl_radius)
+        
+        if norm_const is None:
+                norm_const = self.eigval_norm_const
+
         if self.use_tridiagonal:
             # pylint: disable=too-many-arguments
-            if norm_const is None:
-                norm_const = 1/np.sqrt(self.n) if self.beta==4 else 1/np.sqrt(self.n/2)
 
             observed, bins = tridiag_eigval_hist(self.matrix*norm_const, bins=bins,
                                                  interval=interval, density=density)
@@ -295,10 +307,13 @@ class GaussianEnsemble(_Ensemble):
 
         else:
             # pylint: disable=too-many-arguments
-            if norm_const is None:
-                norm_const = 1/np.sqrt(self.n)
-            super().plot_eigval_hist(bins, interval=interval, density=density,
-                                     norm_const=norm_const, fig_path=fig_path)
+            super().plot_eigval_hist(
+                bins=bins,
+                interval=interval,
+                density=density,
+                norm_const=self.eigval_norm_const,
+                fig_path=fig_path
+            )
 
     def joint_eigval_pdf(self, eigvals=None):
         '''Computes joint eigenvalue pdf.
