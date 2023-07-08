@@ -252,7 +252,7 @@ class WignerSemicircleDistribution:
             interval = (self.center - self.radius - 0.1, self.center + self.radius + 0.1)
         
         _plot_func(
-            interval, func=self.pdf, bins=bins, 
+            interval, func=self.pdf, bins=bins, plot_title="Wigner Semicircle law PDF", 
             plot_ylabel="probability density", savefig_path=savefig_path
         )
     
@@ -272,7 +272,7 @@ class WignerSemicircleDistribution:
             interval = (self.center - self.radius - 0.1, self.center + self.radius + 0.1)
         
         _plot_func(
-            interval, func=self.cdf, bins=bins, 
+            interval, func=self.cdf, bins=bins, plot_title="Wigner Semicircle law CDF",
             plot_ylabel="cumulative distribution", savefig_path=savefig_path
         )
     
@@ -503,7 +503,7 @@ class MarchenkoPasturDistribution:
             interval = (self.lambda_minus, self.lambda_plus)
         
         _plot_func(
-            interval, func=self.pdf, bins=bins, 
+            interval, func=self.pdf, bins=bins, plot_title="Marchenko-Pastur law PDF",
             plot_ylabel="probability density", savefig_path=savefig_path
         )
     
@@ -523,7 +523,7 @@ class MarchenkoPasturDistribution:
             interval = (self.lambda_minus, self.lambda_plus)
         
         _plot_func(
-            interval, func=self.cdf, bins=bins, 
+            interval, func=self.cdf, bins=bins, plot_title="Marchenko-Pastur law CDF",
             plot_ylabel="cumulative distribution", savefig_path=savefig_path
         )
 
@@ -630,7 +630,7 @@ class MarchenkoPasturDistribution:
             pdf = mpd.pdf(centers)
             plt.plot(centers, pdf, color='red', linewidth=2)
 
-        plt.title("Marchenko-Pastur Law - Empirical density histogram", fontweight="bold")
+        plt.title("Marchenko-Pastur Law - Eigenvalue histogram", fontweight="bold")
         plt.xlabel("x")
         plt.ylabel("probability density")
         if approx_ratio > 1:
@@ -781,7 +781,7 @@ class TracyWidomDistribution:
             interval = (-5, 4-self.beta)
         
         _plot_func(
-            interval, func=self.pdf, bins=bins, 
+            interval, func=self.pdf, bins=bins, plot_title="Tracy-Widom law PDF",
             plot_ylabel="probability density", savefig_path=savefig_path
         )
     
@@ -801,7 +801,7 @@ class TracyWidomDistribution:
             interval = (-5, 4-self.beta)
         
         _plot_func(
-            interval, func=self.cdf, bins=bins, 
+            interval, func=self.cdf, bins=bins, plot_title="Tracy-Widom law CDF",
             plot_ylabel="cumulative distribution", savefig_path=savefig_path
         )
 
@@ -881,7 +881,7 @@ class TracyWidomDistribution:
             pdf = self.pdf(centers)
             plt.plot(centers, pdf, color='red', linewidth=2)
 
-        plt.title("Tracy-Widom Law - Empirical density histogram", fontweight="bold")
+        plt.title("Tracy-Widom Law - Eigenvalue histogram", fontweight="bold")
         plt.xlabel("x")
         plt.ylabel("probability density")
 
@@ -1048,7 +1048,7 @@ class ManovaSpectrumDistribution:
             interval = (self.lambda_minus, self.lambda_plus)
         
         _plot_func(
-            interval, func=self.pdf, bins=bins, 
+            interval, func=self.pdf, bins=bins, plot_title="Manova spectrum PDF",
             plot_ylabel="probability density", savefig_path=savefig_path
         )
 
@@ -1068,7 +1068,7 @@ class ManovaSpectrumDistribution:
             interval = (self.lambda_minus, self.lambda_plus)
 
         _plot_func(
-            interval, func=self.cdf, bins=bins, 
+            interval, func=self.cdf, bins=bins, plot_title="Manova spectrum CDF",
             plot_ylabel="cumulative distribution", savefig_path=savefig_path
         )
 
@@ -1178,7 +1178,7 @@ class ManovaSpectrumDistribution:
             pdf = msd.pdf(centers)
             plt.plot(centers, pdf, color='red', linewidth=2)
 
-        plt.title("Manova Spectrum - Empirical density histogram", fontweight="bold")
+        plt.title("Manova Spectrum - Eigenvalue histogram", fontweight="bold")
         plt.xlabel("x")
         plt.ylabel("probability density")
         if approx_a <= 1 or approx_b <= 1:

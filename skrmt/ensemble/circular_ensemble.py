@@ -289,7 +289,7 @@ class CircularEnsemble(_Ensemble):
         axes[0].set_xlim(rang[0][0], rang[0][1])
         axes[0].set_ylim(rang[1][0], rang[1][1])
         axes[0].plot(xvals, yvals, 'o')
-        axes[0].set_title('Eigenvalue plot')
+        axes[0].set_title('Complex plane')
         axes[0].set_xlabel('real')
         axes[0].set_ylabel('imaginary')
 
@@ -298,12 +298,11 @@ class CircularEnsemble(_Ensemble):
         fig.colorbar(img, ax=axes[1])
         axes[1].cla()
         axes[1].imshow(h2d.transpose(), origin='lower', interpolation="bilinear", extent=extent)
-        axes[1].set_title('Heatmap eigenvalue plot')
+        axes[1].set_title('Eigenvalue heatmap')
         axes[1].set_xlabel('real')
         axes[1].set_ylabel('imaginary')
 
-        plt.suptitle("matrix size: "+\
-                      str(len(self.matrix))+"x"+str(len(self.matrix)), fontweight="bold")
+        plt.suptitle("Complex eigenvalues histogram", fontweight="bold")
 
         # Saving plot or showing it
         if fig_path:
