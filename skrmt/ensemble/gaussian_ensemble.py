@@ -87,7 +87,14 @@ class GaussianEnsemble(_Ensemble):
         self.beta = beta
         self.use_tridiagonal = use_tridiagonal
         self.sigma = sigma
+        self._eigvals = None
         self.matrix = self.sample()
+
+        # default eigenvalue normalization constant
+        if self.use_tridiagonal:
+            self.eigval_norm_const = 1/np.sqrt(self.n) if self.beta==4 else 1/np.sqrt(self.n/2)
+        else:
+            self.eigval_norm_const = 1/np.sqrt(self.n)
 
 
     def set_size(self, n, resample_mtx=True):
@@ -210,7 +217,7 @@ class GaussianEnsemble(_Ensemble):
         self._eigvals = None
         return self.matrix
 
-    def eigvals(self):
+    def eigvals(self, normalize=False):
         """Computes the random matrix eigenvalues.
 
         Calculates the random matrix eigenvalues using numpy standard procedure.
@@ -220,23 +227,30 @@ class GaussianEnsemble(_Ensemble):
             numpy array with the calculated eigenvalues.
 
         """
+        norm_const = self.eigval_norm_const if normalize else 1.0
+
         if self._eigvals is not None:
-            return self._eigvals
+            return norm_const * self._eigvals
 
+        # always storing non-normalized eigenvalues
         self._eigvals = np.linalg.eigvalsh(self.matrix)
-        return self._eigvals
+        return norm_const * self._eigvals
 
-    def eigval_hist(self, bins, interval=None, density=False, norm_const=None, avoid_img=False):
+    def eigval_hist(self, bins, interval=None, density=False, normalize=True, avoid_img=False):
         if self.use_tridiagonal:
-            if norm_const:
-                return tridiag_eigval_hist(self.matrix*norm_const, bins=bins,
-                                           interval=interval, density=density)
+            if normalize:
+                return tridiag_eigval_hist(
+                    self.eigval_norm_const * self.matrix,
+                    bins=bins,
+                    interval=interval,
+                    density=density,
+                )
             return tridiag_eigval_hist(self.matrix, bins=bins, interval=interval, density=density)
 
         return super().eigval_hist(bins, interval=interval, density=density,
-                                   norm_const=norm_const, avoid_img=avoid_img)
+                                   normalize=normalize, avoid_img=avoid_img)
 
-    def plot_eigval_hist(self, bins=100, interval=None, density=False, norm_const=None, fig_path=None):
+    def plot_eigval_hist(self, bins=100, interval=None, density=False, normalize=True, fig_path=None):
         """Computes and plots the histogram of the matrix eigenvalues.
 
         Calculates and plots the histogram of the current sampled matrix eigenvalues.
@@ -256,10 +270,10 @@ class GaussianEnsemble(_Ensemble):
                 number of counts and the bin width, so that the area under the histogram
                 integrates to 1. If set to False, the absolute frequencies of the eigenvalues
                 are returned.
-            norm_const (float, default=None): Eigenvalue normalization constant. By default,
-                it is set to None, so eigenvalues are not normalized. However, it is advisable
-                to specify a normalization constant to observe eigenvalue spectrum, e.g.
-                1/sqrt(n/2) if you want to analyze Wigner's Semicircular Law.
+            normalize (bool, default=True): Whether to normalize the computed eigenvalues
+                by the default normalization constant (see references). Defaults to True, i.e.,
+                the eigenvalues are normalized. Normalization makes the eigenvalues to be in the
+                same support independently of the sample size.
             fig_path (string, default=None): path to save the created figure. If it is not
                 provided, the plot is shown at the end of the routine.
 
@@ -275,16 +289,16 @@ class GaussianEnsemble(_Ensemble):
         if interval is None:
             wsl_radius = 2*np.sqrt(self.beta)*self.sigma
             interval = (-wsl_radius, wsl_radius)
+
         if self.use_tridiagonal:
             # pylint: disable=too-many-arguments
-            if norm_const is None:
-                norm_const = 1/np.sqrt(self.n) if self.beta==4 else 1/np.sqrt(self.n/2)
+            observed, bins = self.eigval_hist(
+                bins=bins, interval=interval, density=density, normalize=normalize
+            )
 
-            observed, bins = tridiag_eigval_hist(self.matrix*norm_const, bins=bins,
-                                                 interval=interval, density=density)
             width = bins[1]-bins[0]
             plt.bar(bins[:-1], observed, width=width, align='edge')
-            plt.title("Eigenvalue density histogram", fontweight="bold")
+            plt.title("Eigenvalue histogram", fontweight="bold")
             plt.xlabel("x")
             plt.ylabel("density")
             # Saving plot or showing it
@@ -295,10 +309,13 @@ class GaussianEnsemble(_Ensemble):
 
         else:
             # pylint: disable=too-many-arguments
-            if norm_const is None:
-                norm_const = 1/np.sqrt(self.n)
-            super().plot_eigval_hist(bins, interval=interval, density=density,
-                                     norm_const=norm_const, fig_path=fig_path)
+            super().plot_eigval_hist(
+                bins=bins,
+                interval=interval,
+                density=density,
+                normalize=normalize,
+                fig_path=fig_path,
+            )
 
     def joint_eigval_pdf(self, eigvals=None):
         '''Computes joint eigenvalue pdf.

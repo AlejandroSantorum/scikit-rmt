@@ -89,6 +89,7 @@ class ManovaEnsemble(_Ensemble):
         self.n1 = n1
         self.n2 = n2
         self.beta = beta
+        self._eigvals = None
         self.matrix = self.sample()
 
     def set_size(self, m, n1, n2, resample_mtx=True):
@@ -206,7 +207,7 @@ class ManovaEnsemble(_Ensemble):
         self._eigvals = None
         return self.matrix
 
-    def eigvals(self):
+    def eigvals(self, normalize=False):
         """Computes the random matrix eigenvalues.
 
         Calculates the random matrix eigenvalues using numpy standard procedure.
@@ -216,13 +217,16 @@ class ManovaEnsemble(_Ensemble):
             numpy array with the calculated eigenvalues.
 
         """
+        norm_const = self.eigval_norm_const if normalize else 1.0
+
         if self._eigvals is not None:
-            return self._eigvals
+            return norm_const * self._eigvals
 
+        # always storing non-normalized eigenvalues
         self._eigvals = np.linalg.eigvals(self.matrix)
-        return self._eigvals
+        return norm_const * self._eigvals
 
-    def plot_eigval_hist(self, bins, interval=(0,1), density=False, norm_const=None, fig_path=None):
+    def plot_eigval_hist(self, bins, interval=(0,1), density=False, normalize=True, fig_path=None):
         """Computes and plots the histogram of the matrix eigenvalues
 
         Calculates and plots the histogram of the current sampled matrix eigenvalues.
@@ -239,10 +243,10 @@ class ManovaEnsemble(_Ensemble):
                 number of counts and the bin width, so that the area under the histogram
                 integrates to 1. If set to False, the absolute frequencies of the eigenvalues
                 are returned.
-            norm_const (float, default=None): Eigenvalue normalization constant. By default,
-                it is set to None, so eigenvalues are not normalized. However, it is advisable
-                to specify a normalization constant to observe eigenvalue spectrum, e.g.
-                1/sqrt(n/2) if you want to analyze Wigner's Semicircular Law.
+            normalize (bool, default=True): Whether to normalize the computed eigenvalues
+                by the default normalization constant (see references). Defaults to True, i.e.,
+                the eigenvalues are normalized. Normalization makes the eigenvalues to be in the
+                same support independently of the sample size.
             fig_path (string, default=None): path to save the created figure. If it is not
                 provided, the plot is shown at the end of the routine.
 
@@ -256,8 +260,14 @@ class ManovaEnsemble(_Ensemble):
 
         """
         # pylint: disable=too-many-arguments
-        return super().plot_eigval_hist(bins, interval, density,
-                                        norm_const=norm_const, avoid_img=True, fig_path=fig_path)
+        return super().plot_eigval_hist(
+            bins=bins,
+            interval=interval,
+            density=density,
+            normalize=normalize,
+            fig_path=fig_path,
+            avoid_img=True,
+        )
 
     def joint_eigval_pdf(self, eigvals=None):
         '''Computes joint eigenvalue pdf.

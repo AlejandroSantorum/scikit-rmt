@@ -92,6 +92,7 @@ class CircularEnsemble(_Ensemble):
         # pylint: disable=invalid-name
         self.n = n
         self.beta = beta
+        self._eigvals = None
         self.matrix = self.sample()
 
     def set_size(self, n, resample_mtx=False):
@@ -199,7 +200,7 @@ class CircularEnsemble(_Ensemble):
         j_mtx[inds+1, inds] = 1
         return j_mtx
 
-    def eigvals(self):
+    def eigvals(self, normalize=False):
         """Calculates the random matrix eigenvalues.
 
         Calculates the random matrix eigenvalues using numpy standard procedure.
@@ -209,8 +210,9 @@ class CircularEnsemble(_Ensemble):
             numpy array with the calculated eigenvalues.
 
         """
+        norm_const = self.eigval_norm_const if normalize else 1.0
         if self._eigvals is not None:
-            return self._eigvals
+            return norm_const * self._eigvals
 
         if self.beta == 1:
             # using eigvalsh because it's known all eigenvalues are real
@@ -219,9 +221,9 @@ class CircularEnsemble(_Ensemble):
             # using eigvals since some eigenvalues could be imaginary
             self._eigvals = np.linalg.eigvals(self.matrix)
 
-        return self._eigvals
+        return norm_const * self._eigvals
 
-    def plot_eigval_hist(self, bins, interval=None, density=False, norm_const=None, fig_path=None):
+    def plot_eigval_hist(self, bins, interval=None, density=False, normalize=True, fig_path=None):
         """Computes and plots the histogram of the matrix eigenvalues.
 
         Calculates and plots the histogram of the current sampled matrix eigenvalues.
@@ -241,10 +243,10 @@ class CircularEnsemble(_Ensemble):
                 number of counts and the bin width, so that the area under the histogram
                 integrates to 1. If set to False, the absolute frequencies of the eigenvalues
                 are returned.
-            norm_const (float, default=None): Eigenvalue normalization constant. By default,
-                it is set to None, so eigenvalues are not normalized. However, it is advisable
-                to specify a normalization constant to observe eigenvalue spectrum, e.g.
-                1/sqrt(n/2) if you want to analyze Wigner's Semicircular Law.
+            normalize (bool, default=True): Whether to normalize the computed eigenvalues
+                by the default normalization constant (see references). Defaults to True, i.e.,
+                the eigenvalues are normalized. Normalization makes the eigenvalues to be in the
+                same support independently of the sample size.
             fig_path (string, default=None): path to save the created figure. If it is not
                 provided, the plot is shown at the end of the routine.
 
@@ -258,7 +260,9 @@ class CircularEnsemble(_Ensemble):
         # pylint: disable=too-many-arguments
         # pylint: disable=too-many-locals
         if self.beta == 1:
-            return super().plot_eigval_hist(bins, interval, density, norm_const, fig_path)
+            return super().plot_eigval_hist(
+                bins=bins, interval=interval, density=density, normalize=normalize, fig_path=fig_path
+            )
 
         if (interval is not None) and not isinstance(interval, tuple):
             raise ValueError("interval argument must be a tuple (or None)")
@@ -283,7 +287,7 @@ class CircularEnsemble(_Ensemble):
         axes[0].set_xlim(rang[0][0], rang[0][1])
         axes[0].set_ylim(rang[1][0], rang[1][1])
         axes[0].plot(xvals, yvals, 'o')
-        axes[0].set_title('Eigenvalue plot')
+        axes[0].set_title('Complex plane')
         axes[0].set_xlabel('real')
         axes[0].set_ylabel('imaginary')
 
@@ -292,12 +296,11 @@ class CircularEnsemble(_Ensemble):
         fig.colorbar(img, ax=axes[1])
         axes[1].cla()
         axes[1].imshow(h2d.transpose(), origin='lower', interpolation="bilinear", extent=extent)
-        axes[1].set_title('Heatmap eigenvalue plot')
+        axes[1].set_title('Eigenvalue heatmap')
         axes[1].set_xlabel('real')
         axes[1].set_ylabel('imaginary')
 
-        plt.suptitle("matrix size: "+\
-                      str(len(self.matrix))+"x"+str(len(self.matrix)), fontweight="bold")
+        plt.suptitle("Complex eigenvalues histogram", fontweight="bold")
 
         # Saving plot or showing it
         if fig_path:

@@ -31,12 +31,19 @@ class _Ensemble(metaclass=ABCMeta):
             eigenvalues are cached in the attribute _eigvals to avoid
             re-computing them. The eigenvalues are re-calculated again
             if the matrix sample changes.
+        eigval_norm_cost (float): constant that is used to normalize the
+            eigenvalues so their support is always the same independently
+            of the sample size. This is really useful for plotting, since
+            the representation interval will always be the same no matter
+            how many eigenvalues are sampled.
     """
 
     @abstractmethod
     def __init__(self):
         self.matrix = None
         self._eigvals = None
+        # default eigenvalue normalization constant
+        self.eigval_norm_const = 1.0
 
     @abstractmethod
     def sample(self):
@@ -58,8 +65,21 @@ class _Ensemble(metaclass=ABCMeta):
         # this will be commented at inherited classes
         pass
 
+    def set_eigval_norm_const(self, eigval_norm_const):
+        """Sets a custom eigenvalue normalization constant.
+
+        This updates the normalization constant applied to the computed eigenvalues.
+        Eigenvalue normalization is useful because normalized eigenvalues always have
+        the same support independently of the sample size.
+
+        Args:
+            eigval_norm_const (float): new eigenvalue normalization constant.
+        """
+        # pylint: disable=unnecessary-pass
+        self.eigval_norm_const = eigval_norm_const
+
     @abstractmethod
-    def eigvals(self):
+    def eigvals(self, normalize=False):
         # pylint: disable=unnecessary-pass
         # pylint: disable=missing-function-docstring
         # this will be commented at inherited classes
@@ -72,7 +92,14 @@ class _Ensemble(metaclass=ABCMeta):
         # this will be commented at inherited classes
         pass
 
-    def eigval_hist(self, bins, interval=None, density=False, norm_const=None, avoid_img=False):
+    def eigval_hist(
+        self,
+        bins,
+        interval=None,
+        density=False,
+        normalize=True,
+        avoid_img=False
+    ):
         """Calculates the histogram of the matrix eigenvalues.
 
         Calculates the histogram of the current sampled matrix eigenvalues. Some ensembles
@@ -94,10 +121,10 @@ class _Ensemble(metaclass=ABCMeta):
                 number of counts and the bin width, so that the area under the histogram
                 integrates to 1. If set to False, the absolute frequencies of the eigenvalues
                 are returned.
-            norm_const (float, default=None): Eigenvalue normalization constant. By default,
-                it is set to None, so eigenvalues are not normalized. However, it is advisable
-                to specify a normalization constant to observe eigenvalue spectrum, e.g.
-                1/sqrt(n/2) if you want to analyze Wigner's Semicircular Law.
+            normalize (bool, default=True): Whether to normalize the computed eigenvalues
+                by the default normalization constant (see references). Defaults to True, i.e.,
+                the eigenvalues are normalized. Normalization makes the eigenvalues to be in the
+                same support independently of the sample size.
             avoid_img (bool, default=False): If True, eigenvalue imaginary part is ignored.
                 This should be used when the eigenvalue compatation is expected to generate
                 complex eigenvalues with really small imaginary part because of computing
@@ -129,20 +156,25 @@ class _Ensemble(metaclass=ABCMeta):
                 raise ValueError("interval argument must be a tuple")
 
         # calculating eigenvalues using standard algorithm
-        eigvals = self.eigvals()
+        eigvals = self.eigvals(normalize=normalize)
         # ignoring imaginary part because of computing rounding errors
         if avoid_img:
             eigvals = eigvals.real
-
-        if norm_const:
-            eigvals = norm_const*eigvals
 
         # using numpy to obtain histogram in the given interval and no. of bins
         observed, bins = np.histogram(eigvals, bins=bins, range=interval, density=density)
         return observed, bins
 
 
-    def plot_eigval_hist(self, bins, interval=None, density=False, norm_const=None, fig_path=None, avoid_img=False):
+    def plot_eigval_hist(
+        self,
+        bins,
+        interval=None,
+        density=False,
+        normalize=True,
+        fig_path=None,
+        avoid_img=False
+    ):
         """Computes and plots the histogram of the matrix eigenvalues.
 
         Calculates and plots the histogram of the current sampled matrix eigenvalues.
@@ -165,10 +197,10 @@ class _Ensemble(metaclass=ABCMeta):
                 number of counts and the bin width, so that the area under the histogram
                 integrates to 1. If set to False, the absolute frequencies of the eigenvalues
                 are returned.
-            norm_const (float, default=None): Eigenvalue normalization constant. By default,
-                it is set to None, so eigenvalues are not normalized. However, it is advisable
-                to specify a normalization constant to observe eigenvalue spectrum, e.g.
-                1/sqrt(n/2) if you want to analyze Wigner's Semicircular Law.
+            normalize (bool, default=True): Whether to normalize the computed eigenvalues
+                by the default normalization constant (see references). Defaults to True, i.e.,
+                the eigenvalues are normalized. Normalization makes the eigenvalues to be in the
+                same support independently of the sample size.
             avoid_img (bool, default=False): If True, eigenvalue imaginary part is ignored.
                 This should be used when the eigenvalue compatation is expected to generate
                 complex eigenvalues with really small imaginary part because of computing
@@ -190,11 +222,11 @@ class _Ensemble(metaclass=ABCMeta):
             raise ValueError("interval argument must be a tuple")
 
         observed, bins = self.eigval_hist(bins=bins, interval=interval, density=density,
-                                          norm_const=norm_const, avoid_img=avoid_img)
+                                          normalize=normalize, avoid_img=avoid_img)
         width = bins[1]-bins[0]
         plt.bar(bins[:-1], observed, width=width, align='edge')
 
-        plt.title("Eigenvalue density histogram", fontweight="bold")
+        plt.title("Eigenvalue histogram", fontweight="bold")
         plt.xlabel("x")
         plt.ylabel("density")
 

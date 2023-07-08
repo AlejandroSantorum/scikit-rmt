@@ -96,7 +96,10 @@ class WishartEnsemble(_Ensemble):
         self.beta = beta
         self.use_tridiagonal = use_tridiagonal
         self.sigma = sigma
+        self._eigvals = None
         self.matrix = self.sample()
+        # default eigenvalue normalization constant
+        self.eigval_norm_const = 1/self.n
 
     def set_size(self, p, n, resample_mtx=True):
         # pylint: disable=arguments-differ
@@ -234,7 +237,7 @@ class WishartEnsemble(_Ensemble):
         return self.matrix
 
 
-    def eigvals(self):
+    def eigvals(self, normalize=False):
         """Computes the random matrix eigenvalues.
 
         Calculates the random matrix eigenvalues using numpy standard procedure.
@@ -244,22 +247,30 @@ class WishartEnsemble(_Ensemble):
             numpy array with the calculated eigenvalues.
 
         """
+        norm_const = self.eigval_norm_const if normalize else 1.0
+
         if self._eigvals is not None:
-            return self._eigvals
+            return norm_const * self._eigvals
 
+        # always storing non-normalized eigenvalues
         self._eigvals = np.linalg.eigvalsh(self.matrix)
-        return self._eigvals
+        return norm_const * self._eigvals
 
-    def eigval_hist(self, bins, interval=None, density=False, norm_const=None, avoid_img=False):
+    def eigval_hist(self, bins, interval=None, density=False, normalize=True, avoid_img=False):
         if self.use_tridiagonal:
-            if norm_const:
-                return tridiag_eigval_hist(self.matrix*norm_const, bins=bins,
-                                           interval=interval, density=density)
+            if normalize:
+                return tridiag_eigval_hist(
+                    self.eigval_norm_const * self.matrix,
+                    bins=bins,
+                    interval=interval,
+                    density=density,
+                )
             return tridiag_eigval_hist(self.matrix, bins=bins, interval=interval, density=density)
 
-        return super().eigval_hist(bins, interval, density, norm_const, avoid_img=avoid_img)
+        return super().eigval_hist(bins, interval=interval, density=density,
+                                   normalize=normalize, avoid_img=avoid_img)
 
-    def plot_eigval_hist(self, bins=100, interval=None, density=False, norm_const=None, fig_path=None):
+    def plot_eigval_hist(self, bins=100, interval=None, density=False, normalize=True, fig_path=None):
         """Computes and plots the histogram of the matrix eigenvalues.
 
         Calculates and plots the histogram of the current sampled matrix eigenvalues.
@@ -279,10 +290,10 @@ class WishartEnsemble(_Ensemble):
                 number of counts and the bin width, so that the area under the histogram
                 integrates to 1. If set to False, the absolute frequencies of the eigenvalues
                 are returned.
-            norm_const (float, default=None): Eigenvalue normalization constant. By default,
-                it is set to None, so eigenvalues are not normalized. However, it is advisable
-                to specify a normalization constant to observe eigenvalue spectrum, e.g.
-                1/sqrt(n/2) if you want to analyze Wigner's Semicircular Law.
+            normalize (bool, default=True): Whether to normalize the computed eigenvalues
+                by the default normalization constant (see references). Defaults to True, i.e.,
+                the eigenvalues are normalized. Normalization makes the eigenvalues to be in the
+                same support independently of the sample size.
             fig_path (string, default=None): path to save the created figure. If it is not
                 provided, the plot is shown at the end of the routine.
 
@@ -295,9 +306,10 @@ class WishartEnsemble(_Ensemble):
                 Journal of Mathematical Physics. 43.11 (2002): 5830-5847.
 
         """
+        if not normalize:
+            print("Warning: setting normalize=False may cause normal instability and/or rounding errors.")
+
         # pylint: disable=too-many-arguments
-        if norm_const is None:
-            norm_const = 1/self.n 
         if interval is None:
             # calculating constants depending on matrix sizes
             ratio = self.p/self.n
@@ -306,11 +318,13 @@ class WishartEnsemble(_Ensemble):
             interval = (lambda_minus, lambda_plus)
 
         if self.use_tridiagonal:
-            observed, bins = tridiag_eigval_hist(self.matrix*norm_const, bins=bins,
-                                                 interval=interval, density=density)
+            observed, bins = self.eigval_hist(
+                bins=bins, interval=interval, density=density, normalize=normalize
+            )
+
             width = bins[1]-bins[0]
             plt.bar(bins[:-1], observed, width=width, align='edge')
-            plt.title("Eigenvalue density histogram", fontweight="bold")
+            plt.title("Eigenvalue histogram", fontweight="bold")
             plt.xlabel("x")
             plt.ylabel("density")
             # Saving plot or showing it
@@ -320,7 +334,13 @@ class WishartEnsemble(_Ensemble):
                 plt.show()
 
         else:
-            super().plot_eigval_hist(bins, interval, density, norm_const, fig_path)
+            super().plot_eigval_hist(
+                bins=bins,
+                interval=interval,
+                density=density,
+                normalize=normalize,
+                fig_path=fig_path,
+            )
 
     def joint_eigval_pdf(self, eigvals=None):
         '''Computes joint eigenvalue pdf.

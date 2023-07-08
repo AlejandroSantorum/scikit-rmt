@@ -252,7 +252,7 @@ class WignerSemicircleDistribution:
             interval = (self.center - self.radius - 0.1, self.center + self.radius + 0.1)
         
         _plot_func(
-            interval, func=self.pdf, bins=bins, 
+            interval, func=self.pdf, bins=bins, plot_title="Wigner Semicircle law PDF", 
             plot_ylabel="probability density", savefig_path=savefig_path
         )
     
@@ -272,12 +272,12 @@ class WignerSemicircleDistribution:
             interval = (self.center - self.radius - 0.1, self.center + self.radius + 0.1)
         
         _plot_func(
-            interval, func=self.cdf, bins=bins, 
+            interval, func=self.cdf, bins=bins, plot_title="Wigner Semicircle law CDF",
             plot_ylabel="cumulative distribution", savefig_path=savefig_path
         )
     
 
-    def plot_empirical_pdf(self, n_size=1000, bins=100, interval=None, density=False,
+    def plot_empirical_pdf(self, n_size=10000, bins=100, interval=None, density=False,
                            plot_law_pdf=False, savefig_path=None):
         """Computes and plots Wigner's semicircle empirical law.
 
@@ -318,6 +318,9 @@ class WignerSemicircleDistribution:
         # pylint: disable=too-many-arguments
         if n_size<1:
             raise ValueError("matrix size must be positive")
+        
+        if interval is None:
+            interval = (-self.radius, self.radius)
 
         random_samples = self.rvs(size=n_size)
         observed, bins = np.histogram(random_samples, bins=bins, range=interval, density=density)
@@ -423,11 +426,10 @@ class MarchenkoPasturDistribution:
             self._wishart_ens = WishartEnsemble(beta=self.beta, p=size, n=_n, use_tridiagonal=False, sigma=self.sigma)
         else:
             self._wishart_ens.set_size(p=size, n=_n, resample_mtx=True)
-        
-        _eigval_norm_const = 1/_n 
+
         if self.beta == 4:
-            return _eigval_norm_const * self._wishart_ens.eigvals()[::2]
-        return _eigval_norm_const * self._wishart_ens.eigvals()
+            return self._wishart_ens.eigvals(normalize=True)[::2]
+        return self._wishart_ens.eigvals(normalize=True)
 
     def pdf(self, x):
         """Computes PDF of the Marchenko-Pastur Law.
@@ -504,7 +506,7 @@ class MarchenkoPasturDistribution:
             interval = (self.lambda_minus, self.lambda_plus)
         
         _plot_func(
-            interval, func=self.pdf, bins=bins, 
+            interval, func=self.pdf, bins=bins, plot_title="Marchenko-Pastur law PDF",
             plot_ylabel="probability density", savefig_path=savefig_path
         )
     
@@ -524,7 +526,7 @@ class MarchenkoPasturDistribution:
             interval = (self.lambda_minus, self.lambda_plus)
         
         _plot_func(
-            interval, func=self.cdf, bins=bins, 
+            interval, func=self.cdf, bins=bins, plot_title="Marchenko-Pastur law CDF",
             plot_ylabel="cumulative distribution", savefig_path=savefig_path
         )
 
@@ -618,11 +620,8 @@ class MarchenkoPasturDistribution:
         ens = WishartEnsemble(beta=self.beta, p=p_size, n=n_size, sigma=self.sigma,
                             use_tridiagonal=(use_tridiag_ratio and use_tridiag_sigma))
 
-        # Wigner eigenvalue normalization constant
-        norm_const = 1/n_size 
+        observed, bins = ens.eigval_hist(bins=bins, interval=interval, density=density, normalize=True)
 
-        observed, bins = ens.eigval_hist(bins=bins, interval=interval,
-                                         density=density, norm_const=norm_const)
         width = bins[1]-bins[0]
         plt.bar(bins[:-1], observed, width=width, align='edge')
 
@@ -634,7 +633,7 @@ class MarchenkoPasturDistribution:
             pdf = mpd.pdf(centers)
             plt.plot(centers, pdf, color='red', linewidth=2)
 
-        plt.title("Marchenko-Pastur Law - Empirical density histogram", fontweight="bold")
+        plt.title("Marchenko-Pastur Law - Eigenvalue histogram", fontweight="bold")
         plt.xlabel("x")
         plt.ylabel("probability density")
         if approx_ratio > 1:
@@ -729,7 +728,7 @@ class TracyWidomDistribution:
 
         max_eigvals = []
         for _ in range(size):
-            max_eigvals.append(self._gaussian_ens.eigvals().max())
+            max_eigvals.append(self._gaussian_ens.eigvals(normalize=False).max())
             self._gaussian_ens.sample()
         max_eigvals = np.asarray(max_eigvals)
 
@@ -785,7 +784,7 @@ class TracyWidomDistribution:
             interval = (-5, 4-self.beta)
         
         _plot_func(
-            interval, func=self.pdf, bins=bins, 
+            interval, func=self.pdf, bins=bins, plot_title="Tracy-Widom law PDF",
             plot_ylabel="probability density", savefig_path=savefig_path
         )
     
@@ -805,7 +804,7 @@ class TracyWidomDistribution:
             interval = (-5, 4-self.beta)
         
         _plot_func(
-            interval, func=self.cdf, bins=bins, 
+            interval, func=self.cdf, bins=bins, plot_title="Tracy-Widom law CDF",
             plot_ylabel="cumulative distribution", savefig_path=savefig_path
         )
 
@@ -855,7 +854,7 @@ class TracyWidomDistribution:
 
         eigvals = []
         for _ in range(times):
-            eigvals.append(ens.eigvals().max())
+            eigvals.append(ens.eigvals(normalize=False).max())
             ens.sample()
         eigvals = np.asarray(eigvals)
 
@@ -885,7 +884,7 @@ class TracyWidomDistribution:
             pdf = self.pdf(centers)
             plt.plot(centers, pdf, color='red', linewidth=2)
 
-        plt.title("Tracy-Widom Law - Empirical density histogram", fontweight="bold")
+        plt.title("Tracy-Widom Law - Eigenvalue histogram", fontweight="bold")
         plt.xlabel("x")
         plt.ylabel("probability density")
 
@@ -985,11 +984,11 @@ class ManovaSpectrumDistribution:
             self._manova_ens = ManovaEnsemble(beta=self.beta, m=size, n1=_n1, n2=_n2)
         else:
             self._manova_ens.set_size(m=size, n1=_n1, n2=_n2, resample_mtx=True)
-        
-        # Here, _eigval_norm_const = 1.0
+
+        # normalization here is not crucial since the default normalization const. of Manova is 1.0
         if self.beta == 4:
-            return self._manova_ens.eigvals()[::2].real
-        return self._manova_ens.eigvals().real
+            return self._manova_ens.eigvals(normalize=True)[::2].real
+        return self._manova_ens.eigvals(normalize=True).real
     
     def pdf(self, x):
         """Computes PDF of the Manova Spectrum distribution.
@@ -1052,7 +1051,7 @@ class ManovaSpectrumDistribution:
             interval = (self.lambda_minus, self.lambda_plus)
         
         _plot_func(
-            interval, func=self.pdf, bins=bins, 
+            interval, func=self.pdf, bins=bins, plot_title="Manova spectrum PDF",
             plot_ylabel="probability density", savefig_path=savefig_path
         )
 
@@ -1072,7 +1071,7 @@ class ManovaSpectrumDistribution:
             interval = (self.lambda_minus, self.lambda_plus)
 
         _plot_func(
-            interval, func=self.cdf, bins=bins, 
+            interval, func=self.cdf, bins=bins, plot_title="Manova spectrum CDF",
             plot_ylabel="cumulative distribution", savefig_path=savefig_path
         )
 
@@ -1163,7 +1162,13 @@ class ManovaSpectrumDistribution:
                 interval[1] = max(lambda_plus, 1.05)
             interval = tuple(interval)
 
-        observed, bins = ens.eigval_hist(bins=bins, interval=interval, density=density, avoid_img=True)
+        observed, bins = ens.eigval_hist(
+            bins=bins,
+            interval=interval,
+            density=density,
+            normalize=True,
+            avoid_img=True
+        )
 
         width = bins[1]-bins[0]
         plt.bar(bins[:-1], observed, width=width, align='edge')
@@ -1176,7 +1181,7 @@ class ManovaSpectrumDistribution:
             pdf = msd.pdf(centers)
             plt.plot(centers, pdf, color='red', linewidth=2)
 
-        plt.title("Manova Spectrum - Empirical density histogram", fontweight="bold")
+        plt.title("Manova Spectrum - Eigenvalue histogram", fontweight="bold")
         plt.xlabel("x")
         plt.ylabel("probability density")
         if approx_a <= 1 or approx_b <= 1:
