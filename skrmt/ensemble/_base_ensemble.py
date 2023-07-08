@@ -103,7 +103,8 @@ class _Ensemble(metaclass=ABCMeta):
                 are returned.
             normalize (bool, default=False): Whether to normalize the computed eigenvalues
                 by the default normalization constant (see references). Defaults to False, i.e.,
-                no normalization.
+                no normalization. Normalization makes the eigenvalues to be in the same support
+                independently of the sample size.
             avoid_img (bool, default=False): If True, eigenvalue imaginary part is ignored.
                 This should be used when the eigenvalue compatation is expected to generate
                 complex eigenvalues with really small imaginary part because of computing
@@ -178,7 +179,8 @@ class _Ensemble(metaclass=ABCMeta):
                 are returned.
             normalize (bool, default=False): Whether to normalize the computed eigenvalues
                 by the default normalization constant (see references). Defaults to False, i.e.,
-                no normalization.
+                no normalization. Normalization makes the eigenvalues to be in the same support
+                independently of the sample size.
             avoid_img (bool, default=False): If True, eigenvalue imaginary part is ignored.
                 This should be used when the eigenvalue compatation is expected to generate
                 complex eigenvalues with really small imaginary part because of computing
