@@ -306,6 +306,9 @@ class WishartEnsemble(_Ensemble):
                 Journal of Mathematical Physics. 43.11 (2002): 5830-5847.
 
         """
+        if not normalize:
+            print("Warning: setting normalize=False may cause normal instability and/or rounding errors.")
+
         # pylint: disable=too-many-arguments
         if interval is None:
             # calculating constants depending on matrix sizes
