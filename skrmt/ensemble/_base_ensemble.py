@@ -59,7 +59,7 @@ class _Ensemble(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def eigvals(self):
+    def eigvals(self, normalize=False):
         # pylint: disable=unnecessary-pass
         # pylint: disable=missing-function-docstring
         # this will be commented at inherited classes
