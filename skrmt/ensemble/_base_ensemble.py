@@ -220,9 +220,6 @@ class _Ensemble(metaclass=ABCMeta):
         # pylint: disable=too-many-arguments
         if not isinstance(interval, tuple):
             raise ValueError("interval argument must be a tuple")
-    
-        if not normalize:
-            print("Warning: setting normalize=False may cause numerical instability and/or rounding errors.")
 
         observed, bins = self.eigval_hist(bins=bins, interval=interval, density=density,
                                           normalize=normalize, avoid_img=avoid_img)

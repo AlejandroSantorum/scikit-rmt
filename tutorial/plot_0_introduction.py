@@ -61,4 +61,4 @@ print(goe.matrix)
 from skrmt.ensemble import GaussianEnsemble
 
 goe = GaussianEnsemble(beta=1, n=1000)
-goe.plot_eigval_hist(bins=60, interval=(-2,2))
+goe.plot_eigval_hist(bins=80)

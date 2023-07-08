@@ -32,7 +32,7 @@ that are going to be detailed as well.
 from skrmt.ensemble import GaussianEnsemble
 
 goe = GaussianEnsemble(beta=1, n=1000)
-goe.plot_eigval_hist(bins=80, interval=(-10, 10), norm_const=1)
+goe.plot_eigval_hist(bins=80, interval=(-10, 10), normalize=False)
 
 ##############################################################################
 # As we can see, the histogram does not explain barely anything about
@@ -46,14 +46,15 @@ goe.plot_eigval_hist(bins=80, interval=(-10, 10), norm_const=1)
 
 ##############################################################################
 # In the former example, GOE matrices of size :math:`n \times n` should be
-# normalized by :math:`1/\sqrt{n}`. 
+# normalized by :math:`1/\sqrt{n}`, which is done by default or by setting
+# `normalize=True`. 
 
 import numpy as np
 from skrmt.ensemble import GaussianEnsemble
 
 n=1000
 goe = GaussianEnsemble(beta=1, n=n)
-goe.plot_eigval_hist(bins=80, interval=(-10, 10), norm_const=1/np.sqrt(n))
+goe.plot_eigval_hist(bins=80, interval=(-10, 10), normalize=True)
 
 ##############################################################################
 # Additionally, we can control the plotting interval to get a better picture
@@ -65,7 +66,7 @@ from skrmt.ensemble import GaussianEnsemble
 
 n=1000
 goe = GaussianEnsemble(beta=1, n=n)
-goe.plot_eigval_hist(bins=80, interval=(-2, 2), norm_const=1/np.sqrt(n))
+goe.plot_eigval_hist(bins=80, interval=(-2, 2), normalize=True)
 
 ##############################################################################
 # This example would be equivalent for Gaussian Unitary Ensemble (GUE) and
@@ -82,14 +83,14 @@ wre = WishartEnsemble(beta=1, p=p, n=n)
 wre.plot_eigval_hist(bins=80, interval=(-5,5))
 
 ##############################################################################
-# By not specifying the normalization constant, the library has taken charge
-# of it by itself. The plotting interval still can be improved.
+# By default, scikit-rmt takes charge of using the most suitable plotting
+# interval and eigenvalue normalization constant.
 
 from skrmt.ensemble import WishartEnsemble
 
 p, n = 1000, 3000
 wre = WishartEnsemble(beta=1, p=p, n=n)
-wre.plot_eigval_hist(bins=80, interval=(0.2, 2.2))
+wre.plot_eigval_hist(bins=80)
 
 ##############################################################################
 # This example would be equivalent for Wishart Complex Ensemble (WCE) and

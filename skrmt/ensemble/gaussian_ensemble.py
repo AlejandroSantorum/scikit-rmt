@@ -286,9 +286,6 @@ class GaussianEnsemble(_Ensemble):
                 Journal of Mathematical Physics. 43.11 (2002): 5830-5847.
 
         """
-        if not normalize:
-            print("Warning: setting normalize=False may cause numerical instability and/or rounding errors.")
-
         if interval is None:
             wsl_radius = 2*np.sqrt(self.beta)*self.sigma
             interval = (-wsl_radius, wsl_radius)
