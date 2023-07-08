@@ -243,7 +243,7 @@ class GaussianEnsemble(_Ensemble):
                     self.eigval_norm_const * self.matrix,
                     bins=bins,
                     interval=interval,
-                    density=density
+                    density=density,
                 )
             return tridiag_eigval_hist(self.matrix, bins=bins, interval=interval, density=density)
 
@@ -314,7 +314,7 @@ class GaussianEnsemble(_Ensemble):
                 interval=interval,
                 density=density,
                 normalize=normalize,
-                fig_path=fig_path
+                fig_path=fig_path,
             )
 
     def joint_eigval_pdf(self, eigvals=None):

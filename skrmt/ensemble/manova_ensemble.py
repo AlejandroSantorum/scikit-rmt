@@ -228,7 +228,7 @@ class ManovaEnsemble(_Ensemble):
         self._eigvals = np.linalg.eigvals(self.matrix)
         return norm_const * self._eigvals
 
-    def plot_eigval_hist(self, bins, interval=(0,1), density=False, norm_const=None, fig_path=None):
+    def plot_eigval_hist(self, bins, interval=(0,1), density=False, normalize=False, fig_path=None):
         """Computes and plots the histogram of the matrix eigenvalues
 
         Calculates and plots the histogram of the current sampled matrix eigenvalues.
@@ -245,10 +245,10 @@ class ManovaEnsemble(_Ensemble):
                 number of counts and the bin width, so that the area under the histogram
                 integrates to 1. If set to False, the absolute frequencies of the eigenvalues
                 are returned.
-            norm_const (float, default=None): Eigenvalue normalization constant. By default,
-                it is set to None, so eigenvalues are not normalized. However, it is advisable
-                to specify a normalization constant to observe eigenvalue spectrum, e.g.
-                1/sqrt(n/2) if you want to analyze Wigner's Semicircular Law.
+            normalize (bool, default=False): Whether to normalize the computed eigenvalues
+                by the default normalization constant (see references). Defaults to False, i.e.,
+                no normalization. Normalization makes the eigenvalues to be in the same support
+                independently of the sample size.
             fig_path (string, default=None): path to save the created figure. If it is not
                 provided, the plot is shown at the end of the routine.
 
@@ -266,9 +266,9 @@ class ManovaEnsemble(_Ensemble):
             bins=bins,
             interval=interval,
             density=density,
-            norm_const=norm_const,
+            normalize=normalize,
+            fig_path=fig_path,
             avoid_img=True,
-            fig_path=fig_path
         )
 
     def joint_eigval_pdf(self, eigvals=None):
