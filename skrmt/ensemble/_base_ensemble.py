@@ -31,6 +31,11 @@ class _Ensemble(metaclass=ABCMeta):
             eigenvalues are cached in the attribute _eigvals to avoid
             re-computing them. The eigenvalues are re-calculated again
             if the matrix sample changes.
+        eigval_norm_cost (float): constant that is used to normalize the
+            eigenvalues so their support is always the same independently
+            of the sample size. This is really useful for plotting, since
+            the representation interval will always be the same no matter
+            how many eigenvalues are sampled.
     """
 
     @abstractmethod
