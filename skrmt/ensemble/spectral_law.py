@@ -425,8 +425,8 @@ class MarchenkoPasturDistribution:
             self._wishart_ens.set_size(p=size, n=_n, resample_mtx=True)
 
         if self.beta == 4:
-            return _eigval_norm_const * self._wishart_ens.eigvals(normalize=True)[::2]
-        return _eigval_norm_const * self._wishart_ens.eigvals(normalize=True)
+            return self._wishart_ens.eigvals(normalize=True)[::2]
+        return self._wishart_ens.eigvals(normalize=True)
 
     def pdf(self, x):
         """Computes PDF of the Marchenko-Pastur Law.
@@ -617,11 +617,8 @@ class MarchenkoPasturDistribution:
         ens = WishartEnsemble(beta=self.beta, p=p_size, n=n_size, sigma=self.sigma,
                             use_tridiagonal=(use_tridiag_ratio and use_tridiag_sigma))
 
-        # Wigner eigenvalue normalization constant
-        norm_const = 1/n_size 
+        observed, bins = ens.eigval_hist(bins=bins, interval=interval, density=density, normalize=True)
 
-        observed, bins = ens.eigval_hist(bins=bins, interval=interval,
-                                         density=density, norm_const=norm_const)
         width = bins[1]-bins[0]
         plt.bar(bins[:-1], observed, width=width, align='edge')
 
@@ -984,11 +981,11 @@ class ManovaSpectrumDistribution:
             self._manova_ens = ManovaEnsemble(beta=self.beta, m=size, n1=_n1, n2=_n2)
         else:
             self._manova_ens.set_size(m=size, n1=_n1, n2=_n2, resample_mtx=True)
-        
-        # Here, _eigval_norm_const = 1.0
+
+        # normalization here is not crucial since the default normalization const. of Manova is 1.0
         if self.beta == 4:
-            return self._manova_ens.eigvals()[::2].real
-        return self._manova_ens.eigvals().real
+            return self._manova_ens.eigvals(normalize=True)[::2].real
+        return self._manova_ens.eigvals(normalize=True).real
     
     def pdf(self, x):
         """Computes PDF of the Manova Spectrum distribution.
@@ -1162,7 +1159,13 @@ class ManovaSpectrumDistribution:
                 interval[1] = max(lambda_plus, 1.05)
             interval = tuple(interval)
 
-        observed, bins = ens.eigval_hist(bins=bins, interval=interval, density=density, avoid_img=True)
+        observed, bins = ens.eigval_hist(
+            bins=bins,
+            interval=interval,
+            density=density,
+            normalize=True,
+            avoid_img=True
+        )
 
         width = bins[1]-bins[0]
         plt.bar(bins[:-1], observed, width=width, align='edge')
