@@ -82,9 +82,9 @@ def test_goe_build_tridiagonal():
     goe = GaussianEnsemble(beta=1, n=n_size, use_tridiagonal=True)
 
     np.random.seed(1)
-    normals = (1/np.sqrt(2)) * np.random.normal(loc=0, scale=np.sqrt(2), size=n_size)
+    normals = np.random.normal(loc=0, scale=1, size=n_size)
     dfs = np.flip(np.arange(1, n_size))
-    chisqs = (1/np.sqrt(2)) * np.array([np.sqrt(np.random.chisquare(df*beta)) for df in dfs])
+    chisqs = np.array([np.sqrt(np.random.chisquare(df*beta)) for df in dfs])
 
     for i in range(n_size):
         assert normals[i] == goe.matrix[i][i]
@@ -217,9 +217,9 @@ def test_gue_build_tridiagonal():
     gue = GaussianEnsemble(beta=2, n=n_size, use_tridiagonal=True)
 
     np.random.seed(1)
-    normals = (1/np.sqrt(2)) * np.random.normal(loc=0, scale=np.sqrt(2), size=n_size)
+    normals = np.random.normal(loc=0, scale=1, size=n_size)
     dfs = np.flip(np.arange(1, n_size))
-    chisqs = (1/np.sqrt(2)) * np.array([np.sqrt(np.random.chisquare(df*beta)) for df in dfs])
+    chisqs = np.array([np.sqrt(np.random.chisquare(df*beta)) for df in dfs])
 
     for i in range(n_size):
         assert normals[i] == gue.matrix[i][i]
@@ -272,16 +272,14 @@ def test_gse_init():
 
     assert gse.matrix.shape == (2*n_size,2*n_size)
 
-    mtx_sol = [[2.29717124+0.j, -0.80605094-2.86120185j,\
-                0.+0.j, -1.21019792-1.0732635j],
-               [-0.80605094+2.86120185j, -1.51740678+0.j,\
-                1.21019792+1.0732635j, 0.+0.j],
-               [0.+0.j, 1.21019792-1.0732635j,\
-                2.29717124+0.j, -0.80605094+2.86120185j],
-               [-1.21019792+1.0732635j, 0.+0.j,\
-                -0.80605094-2.86120185j, -1.51740678+0.j]]
+    mtx_sol = [
+        [3.24869073+0.j, -1.13992817-4.04635046j, 0.+0.j, -1.71147831-1.5178238j],
+        [-1.13992817+4.04635046j, -2.14593724+0.j, 1.71147831+1.5178238j, 0.+0.j],
+        [0.+0.j, 1.71147831-1.5178238j, 3.24869073+0.j, -1.13992817+4.04635046j],
+        [-1.71147831+1.5178238j, 0.+0.j, -1.13992817-4.04635046j, -2.14593724+0.j],
+    ]
 
-    assert_almost_equal(gse.matrix, np.array(mtx_sol),
+    assert_almost_equal(gse.matrix, np.asarray(mtx_sol),
                         decimal=4)
 
 
@@ -325,9 +323,9 @@ def test_gse_build_tridiagonal():
 
     np.random.seed(1)
     n_size *= 2  # WQE matrices are 2p times 2p
-    normals = (1/np.sqrt(2)) * np.random.normal(loc=0, scale=np.sqrt(2), size=n_size)
+    normals = np.random.normal(loc=0, scale=1, size=n_size)
     dfs = np.flip(np.arange(1, n_size))
-    chisqs = (1/np.sqrt(2)) * np.array([np.sqrt(np.random.chisquare(df*beta)) for df in dfs])
+    chisqs = np.array([np.sqrt(np.random.chisquare(df*beta)) for df in dfs])
 
     for i in range(n_size):
         assert normals[i] == gse.matrix[i][i]
