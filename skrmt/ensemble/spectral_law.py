@@ -320,7 +320,7 @@ class WignerSemicircleDistribution:
             raise ValueError("matrix size must be positive")
         
         if interval is None:
-            interval = (-self.radius, self.radius)
+            interval = (self.center - self.radius, self.center + self.radius)
 
         random_samples = self.rvs(size=n_size)
         observed, bins = np.histogram(random_samples, bins=bins, range=interval, density=density)
