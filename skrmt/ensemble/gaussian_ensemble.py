@@ -87,14 +87,19 @@ class GaussianEnsemble(_Ensemble):
         self.beta = beta
         self.use_tridiagonal = use_tridiagonal
         self.sigma = sigma
+        self.radius = 2 * np.sqrt(self.beta) * self.sigma
         self._eigvals = None
         self.matrix = self.sample()
 
         # default eigenvalue normalization constant
-        if self.use_tridiagonal:
-            self.eigval_norm_const = 1/np.sqrt(self.n) if self.beta==4 else 1/np.sqrt(self.n/2)
-        else:
-            self.eigval_norm_const = 1/np.sqrt(self.n)
+        self.eigval_norm_const = 1/np.sqrt(2*self.n) if self.beta==4 else 1/np.sqrt(self.n)
+
+        # non-normalized semicircle interval (keys are betas)
+        self._non_normalized_interval = {
+            1: (-2*np.sqrt(self.n), 2*np.sqrt(self.n)),
+            2: (-2*np.sqrt(2*self.n), 2*np.sqrt(2*self.n)),
+            4: (-4*np.sqrt(2*self.n), 4*np.sqrt(2*self.n)),
+        }
 
 
     def set_size(self, n, resample_mtx=True):
@@ -173,7 +178,8 @@ class GaussianEnsemble(_Ensemble):
                        [-np.conjugate(y_mtx), np.conjugate(x_mtx)]
                         ])
         # hermitian matrix
-        self.matrix = (mtx + mtx.transpose().conj())/np.sqrt(2)
+        # Before: self.matrix = (mtx + mtx.transpose().conj())/np.sqrt(2)
+        self.matrix = (mtx + mtx.transpose().conj())
         # setting array of eigenvalues to None to force re-computing them
         self._eigvals = None
         return self.matrix
@@ -203,11 +209,13 @@ class GaussianEnsemble(_Ensemble):
 
         size = 2*self.n if self.beta==4 else self.n
         # sampling diagonal normals
-        normals = (1/np.sqrt(2)) * np.random.normal(loc=0, scale=np.sqrt(2), size=size)
+        # normals = (1/np.sqrt(2)) * np.random.normal(loc=0, scale=np.sqrt(2), size=size)
+        normals = np.random.normal(loc=0, scale=1, size=size)
         # sampling chi-squares
         dfs = np.flip(np.arange(1, size))
-        chisqs = (1/np.sqrt(2)) * \
-                 np.array([np.sqrt(np.random.chisquare(df*self.beta)) for df in dfs])
+        # chisqs = (1/np.sqrt(2)) * \
+        #          np.array([np.sqrt(np.random.chisquare(df*self.beta)) for df in dfs])
+        chisqs = np.array([np.sqrt(np.random.chisquare(df*self.beta)) for df in dfs])
         # inserting diagonals
         diagonals = [chisqs, normals, chisqs]
         mtx = sparse.diags(diagonals, [-1, 0, 1])
@@ -287,8 +295,10 @@ class GaussianEnsemble(_Ensemble):
 
         """
         if interval is None:
-            wsl_radius = 2*np.sqrt(self.beta)*self.sigma
-            interval = (-wsl_radius, wsl_radius)
+            if normalize:
+                interval = (-self.radius, self.radius)
+            else:
+                interval = self._non_normalized_interval[self.beta]
 
         if self.use_tridiagonal:
             # pylint: disable=too-many-arguments

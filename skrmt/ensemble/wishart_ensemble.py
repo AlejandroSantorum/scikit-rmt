@@ -100,6 +100,13 @@ class WishartEnsemble(_Ensemble):
         self.matrix = self.sample()
         # default eigenvalue normalization constant
         self.eigval_norm_const = 1/self.n
+        self._compute_parameters()
+
+    def _compute_parameters(self):
+        # calculating constants depending on matrix sizes
+        self.ratio = self.p/self.n
+        self.lambda_plus = self.beta * self.sigma**2 * (1 + np.sqrt(self.ratio))**2
+        self.lambda_minus = self.beta * self.sigma**2 * (1 - np.sqrt(self.ratio))**2
 
     def set_size(self, p, n, resample_mtx=True):
         # pylint: disable=arguments-differ
@@ -118,6 +125,7 @@ class WishartEnsemble(_Ensemble):
         """
         self.p = p
         self.n = n
+        self._compute_parameters()
         if resample_mtx:
             self.matrix = self.sample()
 
@@ -306,16 +314,12 @@ class WishartEnsemble(_Ensemble):
                 Journal of Mathematical Physics. 43.11 (2002): 5830-5847.
 
         """
-        if not normalize:
-            print("Warning: setting normalize=False may cause normal instability and/or rounding errors.")
-
         # pylint: disable=too-many-arguments
         if interval is None:
-            # calculating constants depending on matrix sizes
-            ratio = self.p/self.n
-            lambda_plus = self.beta * self.sigma**2 * (1 + np.sqrt(ratio))**2
-            lambda_minus = self.beta * self.sigma**2 * (1 - np.sqrt(ratio))**2
-            interval = (lambda_minus, lambda_plus)
+            if normalize:
+                interval = (self.lambda_minus, self.lambda_plus)
+            else:
+                interval = (self.n*self.lambda_minus, self.n*self.lambda_plus)
 
         if self.use_tridiagonal:
             observed, bins = self.eigval_hist(
