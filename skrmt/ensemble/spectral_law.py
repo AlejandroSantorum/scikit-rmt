@@ -13,6 +13,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.integrate import quad
 from scipy.stats import rv_continuous
+from scipy import interpolate
 import collections.abc
 
 from .gaussian_ensemble import GaussianEnsemble
@@ -314,7 +315,8 @@ class WignerSemicircleDistribution:
         """
         # pylint: disable=too-many-arguments
         if sample_size<1:
-            raise ValueError("matrix size must be positive")
+            raise ValueError("Negative eigenvalue sample size (given = {sample_size})."
+                             " Please, provide a sample size greater or equal than 1.")
         
         interval = (self.center - self.radius, self.center + self.radius)
 
@@ -849,8 +851,21 @@ class ManovaSpectrumDistribution(rv_continuous):
         self.lambda_term2 = np.sqrt((1/(ratio_a + ratio_b)) * (1 - (ratio_a/(ratio_a + ratio_b))))
         self.lambda_minus = (self.lambda_term1 - self.lambda_term2)**2
         self.lambda_plus = (self.lambda_term1 + self.lambda_term2)**2
+        self._approximate_inv_cdf()
     
-    def __pdf_aux(self, x):
+    def _approximate_inv_cdf(self):
+        # https://gist.github.com/amarvutha/c2a3ea9d42d238551c694480019a6ce1
+        x_vals = np.linspace(self.lambda_minus, self.lambda_plus, 1000)
+        _pdf = self._pdf(x_vals)
+        _cdf = np.cumsum(_pdf)      # approximating CDF
+        cdf_y = _cdf/_cdf.max()     # normalizing approximated CDF to 1.0
+        self._inv_cdf = interpolate.interp1d(cdf_y, x_vals)
+
+    def _rvs(self, size, random_state):
+        uniform_samples = np.random.random(size=size)
+        return self._inv_cdf(uniform_samples)
+    
+    def __pdf_float(self, x):
         if x <= self.lambda_minus:
             return 0.0
 
@@ -875,12 +890,12 @@ class ManovaSpectrumDistribution(rv_continuous):
             # TODO: Vectorize this loop in case x is array-like
             y_ret = []
             for val in x:
-                y_ret.append(self.__pdf_aux(val))
+                y_ret.append(self.__pdf_float(val))
             return np.asarray(y_ret)
         # if x is a number (int or float)
-        return self.__pdf_aux(x)
+        return self.__pdf_float(x)
     
-    def __cdf_aux(self, x):
+    def __cdf_float(self, x):
         if x <= self.lambda_minus:
             return 0.0
 
@@ -904,11 +919,11 @@ class ManovaSpectrumDistribution(rv_continuous):
             # TODO: Vectorize this loop in case x is array-like
             y_ret = []
             for val in x:
-                y_ret.append(self.__cdf_aux(val))
+                y_ret.append(self.__cdf_float(val))
             return np.asarray(y_ret)
         
         # if x is a number (int or float)
-        return self.__cdf_aux(x)
+        return self.__cdf_float(x)
 
     def plot_pdf(self, interval=None, bins=1000, savefig_path=None):
         """Plots the PDF of the Manova Spectrum distribution.
@@ -1006,8 +1021,10 @@ class ManovaSpectrumDistribution(rv_continuous):
                 Journal of Mathematical Physics. 43.11 (2002): 5830-5847.
 
         """
-        # if m_size<1 or (n1_size is not None and n1_size<1) or (n2_size is not None and n2_size<1):
-        #     raise ValueError("matrix size must be positive")
+        # pylint: disable=too-many-arguments
+        if sample_size<1:
+            raise ValueError("Negative eigenvalue sample size (given = {sample_size})."
+                             " Please, provide a sample size greater or equal than 1.")
 
         if interval is None:
             interval = [self.lambda_minus, self.lambda_plus]
