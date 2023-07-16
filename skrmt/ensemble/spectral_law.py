@@ -406,6 +406,21 @@ class MarchenkoPasturDistribution(rv_continuous):
         self.lambda_minus = self.beta * self.sigma**2 * (1 - np.sqrt(self.ratio))**2
         self.lambda_plus = self.beta * self.sigma**2 * (1 + np.sqrt(self.ratio))**2
         self._var = self.beta * self.sigma**2
+        # when the support is finite (lambda_minus, lambda_plus) it is better
+        # to explicity approximate the inverse of the CDF to implement rvs
+        self._approximate_inv_cdf()
+    
+    def _approximate_inv_cdf(self):
+        # https://gist.github.com/amarvutha/c2a3ea9d42d238551c694480019a6ce1
+        x_vals = np.linspace(self.lambda_minus, self.lambda_plus, 1000)
+        _pdf = self._pdf(x_vals)
+        _cdf = np.cumsum(_pdf)      # approximating CDF
+        cdf_y = _cdf/_cdf.max()     # normalizing approximated CDF to 1.0
+        self._inv_cdf = interpolate.interp1d(cdf_y, x_vals)
+
+    def _rvs(self, size, random_state):
+        uniform_samples = np.random.random(size=size)
+        return self._inv_cdf(uniform_samples)
 
     def _pdf(self, x):
         """Computes PDF of the Marchenko-Pastur Law.
@@ -851,6 +866,8 @@ class ManovaSpectrumDistribution(rv_continuous):
         self.lambda_term2 = np.sqrt((1/(ratio_a + ratio_b)) * (1 - (ratio_a/(ratio_a + ratio_b))))
         self.lambda_minus = (self.lambda_term1 - self.lambda_term2)**2
         self.lambda_plus = (self.lambda_term1 + self.lambda_term2)**2
+        # when the support is finite (lambda_minus, lambda_plus) it is better
+        # to explicity approximate the inverse of the CDF to implement rvs
         self._approximate_inv_cdf()
     
     def _approximate_inv_cdf(self):
