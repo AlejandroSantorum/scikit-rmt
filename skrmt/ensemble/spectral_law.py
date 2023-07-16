@@ -839,10 +839,10 @@ class ManovaSpectrumDistribution(rv_continuous):
             raise ValueError(f"Error: invalid beta. It has to be 1,2 or 4. Provided beta = {beta}.")
         if ratio_a <= 0 or ratio_b <= 0:
             raise ValueError("Error: invalid matrix parameters. They have to be both positive.\n"
-                             f"\tProvided a = {self.ratio_a} and b = {self.ratio_b}.")
+                             f"\tProvided a = {ratio_a} and b = {ratio_b}.")
 
         if ratio_a < 1 or ratio_b < 1:
-            print(f"Warning: Setting a < 1 (a = {self.ratio_a}) or b < 1 (b = {self.ratio_b}) may cause numerical instability.")
+            print(f"Warning: Setting a < 1 (a = {ratio_a}) or b < 1 (b = {ratio_b}) may cause numerical instability.")
 
         self.ratio_a = ratio_a
         self.ratio_b = ratio_b

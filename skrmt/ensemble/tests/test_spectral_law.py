@@ -672,11 +672,7 @@ class TestTracyWidomDistribution:
         '''
         with pytest.raises(ValueError):
             twd = TracyWidomDistribution(beta=1)
-            twd.rvs(-5)
-
-        with pytest.raises(ValueError):
-            twd = TracyWidomDistribution(beta=1)
-            twd.rvs(size=5, mtx_size=0)
+            twd.rvs(size=-5)
     
     def test_twd_pdf(self):
         '''Testing TracyWidomDistribution pdf
@@ -726,8 +722,7 @@ class TestTracyWidomDistribution:
         fig_name = "test_twl_goe_abs_freq.png"
         twd = TracyWidomDistribution(beta=1)
         twd.plot_empirical_pdf(
-            n_size=50,
-            times=100,
+            sample_size=10,
             bins=100,
             density=False,
             plot_law_pdf=False,
@@ -739,8 +734,7 @@ class TestTracyWidomDistribution:
         fig_name = "test_twl_gue_abs_freq.png"
         twd = TracyWidomDistribution(beta=2)
         twd.plot_empirical_pdf(
-            n_size=50,
-            times=100,
+            sample_size=10,
             bins=100,
             density=False,
             plot_law_pdf=False,
@@ -752,8 +746,7 @@ class TestTracyWidomDistribution:
         fig_name = "test_twl_gse_abs_freq.png"
         twd = TracyWidomDistribution(beta=4)
         twd.plot_empirical_pdf(
-            n_size=25,
-            times=100,
+            sample_size=10,
             bins=100,
             density=False,
             plot_law_pdf=False,
@@ -765,8 +758,7 @@ class TestTracyWidomDistribution:
         fig_name = "test_twl_goe_normalized.png"
         twd = TracyWidomDistribution(beta=1)
         twd.plot_empirical_pdf(
-            n_size=50,
-            times=100,
+            sample_size=10,
             bins=100,
             density=True,
             plot_law_pdf=False,
@@ -778,8 +770,7 @@ class TestTracyWidomDistribution:
         fig_name = "test_twl_gue_normalized.png"
         twd = TracyWidomDistribution(beta=2)
         twd.plot_empirical_pdf(
-            n_size=50,
-            times=100,
+            sample_size=10,
             bins=100,
             density=True,
             plot_law_pdf=False,
@@ -791,8 +782,7 @@ class TestTracyWidomDistribution:
         fig_name = "test_twl_gse_normalized.png"
         twd = TracyWidomDistribution(beta=4)
         twd.plot_empirical_pdf(
-            n_size=25,
-            times=100,
+            sample_size=10,
             bins=100,
             density=True,
             plot_law_pdf=False,
@@ -804,8 +794,7 @@ class TestTracyWidomDistribution:
         fig_name = "test_twl_goe_theory.png"
         twd = TracyWidomDistribution(beta=1)
         twd.plot_empirical_pdf(
-            n_size=50,
-            times=100,
+            sample_size=10,
             bins=100,
             density=True,
             plot_law_pdf=True,
@@ -817,8 +806,7 @@ class TestTracyWidomDistribution:
         fig_name = "test_twl_gue_theory.png"
         twd = TracyWidomDistribution(beta=2)
         twd.plot_empirical_pdf(
-            n_size=50,
-            times=100,
+            sample_size=10,
             bins=100,
             density=True,
             plot_law_pdf=True,
@@ -830,8 +818,7 @@ class TestTracyWidomDistribution:
         fig_name = "test_twl_gse_theory.png"
         twd = TracyWidomDistribution(beta=4)
         twd.plot_empirical_pdf(
-            n_size=25,
-            times=100,
+            sample_size=10,
             bins=100,
             density=True,
             plot_law_pdf=True,
@@ -842,7 +829,7 @@ class TestTracyWidomDistribution:
     def test_twd_plot_size_exception(self):
         with pytest.raises(ValueError):
             twd = TracyWidomDistribution(beta=1)
-            twd.plot_empirical_pdf(n_size=0)
+            twd.plot_empirical_pdf(sample_size=0)
     
     def test_twd_plot_ensemble_exception(self):
         with pytest.raises(ValueError):
@@ -860,26 +847,25 @@ class TestManovaSpectrumDistribution:
         a = 3
         b = 3
 
-        msd = ManovaSpectrumDistribution(beta=beta, a=a, b=b)
+        msd = ManovaSpectrumDistribution(beta=beta, ratio_a=a, ratio_b=b)
 
         assert msd.beta == beta
-        assert msd.a == a
-        assert msd.b == b
+        assert msd.ratio_a == a
+        assert msd.ratio_b == b
 
         assert msd.lambda_term1 == np.sqrt((a/(a+b)) * (1 - (1/(a+b))))
         assert msd.lambda_term2 == np.sqrt((1/(a+b)) * (1 - (a/(a+b))))
         assert msd.lambda_minus == (msd.lambda_term1 - msd.lambda_term2)**2
         assert msd.lambda_plus == (msd.lambda_term1 + msd.lambda_term2)**2
-        assert msd._manova_ens is None
     
     def test_msd_init_raise(self):
         '''Testing ManovaSpectrumDistribution init raising exception
         '''
         with pytest.raises(ValueError):
-            _ = ManovaSpectrumDistribution(a=1, b=1, beta=3)
+            _ = ManovaSpectrumDistribution(ratio_a=1, ratio_b=1, beta=3)
         
         with pytest.raises(ValueError):
-            _ = ManovaSpectrumDistribution(a=0, b=0, beta=1)
+            _ = ManovaSpectrumDistribution(ratio_a=0, ratio_b=0, beta=1)
 
     def test_msd_rvs_success(self):
         '''Testing ManovaSpectrumDistribution random variates (sampling)
@@ -887,14 +873,14 @@ class TestManovaSpectrumDistribution:
         beta = 1
         a = b = 3
         size = 5
-        msd1 = ManovaSpectrumDistribution(beta=beta, a=a, b=b)
+        msd1 = ManovaSpectrumDistribution(beta=beta, ratio_a=a, ratio_b=b)
         samples = msd1.rvs(size=size)
         assert len(samples == size)
 
         beta = 4
         a = b = 3
         size = 5
-        msd4 = ManovaSpectrumDistribution(beta=beta, a=a, b=b)
+        msd4 = ManovaSpectrumDistribution(beta=beta, ratio_a=a, ratio_b=b)
         samples = msd4.rvs(size=size)
         assert len(samples == size)
 
@@ -907,15 +893,15 @@ class TestManovaSpectrumDistribution:
         exception because of an invalid argument
         '''
         with pytest.raises(ValueError):
-            msd = ManovaSpectrumDistribution(beta=1, a=1, b=1)
-            msd.rvs(-5)
+            msd = ManovaSpectrumDistribution(beta=1, ratio_a=1, ratio_b=1)
+            msd.rvs(size=-5)
     
     def test_msd_pdf(self):
         '''Testing ManovaSpectrumDistribution pdf
         '''
         beta = 4
         a = b = 2
-        msd = ManovaSpectrumDistribution(beta=beta, a=a, b=b)
+        msd = ManovaSpectrumDistribution(beta=beta, ratio_a=a, ratio_b=b)
 
         middle = np.mean([msd.lambda_minus, msd.lambda_plus])
         assert msd.pdf(middle) > 0.0
@@ -927,7 +913,7 @@ class TestManovaSpectrumDistribution:
         '''
         beta = 4
         a = b = 2
-        msd = ManovaSpectrumDistribution(beta=beta, a=a, b=b)
+        msd = ManovaSpectrumDistribution(beta=beta, ratio_a=a, ratio_b=b)
 
         middle = np.mean([msd.lambda_minus, msd.lambda_plus])
         assert msd.cdf(middle) > 0.0
@@ -938,12 +924,12 @@ class TestManovaSpectrumDistribution:
         '''Testing ManovaSpectrumDistribution plot pdf
         '''
         fig_name = "test_msd_pdf_wo_interval.png"
-        msd = ManovaSpectrumDistribution(a=3, b=3)
+        msd = ManovaSpectrumDistribution(ratio_a=3, ratio_b=3)
         msd.plot_pdf(savefig_path=TMP_DIR_PATH+"/"+fig_name)
         assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name)) == True
 
         fig_name = "test_msd_pdf_w_interval.png"
-        msd = ManovaSpectrumDistribution(a=3, b=3)
+        msd = ManovaSpectrumDistribution(ratio_a=3, ratio_b=3)
         msd.plot_pdf(interval=(-1,2), savefig_path=TMP_DIR_PATH+"/"+fig_name)
         assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name)) == True
     
@@ -951,20 +937,20 @@ class TestManovaSpectrumDistribution:
         '''Testing ManovaSpectrumDistribution plot cdf
         '''
         fig_name = "test_msd_cdf_wo_interval.png"
-        msd = ManovaSpectrumDistribution(a=3, b=3)
+        msd = ManovaSpectrumDistribution(ratio_a=3, ratio_b=3)
         msd.plot_cdf(savefig_path=TMP_DIR_PATH+"/"+fig_name)
         assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name)) == True
 
         fig_name = "test_msd_cdf_w_interval.png"
-        msd = ManovaSpectrumDistribution(a=3, b=3)
+        msd = ManovaSpectrumDistribution(ratio_a=3, ratio_b=3)
         msd.plot_cdf(interval=(-1,2), savefig_path=TMP_DIR_PATH+"/"+fig_name)
         assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name)) == True
     
     def test_msd_plot_mre_abs_freq(self):
         fig_name = "test_msd_mre_absfreq.png"
-        msd = ManovaSpectrumDistribution(beta=1, a=3, b=3)
+        msd = ManovaSpectrumDistribution(beta=1, ratio_a=3, ratio_b=3)
         msd.plot_empirical_pdf(
-            m_size=40,
+            sample_size=10,
             bins=100,
             density=False,
             plot_law_pdf=False,
@@ -974,9 +960,9 @@ class TestManovaSpectrumDistribution:
 
     def test_msd_plot_mce_abs_freq(self):
         fig_name = "test_msd_mce_absfreq.png"
-        msd = ManovaSpectrumDistribution(beta=2, a=3, b=3)
+        msd = ManovaSpectrumDistribution(beta=2, ratio_a=3, ratio_b=3)
         msd.plot_empirical_pdf(
-            m_size=40,
+            sample_size=10,
             bins=100,
             density=False,
             plot_law_pdf=False,
@@ -986,9 +972,9 @@ class TestManovaSpectrumDistribution:
     
     def test_msd_plot_mqe_abs_freq(self):
         fig_name = "test_msd_mqe_absfreq.png"
-        msd = ManovaSpectrumDistribution(beta=4, a=3, b=3)
+        msd = ManovaSpectrumDistribution(beta=4, ratio_a=3, ratio_b=3)
         msd.plot_empirical_pdf(
-            m_size=40,
+            sample_size=10,
             bins=100,
             density=False,
             plot_law_pdf=False,
@@ -998,9 +984,9 @@ class TestManovaSpectrumDistribution:
     
     def test_msd_plot_mre_normalized(self):
         fig_name = "test_msd_mre_norm.png"
-        msd = ManovaSpectrumDistribution(beta=1, a=3, b=3)
+        msd = ManovaSpectrumDistribution(beta=1,ratio_a=3, ratio_b=3)
         msd.plot_empirical_pdf(
-            m_size=40,
+            sample_size=10,
             bins=100,
             density=True,
             plot_law_pdf=False,
@@ -1010,9 +996,9 @@ class TestManovaSpectrumDistribution:
 
     def test_msd_plot_mce_normalized(self):
         fig_name = "test_msd_mce_norm.png"
-        msd = ManovaSpectrumDistribution(beta=2, a=3, b=3)
+        msd = ManovaSpectrumDistribution(beta=2, ratio_a=3, ratio_b=3)
         msd.plot_empirical_pdf(
-            m_size=40,
+            sample_size=10,
             bins=100,
             density=True,
             plot_law_pdf=False,
@@ -1022,9 +1008,9 @@ class TestManovaSpectrumDistribution:
     
     def test_msd_plot_mqe_normalized(self):
         fig_name = "test_msd_mqe_norm.png"
-        msd = ManovaSpectrumDistribution(beta=4, a=3, b=3)
+        msd = ManovaSpectrumDistribution(beta=4, ratio_a=3, ratio_b=3)
         msd.plot_empirical_pdf(
-            m_size=40,
+            sample_size=10,
             bins=100,
             density=True,
             plot_law_pdf=False,
@@ -1034,9 +1020,9 @@ class TestManovaSpectrumDistribution:
     
     def test_msd_plot_mre_theoretical(self):
         fig_name = "test_msd_mre_theory.png"
-        msd = ManovaSpectrumDistribution(beta=1, a=3, b=3)
+        msd = ManovaSpectrumDistribution(beta=1, ratio_a=3, ratio_b=3)
         msd.plot_empirical_pdf(
-            m_size=40,
+            sample_size=10,
             bins=100,
             density=True,
             plot_law_pdf=True,
@@ -1046,9 +1032,9 @@ class TestManovaSpectrumDistribution:
 
     def test_msd_plot_mce_theoretical(self):
         fig_name = "test_msd_mce_theory.png"
-        msd = ManovaSpectrumDistribution(beta=2, a=3, b=3)
+        msd = ManovaSpectrumDistribution(beta=2, ratio_a=3, ratio_b=3)
         msd.plot_empirical_pdf(
-            m_size=40,
+            sample_size=10,
             bins=100,
             density=True,
             plot_law_pdf=True,
@@ -1058,9 +1044,9 @@ class TestManovaSpectrumDistribution:
     
     def test_msd_plot_mqe_theoretical(self):
         fig_name = "test_msd_mqe_theory.png"
-        msd = ManovaSpectrumDistribution(beta=4, a=3, b=3)
+        msd = ManovaSpectrumDistribution(beta=4, ratio_a=3, ratio_b=3)
         msd.plot_empirical_pdf(
-            m_size=40,
+            sample_size=10,
             bins=100,
             density=True,
             plot_law_pdf=True,
@@ -1070,9 +1056,9 @@ class TestManovaSpectrumDistribution:
     
     def test_msd_plot_mre_ratio_ge1(self):
         fig_name = "test_msd_mre_ratio_ge1.png"
-        msd = ManovaSpectrumDistribution(beta=1, a=3, b=3)
+        msd = ManovaSpectrumDistribution(beta=1, ratio_a=3, ratio_b=3)
         msd.plot_empirical_pdf(
-            m_size=200,
+            sample_size=10,
             bins=100,
             density=False,
             plot_law_pdf=False,
@@ -1082,9 +1068,9 @@ class TestManovaSpectrumDistribution:
     
     def test_msd_plot_msd_mre_theoretical_ratio_ge1(self):
         fig_name = "test_msd_wre_theory_ratio_ge1.png"
-        msd = ManovaSpectrumDistribution(beta=1, a=3, b=3)
+        msd = ManovaSpectrumDistribution(beta=1, ratio_a=3, ratio_b=3)
         msd.plot_empirical_pdf(
-            m_size=1000,
+            sample_size=10,
             bins=100,
             density=True,
             plot_law_pdf=True,
@@ -1094,9 +1080,9 @@ class TestManovaSpectrumDistribution:
     
     def test_msd_plot_mre_interval(self):
         fig_name = "test_msd_mre_interval.png"
-        msd = ManovaSpectrumDistribution(beta=1, a=3, b=3)
+        msd = ManovaSpectrumDistribution(beta=1, ratio_a=3, ratio_b=3)
         msd.plot_empirical_pdf(
-            m_size=200,
+            sample_size=10,
             bins=100,
             interval=(0,10),
             density=False,
@@ -1107,9 +1093,9 @@ class TestManovaSpectrumDistribution:
     
     def test_msd_plot_mre_a_le_1_b_le_1(self):
         fig_name = "test_msd_plot_mre_a_le_1_b_le_1.png"
-        msd = ManovaSpectrumDistribution(beta=1, a=0.9, b=0.9)
+        msd = ManovaSpectrumDistribution(beta=1, ratio_a=0.9, ratio_b=0.9)
         msd.plot_empirical_pdf(
-            m_size=200,
+            sample_size=10,
             bins=100,
             interval=(0,10),
             density=False,
@@ -1120,9 +1106,9 @@ class TestManovaSpectrumDistribution:
     
     def test_msd_plot_mre_a_le_1_b_le_1_density(self):
         fig_name = "test_msd_plot_mre_a_le_1_b_le_1_density.png"
-        msd = ManovaSpectrumDistribution(beta=1, a=0.9, b=0.9)
+        msd = ManovaSpectrumDistribution(beta=1, ratio_a=0.9, ratio_b=0.9)
         msd.plot_empirical_pdf(
-            m_size=200,
+            sample_size=10,
             bins=100,
             interval=(0,10),
             density=True,
@@ -1130,60 +1116,16 @@ class TestManovaSpectrumDistribution:
             savefig_path=TMP_DIR_PATH+"/"+fig_name
         )
         assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name)) == True
-
-    
-    def test_msd_plot_mre_emppdf_n1_size(self):
-        fig_name = "test_msd_mre_emppdf_n1_size.png"
-        mpd = ManovaSpectrumDistribution(beta=1, a=3, b=3)
-        mpd.plot_empirical_pdf(
-            m_size=200,
-            n1_size=500,
-            bins=100,
-            interval=(0,10),
-            density=False,
-            plot_law_pdf=False,
-            savefig_path=TMP_DIR_PATH+"/"+fig_name
-        )
-        assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name)) == True
-    
-    def test_msd_plot_mre_emppdf_n2_size(self):
-        fig_name = "test_msd_mre_emppdf_n2_size.png"
-        mpd = ManovaSpectrumDistribution(beta=1, a=3, b=3)
-        mpd.plot_empirical_pdf(
-            m_size=200,
-            n2_size=500,
-            bins=100,
-            interval=(0,10),
-            density=False,
-            plot_law_pdf=False,
-            savefig_path=TMP_DIR_PATH+"/"+fig_name
-        )
-        assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name)) == True
-    
-    def test_msd_plot_mre_emppdf_n1n2_size(self):
-        fig_name = "test_msd_mre_emppdf_n1n2_size.png"
-        mpd = ManovaSpectrumDistribution(beta=1, a=3, b=3)
-        mpd.plot_empirical_pdf(
-            m_size=200,
-            n1_size=500,
-            n2_size=600,
-            bins=100,
-            interval=(0,10),
-            density=False,
-            plot_law_pdf=False,
-            savefig_path=TMP_DIR_PATH+"/"+fig_name
-        )
-        assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name)) == True
     
     def test_msd_plot_size_exception(self):
         with pytest.raises(ValueError):
-            msd = ManovaSpectrumDistribution(beta=1, a=3, b=3)
-            msd.plot_empirical_pdf(m_size=0)
+            msd = ManovaSpectrumDistribution(beta=1, ratio_a=3, ratio_b=3)
+            msd.plot_empirical_pdf(sample_size=0)
     
     def test_msd_plot_ensemble_exception(self):
         with pytest.raises(ValueError):
-            msd = ManovaSpectrumDistribution(beta=0, a=3, b=3)
-            msd.plot_empirical_pdf(m_size=10)
+            msd = ManovaSpectrumDistribution(beta=0, ratio_a=3, ratio_b=3)
+            msd.plot_empirical_pdf(sample_size=10)
 
 
 
