@@ -97,7 +97,7 @@ class _Ensemble(metaclass=ABCMeta):
         bins,
         interval=None,
         density=False,
-        normalize=True,
+        normalize=False,
         avoid_img=False
     ):
         """Calculates the histogram of the matrix eigenvalues.
@@ -121,10 +121,10 @@ class _Ensemble(metaclass=ABCMeta):
                 number of counts and the bin width, so that the area under the histogram
                 integrates to 1. If set to False, the absolute frequencies of the eigenvalues
                 are returned.
-            normalize (bool, default=True): Whether to normalize the computed eigenvalues
-                by the default normalization constant (see references). Defaults to True, i.e.,
-                the eigenvalues are normalized. Normalization makes the eigenvalues to be in the
-                same support independently of the sample size.
+            normalize (bool, default=False): Whether to normalize the computed eigenvalues
+                by the default normalization constant (see references). Defaults to False,
+                i.e., the eigenvalues are normalized. Normalization makes the eigenvalues
+                to be in the same support independently of the sample size.
             avoid_img (bool, default=False): If True, eigenvalue imaginary part is ignored.
                 This should be used when the eigenvalue compatation is expected to generate
                 complex eigenvalues with really small imaginary part because of computing
@@ -171,7 +171,7 @@ class _Ensemble(metaclass=ABCMeta):
         bins,
         interval=None,
         density=False,
-        normalize=True,
+        normalize=False,
         fig_path=None,
         avoid_img=False
     ):
@@ -197,10 +197,10 @@ class _Ensemble(metaclass=ABCMeta):
                 number of counts and the bin width, so that the area under the histogram
                 integrates to 1. If set to False, the absolute frequencies of the eigenvalues
                 are returned.
-            normalize (bool, default=True): Whether to normalize the computed eigenvalues
-                by the default normalization constant (see references). Defaults to True, i.e.,
-                the eigenvalues are normalized. Normalization makes the eigenvalues to be in the
-                same support independently of the sample size.
+            normalize (bool, default=False): Whether to normalize the computed eigenvalues
+                by the default normalization constant (see references). Defaults to False,
+                i.e., the eigenvalues are normalized. Normalization makes the eigenvalues
+                to be in the same support independently of the sample size.
             avoid_img (bool, default=False): If True, eigenvalue imaginary part is ignored.
                 This should be used when the eigenvalue compatation is expected to generate
                 complex eigenvalues with really small imaginary part because of computing

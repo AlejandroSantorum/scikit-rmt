@@ -223,7 +223,7 @@ class CircularEnsemble(_Ensemble):
 
         return norm_const * self._eigvals
 
-    def plot_eigval_hist(self, bins, interval=None, density=False, normalize=True, fig_path=None):
+    def plot_eigval_hist(self, bins, interval=None, density=False, normalize=False, fig_path=None):
         """Computes and plots the histogram of the matrix eigenvalues.
 
         Calculates and plots the histogram of the current sampled matrix eigenvalues.
@@ -243,10 +243,10 @@ class CircularEnsemble(_Ensemble):
                 number of counts and the bin width, so that the area under the histogram
                 integrates to 1. If set to False, the absolute frequencies of the eigenvalues
                 are returned.
-            normalize (bool, default=True): Whether to normalize the computed eigenvalues
-                by the default normalization constant (see references). Defaults to True, i.e.,
-                the eigenvalues are normalized. Normalization makes the eigenvalues to be in the
-                same support independently of the sample size.
+            normalize (bool, default=False): Whether to normalize the computed eigenvalues
+                by the default normalization constant (see references). Defaults to False,
+                i.e., the eigenvalues are normalized. Normalization makes the eigenvalues
+                to be in the same support independently of the sample size.
             fig_path (string, default=None): path to save the created figure. If it is not
                 provided, the plot is shown at the end of the routine.
 
