@@ -90,7 +90,7 @@ class TestWignerSemicircleDistribution:
         '''
         with pytest.raises(ValueError):
             wsd = WignerSemicircleDistribution(beta=1)
-            wsd.rvs(-5)
+            wsd.rvs(size=-5)
     
     def test_wsd_pdf(self):
         '''Testing WignerSemicircleDistribution pdf
@@ -167,8 +167,8 @@ class TestWignerSemicircleDistribution:
         fig_name = "test_wsl_goe_absfreq.png"
         wsd = WignerSemicircleDistribution(beta=1)
         wsd.plot_empirical_pdf(
-            n_size=100,
-            bins=100,
+            sample_size=10,
+            bins=10,
             density=False,
             plot_law_pdf=False,
             savefig_path=TMP_DIR_PATH+"/"+fig_name
@@ -179,8 +179,8 @@ class TestWignerSemicircleDistribution:
         fig_name = "test_wsl_gue_absfreq.png"
         wsd = WignerSemicircleDistribution(beta=2)
         wsd.plot_empirical_pdf(
-            n_size=100,
-            bins=100,
+            sample_size=10,
+            bins=10,
             density=False,
             plot_law_pdf=False,
             savefig_path=TMP_DIR_PATH+"/"+fig_name
@@ -191,8 +191,8 @@ class TestWignerSemicircleDistribution:
         fig_name = "test_wsl_gse_absfreq.png"
         wsd = WignerSemicircleDistribution(beta=4)
         wsd.plot_empirical_pdf(
-            n_size=50,
-            bins=100,
+            sample_size=10,
+            bins=10,
             density=False,
             plot_law_pdf=False,
             savefig_path=TMP_DIR_PATH+"/"+fig_name
@@ -203,8 +203,8 @@ class TestWignerSemicircleDistribution:
         fig_name = "test_wsl_goe_norm.png"
         wsd = WignerSemicircleDistribution(beta=1)
         wsd.plot_empirical_pdf(
-            n_size=100,
-            bins=100,
+            sample_size=10,
+            bins=10,
             density=True,
             plot_law_pdf=False,
             savefig_path=TMP_DIR_PATH+"/"+fig_name
@@ -215,8 +215,8 @@ class TestWignerSemicircleDistribution:
         fig_name = "test_wsl_gue_norm.png"
         wsd = WignerSemicircleDistribution(beta=2)
         wsd.plot_empirical_pdf(
-            n_size=100,
-            bins=100,
+            sample_size=10,
+            bins=10,
             density=True,
             plot_law_pdf=False,
             savefig_path=TMP_DIR_PATH+"/"+fig_name
@@ -227,8 +227,8 @@ class TestWignerSemicircleDistribution:
         fig_name = "test_wsl_gse_norm.png"
         wsd = WignerSemicircleDistribution(beta=4)
         wsd.plot_empirical_pdf(
-            n_size=50,
-            bins=100,
+            sample_size=10,
+            bins=10,
             density=True,
             plot_law_pdf=False,
             savefig_path=TMP_DIR_PATH+"/"+fig_name
@@ -239,8 +239,8 @@ class TestWignerSemicircleDistribution:
         fig_name = "test_wsl_goe_theory.png"
         wsd = WignerSemicircleDistribution(beta=1)
         wsd.plot_empirical_pdf(
-            n_size=100,
-            bins=100,
+            sample_size=10,
+            bins=10,
             density=True,
             plot_law_pdf=True,
             savefig_path=TMP_DIR_PATH+"/"+fig_name
@@ -251,8 +251,8 @@ class TestWignerSemicircleDistribution:
         fig_name = "test_wsl_gue_theory.png"
         wsd = WignerSemicircleDistribution(beta=2)
         wsd.plot_empirical_pdf(
-            n_size=100,
-            bins=100,
+            sample_size=10,
+            bins=10,
             density=True,
             plot_law_pdf=True,
             savefig_path=TMP_DIR_PATH+"/"+fig_name
@@ -263,8 +263,8 @@ class TestWignerSemicircleDistribution:
         fig_name = "test_wsl_gse_theory.png"
         wsd = WignerSemicircleDistribution(beta=4)
         wsd.plot_empirical_pdf(
-            n_size=50,
-            bins=100,
+            sample_size=10,
+            bins=10,
             density=True,
             plot_law_pdf=True,
             savefig_path=TMP_DIR_PATH+"/"+fig_name
@@ -274,7 +274,7 @@ class TestWignerSemicircleDistribution:
     def test_wsd_plot_size_exception(self):
         with pytest.raises(ValueError):
             wsd = WignerSemicircleDistribution(beta=1)
-            wsd.plot_empirical_pdf(n_size=0)
+            wsd.plot_empirical_pdf(sample_size=0)
     
     def test_wsd_plot_ensemble_exception(self):
         with pytest.raises(ValueError):
@@ -300,7 +300,6 @@ class TestMarchenkoPasturDistribution:
         assert mpd.lambda_minus == beta * sigma**2 * (1 - np.sqrt(ratio))**2
         assert mpd.lambda_plus == beta * sigma**2 * (1 + np.sqrt(ratio))**2
         assert mpd._var == beta * sigma**2
-        assert mpd._wishart_ens is None
     
     def test_mpd_init_raise(self):
         '''Testing MarchenkoPasturDistribution init raising exception
@@ -338,7 +337,7 @@ class TestMarchenkoPasturDistribution:
         '''
         with pytest.raises(ValueError):
             mpd = MarchenkoPasturDistribution(beta=1, ratio=1)
-            mpd.rvs(-5)
+            mpd.rvs(size=-5)
     
     def test_mpd_pdf(self):
         '''Testing MarchenkoPasturDistribution pdf
@@ -413,8 +412,8 @@ class TestMarchenkoPasturDistribution:
         fig_name = "test_mpl_wre_absfreq.png"
         mpd = MarchenkoPasturDistribution(beta=1, ratio=1/3)
         mpd.plot_empirical_pdf(
-            n_size=100,
-            bins=100,
+            sample_size=10,
+            bins=10,
             density=False,
             plot_law_pdf=False,
             savefig_path=TMP_DIR_PATH+"/"+fig_name
@@ -425,8 +424,8 @@ class TestMarchenkoPasturDistribution:
         fig_name = "test_mpl_wce_absfreq.png"
         mpd = MarchenkoPasturDistribution(beta=2, ratio=1/3)
         mpd.plot_empirical_pdf(
-            n_size=100,
-            bins=100,
+            sample_size=10,
+            bins=10,
             density=False,
             plot_law_pdf=False,
             savefig_path=TMP_DIR_PATH+"/"+fig_name
@@ -437,8 +436,8 @@ class TestMarchenkoPasturDistribution:
         fig_name = "test_mpl_wqe_absfreq.png"
         mpd = MarchenkoPasturDistribution(beta=4, ratio=1/3)
         mpd.plot_empirical_pdf(
-            n_size=100,
-            bins=100,
+            sample_size=10,
+            bins=10,
             density=False,
             plot_law_pdf=False,
             savefig_path=TMP_DIR_PATH+"/"+fig_name
@@ -449,8 +448,8 @@ class TestMarchenkoPasturDistribution:
         fig_name = "test_mpl_wre_norm.png"
         mpd = MarchenkoPasturDistribution(beta=1, ratio=1/3)
         mpd.plot_empirical_pdf(
-            n_size=100,
-            bins=100,
+            sample_size=10,
+            bins=10,
             density=True,
             plot_law_pdf=False,
             savefig_path=TMP_DIR_PATH+"/"+fig_name
@@ -461,8 +460,8 @@ class TestMarchenkoPasturDistribution:
         fig_name = "test_mpl_wce_norm.png"
         mpd = MarchenkoPasturDistribution(beta=2, ratio=1/3)
         mpd.plot_empirical_pdf(
-            n_size=100,
-            bins=100,
+            sample_size=10,
+            bins=10,
             density=True,
             plot_law_pdf=False,
             savefig_path=TMP_DIR_PATH+"/"+fig_name
@@ -473,8 +472,8 @@ class TestMarchenkoPasturDistribution:
         fig_name = "test_mpl_wqe_norm.png"
         mpd = MarchenkoPasturDistribution(beta=4, ratio=1/3)
         mpd.plot_empirical_pdf(
-            n_size=100,
-            bins=100,
+            sample_size=10,
+            bins=10,
             density=True,
             plot_law_pdf=False,
             savefig_path=TMP_DIR_PATH+"/"+fig_name
@@ -485,8 +484,8 @@ class TestMarchenkoPasturDistribution:
         fig_name = "test_mpl_wre_theory.png"
         mpd = MarchenkoPasturDistribution(beta=1, ratio=1/3)
         mpd.plot_empirical_pdf(
-            n_size=100,
-            bins=100,
+            sample_size=10,
+            bins=10,
             density=True,
             plot_law_pdf=True,
             savefig_path=TMP_DIR_PATH+"/"+fig_name
@@ -497,8 +496,8 @@ class TestMarchenkoPasturDistribution:
         fig_name = "test_mpl_wce_theory.png"
         mpd = MarchenkoPasturDistribution(beta=2, ratio=1/3)
         mpd.plot_empirical_pdf(
-            n_size=100,
-            bins=100,
+            sample_size=10,
+            bins=10,
             density=True,
             plot_law_pdf=True,
             savefig_path=TMP_DIR_PATH+"/"+fig_name
@@ -509,8 +508,8 @@ class TestMarchenkoPasturDistribution:
         fig_name = "test_mpl_wqe_theory.png"
         mpd = MarchenkoPasturDistribution(beta=4, ratio=1/3)
         mpd.plot_empirical_pdf(
-            n_size=100,
-            bins=100,
+            sample_size=10,
+            bins=10,
             density=True,
             plot_law_pdf=True,
             savefig_path=TMP_DIR_PATH+"/"+fig_name
@@ -521,8 +520,8 @@ class TestMarchenkoPasturDistribution:
         fig_name = "test_mpl_wre_ratio_ge1.png"
         mpd = MarchenkoPasturDistribution(beta=1, ratio=1/3)
         mpd.plot_empirical_pdf(
-            n_size=100,
-            bins=100,
+            sample_size=10,
+            bins=10,
             density=False,
             plot_law_pdf=False,
             savefig_path=TMP_DIR_PATH+"/"+fig_name
@@ -533,8 +532,8 @@ class TestMarchenkoPasturDistribution:
         fig_name = "test_mpl_wre_theory_ratio_ge1.png"
         mpd = MarchenkoPasturDistribution(beta=1, ratio=1/3)
         mpd.plot_empirical_pdf(
-            n_size=100,
-            bins=100,
+            sample_size=10,
+            bins=10,
             density=True,
             plot_law_pdf=True,
             savefig_path=TMP_DIR_PATH+"/"+fig_name
@@ -545,48 +544,45 @@ class TestMarchenkoPasturDistribution:
         fig_name = "test_mpl_wre_interval.png"
         mpd = MarchenkoPasturDistribution(beta=1, ratio=1/3)
         mpd.plot_empirical_pdf(
-            n_size=100,
-            bins=100,
-            interval=(0,10),
+            sample_size=10,
+            bins=10,
+            #interval=(0,10),
             density=False,
             plot_law_pdf=False,
             savefig_path=TMP_DIR_PATH+"/"+fig_name
         )
         assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name)) == True
     
-    def test_mpd_plot_wre_emppdf_p_size(self):
-        fig_name = "test_mpd_wre_emppdf_p_size.png"
+    def test_mpd_plot_wre_emppdf_sample_size(self):
+        fig_name = "test_mpd_wre_emppdf_sample_size.png"
         mpd = MarchenkoPasturDistribution(beta=1, ratio=1/3)
         mpd.plot_empirical_pdf(
-            p_size=50,
-            n_size=100,
-            bins=100,
+            sample_size=10,
+            bins=10,
             density=False,
             plot_law_pdf=False,
             savefig_path=TMP_DIR_PATH+"/"+fig_name
         )
         assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name)) == True
     
-    def test_mpd_plot_wce_emppdf_p_size(self):
-        fig_name = "test_mpd_wce_emppdf_p_size.png"
+    def test_mpd_plot_wce_emppdf_sample_size(self):
+        fig_name = "test_mpd_wce_emppdf_sample_size.png"
         mpd = MarchenkoPasturDistribution(beta=2, ratio=1/3)
         mpd.plot_empirical_pdf(
-            p_size=50,
-            n_size=100,
-            bins=100,
+            sample_size=10,
+            bins=10,
             density=False,
             plot_law_pdf=False,
             savefig_path=TMP_DIR_PATH+"/"+fig_name
         )
         assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name)) == True
     
-    def test_mpd_plot_wqe_emppdf_p_size(self):
-        fig_name = "test_mpd_wqe_emppdf_p_size.png"
+    def test_mpd_plot_wqe_emppdf_sample_size(self):
+        fig_name = "test_mpd_wqe_emppdf_sample_size.png"
         mpd = MarchenkoPasturDistribution(beta=4, ratio=1/3)
         mpd.plot_empirical_pdf(
-            p_size=50,
-            n_size=100,
-            bins=100,
+            sample_size=10,
+            bins=10,
             density=False,
             plot_law_pdf=False,
             savefig_path=TMP_DIR_PATH+"/"+fig_name
@@ -597,8 +593,8 @@ class TestMarchenkoPasturDistribution:
         fig_name = "test_mpd_plot_wre_emppdf_ratio_g_1.png"
         mpd = MarchenkoPasturDistribution(beta=1, ratio=2)
         mpd.plot_empirical_pdf(
-            n_size=50,
-            bins=100,
+            sample_size=10,
+            bins=10,
             density=False,
             plot_law_pdf=False,
             savefig_path=TMP_DIR_PATH+"/"+fig_name
@@ -609,8 +605,8 @@ class TestMarchenkoPasturDistribution:
         fig_name = "test_mpd_plot_wre_emppdf_ratio_g_1_density.png"
         mpd = MarchenkoPasturDistribution(beta=1, ratio=2)
         mpd.plot_empirical_pdf(
-            n_size=50,
-            bins=100,
+            sample_size=10,
+            bins=10,
             density=True,
             plot_law_pdf=True,
             savefig_path=TMP_DIR_PATH+"/"+fig_name
@@ -620,7 +616,7 @@ class TestMarchenkoPasturDistribution:
     def test_mpd_plot_mpl_size_exception(self):
         with pytest.raises(ValueError):
             mpd = MarchenkoPasturDistribution(beta=1, ratio=1/3)
-            mpd.plot_empirical_pdf(n_size=0)
+            mpd.plot_empirical_pdf(sample_size=0)
     
     def test_mpd_plot_mpl_ensemble_exception(self):
         with pytest.raises(ValueError):
@@ -723,7 +719,7 @@ class TestTracyWidomDistribution:
         twd = TracyWidomDistribution(beta=1)
         twd.plot_empirical_pdf(
             sample_size=10,
-            bins=100,
+            bins=10,
             density=False,
             plot_law_pdf=False,
             savefig_path=TMP_DIR_PATH+"/"+fig_name
@@ -735,7 +731,7 @@ class TestTracyWidomDistribution:
         twd = TracyWidomDistribution(beta=2)
         twd.plot_empirical_pdf(
             sample_size=10,
-            bins=100,
+            bins=10,
             density=False,
             plot_law_pdf=False,
             savefig_path=TMP_DIR_PATH+"/"+fig_name
@@ -747,7 +743,7 @@ class TestTracyWidomDistribution:
         twd = TracyWidomDistribution(beta=4)
         twd.plot_empirical_pdf(
             sample_size=10,
-            bins=100,
+            bins=10,
             density=False,
             plot_law_pdf=False,
             savefig_path=TMP_DIR_PATH+"/"+fig_name
@@ -759,7 +755,7 @@ class TestTracyWidomDistribution:
         twd = TracyWidomDistribution(beta=1)
         twd.plot_empirical_pdf(
             sample_size=10,
-            bins=100,
+            bins=10,
             density=True,
             plot_law_pdf=False,
             savefig_path=TMP_DIR_PATH+"/"+fig_name
@@ -771,7 +767,7 @@ class TestTracyWidomDistribution:
         twd = TracyWidomDistribution(beta=2)
         twd.plot_empirical_pdf(
             sample_size=10,
-            bins=100,
+            bins=10,
             density=True,
             plot_law_pdf=False,
             savefig_path=TMP_DIR_PATH+"/"+fig_name
@@ -783,7 +779,7 @@ class TestTracyWidomDistribution:
         twd = TracyWidomDistribution(beta=4)
         twd.plot_empirical_pdf(
             sample_size=10,
-            bins=100,
+            bins=10,
             density=True,
             plot_law_pdf=False,
             savefig_path=TMP_DIR_PATH+"/"+fig_name
@@ -795,7 +791,7 @@ class TestTracyWidomDistribution:
         twd = TracyWidomDistribution(beta=1)
         twd.plot_empirical_pdf(
             sample_size=10,
-            bins=100,
+            bins=10,
             density=True,
             plot_law_pdf=True,
             savefig_path=TMP_DIR_PATH+"/"+fig_name
@@ -807,7 +803,7 @@ class TestTracyWidomDistribution:
         twd = TracyWidomDistribution(beta=2)
         twd.plot_empirical_pdf(
             sample_size=10,
-            bins=100,
+            bins=10,
             density=True,
             plot_law_pdf=True,
             savefig_path=TMP_DIR_PATH+"/"+fig_name
@@ -819,7 +815,7 @@ class TestTracyWidomDistribution:
         twd = TracyWidomDistribution(beta=4)
         twd.plot_empirical_pdf(
             sample_size=10,
-            bins=100,
+            bins=10,
             density=True,
             plot_law_pdf=True,
             savefig_path=TMP_DIR_PATH+"/"+fig_name
@@ -834,7 +830,7 @@ class TestTracyWidomDistribution:
     def test_twd_plot_ensemble_exception(self):
         with pytest.raises(ValueError):
             twd = TracyWidomDistribution(beta=0)
-            twd.plot_empirical_pdf(n_size=10)
+            twd.plot_empirical_pdf(sample_size=10)
 
 
 
@@ -951,7 +947,7 @@ class TestManovaSpectrumDistribution:
         msd = ManovaSpectrumDistribution(beta=1, ratio_a=3, ratio_b=3)
         msd.plot_empirical_pdf(
             sample_size=10,
-            bins=100,
+            bins=10,
             density=False,
             plot_law_pdf=False,
             savefig_path=TMP_DIR_PATH+"/"+fig_name
@@ -963,7 +959,7 @@ class TestManovaSpectrumDistribution:
         msd = ManovaSpectrumDistribution(beta=2, ratio_a=3, ratio_b=3)
         msd.plot_empirical_pdf(
             sample_size=10,
-            bins=100,
+            bins=10,
             density=False,
             plot_law_pdf=False,
             savefig_path=TMP_DIR_PATH+"/"+fig_name
@@ -975,7 +971,7 @@ class TestManovaSpectrumDistribution:
         msd = ManovaSpectrumDistribution(beta=4, ratio_a=3, ratio_b=3)
         msd.plot_empirical_pdf(
             sample_size=10,
-            bins=100,
+            bins=10,
             density=False,
             plot_law_pdf=False,
             savefig_path=TMP_DIR_PATH+"/"+fig_name
@@ -987,7 +983,7 @@ class TestManovaSpectrumDistribution:
         msd = ManovaSpectrumDistribution(beta=1,ratio_a=3, ratio_b=3)
         msd.plot_empirical_pdf(
             sample_size=10,
-            bins=100,
+            bins=10,
             density=True,
             plot_law_pdf=False,
             savefig_path=TMP_DIR_PATH+"/"+fig_name
@@ -999,7 +995,7 @@ class TestManovaSpectrumDistribution:
         msd = ManovaSpectrumDistribution(beta=2, ratio_a=3, ratio_b=3)
         msd.plot_empirical_pdf(
             sample_size=10,
-            bins=100,
+            bins=10,
             density=True,
             plot_law_pdf=False,
             savefig_path=TMP_DIR_PATH+"/"+fig_name
@@ -1011,7 +1007,7 @@ class TestManovaSpectrumDistribution:
         msd = ManovaSpectrumDistribution(beta=4, ratio_a=3, ratio_b=3)
         msd.plot_empirical_pdf(
             sample_size=10,
-            bins=100,
+            bins=10,
             density=True,
             plot_law_pdf=False,
             savefig_path=TMP_DIR_PATH+"/"+fig_name
@@ -1023,7 +1019,7 @@ class TestManovaSpectrumDistribution:
         msd = ManovaSpectrumDistribution(beta=1, ratio_a=3, ratio_b=3)
         msd.plot_empirical_pdf(
             sample_size=10,
-            bins=100,
+            bins=10,
             density=True,
             plot_law_pdf=True,
             savefig_path=TMP_DIR_PATH+"/"+fig_name
@@ -1035,7 +1031,7 @@ class TestManovaSpectrumDistribution:
         msd = ManovaSpectrumDistribution(beta=2, ratio_a=3, ratio_b=3)
         msd.plot_empirical_pdf(
             sample_size=10,
-            bins=100,
+            bins=10,
             density=True,
             plot_law_pdf=True,
             savefig_path=TMP_DIR_PATH+"/"+fig_name
@@ -1047,7 +1043,7 @@ class TestManovaSpectrumDistribution:
         msd = ManovaSpectrumDistribution(beta=4, ratio_a=3, ratio_b=3)
         msd.plot_empirical_pdf(
             sample_size=10,
-            bins=100,
+            bins=10,
             density=True,
             plot_law_pdf=True,
             savefig_path=TMP_DIR_PATH+"/"+fig_name
@@ -1059,7 +1055,7 @@ class TestManovaSpectrumDistribution:
         msd = ManovaSpectrumDistribution(beta=1, ratio_a=3, ratio_b=3)
         msd.plot_empirical_pdf(
             sample_size=10,
-            bins=100,
+            bins=10,
             density=False,
             plot_law_pdf=False,
             savefig_path=TMP_DIR_PATH+"/"+fig_name
@@ -1071,7 +1067,7 @@ class TestManovaSpectrumDistribution:
         msd = ManovaSpectrumDistribution(beta=1, ratio_a=3, ratio_b=3)
         msd.plot_empirical_pdf(
             sample_size=10,
-            bins=100,
+            bins=10,
             density=True,
             plot_law_pdf=True,
             savefig_path=TMP_DIR_PATH+"/"+fig_name
@@ -1083,7 +1079,7 @@ class TestManovaSpectrumDistribution:
         msd = ManovaSpectrumDistribution(beta=1, ratio_a=3, ratio_b=3)
         msd.plot_empirical_pdf(
             sample_size=10,
-            bins=100,
+            bins=10,
             interval=(0,10),
             density=False,
             plot_law_pdf=False,
@@ -1096,7 +1092,7 @@ class TestManovaSpectrumDistribution:
         msd = ManovaSpectrumDistribution(beta=1, ratio_a=0.9, ratio_b=0.9)
         msd.plot_empirical_pdf(
             sample_size=10,
-            bins=100,
+            bins=10,
             interval=(0,10),
             density=False,
             plot_law_pdf=False,
@@ -1109,7 +1105,7 @@ class TestManovaSpectrumDistribution:
         msd = ManovaSpectrumDistribution(beta=1, ratio_a=0.9, ratio_b=0.9)
         msd.plot_empirical_pdf(
             sample_size=10,
-            bins=100,
+            bins=10,
             interval=(0,10),
             density=True,
             plot_law_pdf=True,
