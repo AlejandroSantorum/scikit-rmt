@@ -190,7 +190,8 @@ class WignerSemicircleDistribution:
         self.center = center
         self.sigma = sigma
         self.radius = 2.0 * np.sqrt(self.beta) * self.sigma
-    
+        self.default_interval = (self.center - self.radius, self.center + self.radius)
+
     def rvs(self, size):
         """Samples ranfom variates following this distribution.
         This uses the relationship between Wigner Semicircle law and Beta distribution.
@@ -278,7 +279,8 @@ class WignerSemicircleDistribution:
             plot_ylabel="cumulative distribution", savefig_path=savefig_path
         )
 
-    def plot_empirical_pdf(self, sample_size=10000, bins=100, density=False, plot_law_pdf=False, savefig_path=None):
+    def plot_empirical_pdf(self, sample_size=10000, bins=100, interval=None,
+                           density=False, plot_law_pdf=False, savefig_path=None):
         """Computes and plots Wigner's semicircle empirical law.
 
         Calculates and plots Wigner's semicircle empirical law using random samples generated
@@ -293,6 +295,10 @@ class WignerSemicircleDistribution:
                 of equal-width bins in the range. If bins is a sequence, it defines the
                 bin edges, including the left edge of the first bin and the right
                 edge of the last bin; in this case, bins may be unequally spaced.
+            interval (tuple, default=None): Delimiters (xmin, xmax) of the histogram.
+                The lower and upper range of the bins. Lower and upper outliers are ignored.
+                If one of the bounds of the specified interval is outside of the minimum default
+                interval, this will be adjusted to show the distribution bulk properly.
             density (bool, default=False): If True, draw and return a probability
                 density: each bin will display the bin's raw count divided by the total
                 number of counts and the bin width, so that the area under the histogram
@@ -318,10 +324,20 @@ class WignerSemicircleDistribution:
             raise ValueError("Negative eigenvalue sample size (given = {sample_size})."
                              " Please, provide a sample size greater or equal than 1.")
         
-        interval = (self.center - self.radius, self.center + self.radius)
+        if interval is None:
+            range_interval = self.default_interval
+        else:
+            xmin = min(interval[0], self.default_interval[0])
+            xmax = max(interval[1], self.default_interval[1])
+            if interval[0] > self.default_interval[0]:
+                print(f"Lower bound of interval too large. Setting lower bound to {xmin}.")
+            if interval[1] < self.default_interval[1]:
+                print(f"Upper bound of interval too large. Setting upper bound to {xmax}.")
+            range_interval = (xmin, xmax)
+            print(f"Setting plot interval to {range_interval}.")
 
         random_samples = self.rvs(size=sample_size)
-        observed, bins = np.histogram(random_samples, bins=bins, range=interval, density=density)
+        observed, bins = np.histogram(random_samples, bins=bins, range=range_interval, density=density)
 
         width = bins[1]-bins[0]
         plt.bar(bins[:-1], observed, width=width, align='edge')
@@ -406,9 +422,17 @@ class MarchenkoPasturDistribution(rv_continuous):
         self.lambda_minus = self.beta * self.sigma**2 * (1 - np.sqrt(self.ratio))**2
         self.lambda_plus = self.beta * self.sigma**2 * (1 + np.sqrt(self.ratio))**2
         self._var = self.beta * self.sigma**2
+        self._set_default_interval()
         # when the support is finite (lambda_minus, lambda_plus) it is better
         # to explicity approximate the inverse of the CDF to implement rvs
         self._approximate_inv_cdf()
+    
+    def _set_default_interval(self):
+        # computing interval according to the matrix size ratio and support
+        if self.ratio <= 1:
+            self.default_interval = (self.lambda_minus, self.lambda_plus)
+        else:
+            self.default_interval = (min(-0.05, self.lambda_minus), self.lambda_plus)
     
     def _approximate_inv_cdf(self):
         # https://gist.github.com/amarvutha/c2a3ea9d42d238551c694480019a6ce1
@@ -521,7 +545,8 @@ class MarchenkoPasturDistribution(rv_continuous):
             plot_ylabel="cumulative distribution", savefig_path=savefig_path
         )
 
-    def plot_empirical_pdf(self, sample_size=1000, bins=100, density=False, plot_law_pdf=False, savefig_path=None):
+    def plot_empirical_pdf(self, sample_size=1000, bins=100, interval=None,
+                           density=False, plot_law_pdf=False, savefig_path=None):
         """Computes and plots Marchenko-Pastur empirical law using Wishart Ensemble random matrices.
 
         Calculates and plots Marchenko-Pastur empirical law using Wishart Ensemble random matrices.
@@ -548,6 +573,10 @@ class MarchenkoPasturDistribution(rv_continuous):
                 of equal-width bins in the range. If bins is a sequence, it defines the
                 bin edges, including the left edge of the first bin and the right
                 edge of the last bin; in this case, bins may be unequally spaced.
+            interval (tuple, default=None): Delimiters (xmin, xmax) of the histogram.
+                The lower and upper range of the bins. Lower and upper outliers are ignored.
+                If one of the bounds of the specified interval is outside of the minimum default
+                interval, this will be adjusted to show the distribution bulk properly.
             density (bool, default=False): If True, draw and return a probability
                 density: each bin will display the bin's raw count divided by the total
                 number of counts and the bin width, so that the area under the histogram
@@ -573,14 +602,20 @@ class MarchenkoPasturDistribution(rv_continuous):
             raise ValueError("Negative eigenvalue sample size (given = {sample_size})."
                              " Please, provide a sample size greater or equal than 1.")
 
-        # computing interval according to the matrix size ratio and support
-        if self.ratio <= 1:
-            interval = (self.lambda_minus, self.lambda_plus)
+        if interval is None:
+            range_interval = self.default_interval
         else:
-            interval = (min(-0.05, self.lambda_minus), self.lambda_plus)
+            xmin = min(interval[0], self.default_interval[0])
+            xmax = max(interval[1], self.default_interval[1])
+            if interval[0] > self.default_interval[0]:
+                print(f"Lower bound of interval too large. Setting lower bound to {xmin}.")
+            if interval[1] < self.default_interval[1]:
+                print(f"Upper bound of interval too large. Setting upper bound to {xmax}.")
+            range_interval = (xmin, xmax)
+            print(f"Setting plot interval to {range_interval}.")
         
         random_samples = self.rvs(size=sample_size)
-        observed, bins = np.histogram(random_samples, bins=bins, range=interval, density=density)
+        observed, bins = np.histogram(random_samples, bins=bins, range=range_interval, density=density)
 
         width = bins[1]-bins[0]
         plt.bar(bins[:-1], observed, width=width, align='edge')
@@ -666,6 +701,7 @@ class TracyWidomDistribution(rv_continuous):
 
         self.beta = beta
         self.tw_approx = TW_Approximator(beta=self.beta)
+        self.default_interval = (-5, 4-self.beta)
 
     def _pdf(self, x):
         """Computes PDF of the Tracy-Widom Law.
@@ -704,7 +740,7 @@ class TracyWidomDistribution(rv_continuous):
         
         """
         if interval is None:
-            interval = (-5, 4-self.beta)
+            interval = self.default_interval
         
         _plot_func(
             interval, func=self._pdf, bins=bins, plot_title="Tracy-Widom law PDF",
@@ -724,14 +760,15 @@ class TracyWidomDistribution(rv_continuous):
         
         """
         if interval is None:
-            interval = (-5, 4-self.beta)
+            interval = self.default_interval
         
         _plot_func(
             interval, func=self._cdf, bins=bins, plot_title="Tracy-Widom law CDF",
             plot_ylabel="cumulative distribution", savefig_path=savefig_path
         )
 
-    def plot_empirical_pdf(self, sample_size=1000, bins=100, density=False, plot_law_pdf=False, savefig_path=None):
+    def plot_empirical_pdf(self, sample_size=1000, bins=100, interval=None,
+                           density=False, plot_law_pdf=False, savefig_path=None):
         """Computes and plots Tracy-Widom empirical law using Gaussian Ensemble.
 
         Calculates and plots Tracy-Widom empirical law using Gaussian Ensemble random matrices.
@@ -751,6 +788,10 @@ class TracyWidomDistribution(rv_continuous):
                 number of counts and the bin width, so that the area under the histogram
                 integrates to 1. If set to False, the absolute frequencies of the eigenvalues
                 are returned.
+            interval (tuple, default=None): Delimiters (xmin, xmax) of the histogram.
+                The lower and upper range of the bins. Lower and upper outliers are ignored.
+                If one of the bounds of the specified interval is outside of the minimum default
+                interval, this will be adjusted to show the distribution bulk properly.
             plot_law_pdf (bool, default=False): If True, the limiting theoretical law is plotted.
                 If set to False, just the empirical histogram is shown. This parameter is only
                 considered when the argument 'density' is set also to True.
@@ -771,10 +812,20 @@ class TracyWidomDistribution(rv_continuous):
             raise ValueError("Negative eigenvalue sample size (given = {sample_size})."
                              " Please, provide a sample size greater or equal than 1.")
 
-        random_samples = self.rvs(size=sample_size)
-        observed, bins = np.histogram(random_samples, bins=bins, range=None, density=density)
+        if interval is None:
+            range_interval = self.default_interval
+        else:
+            xmin = min(interval[0], self.default_interval[0])
+            xmax = max(interval[1], self.default_interval[1])
+            if interval[0] > self.default_interval[0]:
+                print(f"Lower bound of interval too large. Setting lower bound to {xmin}.")
+            if interval[1] < self.default_interval[1]:
+                print(f"Upper bound of interval too large. Setting upper bound to {xmax}.")
+            range_interval = (xmin, xmax)
+            print(f"Setting plot interval to {range_interval}.")
 
-        # interval=(observed.min(), observed.max())
+        random_samples = self.rvs(size=sample_size)
+        observed, bins = np.histogram(random_samples, bins=bins, range=range_interval, density=density)
 
         width = bins[1]-bins[0]
         plt.bar(bins[:-1], observed, width=width, align='edge')
@@ -866,10 +917,19 @@ class ManovaSpectrumDistribution(rv_continuous):
         self.lambda_term2 = np.sqrt((1/(ratio_a + ratio_b)) * (1 - (ratio_a/(ratio_a + ratio_b))))
         self.lambda_minus = (self.lambda_term1 - self.lambda_term2)**2
         self.lambda_plus = (self.lambda_term1 + self.lambda_term2)**2
+        self._set_default_interval()
         # when the support is finite (lambda_minus, lambda_plus) it is better
         # to explicity approximate the inverse of the CDF to implement rvs
         self._approximate_inv_cdf()
     
+    def _set_default_interval(self):
+        interval = [self.lambda_minus, self.lambda_plus]
+        if self.ratio_a <= 1:
+            interval[0] = min(-0.05, self.lambda_minus)
+        if self.ratio_b <= 1:
+            interval[1] = max(self.lambda_plus, 1.05)
+        self.default_interval = tuple(interval)
+
     def _approximate_inv_cdf(self):
         # https://gist.github.com/amarvutha/c2a3ea9d42d238551c694480019a6ce1
         x_vals = np.linspace(self.lambda_minus, self.lambda_plus, 1000)
@@ -1015,6 +1075,8 @@ class ManovaSpectrumDistribution(rv_continuous):
                 edge of the last bin; in this case, bins may be unequally spaced.
             interval (tuple, default=None): Delimiters (xmin, xmax) of the histogram.
                 The lower and upper range of the bins. Lower and upper outliers are ignored.
+                If one of the bounds of the specified interval is outside of the minimum default
+                interval, this will be adjusted to show the distribution bulk properly.
             density (bool, default=False): If True, draw and return a probability
                 density: each bin will display the bin's raw count divided by the total
                 number of counts and the bin width, so that the area under the histogram
@@ -1044,15 +1106,19 @@ class ManovaSpectrumDistribution(rv_continuous):
                              " Please, provide a sample size greater or equal than 1.")
 
         if interval is None:
-            interval = [self.lambda_minus, self.lambda_plus]
-            if self.ratio_a <= 1:
-                interval[0] = min(-0.05, self.lambda_minus)
-            if self.ratio_b <= 1:
-                interval[1] = max(self.lambda_plus, 1.05)
-            interval = tuple(interval)
+            range_interval = self.default_interval
+        else:
+            xmin = min(interval[0], self.default_interval[0])
+            xmax = max(interval[1], self.default_interval[1])
+            if interval[0] > self.default_interval[0]:
+                print(f"Lower bound of interval too large. Setting lower bound to {xmin}.")
+            if interval[1] < self.default_interval[1]:
+                print(f"Upper bound of interval too large. Setting upper bound to {xmax}.")
+            range_interval = (xmin, xmax)
+            print(f"Setting plot interval to {range_interval}.")
 
         random_samples = self.rvs(size=sample_size)
-        observed, bins = np.histogram(random_samples, bins=bins, range=interval, density=density)
+        observed, bins = np.histogram(random_samples, bins=bins, range=range_interval, density=density)
 
         width = bins[1]-bins[0]
         plt.bar(bins[:-1], observed, width=width, align='edge')

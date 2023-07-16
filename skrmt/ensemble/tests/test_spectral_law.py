@@ -271,6 +271,19 @@ class TestWignerSemicircleDistribution:
         )
         assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name)) == True
     
+    def test_wsd_plot_tiny_interval_adjusted(self):
+        fig_name = "test_wsl_tiny_interval_adjusted.png"
+        wsd = WignerSemicircleDistribution(beta=1)
+        wsd.plot_empirical_pdf(
+            sample_size=10,
+            bins=10,
+            interval=(-0.1, 0.1),
+            density=True,
+            plot_law_pdf=False,
+            savefig_path=TMP_DIR_PATH+"/"+fig_name
+        )
+        assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name)) == True
+    
     def test_wsd_plot_size_exception(self):
         with pytest.raises(ValueError):
             wsd = WignerSemicircleDistribution(beta=1)
@@ -613,6 +626,19 @@ class TestMarchenkoPasturDistribution:
         )
         assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name)) == True
     
+    def test_mpd_plot_tiny_interval_adjusted(self):
+        fig_name = "test_mpd_plot_tiny_interval_adjusted.png"
+        mpd = MarchenkoPasturDistribution(beta=1, ratio=1/2)
+        mpd.plot_empirical_pdf(
+            sample_size=10,
+            bins=10,
+            interval=(mpd.lambda_minus+0.1, mpd.lambda_minus-0.1),
+            density=True,
+            plot_law_pdf=False,
+            savefig_path=TMP_DIR_PATH+"/"+fig_name
+        )
+        assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name)) == True
+    
     def test_mpd_plot_mpl_size_exception(self):
         with pytest.raises(ValueError):
             mpd = MarchenkoPasturDistribution(beta=1, ratio=1/3)
@@ -818,6 +844,19 @@ class TestTracyWidomDistribution:
             bins=10,
             density=True,
             plot_law_pdf=True,
+            savefig_path=TMP_DIR_PATH+"/"+fig_name
+        )
+        assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name)) == True
+    
+    def test_twd_plot_tiny_interval_adjusted(self):
+        fig_name = "test_twd_plot_tiny_interval_adjusted.png"
+        mpd = TracyWidomDistribution(beta=1)
+        mpd.plot_empirical_pdf(
+            sample_size=10,
+            bins=10,
+            interval=(-0.2, -0.1),
+            density=True,
+            plot_law_pdf=False,
             savefig_path=TMP_DIR_PATH+"/"+fig_name
         )
         assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name)) == True
@@ -1112,7 +1151,20 @@ class TestManovaSpectrumDistribution:
             savefig_path=TMP_DIR_PATH+"/"+fig_name
         )
         assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name)) == True
-    
+
+    def test_msd_plot_tiny_interval_adjusted(self):
+        fig_name = "test_msd_plot_tiny_interval_adjusted.png"
+        mpd = ManovaSpectrumDistribution(beta=1, ratio_a=2, ratio_b=2)
+        mpd.plot_empirical_pdf(
+            sample_size=10,
+            bins=10,
+            interval=(mpd.lambda_minus+0.1, mpd.lambda_minus-0.1),
+            density=True,
+            plot_law_pdf=False,
+            savefig_path=TMP_DIR_PATH+"/"+fig_name
+        )
+        assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name)) == True
+
     def test_msd_plot_size_exception(self):
         with pytest.raises(ValueError):
             msd = ManovaSpectrumDistribution(beta=1, ratio_a=3, ratio_b=3)
