@@ -158,7 +158,7 @@ class WishartEnsemble(_Ensemble):
             - Dumitriu, I. and Edelman, A. "Matrix Models for Beta Ensembles".
                 Journal of Mathematical Physics. 43.11 (2002): 5830-5847.
         """
-        if random_state:
+        if random_state is not None:
             np.random.seed(random_state)
 
         if self.use_tridiagonal:

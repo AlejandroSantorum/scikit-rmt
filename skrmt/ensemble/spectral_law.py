@@ -1,4 +1,4 @@
-"""Law module
+"""Spectral Law module
 
 This module contains classes that implement the main spectral distributions.
 When the limiting behaviour of the spectrum of a random matrix ensemble is
@@ -17,122 +17,7 @@ from scipy import interpolate
 import collections.abc
 
 from .tracy_widom_approximator import TW_Approximator
-
-
-def _relu(x):
-    """Element-wise maximum between the value and zero.
-
-    Args:
-        x (ndarray): list of numbers to compute its element-wise maximum.
-    
-    Returns:
-        array_like consisting in the element-wise maximum vector of the given values.
-    """
-    return np.maximum(x, np.zeros_like(x))
-
-
-def _indicator(x, start=None, stop=None, inclusive="both"):
-    r"""Element-wise indicator function within a real interval.
-    The interval can be left-closed, right-closed, closed or open.
-    Visit https://en.wikipedia.org/wiki/Indicator_function for more information.
-
-    Args:
-        x (ndarray): list of numbers to compute its element-wise indicator image.
-        start (double, default=None): left value of the interval. If not provided,
-            the left value is equivalent to :math:`- \infty`.
-        stop (double, default=None): right value of the interval. If not provided,
-            the right value is equivalent to :math:`+ \infty`.
-        inclusive (string, default="both"): type of interval. For left-closed interval
-            use "left", for right-closed interval use "right", for closed interval use
-            "both" and for open interval use "neither".
-
-    Returns:
-        array_like consisting in the element-wise indicator function image of the given values.
-    """
-    if start is None and stop is None:
-        raise ValueError("Error: provide start and/or stop for indicator function.")
-
-    INCLUSIVE_OPTIONS = ["both", "left", "right", "neither"]
-    if inclusive not in INCLUSIVE_OPTIONS:
-        raise ValueError(f"Error: invalid interval inclusive parameter: {inclusive}\n"
-                         "\t inclusive has to be one of the following: {INCLUSIVE_OPTIONS}.")
-
-    if start is not None:
-        if inclusive == "both" or inclusive == "left":
-            condition = (start <= x)
-        elif inclusive == "neither" or inclusive == "right":
-            condition = (start < x)
-    
-    if (start is not None) and (stop is not None):
-        if inclusive == "both" or inclusive == "right":
-            condition = np.logical_and(condition, (x <= stop))
-        elif inclusive == "neither" or inclusive == "left":
-            condition = np.logical_and(condition, (x < stop))
-    elif stop:
-        if inclusive == "both" or inclusive == "right":
-            condition = (x <= stop)
-        elif inclusive == "neither" or inclusive == "left":
-            condition = (x < stop)
-
-    return np.where(condition, 1.0, 0.0)
-
-
-def _plot_func(interval, func, bins=1000, plot_title=None, plot_ylabel=None, savefig_path=None):
-    """Plots a given function (callable) within the provided interval.
-
-    Args:
-        interval (tuple): Delimiters (xmin, xmax) of the histogram.
-        func (callable): Function to be evaluated. The image of the function builds
-            the y-axis values that are plotted.
-        bins (int, default=100): It defines the number of equal-width bins within the
-            provided interval or range.
-        plot_title (string, default=None): Title of the plot.
-        plot_ylabel (string, default=None): Label of the y-axis.
-        savefig_path (string, default=None): path to save the created figure. If it is not
-            provided, the plot is shown at the end of the routine.
-    
-    """
-    if not isinstance(interval, tuple):
-        raise ValueError("interval argument must be a tuple")
-    
-    (xmin, xmax) = interval
-
-    xx = np.linspace(xmin, xmax, num=bins)
-    yy = func(xx)
-
-    plt.plot(xx, yy)
-    plt.xlabel("x")
-    if plot_ylabel:
-        plt.ylabel(plot_ylabel)
-    
-    if plot_title:
-        plt.title(plot_title)
-
-    if savefig_path:
-        plt.savefig(savefig_path, dpi=800)
-    else:
-        plt.show()
-
-
-def _get_bins_centers_and_contour(bins):
-    """Calculates the centers and contour of the given bins.
-
-    Computes the centers of the given bins. Also, the smallest and the largest bin
-    delimitiers are included to define the countour of the representation interval.
-
-    Args:
-        bins (list): list of numbers (floats) that specify each bin delimiter.
-
-    Returns:
-        list of numbers (floats) consisting in the list of bin centers and contour.
-    
-    """
-    centers = [bins[0]] # Adding initial contour
-    l = len(bins)
-    for i in range(l-1):
-        centers.append((bins[i]+bins[i+1])/2) # Adding centers
-    centers.append(bins[-1]) # Adding final contour
-    return centers
+from .utils import relu, indicator, plot_func, get_bins_centers_and_contour
 
 
 class WignerSemicircleDistribution:
@@ -205,7 +90,7 @@ class WignerSemicircleDistribution:
         if size <= 0:
             raise ValueError(f"Error: invalid sample size. It has to be positive. Provided size = {size}.")
         
-        if random_state:
+        if random_state is not None:
             np.random.seed(random_state)
 
         # Use relationship with beta distribution
@@ -222,7 +107,7 @@ class WignerSemicircleDistribution:
             float or numpy array with the computed PDF in the given value(s).
         
         """
-        return 2.0 * np.sqrt(_relu(self.radius**2 - (x-self.center)**2)) / (np.pi * self.radius**2)
+        return 2.0 * np.sqrt(relu(self.radius**2 - (x-self.center)**2)) / (np.pi * self.radius**2)
     
     def cdf(self, x):
         """Computes CDF of the Wigner Semicircle Law.
@@ -257,7 +142,7 @@ class WignerSemicircleDistribution:
         if interval is None:
             interval = (self.center - self.radius - 0.1, self.center + self.radius + 0.1)
         
-        _plot_func(
+        plot_func(
             interval, func=self.pdf, bins=bins, plot_title="Wigner Semicircle law PDF", 
             plot_ylabel="probability density", savefig_path=savefig_path
         )
@@ -277,7 +162,7 @@ class WignerSemicircleDistribution:
         if interval is None:
             interval = (self.center - self.radius - 0.1, self.center + self.radius + 0.1)
         
-        _plot_func(
+        plot_func(
             interval, func=self.cdf, bins=bins, plot_title="Wigner Semicircle law CDF",
             plot_ylabel="cumulative distribution", savefig_path=savefig_path
         )
@@ -350,7 +235,7 @@ class WignerSemicircleDistribution:
 
         # Plotting Wigner Semicircle Law pdf
         if plot_law_pdf and density:
-            centers = np.asarray(_get_bins_centers_and_contour(bins))
+            centers = np.asarray(get_bins_centers_and_contour(bins))
             pdf = self.pdf(centers)
             plt.plot(centers, pdf, color='red', linewidth=2)
         elif plot_law_pdf and not density:
@@ -449,7 +334,7 @@ class MarchenkoPasturDistribution(rv_continuous):
         self._inv_cdf = interpolate.interp1d(cdf_y, x_vals)
 
     def _rvs(self, size, random_state, _random_state=None):
-        if _random_state:
+        if _random_state is not None:
             np.random.seed(_random_state)
 
         uniform_samples = np.random.random(size=size)
@@ -466,7 +351,7 @@ class MarchenkoPasturDistribution(rv_continuous):
         
         """
         with np.errstate(divide='ignore', invalid='ignore'):
-            return np.sqrt(_relu(self.lambda_plus - x) * _relu(x - self.lambda_minus)) \
+            return np.sqrt(relu(self.lambda_plus - x) * relu(x - self.lambda_minus)) \
                 / (2.0 * np.pi * self.ratio * self._var * x)
 
     def _cdf(self, x):
@@ -480,19 +365,19 @@ class MarchenkoPasturDistribution(rv_continuous):
         
         """
         with np.errstate(divide='ignore', invalid='ignore'):
-            acum = _indicator(x, start=self.lambda_plus, inclusive="left")
-            acum += np.where(_indicator(x, start=self.lambda_minus, stop=self.lambda_plus, inclusive="left"),
+            acum = indicator(x, start=self.lambda_plus, inclusive="left")
+            acum += np.where(indicator(x, start=self.lambda_minus, stop=self.lambda_plus, inclusive="left"),
                             self._cdf_aux_f(x), 0.0)
 
             if self.ratio <= 1:
                 return acum
             
-            acum += np.where(_indicator(x, start=self.lambda_minus, stop=self.lambda_plus, inclusive="left"),
+            acum += np.where(indicator(x, start=self.lambda_minus, stop=self.lambda_plus, inclusive="left"),
                             (self.ratio-1)/(2*self.ratio), 0.0)
 
             ### This would need to be added if the extra density point at zero is measured
             # https://en.wikipedia.org/wiki/Marchenko%E2%80%93Pastur_distribution
-            # acum += np.where(_indicator(x, start=0, stop=self.lambda_minus, inclusive="left"),
+            # acum += np.where(indicator(x, start=0, stop=self.lambda_minus, inclusive="left"),
             #                 (self.ratio-1)/self.ratio, 0.0)
             return acum
 
@@ -508,7 +393,7 @@ class MarchenkoPasturDistribution(rv_continuous):
                                                 / (2*self._var*(1-self.ratio)*self._cdf_aux_r(x)))
                                 )
         return 1/(2*np.pi*self.ratio) * (np.pi*self.ratio \
-                                         + (1/self._var)*np.sqrt(_relu(self.lambda_plus-x)*_relu(x-self.lambda_minus)) \
+                                         + (1/self._var)*np.sqrt(relu(self.lambda_plus-x)*relu(x-self.lambda_minus)) \
                                          - (1+self.ratio)*first_arctan_term + (1-self.ratio)*second_arctan_term)
 
     def _cdf_aux_r(self, x):
@@ -529,7 +414,7 @@ class MarchenkoPasturDistribution(rv_continuous):
         if interval is None:
             interval = (self.lambda_minus, self.lambda_plus)
         
-        _plot_func(
+        plot_func(
             interval, func=self._pdf, bins=bins, plot_title="Marchenko-Pastur law PDF",
             plot_ylabel="probability density", savefig_path=savefig_path
         )
@@ -549,7 +434,7 @@ class MarchenkoPasturDistribution(rv_continuous):
         if interval is None:
             interval = (self.lambda_minus, self.lambda_plus)
         
-        _plot_func(
+        plot_func(
             interval, func=self._cdf, bins=bins, plot_title="Marchenko-Pastur law CDF",
             plot_ylabel="cumulative distribution", savefig_path=savefig_path
         )
@@ -634,7 +519,7 @@ class MarchenkoPasturDistribution(rv_continuous):
 
         # Plotting theoretical graphic
         if plot_law_pdf and density:
-            centers = np.array(_get_bins_centers_and_contour(bins))
+            centers = np.asarray(get_bins_centers_and_contour(bins))
             # creating new instance with the approximated ratio depending on the given matrix sizes
             pdf = self._pdf(centers)
             plt.plot(centers, pdf, color='red', linewidth=2)
@@ -754,7 +639,7 @@ class TracyWidomDistribution(rv_continuous):
         if interval is None:
             interval = self.default_interval
         
-        _plot_func(
+        plot_func(
             interval, func=self._pdf, bins=bins, plot_title="Tracy-Widom law PDF",
             plot_ylabel="probability density", savefig_path=savefig_path
         )
@@ -774,7 +659,7 @@ class TracyWidomDistribution(rv_continuous):
         if interval is None:
             interval = self.default_interval
         
-        _plot_func(
+        plot_func(
             interval, func=self._cdf, bins=bins, plot_title="Tracy-Widom law CDF",
             plot_ylabel="cumulative distribution", savefig_path=savefig_path
         )
@@ -847,7 +732,7 @@ class TracyWidomDistribution(rv_continuous):
 
         # Plotting theoretical graphic
         if plot_law_pdf and density:
-            centers = _get_bins_centers_and_contour(bins)
+            centers = get_bins_centers_and_contour(bins)
             pdf = self._pdf(centers)
             plt.plot(centers, pdf, color='red', linewidth=2)
 
@@ -954,7 +839,7 @@ class ManovaSpectrumDistribution(rv_continuous):
         self._inv_cdf = interpolate.interp1d(cdf_y, x_vals)
 
     def _rvs(self, size, random_state, _random_state=None):
-        if _random_state:
+        if _random_state is not None:
             np.random.seed(_random_state)
 
         uniform_samples = np.random.random(size=size)
@@ -1035,7 +920,7 @@ class ManovaSpectrumDistribution(rv_continuous):
         if interval is None:
             interval = (self.lambda_minus, self.lambda_plus)
         
-        _plot_func(
+        plot_func(
             interval, func=self._pdf, bins=bins, plot_title="Manova spectrum PDF",
             plot_ylabel="probability density", savefig_path=savefig_path
         )
@@ -1055,7 +940,7 @@ class ManovaSpectrumDistribution(rv_continuous):
         if interval is None:
             interval = (self.lambda_minus, self.lambda_plus)
 
-        _plot_func(
+        plot_func(
             interval, func=self._cdf, bins=bins, plot_title="Manova spectrum CDF",
             plot_ylabel="cumulative distribution", savefig_path=savefig_path
         )
@@ -1146,7 +1031,7 @@ class ManovaSpectrumDistribution(rv_continuous):
 
         # Plotting theoretical graphic
         if plot_law_pdf and density:
-            centers = np.array(_get_bins_centers_and_contour(bins))
+            centers = np.asarray(get_bins_centers_and_contour(bins))
             # creating new instance with the approximated ratios depending on the given matrix sizes
             pdf = self._pdf(centers)
             plt.plot(centers, pdf, color='red', linewidth=2)

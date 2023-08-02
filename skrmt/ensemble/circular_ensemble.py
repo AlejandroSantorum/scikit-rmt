@@ -144,7 +144,7 @@ class CircularEnsemble(_Ensemble):
                 en.wikipedia.org/wiki/Circular_ensemble
 
         """
-        if random_state:
+        if random_state is not None:
             np.random.seed(random_state)
 
         if self.beta == 1:

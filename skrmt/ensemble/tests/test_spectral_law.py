@@ -12,7 +12,7 @@ from skrmt.ensemble import WignerSemicircleDistribution
 from skrmt.ensemble import MarchenkoPasturDistribution
 from skrmt.ensemble import TracyWidomDistribution
 from skrmt.ensemble import ManovaSpectrumDistribution
-from skrmt.ensemble.spectral_law import _indicator
+from skrmt.ensemble.utils import indicator
 
 
 TMP_DIR_PATH = os.path.join(os.getcwd(), "skrmt/ensemble/tests/tmp")
@@ -429,7 +429,8 @@ class TestMarchenkoPasturDistribution:
             bins=10,
             density=False,
             plot_law_pdf=False,
-            savefig_path=TMP_DIR_PATH+"/"+fig_name
+            savefig_path=TMP_DIR_PATH+"/"+fig_name,
+            random_state=1,
         )
         assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name)) == True
 
@@ -441,7 +442,8 @@ class TestMarchenkoPasturDistribution:
             bins=10,
             density=False,
             plot_law_pdf=False,
-            savefig_path=TMP_DIR_PATH+"/"+fig_name
+            savefig_path=TMP_DIR_PATH+"/"+fig_name,
+            random_state=1,
         )
         assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name)) == True
     
@@ -453,7 +455,8 @@ class TestMarchenkoPasturDistribution:
             bins=10,
             density=False,
             plot_law_pdf=False,
-            savefig_path=TMP_DIR_PATH+"/"+fig_name
+            savefig_path=TMP_DIR_PATH+"/"+fig_name,
+            random_state=1,
         )
         assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name)) == True
     
@@ -465,7 +468,8 @@ class TestMarchenkoPasturDistribution:
             bins=10,
             density=True,
             plot_law_pdf=False,
-            savefig_path=TMP_DIR_PATH+"/"+fig_name
+            savefig_path=TMP_DIR_PATH+"/"+fig_name,
+            random_state=1,
         )
         assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name)) == True
 
@@ -477,7 +481,8 @@ class TestMarchenkoPasturDistribution:
             bins=10,
             density=True,
             plot_law_pdf=False,
-            savefig_path=TMP_DIR_PATH+"/"+fig_name
+            savefig_path=TMP_DIR_PATH+"/"+fig_name,
+            random_state=1,
         )
         assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name)) == True
     
@@ -489,7 +494,8 @@ class TestMarchenkoPasturDistribution:
             bins=10,
             density=True,
             plot_law_pdf=False,
-            savefig_path=TMP_DIR_PATH+"/"+fig_name
+            savefig_path=TMP_DIR_PATH+"/"+fig_name,
+            random_state=1,
         )
         assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name)) == True
     
@@ -989,7 +995,8 @@ class TestManovaSpectrumDistribution:
             bins=10,
             density=False,
             plot_law_pdf=False,
-            savefig_path=TMP_DIR_PATH+"/"+fig_name
+            savefig_path=TMP_DIR_PATH+"/"+fig_name,
+            random_state=1,
         )
         assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name)) == True
 
@@ -1001,7 +1008,8 @@ class TestManovaSpectrumDistribution:
             bins=10,
             density=False,
             plot_law_pdf=False,
-            savefig_path=TMP_DIR_PATH+"/"+fig_name
+            savefig_path=TMP_DIR_PATH+"/"+fig_name,
+            random_state=1,
         )
         assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name)) == True
     
@@ -1013,7 +1021,8 @@ class TestManovaSpectrumDistribution:
             bins=10,
             density=False,
             plot_law_pdf=False,
-            savefig_path=TMP_DIR_PATH+"/"+fig_name
+            savefig_path=TMP_DIR_PATH+"/"+fig_name,
+            random_state=1,
         )
         assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name)) == True
     
@@ -1025,7 +1034,8 @@ class TestManovaSpectrumDistribution:
             bins=10,
             density=True,
             plot_law_pdf=False,
-            savefig_path=TMP_DIR_PATH+"/"+fig_name
+            savefig_path=TMP_DIR_PATH+"/"+fig_name,
+            random_state=1,
         )
         assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name)) == True
 
@@ -1037,7 +1047,8 @@ class TestManovaSpectrumDistribution:
             bins=10,
             density=True,
             plot_law_pdf=False,
-            savefig_path=TMP_DIR_PATH+"/"+fig_name
+            savefig_path=TMP_DIR_PATH+"/"+fig_name,
+            random_state=1,
         )
         assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name)) == True
     
@@ -1049,7 +1060,8 @@ class TestManovaSpectrumDistribution:
             bins=10,
             density=True,
             plot_law_pdf=False,
-            savefig_path=TMP_DIR_PATH+"/"+fig_name
+            savefig_path=TMP_DIR_PATH+"/"+fig_name,
+            random_state=1,
         )
         assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name)) == True
     
@@ -1180,25 +1192,25 @@ class TestManovaSpectrumDistribution:
 def test_indicator_func():
     '''Testing indicator function
     '''
-    assert _indicator(1.0, start=1.0, stop=2.0, inclusive="both") == 1.0
-    assert _indicator(1.0, start=1.0, stop=2.0, inclusive="left") == 1.0
-    assert _indicator(1.0, start=1.0, stop=2.0, inclusive="right") == 0.0
-    assert _indicator(1.0, start=1.0, stop=2.0, inclusive="neither") == 0.0
-    assert _indicator(2.0, start=1.0, stop=2.0, inclusive="both") == 1.0
-    assert _indicator(2.0, start=1.0, stop=2.0, inclusive="left") == 0.0
-    assert _indicator(2.0, start=1.0, stop=2.0, inclusive="right") == 1.0
-    assert _indicator(2.0, start=1.0, stop=2.0, inclusive="neither") == 0.0
-    assert _indicator(2.0, stop=2.0, inclusive="both") == 1.0
-    assert _indicator(2.0, stop=2.0, inclusive="left") == 0.0
-    assert _indicator(2.0, stop=2.0, inclusive="right") == 1.0
-    assert _indicator(2.0, stop=2.0, inclusive="neither") == 0.0
+    assert indicator(1.0, start=1.0, stop=2.0, inclusive="both") == 1.0
+    assert indicator(1.0, start=1.0, stop=2.0, inclusive="left") == 1.0
+    assert indicator(1.0, start=1.0, stop=2.0, inclusive="right") == 0.0
+    assert indicator(1.0, start=1.0, stop=2.0, inclusive="neither") == 0.0
+    assert indicator(2.0, start=1.0, stop=2.0, inclusive="both") == 1.0
+    assert indicator(2.0, start=1.0, stop=2.0, inclusive="left") == 0.0
+    assert indicator(2.0, start=1.0, stop=2.0, inclusive="right") == 1.0
+    assert indicator(2.0, start=1.0, stop=2.0, inclusive="neither") == 0.0
+    assert indicator(2.0, stop=2.0, inclusive="both") == 1.0
+    assert indicator(2.0, stop=2.0, inclusive="left") == 0.0
+    assert indicator(2.0, stop=2.0, inclusive="right") == 1.0
+    assert indicator(2.0, stop=2.0, inclusive="neither") == 0.0
 
 def test_indicator_func_except():
     '''Testing indicator function raising exception
     '''
     with pytest.raises(ValueError):
-        _ = _indicator(2.0)
+        _ = indicator(2.0)
     
     with pytest.raises(ValueError):
-        _ = _indicator(2.0, start=2.0, inclusive="foo")
+        _ = indicator(2.0, start=2.0, inclusive="foo")
     

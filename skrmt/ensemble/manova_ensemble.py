@@ -144,7 +144,7 @@ class ManovaEnsemble(_Ensemble):
                 Journal of Mathematical Physics. 43.11 (2002): 5830-5847.
 
         """
-        if random_state:
+        if random_state is not None:
             np.random.seed(random_state)
 
         if self.beta == 1:
