@@ -59,7 +59,7 @@ class GaussianEnsemble(_Ensemble):
 
     """
 
-    def __init__(self, beta, n, use_tridiagonal=False, sigma=1.0):
+    def __init__(self, beta, n, use_tridiagonal=False, sigma=1.0, random_state=None):
         """Constructor for GaussianEnsemble class.
 
         Initializes an instance of this class with the given parameters.
@@ -76,6 +76,10 @@ class GaussianEnsemble(_Ensemble):
                 its standard form.
             sigma (float, 1.0): scale (standard deviation) of the random entries of the
                 sampled matrix.
+            random_state (int, default=None): random seed to initialize the pseudo-random
+                number generator of numpy before sampling the random matrix instance. This 
+                has to be any integer between 0 and 2**32 - 1 (inclusive), or None (default).
+                If None, the seed is obtained from the clock.
 
         """
         if beta not in [1,2,4]:
@@ -89,7 +93,7 @@ class GaussianEnsemble(_Ensemble):
         self.sigma = sigma
         self.radius = 2 * np.sqrt(self.beta) * self.sigma
         self._eigvals = None
-        self.matrix = self.sample()
+        self.matrix = self.sample(random_state=random_state)
 
         # default eigenvalue normalization constant
         self.eigval_norm_const = 1/np.sqrt(2*self.n) if self.beta==4 else 1/np.sqrt(self.n)

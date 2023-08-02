@@ -67,7 +67,7 @@ class WishartEnsemble(_Ensemble):
 
     """
 
-    def __init__(self, beta, p, n, use_tridiagonal=False, sigma=1.0):
+    def __init__(self, beta, p, n, use_tridiagonal=False, sigma=1.0, random_state=None):
         """Constructor for WishartEnsemble class.
 
         Initializes an instance of this class with the given parameters.
@@ -84,6 +84,10 @@ class WishartEnsemble(_Ensemble):
                 eigenvalues than its standard form.
             sigma (float, 1.0): scale (standard deviation) of the random entries of the
                 sampled matrix.
+            random_state (int, default=None): random seed to initialize the pseudo-random
+                number generator of numpy before sampling the random matrix instance. This 
+                has to be any integer between 0 and 2**32 - 1 (inclusive), or None (default).
+                If None, the seed is obtained from the clock.
 
         """
         if beta not in [1,2,4]:
@@ -97,7 +101,7 @@ class WishartEnsemble(_Ensemble):
         self.use_tridiagonal = use_tridiagonal
         self.sigma = sigma
         self._eigvals = None
-        self.matrix = self.sample()
+        self.matrix = self.sample(random_state=random_state)
         # default eigenvalue normalization constant
         self.eigval_norm_const = 1/self.n
         self._compute_parameters()
@@ -108,7 +112,7 @@ class WishartEnsemble(_Ensemble):
         self.lambda_plus = self.beta * self.sigma**2 * (1 + np.sqrt(self.ratio))**2
         self.lambda_minus = self.beta * self.sigma**2 * (1 - np.sqrt(self.ratio))**2
 
-    def set_size(self, p, n, resample_mtx=True):
+    def set_size(self, p, n, resample_mtx=True, random_state: int = None):
         # pylint: disable=arguments-differ
         """Setter of matrix size.
 
@@ -121,16 +125,19 @@ class WishartEnsemble(_Ensemble):
                 the matrix of the corresponding ensemble.
             resample_mtx (bool, default=True): If set to True, the ensemble matrix is
                 resampled with the new dimensions.
+            random_state (int, default=None): random seed to initialize the pseudo-random
+                number generator of numpy. This has to be any integer between 0 and 2**32 - 1
+                (inclusive), or None (default). If None, the seed is obtained from the clock.
 
         """
         self.p = p
         self.n = n
         self._compute_parameters()
         if resample_mtx:
-            self.matrix = self.sample()
+            self.matrix = self.sample(random_state=random_state)
 
     # pylint: disable=inconsistent-return-statements
-    def sample(self):
+    def sample(self, random_state: int = None):
         """Samples new Wishart Ensemble random matrix.
 
         The sampling algorithm depends on the specification of
@@ -139,6 +146,11 @@ class WishartEnsemble(_Ensemble):
         is sampled. Otherwise, it is sampled using the standard
         form.
 
+        Args:
+            random_state (int, default=None): random seed to initialize the pseudo-random
+                number generator of numpy. This has to be any integer between 0 and 2**32 - 1
+                (inclusive), or None (default). If None, the seed is obtained from the clock.
+
         Returns:
             numpy array containing new matrix sampled.
 
@@ -146,6 +158,9 @@ class WishartEnsemble(_Ensemble):
             - Dumitriu, I. and Edelman, A. "Matrix Models for Beta Ensembles".
                 Journal of Mathematical Physics. 43.11 (2002): 5830-5847.
         """
+        if random_state:
+            np.random.seed(random_state)
+
         if self.use_tridiagonal:
             if self.p > self.n:  # check reference ("Matrix Models for Beta Ensembles"): page 5, table 1.
                 raise ValueError("Error: cannot use tridiagonal form if 'p' (degrees of freedom)"
