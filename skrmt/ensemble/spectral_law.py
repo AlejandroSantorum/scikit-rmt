@@ -16,9 +16,6 @@ from scipy.stats import rv_continuous
 from scipy import interpolate
 import collections.abc
 
-from .gaussian_ensemble import GaussianEnsemble
-from .wishart_ensemble import WishartEnsemble
-from .manova_ensemble import ManovaEnsemble
 from .tracy_widom_approximator import TW_Approximator
 
 
@@ -192,18 +189,24 @@ class WignerSemicircleDistribution:
         self.radius = 2.0 * np.sqrt(self.beta) * self.sigma
         self.default_interval = (self.center - self.radius, self.center + self.radius)
 
-    def rvs(self, size):
+    def rvs(self, size, random_state: int = None):
         """Samples ranfom variates following this distribution.
         This uses the relationship between Wigner Semicircle law and Beta distribution.
 
         Args:
             size (int): sample size.
+            random_state (int, default=None): random seed to initialize the pseudo-random
+                number generator of numpy. This has to be any integer between 0 and 2**32 - 1
+                (inclusive), or None (default). If None, the seed is obtained from the clock.
         
         Returns:
             numpy array with the generated samples.
         """
         if size <= 0:
             raise ValueError(f"Error: invalid sample size. It has to be positive. Provided size = {size}.")
+        
+        if random_state:
+            np.random.seed(random_state)
 
         # Use relationship with beta distribution
         beta_samples = np.random.beta(1.5, 1.5, size=size)
@@ -279,8 +282,8 @@ class WignerSemicircleDistribution:
             plot_ylabel="cumulative distribution", savefig_path=savefig_path
         )
 
-    def plot_empirical_pdf(self, sample_size=10000, bins=100, interval=None,
-                           density=False, plot_law_pdf=False, savefig_path=None):
+    def plot_empirical_pdf(self, sample_size=10000, bins=100, interval=None, density=False,
+                           plot_law_pdf=False, savefig_path=None, random_state=None):
         """Computes and plots Wigner's semicircle empirical law.
 
         Calculates and plots Wigner's semicircle empirical law using random samples generated
@@ -309,6 +312,9 @@ class WignerSemicircleDistribution:
                 considered when the argument 'density' is set also to True.
             savefig_path (string, default=None): path to save the created figure. If it is not
                 provided, the plot is shown are the end of the routine.
+            random_state (int, default=None): random seed to initialize the pseudo-random
+                number generator of numpy. This has to be any integer between 0 and 2**32 - 1
+                (inclusive), or None (default). If None, the seed is obtained from the clock.
 
         References:
             - Albrecht, J. and Chan, C.P. and Edelman, A.
@@ -336,7 +342,7 @@ class WignerSemicircleDistribution:
             range_interval = (xmin, xmax)
             print(f"Setting plot interval to {range_interval}.")
 
-        random_samples = self.rvs(size=sample_size)
+        random_samples = self.rvs(size=sample_size, random_state=random_state)
         observed, bins = np.histogram(random_samples, bins=bins, range=range_interval, density=density)
 
         width = bins[1]-bins[0]
@@ -442,7 +448,10 @@ class MarchenkoPasturDistribution(rv_continuous):
         cdf_y = _cdf/_cdf.max()     # normalizing approximated CDF to 1.0
         self._inv_cdf = interpolate.interp1d(cdf_y, x_vals)
 
-    def _rvs(self, size, random_state):
+    def _rvs(self, size, random_state, _random_state=None):
+        if _random_state:
+            np.random.seed(_random_state)
+
         uniform_samples = np.random.random(size=size)
         return self._inv_cdf(uniform_samples)
 
@@ -545,8 +554,8 @@ class MarchenkoPasturDistribution(rv_continuous):
             plot_ylabel="cumulative distribution", savefig_path=savefig_path
         )
 
-    def plot_empirical_pdf(self, sample_size=1000, bins=100, interval=None,
-                           density=False, plot_law_pdf=False, savefig_path=None):
+    def plot_empirical_pdf(self, sample_size=1000, bins=100, interval=None, density=False,
+                           plot_law_pdf=False, savefig_path=None, random_state=None):
         """Computes and plots Marchenko-Pastur empirical law using Wishart Ensemble random matrices.
 
         Calculates and plots Marchenko-Pastur empirical law using Wishart Ensemble random matrices.
@@ -587,6 +596,9 @@ class MarchenkoPasturDistribution(rv_continuous):
                 considered when the argument 'density' is set also to True.
             savefig_path (string, default=None): path to save the created figure. If it is not
                 provided, the plot is shown are the end of the routine.
+            random_state (int, default=None): random seed to initialize the pseudo-random
+                number generator of numpy. This has to be any integer between 0 and 2**32 - 1
+                (inclusive), or None (default). If None, the seed is obtained from the clock.
 
         References:
             - Albrecht, J. and Chan, C.P. and Edelman, A.
@@ -614,7 +626,7 @@ class MarchenkoPasturDistribution(rv_continuous):
             range_interval = (xmin, xmax)
             print(f"Setting plot interval to {range_interval}.")
         
-        random_samples = self.rvs(size=sample_size)
+        random_samples = self._rvs(size=sample_size, random_state=random_state, _random_state=random_state)
         observed, bins = np.histogram(random_samples, bins=bins, range=range_interval, density=density)
 
         width = bins[1]-bins[0]
@@ -767,8 +779,8 @@ class TracyWidomDistribution(rv_continuous):
             plot_ylabel="cumulative distribution", savefig_path=savefig_path
         )
 
-    def plot_empirical_pdf(self, sample_size=1000, bins=100, interval=None,
-                           density=False, plot_law_pdf=False, savefig_path=None):
+    def plot_empirical_pdf(self, sample_size=1000, bins=100, interval=None, density=False,
+                           plot_law_pdf=False, savefig_path=None, random_state=None):
         """Computes and plots Tracy-Widom empirical law using Gaussian Ensemble.
 
         Calculates and plots Tracy-Widom empirical law using Gaussian Ensemble random matrices.
@@ -797,6 +809,9 @@ class TracyWidomDistribution(rv_continuous):
                 considered when the argument 'density' is set also to True.
             savefig_path (string, default=None): path to save the created figure. If it is not
                 provided, the plot is shown are the end of the routine.
+            random_state (int, default=None): random seed to initialize the pseudo-random
+                number generator of numpy. This has to be any integer between 0 and 2**32 - 1
+                (inclusive), or None (default). If None, the seed is obtained from the clock.
 
         References:
             - Albrecht, J. and Chan, C.P. and Edelman, A.
@@ -824,7 +839,7 @@ class TracyWidomDistribution(rv_continuous):
             range_interval = (xmin, xmax)
             print(f"Setting plot interval to {range_interval}.")
 
-        random_samples = self.rvs(size=sample_size)
+        random_samples = self.rvs(size=sample_size, random_state=random_state)
         observed, bins = np.histogram(random_samples, bins=bins, range=range_interval, density=density)
 
         width = bins[1]-bins[0]
@@ -938,7 +953,10 @@ class ManovaSpectrumDistribution(rv_continuous):
         cdf_y = _cdf/_cdf.max()     # normalizing approximated CDF to 1.0
         self._inv_cdf = interpolate.interp1d(cdf_y, x_vals)
 
-    def _rvs(self, size, random_state):
+    def _rvs(self, size, random_state, _random_state=None):
+        if _random_state:
+            np.random.seed(_random_state)
+
         uniform_samples = np.random.random(size=size)
         return self._inv_cdf(uniform_samples)
     
@@ -1042,8 +1060,8 @@ class ManovaSpectrumDistribution(rv_continuous):
             plot_ylabel="cumulative distribution", savefig_path=savefig_path
         )
 
-    def plot_empirical_pdf(self, sample_size=1000, bins=100, interval=None,
-                           density=False, plot_law_pdf=False, savefig_path=None):
+    def plot_empirical_pdf(self, sample_size=1000, bins=100, interval=None, density=False,
+                           plot_law_pdf=False, savefig_path=None, random_state=None):
         """Computes and plots Manova spectrum empirical pdf and analytical distribution.
 
         Calculates and plots Manova spectrum empirical pdf using Manova Ensemble random matrices.
@@ -1087,6 +1105,9 @@ class ManovaSpectrumDistribution(rv_continuous):
                 considered when the argument 'density' is set also to True.
             savefig_path (string, default=None): path to save the created figure. If it is not
                 provided, the plot is shown are the end of the routine.
+            random_state (int, default=None): random seed to initialize the pseudo-random
+                number generator of numpy. This has to be any integer between 0 and 2**32 - 1
+                (inclusive), or None (default). If None, the seed is obtained from the clock.
 
         References:
             - Laszlo, L. and Farrel, B.
@@ -1117,7 +1138,7 @@ class ManovaSpectrumDistribution(rv_continuous):
             range_interval = (xmin, xmax)
             print(f"Setting plot interval to {range_interval}.")
 
-        random_samples = self.rvs(size=sample_size)
+        random_samples = self._rvs(size=sample_size, random_state=random_state, _random_state=random_state)
         observed, bins = np.histogram(random_samples, bins=bins, range=range_interval, density=density)
 
         width = bins[1]-bins[0]

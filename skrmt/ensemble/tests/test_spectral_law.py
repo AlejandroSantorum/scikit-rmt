@@ -81,7 +81,7 @@ class TestWignerSemicircleDistribution:
         assert len(samples == size)
 
         size = 10
-        samples = wsd4.rvs(size=size)
+        samples = wsd4.rvs(size=size, random_state=1)
         assert len(samples == size)
     
     def test_wsd_rvs_raise(self):
@@ -341,7 +341,7 @@ class TestMarchenkoPasturDistribution:
         assert len(samples == size)
 
         size = 10
-        samples = mpd4.rvs(size=size)
+        samples = mpd4.rvs(size=size, random_state=1)
         assert len(samples == size)
     
     def test_mpd_rvs_raise(self):
@@ -685,7 +685,7 @@ class TestTracyWidomDistribution:
         assert len(samples == size)
 
         size = 10
-        samples = twd4.rvs(size=size)
+        samples = twd4.rvs(size=size, random_state=1)
         assert len(samples == size)
     
     def test_twd_rvs_raise(self):
@@ -920,7 +920,7 @@ class TestManovaSpectrumDistribution:
         assert len(samples == size)
 
         size = 10
-        samples = msd4.rvs(size=size)
+        samples = msd4.rvs(size=size, random_state=1)
         assert len(samples == size)
     
     def test_msd_rvs_raise(self):

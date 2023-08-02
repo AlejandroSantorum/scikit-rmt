@@ -50,7 +50,7 @@ def test_mre_set_size():
     assert mre.n2 == n22_size
     assert mre.matrix.shape == (m1_size,m1_size)
 
-    mre.set_size(m=m2_size, n1=n21_size, n2=n22_size, resample_mtx=True)
+    mre.set_size(m=m2_size, n1=n21_size, n2=n22_size, resample_mtx=True, random_state=1)
     assert mre.m == m2_size
     assert mre.n1 == n21_size
     assert mre.n2 == n22_size
@@ -108,7 +108,7 @@ def test_mce_set_size():
     assert mce.n2 == n22_size
     assert mce.matrix.shape == (m1_size,m1_size)
 
-    mce.set_size(m=m2_size, n1=n21_size, n2=n22_size, resample_mtx=True)
+    mce.set_size(m=m2_size, n1=n21_size, n2=n22_size, resample_mtx=True, random_state=1)
     assert mce.m == m2_size
     assert mce.n1 == n21_size
     assert mce.n2 == n22_size
@@ -160,7 +160,7 @@ def test_mqe_set_size():
     assert mqe.n2 == n22_size
     assert mqe.matrix.shape == (2*m1_size,2*m1_size)
 
-    mqe.set_size(m=m2_size, n1=n21_size, n2=n22_size, resample_mtx=True)
+    mqe.set_size(m=m2_size, n1=n21_size, n2=n22_size, resample_mtx=True, random_state=1)
     assert mqe.m == m2_size
     assert mqe.n1 == n21_size
     assert mqe.n2 == n22_size

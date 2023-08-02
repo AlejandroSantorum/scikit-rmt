@@ -75,7 +75,7 @@ def test_wre_set_size():
     assert ens.n == n2_size
     assert ens.matrix.shape == (p1_size,p1_size)
 
-    ens.set_size(p=p2_size, n=n2_size, resample_mtx=True)
+    ens.set_size(p=p2_size, n=n2_size, resample_mtx=True, random_state=1)
     assert ens.p == p2_size
     assert ens.n == n2_size
     assert ens.matrix.shape == (p2_size,p2_size)
@@ -227,7 +227,7 @@ def test_wce_set_size():
     assert ens.n == n2_size
     assert ens.matrix.shape == (p1_size,p1_size)
 
-    ens.set_size(p=p2_size, n=n2_size, resample_mtx=True)
+    ens.set_size(p=p2_size, n=n2_size, resample_mtx=True, random_state=1)
     assert ens.p == p2_size
     assert ens.n == n2_size
     assert ens.matrix.shape == (p2_size,p2_size)
@@ -355,7 +355,7 @@ def test_wqe_set_size():
     assert ens.n == n_size2
     assert ens.matrix.shape == (2*p_size1,2*p_size1)
 
-    ens.set_size(p=p_size2, n=n_size2, resample_mtx=True)
+    ens.set_size(p=p_size2, n=n_size2, resample_mtx=True, random_state=1)
     assert ens.p == p_size2
     assert ens.n == n_size2
     assert ens.matrix.shape == (2*p_size2,2*p_size2)

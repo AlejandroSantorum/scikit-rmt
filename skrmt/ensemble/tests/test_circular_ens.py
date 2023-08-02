@@ -56,7 +56,7 @@ def test_coe_set_size():
     assert coe.n == n2_size
     assert coe.matrix.shape == (n1_size,n1_size)
 
-    coe.set_size(n2_size, resample_mtx=True)
+    coe.set_size(n2_size, resample_mtx=True, random_state=1)
     assert coe.n == n2_size
     assert coe.matrix.shape == (n2_size,n2_size)
 
@@ -122,7 +122,7 @@ def test_cue_set_size():
     assert cue.n == n2_size
     assert cue.matrix.shape == (n1_size,n1_size)
 
-    cue.set_size(n2_size, resample_mtx=True)
+    cue.set_size(n2_size, resample_mtx=True, random_state=1)
     assert cue.n == n2_size
     assert cue.matrix.shape == (n2_size,n2_size)
 
@@ -193,7 +193,7 @@ def test_cse_set_size():
     assert cse.n == n2_size
     assert cse.matrix.shape == (2*n1_size,2*n1_size)
 
-    cse.set_size(n2_size, resample_mtx=True)
+    cse.set_size(n2_size, resample_mtx=True, random_state=1)
     assert cse.n == n2_size
     assert cse.matrix.shape == (2*n2_size,2*n2_size)
 
