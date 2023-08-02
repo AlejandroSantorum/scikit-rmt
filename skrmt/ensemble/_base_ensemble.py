@@ -46,11 +46,16 @@ class _Ensemble(metaclass=ABCMeta):
         self.eigval_norm_const = 1.0
 
     @abstractmethod
-    def sample(self):
+    def sample(self, random_state: int = None):
         """Samples new random matrix.
 
         The sampling algorithm depends on the inherited classes, so it should be
         specified by them.
+
+        Args:
+            random_state (int, optional): random seed to initialize the pseudo-random
+                number generator of numpy. This has to be any integer between 0 and 2**32 - 1
+                (inclusive), or None (default).
 
         Returns:
             numpy array containing new matrix sampled.
