@@ -101,7 +101,7 @@ class GaussianEnsemble(_Ensemble):
             4: (-4*np.sqrt(2*self.n), 4*np.sqrt(2*self.n)),
         }
 
-    def set_size(self, n, resample_mtx=True):
+    def set_size(self, n, resample_mtx=True, random_state: int = None):
         # pylint: disable=arguments-differ
         """Setter of matrix size.
 
@@ -113,14 +113,17 @@ class GaussianEnsemble(_Ensemble):
                 GSE are of size 2n times 2n.
             resample_mtx (bool, default=True): If set to True, the ensemble matrix is
                 resampled with the new dimensions.
+            random_state (int, default=None): random seed to initialize the pseudo-random
+                number generator of numpy. This has to be any integer between 0 and 2**32 - 1
+                (inclusive), or None (default). If None, the seed is obtained from the clock.
 
         """
         self.n = n
         if resample_mtx:
-            self.matrix = self.sample()
+            self.matrix = self.sample(random_state=random_state)
 
     # pylint: disable=inconsistent-return-statements
-    def sample(self):
+    def sample(self, random_state: int = None):
         """Samples new Gaussian Ensemble random matrix.
 
         The sampling algorithm depends on the specification of
@@ -129,6 +132,11 @@ class GaussianEnsemble(_Ensemble):
         is sampled. Otherwise, it is sampled using the standard
         form.
 
+        Args:
+            random_state (int, default=None): random seed to initialize the pseudo-random
+                number generator of numpy. This has to be any integer between 0 and 2**32 - 1
+                (inclusive), or None (default). If None, the seed is obtained from the clock.
+
         Returns:
             numpy array containing new matrix sampled.
 
@@ -136,6 +144,9 @@ class GaussianEnsemble(_Ensemble):
             - Dumitriu, I. and Edelman, A. "Matrix Models for Beta Ensembles".
                 Journal of Mathematical Physics. 43.11 (2002): 5830-5847.
         """
+        if random_state:
+            np.random.seed(random_state)
+
         if self.use_tridiagonal:
             return self.sample_tridiagonal()
 

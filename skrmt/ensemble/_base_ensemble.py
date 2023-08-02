@@ -53,9 +53,9 @@ class _Ensemble(metaclass=ABCMeta):
         specified by them.
 
         Args:
-            random_state (int, optional): random seed to initialize the pseudo-random
+            random_state (int, default=None): random seed to initialize the pseudo-random
                 number generator of numpy. This has to be any integer between 0 and 2**32 - 1
-                (inclusive), or None (default).
+                (inclusive), or None (default). If None, the seed is obtained from the clock.
 
         Returns:
             numpy array containing new matrix sampled.
