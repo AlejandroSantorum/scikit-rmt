@@ -75,7 +75,7 @@ class CircularEnsemble(_Ensemble):
 
     """
 
-    def __init__(self, beta, n):
+    def __init__(self, beta, n, random_state=None):
         """Constructor for CircularEnsemble class.
 
         Initializes an instance of this class with the given parameters.
@@ -86,6 +86,10 @@ class CircularEnsemble(_Ensemble):
             n (int): random matrix size. Circular ensemble matrices are
                 squared matrices. COE and CUE are of size n times n,
                 and CSE are of size 2n times 2n.
+            random_state (int, default=None): random seed to initialize the pseudo-random
+                number generator of numpy before sampling the random matrix instance. This 
+                has to be any integer between 0 and 2**32 - 1 (inclusive), or None (default).
+                If None, the seed is obtained from the clock.
 
         """
         super().__init__()
@@ -93,9 +97,9 @@ class CircularEnsemble(_Ensemble):
         self.n = n
         self.beta = beta
         self._eigvals = None
-        self.matrix = self.sample()
+        self.matrix = self.sample(random_state=random_state)
 
-    def set_size(self, n, resample_mtx=False):
+    def set_size(self, n, resample_mtx=False, random_state: int = None):
         # pylint: disable=arguments-differ
         """Setter of matrix size.
 
@@ -105,20 +109,28 @@ class CircularEnsemble(_Ensemble):
             n (int): random matrix size. Circular ensemble matrices are
                 squared matrices. COE and CUE are of size n times n,
                 and CSE are of size 2n times 2n.
+            random_state (int, default=None): random seed to initialize the pseudo-random
+                number generator of numpy. This has to be any integer between 0 and 2**32 - 1
+                (inclusive), or None (default). If None, the seed is obtained from the clock.
 
         """
         self.n = n
         if resample_mtx:
-            self.matrix = self.sample()
+            self.matrix = self.sample(random_state=random_state)
 
     # pylint: disable=inconsistent-return-statements
-    def sample(self):
+    def sample(self, random_state: int = None):
         """Samples new Circular Ensemble random matrix.
 
         The sampling algorithm depends on the specification of
         beta parameter. If beta=1, COE matrix is sampled; if
         beta=2 CUE matrix is sampled and if beta=4
         CSE matrix is sampled.
+
+        Args:
+            random_state (int, default=None): random seed to initialize the pseudo-random
+                number generator of numpy. This has to be any integer between 0 and 2**32 - 1
+                (inclusive), or None (default). If None, the seed is obtained from the clock.
 
         Returns:
             numpy array containing new matrix sampled.
@@ -132,6 +144,9 @@ class CircularEnsemble(_Ensemble):
                 en.wikipedia.org/wiki/Circular_ensemble
 
         """
+        if random_state:
+            np.random.seed(random_state)
+
         if self.beta == 1:
             return self._sample_coe()
         if self.beta == 2:
