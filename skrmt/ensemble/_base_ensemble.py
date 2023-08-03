@@ -177,7 +177,7 @@ class _Ensemble(metaclass=ABCMeta):
         interval=None,
         density=False,
         normalize=False,
-        fig_path=None,
+        savefig_path=None,
         avoid_img=False
     ):
         """Computes and plots the histogram of the matrix eigenvalues.
@@ -210,7 +210,7 @@ class _Ensemble(metaclass=ABCMeta):
                 This should be used when the eigenvalue compatation is expected to generate
                 complex eigenvalues with really small imaginary part because of computing
                 rounding errors. E.g.: MANOVA Ensemble eigenvalues.
-            fig_path (string, default=None): path to save the created figure. If it is not
+            savefig_path (string, default=None): path to save the created figure. If it is not
                 provided, the plot is shown at the end of the routine.
 
         References:
@@ -236,7 +236,7 @@ class _Ensemble(metaclass=ABCMeta):
         plt.ylabel("density")
 
         # Saving plot or showing it
-        if fig_path:
-            plt.savefig(fig_path, dpi=1200)
+        if savefig_path:
+            plt.savefig(savefig_path, dpi=1200)
         else:
             plt.show()

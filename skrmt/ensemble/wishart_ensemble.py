@@ -293,7 +293,7 @@ class WishartEnsemble(_Ensemble):
         return super().eigval_hist(bins, interval=interval, density=density,
                                    normalize=normalize, avoid_img=avoid_img)
 
-    def plot_eigval_hist(self, bins=100, interval=None, density=False, normalize=False, fig_path=None):
+    def plot_eigval_hist(self, bins=100, interval=None, density=False, normalize=False, savefig_path=None):
         """Computes and plots the histogram of the matrix eigenvalues.
 
         Calculates and plots the histogram of the current sampled matrix eigenvalues.
@@ -317,7 +317,7 @@ class WishartEnsemble(_Ensemble):
                 by the default normalization constant (see references). Defaults to False, i.e.,
                 the eigenvalues are not normalized. Normalization makes the eigenvalues to be
                 in the same support independently of the sample size.
-            fig_path (string, default=None): path to save the created figure. If it is not
+            savefig_path (string, default=None): path to save the created figure. If it is not
                 provided, the plot is shown at the end of the routine.
 
         References:
@@ -347,8 +347,8 @@ class WishartEnsemble(_Ensemble):
             plt.xlabel("x")
             plt.ylabel("density")
             # Saving plot or showing it
-            if fig_path:
-                plt.savefig(fig_path, dpi=1000)
+            if savefig_path:
+                plt.savefig(savefig_path, dpi=1000)
             else:
                 plt.show()
 
@@ -358,7 +358,7 @@ class WishartEnsemble(_Ensemble):
                 interval=interval,
                 density=density,
                 normalize=normalize,
-                fig_path=fig_path,
+                savefig_path=savefig_path,
             )
 
     def joint_eigval_pdf(self, eigvals=None):

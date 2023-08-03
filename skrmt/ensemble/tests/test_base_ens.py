@@ -66,5 +66,5 @@ def test_base_ens_plot():
     """
     fig_name = "test_base_ens_plot_eigval_hist.png"
     goe = GaussianEnsemble(beta=1, n=100, use_tridiagonal=False)
-    goe.plot_eigval_hist(fig_path=TMP_DIR_PATH+"/"+fig_name)
+    goe.plot_eigval_hist(savefig_path=TMP_DIR_PATH+"/"+fig_name)
     assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name)) == True

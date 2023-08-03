@@ -238,7 +238,7 @@ class CircularEnsemble(_Ensemble):
 
         return norm_const * self._eigvals
 
-    def plot_eigval_hist(self, bins, interval=None, density=False, normalize=False, fig_path=None):
+    def plot_eigval_hist(self, bins, interval=None, density=False, normalize=False, savefig_path=None):
         """Computes and plots the histogram of the matrix eigenvalues.
 
         Calculates and plots the histogram of the current sampled matrix eigenvalues.
@@ -262,7 +262,7 @@ class CircularEnsemble(_Ensemble):
                 by the default normalization constant (see references). Defaults to False,
                 i.e., the eigenvalues are normalized. Normalization makes the eigenvalues
                 to be in the same support independently of the sample size.
-            fig_path (string, default=None): path to save the created figure. If it is not
+            savefig_path (string, default=None): path to save the created figure. If it is not
                 provided, the plot is shown at the end of the routine.
 
         References:
@@ -276,7 +276,7 @@ class CircularEnsemble(_Ensemble):
         # pylint: disable=too-many-locals
         if self.beta == 1:
             return super().plot_eigval_hist(
-                bins=bins, interval=interval, density=density, normalize=normalize, fig_path=fig_path
+                bins=bins, interval=interval, density=density, normalize=normalize, savefig_path=savefig_path
             )
 
         if (interval is not None) and not isinstance(interval, tuple):
@@ -318,8 +318,8 @@ class CircularEnsemble(_Ensemble):
         plt.suptitle("Complex eigenvalues histogram", fontweight="bold")
 
         # Saving plot or showing it
-        if fig_path:
-            plt.savefig(fig_path, dpi=600)
+        if savefig_path:
+            plt.savefig(savefig_path, dpi=600)
         else:
             plt.show()
 
