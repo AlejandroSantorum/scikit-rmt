@@ -17,6 +17,25 @@ def plot_max_eigvals_tracy_widom(
     random_state: int = None,
     savefig_path: str = None,
 ):
+    """Plots the histogram of the maximum eigenvalues of a random ensemble with the
+    Tracy-Widom PDF.
+
+    It computes samples of normalized maximum eigenvalues of the specified random matrix
+    ensemble and plots their histogram alongside the Tracy-Widom PDF.
+
+    Args:
+        ensemble (_Ensemble): a random matrix ensemble instance.
+        n_eigvals (int, default=1): number of maximum eigenvalues to compute. This is the number
+            of times the random matrix is re-sampled in order to get several samples of the maximum
+            eigenvalue.
+        n_bins (int, default=100): number of equal-width bins to build the histogram.
+        random_state (int, default=None): random seed to initialize the pseudo-random
+            number generator of numpy. This has to be any integer between 0 and 2**32 - 1
+            (inclusive), or None (default). If None, the seed is obtained from the clock.
+        savefig_path (string, default=None): path to save the created figure. If it is not
+            provided, the plot is shown at the end of the routine.
+    
+    """
     max_eigvals = rand_mtx_max_eigvals(
         ensemble=ensemble,
         normalize=True,
@@ -55,6 +74,30 @@ def rand_mtx_max_eigvals(
     n_eigvals: int = 1,
     random_state: int = None,
 ):
+    """Computes several times the maximum eigenvalue of different random matrix samples.
+
+    It generates several samples of the maximum eigenvalue of the specified random matrix
+    by sampling several times the randon matrix of the corresponding ensemble and computing
+    the largest eigenvalue. The eigenvalues can be then normalized using the scaling and
+    normalization constants of the Tracy-Widom distribution.
+
+    Args:
+        ensemble (_Ensemble): a random matrix ensemble instance.
+        normalize (bool, default=False): whether to normalize the computed maximum eigenvalues
+            using the scaling and normalization constants of the Tracy-Widom distribution. This
+            is useful if the goal is to compare the distribution of the maximum eigenvalues with
+            the Tracy-Widom distribution.
+        n_eigvals (int, default=1): number of maximum eigenvalues to compute. This is the number
+            of times the random matrix is re-sampled in order to get several samples of the maximum
+            eigenvalue.
+        random_state (int, default=None): random seed to initialize the pseudo-random
+            number generator of numpy. This has to be any integer between 0 and 2**32 - 1
+            (inclusive), or None (default). If None, the seed is obtained from the clock.
+    
+    Returns:
+        numpy array (ndarray) containing the sampled maximum eigenvalues of the given ensemble. 
+    
+    """
     if random_state is not None:
         np.random.seed(random_state)
 
