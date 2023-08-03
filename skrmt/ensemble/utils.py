@@ -7,24 +7,78 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from ._base_ensemble import _Ensemble
+from .tracy_widom_approximator import TW_Approximator
+
+
+def plot_max_eigvals_tracy_widom(
+    ensemble: _Ensemble,
+    n_eigvals: int = 1,
+    n_bins: int = 100,
+    random_state: int = None,
+    savefig_path: str = None,
+):
+    max_eigvals = rand_mtx_max_eigvals(
+        ensemble=ensemble,
+        normalize=True,
+        n_eigvals=n_eigvals,
+        random_state=random_state,
+    )
+
+    interval = (max_eigvals.min(), max_eigvals.max())
+
+    observed, bins = np.histogram(max_eigvals, bins=n_bins, range=interval, density=True)
+    width = bins[1]-bins[0]
+    plt.bar(bins[:-1], observed, width=width, align='edge')
+
+    centers = get_bins_centers_and_contour(bins)
+
+    tw_approx = TW_Approximator(beta=ensemble.beta)
+    tw_pdf = tw_approx.pdf(centers)
+
+    plt.plot(centers, tw_pdf, color='red', linewidth=2)
+
+    plt.title("Comparing maximum eigenvalues histogram with Tracy-Widom law", fontweight="bold")
+    plt.xlabel("x")
+    plt.ylabel("probability density")
+
+    # Saving plot or showing it
+    if savefig_path:
+        plt.savefig(savefig_path, dpi=1200)
+    else:
+        plt.show()
+
 
 
 def rand_mtx_max_eigvals(
     ensemble: _Ensemble,
     normalize: bool = False,
-    size: int = 1,
+    n_eigvals: int = 1,
     random_state: int = None,
 ):
     if random_state is not None:
         np.random.seed(random_state)
 
     max_eigvals = []
-    for _ in range(size):
+    for _ in range(n_eigvals):
         ensemble.sample(random_state=None)
-        max_eigval = ensemble.eigvals(normalize=normalize).max()
+        max_eigval = ensemble.eigvals(normalize=False).max()
         max_eigvals.append(max_eigval)
+    
+    max_eigvals = np.asarray(max_eigvals)
+    
+    if normalize:
+        # `n` is the matrix sample size. Usually it's a square matrix, so shape[0] = shape[1]
+        n_size = ensemble.matrix.shape[1]
 
-    return np.asarray(max_eigvals)
+        # Tracy-Widom eigenvalue normalization constants
+        eigval_scale = 1.0/np.sqrt(ensemble.beta)
+        size_scale = 1.0
+        if ensemble.beta == 4:
+            size_scale = 1/np.sqrt(2)
+
+        max_eigvals = size_scale*(n_size**(1/6))*(eigval_scale*max_eigvals - (2.0 * np.sqrt(n_size)))
+
+    return max_eigvals
 
 
 def plot_func(interval, func, bins=1000, plot_title=None, plot_ylabel=None, savefig_path=None):
