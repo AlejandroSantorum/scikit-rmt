@@ -223,8 +223,9 @@ class _Ensemble(metaclass=ABCMeta):
 
         """
         # pylint: disable=too-many-arguments
-        if not isinstance(interval, tuple):
-            raise ValueError("interval argument must be a tuple")
+        if interval is not None:
+            if not isinstance(interval, tuple):
+                raise ValueError("interval argument must be a tuple")
 
         observed, bin_edges = self.eigval_hist(bins=bins, interval=interval, density=density,
                                                normalize=normalize, avoid_img=avoid_img)

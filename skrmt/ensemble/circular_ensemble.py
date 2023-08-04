@@ -288,6 +288,7 @@ class CircularEnsemble(_Ensemble):
 
         if interval is None:
             rang_val = self.beta/2
+            rang_val += 0.1*rang_val
             rang = ((-rang_val, rang_val), (-rang_val, rang_val))
             extent = [-rang_val, rang_val, -rang_val, rang_val]
         else:
@@ -302,6 +303,7 @@ class CircularEnsemble(_Ensemble):
         axes[0].set_xlim(rang[0][0], rang[0][1])
         axes[0].set_ylim(rang[1][0], rang[1][1])
         axes[0].plot(xvals, yvals, 'o')
+        axes[0].set_aspect('equal', adjustable='box')
         axes[0].set_title('Complex plane')
         axes[0].set_xlabel('real')
         axes[0].set_ylabel('imaginary')
