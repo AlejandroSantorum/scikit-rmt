@@ -141,8 +141,8 @@ class _Ensemble(metaclass=ABCMeta):
                 True these values are the relative frequencies in order to get an area under
                 the histogram equal to 1. Otherwise, this list contains the absolute
                 frequencies of the eigenvalues.
-                bins (array): The edges of the bins. Length nbins + 1 (nbins left edges and
-                right edge of last bin)
+                bin_edges (array): The edges of the bins. Length nbins + 1 (nbins left edges
+                and right edge of last bin)
 
         Raises:
             ValueError if interval is not a tuple.
@@ -166,9 +166,9 @@ class _Ensemble(metaclass=ABCMeta):
         if avoid_img:
             eigvals = eigvals.real
 
-        # using numpy to obtain histogram in the given interval and no. of bins
-        observed, bins = np.histogram(eigvals, bins=bins, range=interval, density=density)
-        return observed, bins
+        # using numpy to obtain histogram in the given interval and bins
+        observed, bin_edges = np.histogram(eigvals, bins=bins, range=interval, density=density)
+        return observed, bin_edges
 
 
     def plot_eigval_hist(
@@ -226,10 +226,10 @@ class _Ensemble(metaclass=ABCMeta):
         if not isinstance(interval, tuple):
             raise ValueError("interval argument must be a tuple")
 
-        observed, bins = self.eigval_hist(bins=bins, interval=interval, density=density,
-                                          normalize=normalize, avoid_img=avoid_img)
-        width = bins[1]-bins[0]
-        plt.bar(bins[:-1], observed, width=width, align='edge')
+        observed, bin_edges = self.eigval_hist(bins=bins, interval=interval, density=density,
+                                               normalize=normalize, avoid_img=avoid_img)
+        width = bin_edges[1]-bin_edges[0]
+        plt.bar(bin_edges[:-1], observed, width=width, align='edge')
 
         plt.title("Eigenvalue histogram", fontweight="bold")
         plt.xlabel("x")

@@ -4,6 +4,7 @@ This sub-module contains several useful functions to run and manage various simu
 """
 
 import numpy as np
+from typing import Union, Sequence
 import matplotlib.pyplot as plt
 
 from ._base_ensemble import _Ensemble
@@ -13,7 +14,7 @@ from .tracy_widom_approximator import TW_Approximator
 def plot_max_eigvals_tracy_widom(
     ensemble: _Ensemble,
     n_eigvals: int = 1,
-    n_bins: int = 100,
+    bins: Union[int, Sequence] = 100,
     random_state: int = None,
     savefig_path: str = None,
 ):
@@ -28,7 +29,10 @@ def plot_max_eigvals_tracy_widom(
         n_eigvals (int, default=1): number of maximum eigenvalues to compute. This is the number
             of times the random matrix is re-sampled in order to get several samples of the maximum
             eigenvalue.
-        n_bins (int, default=100): number of equal-width bins to build the histogram.
+        bins (int or sequence, default=100): If bins is an integer, it defines the number of
+            equal-width bins in the range. If bins is a sequence, it defines the
+            bin edges, including the left edge of the first bin and the right
+            edge of the last bin; in this case, bins may be unequally spaced.
         random_state (int, default=None): random seed to initialize the pseudo-random
             number generator of numpy. This has to be any integer between 0 and 2**32 - 1
             (inclusive), or None (default). If None, the seed is obtained from the clock.
@@ -45,11 +49,11 @@ def plot_max_eigvals_tracy_widom(
 
     interval = (max_eigvals.min(), max_eigvals.max())
 
-    observed, bins = np.histogram(max_eigvals, bins=n_bins, range=interval, density=True)
-    width = bins[1]-bins[0]
-    plt.bar(bins[:-1], observed, width=width, align='edge')
+    observed, bin_edges = np.histogram(max_eigvals, bins=bins, range=interval, density=True)
+    width = bin_edges[1]-bin_edges[0]
+    plt.bar(bin_edges[:-1], observed, width=width, align='edge')
 
-    centers = get_bins_centers_and_contour(bins)
+    centers = get_bins_centers_and_contour(bin_edges)
 
     tw_approx = TW_Approximator(beta=ensemble.beta)
     tw_pdf = tw_approx.pdf(centers)
@@ -124,15 +128,18 @@ def rand_mtx_max_eigvals(
     return max_eigvals
 
 
-def plot_func(interval, func, bins=1000, plot_title=None, plot_ylabel=None, savefig_path=None):
-    """Plots a given function (callable) within the provided interval.
+def plot_func(interval, func, num_x_vals=1000, plot_title=None, plot_ylabel=None, savefig_path=None):
+    """Plots a given 1D function (callable) within the provided interval.
+
+    It plots a given 1-dimensional function (python Callable) within the provided interval.
+    The x values are computed by generating `n_
 
     Args:
         interval (tuple): Delimiters (xmin, xmax) of the histogram.
         func (callable): Function to be evaluated. The image of the function builds
             the y-axis values that are plotted.
-        bins (int, default=100): It defines the number of equal-width bins within the
-            provided interval or range.
+        num_x_vals (int, default=100): It defines the number of evenly spaced x values
+            within the given interval or range in which the function (callable) is evaluated.
         plot_title (string, default=None): Title of the plot.
         plot_ylabel (string, default=None): Label of the y-axis.
         savefig_path (string, default=None): path to save the created figure. If it is not
@@ -144,7 +151,7 @@ def plot_func(interval, func, bins=1000, plot_title=None, plot_ylabel=None, save
     
     (xmin, xmax) = interval
 
-    xx = np.linspace(xmin, xmax, num=bins)
+    xx = np.linspace(xmin, xmax, num=num_x_vals)
     yy = func(xx)
 
     plt.plot(xx, yy)
@@ -219,22 +226,22 @@ def indicator(x, start=None, stop=None, inclusive="both"):
     return np.where(condition, 1.0, 0.0)
 
 
-def get_bins_centers_and_contour(bins):
-    """Calculates the centers and contour of the given bins.
+def get_bins_centers_and_contour(bin_edges):
+    """Calculates the centers and contour of the given the bins edges.
 
-    Computes the centers of the given bins. Also, the smallest and the largest bin
-    delimitiers are included to define the countour of the representation interval.
+    Computes the centers of the given the bins edges. Also, the smallest and the largest
+    bin delimitiers are included to define the countour of the representation interval.
 
     Args:
-        bins (list): list of numbers (floats) that specify each bin delimiter.
+        bin_edges (list): list of numbers (floats) that specify each bin delimiter.
 
     Returns:
         list of numbers (floats) consisting in the list of bin centers and contour.
     
     """
-    centers = [bins[0]] # Adding initial contour
-    l = len(bins)
+    centers = [bin_edges[0]] # Adding initial contour
+    l = len(bin_edges)
     for i in range(l-1):
-        centers.append((bins[i]+bins[i+1])/2) # Adding centers
-    centers.append(bins[-1]) # Adding final contour
+        centers.append((bin_edges[i]+bin_edges[i+1])/2) # Adding centers
+    centers.append(bin_edges[-1]) # Adding final contour
     return centers

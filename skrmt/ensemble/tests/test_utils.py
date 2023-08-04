@@ -66,7 +66,7 @@ class TestUtils:
         plot_max_eigvals_tracy_widom(
             ensemble=ens,
             n_eigvals=1,
-            n_bins=10,
+            bins=10,
             random_state=1,
             savefig_path=TMP_DIR_PATH+"/"+fig_name,
         )

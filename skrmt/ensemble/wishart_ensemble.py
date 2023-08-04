@@ -337,12 +337,12 @@ class WishartEnsemble(_Ensemble):
                 interval = (self.n*self.lambda_minus, self.n*self.lambda_plus)
 
         if self.use_tridiagonal:
-            observed, bins = self.eigval_hist(
+            observed, bin_edges = self.eigval_hist(
                 bins=bins, interval=interval, density=density, normalize=normalize
             )
+            width = bin_edges[1]-bin_edges[0]
+            plt.bar(bin_edges[:-1], observed, width=width, align='edge')
 
-            width = bins[1]-bins[0]
-            plt.bar(bins[:-1], observed, width=width, align='edge')
             plt.title("Eigenvalue histogram", fontweight="bold")
             plt.xlabel("x")
             plt.ylabel("density")

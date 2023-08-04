@@ -565,7 +565,6 @@ class TestMarchenkoPasturDistribution:
         mpd.plot_empirical_pdf(
             sample_size=10,
             bins=10,
-            #interval=(0,10),
             density=False,
             plot_law_pdf=False,
             savefig_path=TMP_DIR_PATH+"/"+fig_name

@@ -127,14 +127,14 @@ class WignerSemicircleDistribution:
                          + (np.arcsin((x-self.center)/self.radius)) / np.pi)
             )
     
-    def plot_pdf(self, interval=None, bins=1000, savefig_path=None):
+    def plot_pdf(self, interval=None, num_x_vals=1000, savefig_path=None):
         """Plots the PDF of the Wigner Semicircle Law.
 
         Args:
             interval (tuple, default=None): Delimiters (xmin, xmax) of the histogram. If not
                 provided, the used interval is calculated depending on beta, center, radius and scale.
-            bins (int, default=100): It defines the number of equal-width bins within the
-                provided interval or range.
+            num_x_vals (int, default=100): It defines the number of evenly spaced x values
+                within the given interval or range in which the function (callable) is evaluated.
             savefig_path (string, default=None): path to save the created figure. If it is not
                 provided, the plot is shown at the end of the routine.
         
@@ -143,18 +143,18 @@ class WignerSemicircleDistribution:
             interval = (self.center - self.radius - 0.1, self.center + self.radius + 0.1)
         
         plot_func(
-            interval, func=self.pdf, bins=bins, plot_title="Wigner Semicircle law PDF", 
+            interval, func=self.pdf, num_x_vals=num_x_vals, plot_title="Wigner Semicircle law PDF", 
             plot_ylabel="probability density", savefig_path=savefig_path
         )
     
-    def plot_cdf(self, interval=None, bins=1000, savefig_path=None):
+    def plot_cdf(self, interval=None, num_x_vals=1000, savefig_path=None):
         """Plots the CDF of the Wigner Semicircle Law.
 
         Args:
             interval (tuple, default=None): Delimiters (xmin, xmax) of the histogram. If not
                 provided, the used interval is calculated depending on beta, center, radius and scale.
-            bins (int, default=100): It defines the number of equal-width bins within the
-                provided interval or range.
+            num_x_vals (int, default=100): It defines the number of evenly spaced x values
+                within the given interval or range in which the function (callable) is evaluated.
             savefig_path (string, default=None): path to save the created figure. If it is not
                 provided, the plot is shown at the end of the routine.
         
@@ -163,7 +163,7 @@ class WignerSemicircleDistribution:
             interval = (self.center - self.radius - 0.1, self.center + self.radius + 0.1)
         
         plot_func(
-            interval, func=self.cdf, bins=bins, plot_title="Wigner Semicircle law CDF",
+            interval, func=self.cdf, num_x_vals=num_x_vals, plot_title="Wigner Semicircle law CDF",
             plot_ylabel="cumulative distribution", savefig_path=savefig_path
         )
 
@@ -228,14 +228,14 @@ class WignerSemicircleDistribution:
             print(f"Setting plot interval to {range_interval}.")
 
         random_samples = self.rvs(size=sample_size, random_state=random_state)
-        observed, bins = np.histogram(random_samples, bins=bins, range=range_interval, density=density)
+        observed, bin_edges = np.histogram(random_samples, bins=bins, range=range_interval, density=density)
 
-        width = bins[1]-bins[0]
-        plt.bar(bins[:-1], observed, width=width, align='edge')
+        width = bin_edges[1]-bin_edges[0]
+        plt.bar(bin_edges[:-1], observed, width=width, align='edge')
 
         # Plotting Wigner Semicircle Law pdf
         if plot_law_pdf and density:
-            centers = np.asarray(get_bins_centers_and_contour(bins))
+            centers = np.asarray(get_bins_centers_and_contour(bin_edges))
             pdf = self.pdf(centers)
             plt.plot(centers, pdf, color='red', linewidth=2)
         elif plot_law_pdf and not density:
@@ -399,14 +399,14 @@ class MarchenkoPasturDistribution(rv_continuous):
     def _cdf_aux_r(self, x):
         return np.sqrt((self.lambda_plus-x)/(x - self.lambda_minus))
 
-    def plot_pdf(self, interval=None, bins=1000, savefig_path=None):
+    def plot_pdf(self, interval=None, num_x_vals=1000, savefig_path=None):
         """Plots the PDF of the Marchenko-Pastur Law.
 
         Args:
             interval (tuple, default=None): Delimiters (xmin, xmax) of the histogram. If not
                 provided, the used interval is calculated depending on beta, ratio, and scale.
-            bins (int, default=100): It defines the number of equal-width bins within the
-                provided interval or range.
+            num_x_vals (int, default=100): It defines the number of evenly spaced x values
+                within the given interval or range in which the function (callable) is evaluated.
             savefig_path (string, default=None): path to save the created figure. If it is not
                 provided, the plot is shown at the end of the routine.
         
@@ -415,18 +415,18 @@ class MarchenkoPasturDistribution(rv_continuous):
             interval = (self.lambda_minus, self.lambda_plus)
         
         plot_func(
-            interval, func=self._pdf, bins=bins, plot_title="Marchenko-Pastur law PDF",
+            interval, func=self._pdf, num_x_vals=num_x_vals, plot_title="Marchenko-Pastur law PDF",
             plot_ylabel="probability density", savefig_path=savefig_path
         )
     
-    def plot_cdf(self, interval=None, bins=1000, savefig_path=None):
+    def plot_cdf(self, interval=None, num_x_vals=1000, savefig_path=None):
         """Plots the CDF of the Marchenko-Pastur Law.
 
         Args:
             interval (tuple, default=None): Delimiters (xmin, xmax) of the histogram. If not
                 provided, the used interval is calculated depending on beta, ratio, and scale.
-            bins (int, default=100): It defines the number of equal-width bins within the
-                provided interval or range.
+            num_x_vals (int, default=100): It defines the number of evenly spaced x values
+                within the given interval or range in which the function (callable) is evaluated.
             savefig_path (string, default=None): path to save the created figure. If it is not
                 provided, the plot is shown at the end of the routine.
         
@@ -435,7 +435,7 @@ class MarchenkoPasturDistribution(rv_continuous):
             interval = (self.lambda_minus, self.lambda_plus)
         
         plot_func(
-            interval, func=self._cdf, bins=bins, plot_title="Marchenko-Pastur law CDF",
+            interval, func=self._cdf, num_x_vals=num_x_vals, plot_title="Marchenko-Pastur law CDF",
             plot_ylabel="cumulative distribution", savefig_path=savefig_path
         )
 
@@ -512,14 +512,14 @@ class MarchenkoPasturDistribution(rv_continuous):
             print(f"Setting plot interval to {range_interval}.")
         
         random_samples = self._rvs(size=sample_size, random_state=random_state, _random_state=random_state)
-        observed, bins = np.histogram(random_samples, bins=bins, range=range_interval, density=density)
+        observed, bin_edges = np.histogram(random_samples, bins=bins, range=range_interval, density=density)
 
-        width = bins[1]-bins[0]
-        plt.bar(bins[:-1], observed, width=width, align='edge')
+        width = bin_edges[1]-bin_edges[0]
+        plt.bar(bin_edges[:-1], observed, width=width, align='edge')
 
         # Plotting theoretical graphic
         if plot_law_pdf and density:
-            centers = np.asarray(get_bins_centers_and_contour(bins))
+            centers = np.asarray(get_bins_centers_and_contour(bin_edges))
             # creating new instance with the approximated ratio depending on the given matrix sizes
             pdf = self._pdf(centers)
             plt.plot(centers, pdf, color='red', linewidth=2)
@@ -624,14 +624,14 @@ class TracyWidomDistribution(rv_continuous):
         """
         return self.tw_approx.cdf(x)
 
-    def plot_pdf(self, interval=None, bins=1000, savefig_path=None):
+    def plot_pdf(self, interval=None, num_x_vals=1000, savefig_path=None):
         """Plots the PDF of the Tracy-Widom Law.
 
         Args:
             interval (tuple, default=None): Delimiters (xmin, xmax) of the histogram. If not
                 provided, the used interval is calculated depending on beta.
-            bins (int, default=100): It defines the number of equal-width bins within the
-                provided interval or range.
+            num_x_vals (int, default=100): It defines the number of evenly spaced x values
+                within the given interval or range in which the function (callable) is evaluated.
             savefig_path (string, default=None): path to save the created figure. If it is not
                 provided, the plot is shown at the end of the routine.
         
@@ -640,18 +640,18 @@ class TracyWidomDistribution(rv_continuous):
             interval = self.default_interval
         
         plot_func(
-            interval, func=self._pdf, bins=bins, plot_title="Tracy-Widom law PDF",
+            interval, func=self._pdf, num_x_vals=num_x_vals, plot_title="Tracy-Widom law PDF",
             plot_ylabel="probability density", savefig_path=savefig_path
         )
     
-    def plot_cdf(self, interval=None, bins=1000, savefig_path=None):
+    def plot_cdf(self, interval=None, num_x_vals=1000, savefig_path=None):
         """Plots the PDF of the Tracy-Widom Law.
 
         Args:
             interval (tuple, default=None): Delimiters (xmin, xmax) of the histogram. If not
                 provided, the used interval is calculated depending on beta.
-            bins (int, default=100): It defines the number of equal-width bins within the
-                provided interval or range.
+            num_x_vals (int, default=100): It defines the number of evenly spaced x values
+                within the given interval or range in which the function (callable) is evaluated.
             savefig_path (string, default=None): path to save the created figure. If it is not
                 provided, the plot is shown at the end of the routine.
         
@@ -660,7 +660,7 @@ class TracyWidomDistribution(rv_continuous):
             interval = self.default_interval
         
         plot_func(
-            interval, func=self._cdf, bins=bins, plot_title="Tracy-Widom law CDF",
+            interval, func=self._cdf, num_x_vals=num_x_vals, plot_title="Tracy-Widom law CDF",
             plot_ylabel="cumulative distribution", savefig_path=savefig_path
         )
 
@@ -725,14 +725,14 @@ class TracyWidomDistribution(rv_continuous):
             print(f"Setting plot interval to {range_interval}.")
 
         random_samples = self.rvs(size=sample_size, random_state=random_state)
-        observed, bins = np.histogram(random_samples, bins=bins, range=range_interval, density=density)
+        observed, bin_edges = np.histogram(random_samples, bins=bins, range=range_interval, density=density)
 
-        width = bins[1]-bins[0]
-        plt.bar(bins[:-1], observed, width=width, align='edge')
+        width = bin_edges[1]-bin_edges[0]
+        plt.bar(bin_edges[:-1], observed, width=width, align='edge')
 
         # Plotting theoretical graphic
         if plot_law_pdf and density:
-            centers = get_bins_centers_and_contour(bins)
+            centers = get_bins_centers_and_contour(bin_edges)
             pdf = self._pdf(centers)
             plt.plot(centers, pdf, color='red', linewidth=2)
 
@@ -905,14 +905,14 @@ class ManovaSpectrumDistribution(rv_continuous):
         # if x is a number (int or float)
         return self.__cdf_float(x)
 
-    def plot_pdf(self, interval=None, bins=1000, savefig_path=None):
+    def plot_pdf(self, interval=None, num_x_vals=1000, savefig_path=None):
         """Plots the PDF of the Manova Spectrum distribution.
 
         Args:
             interval (tuple, default=None): Delimiters (xmin, xmax) of the histogram. If not
                 provided, the used interval is calculated depending on beta, a, and b.
-            bins (int, default=100): It defines the number of equal-width bins within the
-                provided interval or range.
+            num_x_vals (int, default=100): It defines the number of evenly spaced x values
+                within the given interval or range in which the function (callable) is evaluated.
             savefig_path (string, default=None): path to save the created figure. If it is not
                 provided, the plot is shown at the end of the routine.
         
@@ -921,18 +921,18 @@ class ManovaSpectrumDistribution(rv_continuous):
             interval = (self.lambda_minus, self.lambda_plus)
         
         plot_func(
-            interval, func=self._pdf, bins=bins, plot_title="Manova spectrum PDF",
+            interval, func=self._pdf, num_x_vals=num_x_vals, plot_title="Manova spectrum PDF",
             plot_ylabel="probability density", savefig_path=savefig_path
         )
 
-    def plot_cdf(self, interval=None, bins=1000, savefig_path=None):
+    def plot_cdf(self, interval=None, num_x_vals=1000, savefig_path=None):
         """Plots the CDF of the Manova Spectrum distribution.
 
         Args:
             interval (tuple, default=None): Delimiters (xmin, xmax) of the histogram. If not
                 provided, the used interval is calculated depending on beta, a, and b.
-            bins (int, default=100): It defines the number of equal-width bins within the
-                provided interval or range.
+            num_x_vals (int, default=100): It defines the number of evenly spaced x values
+                within the given interval or range in which the function (callable) is evaluated.
             savefig_path (string, default=None): path to save the created figure. If it is not
                 provided, the plot is shown at the end of the routine.
         
@@ -941,7 +941,7 @@ class ManovaSpectrumDistribution(rv_continuous):
             interval = (self.lambda_minus, self.lambda_plus)
 
         plot_func(
-            interval, func=self._cdf, bins=bins, plot_title="Manova spectrum CDF",
+            interval, func=self._cdf, num_x_vals=num_x_vals, plot_title="Manova spectrum CDF",
             plot_ylabel="cumulative distribution", savefig_path=savefig_path
         )
 
@@ -1024,14 +1024,14 @@ class ManovaSpectrumDistribution(rv_continuous):
             print(f"Setting plot interval to {range_interval}.")
 
         random_samples = self._rvs(size=sample_size, random_state=random_state, _random_state=random_state)
-        observed, bins = np.histogram(random_samples, bins=bins, range=range_interval, density=density)
+        observed, bin_edges = np.histogram(random_samples, bins=bins, range=range_interval, density=density)
 
-        width = bins[1]-bins[0]
-        plt.bar(bins[:-1], observed, width=width, align='edge')
+        width = bin_edges[1]-bin_edges[0]
+        plt.bar(bin_edges[:-1], observed, width=width, align='edge')
 
         # Plotting theoretical graphic
         if plot_law_pdf and density:
-            centers = np.asarray(get_bins_centers_and_contour(bins))
+            centers = np.asarray(get_bins_centers_and_contour(bin_edges))
             # creating new instance with the approximated ratios depending on the given matrix sizes
             pdf = self._pdf(centers)
             plt.plot(centers, pdf, color='red', linewidth=2)

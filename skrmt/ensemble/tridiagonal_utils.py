@@ -60,8 +60,8 @@ def tridiag_eigval_hist(tridiag_mtx, interval, bins=100, density=False):
             True these values are the relative frequencies in order to get an area under
             the histogram equal to 1. Otherwise, this list contains the absolute
             frequencies of the eigenvalues.
-            bins (array): The edges of the bins. Length nbins + 1 (nbins left edges and
-            right edge of last bin)
+            bin_delimiters (array): The edges of the bins. Length nbins + 1 (nbins left edges
+            and right edge of last bin)
     """
     if not isinstance(interval, tuple):
         raise ValueError("interval argument must be a tuple")
