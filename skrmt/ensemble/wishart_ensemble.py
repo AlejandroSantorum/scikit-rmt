@@ -8,7 +8,6 @@ and Wishart Quaternion Ensemble.
 """
 
 import numpy as np
-import matplotlib.pyplot as plt
 from scipy import sparse, special
 
 from .base_ensemble import _Ensemble

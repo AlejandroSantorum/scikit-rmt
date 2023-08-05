@@ -9,7 +9,6 @@ Gaussian Unitary Ensemble (GUE) and Gaussian Symplectic Ensemble (GSE).
 
 import numpy as np
 from scipy import sparse, special
-import matplotlib.pyplot as plt
 
 from .base_ensemble import _Ensemble
 from .tridiagonal_utils import tridiag_eigval_hist
