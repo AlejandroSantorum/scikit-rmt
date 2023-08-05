@@ -6,8 +6,12 @@ import os
 import pytest
 import shutil
 
-from skrmt.ensemble.utils import rand_mtx_max_eigvals, plot_max_eigvals_tracy_widom
 from skrmt.ensemble.gaussian_ensemble import GaussianEnsemble
+from skrmt.ensemble.utils import (
+    rand_mtx_max_eigvals,
+    plot_spectral_hist_and_law,
+    plot_max_eigvals_tracy_widom,
+)
 
 
 TMP_DIR_PATH = os.path.join(os.getcwd(), "skrmt/ensemble/tests/tmp")
@@ -39,6 +43,21 @@ def _remove_tmp_dir():
 
 
 class TestUtils:
+
+    def test_plot_spectral_hist_and_law(self):
+        """Testing plotting the spectral histogram of a random matrix ensemble
+        alongside the PDF of the corresponding spectral law.
+        """
+        fig_name = "test_test_plot_spectral_hist_and_law.png"
+
+        goe = GaussianEnsemble(beta=1, n=10, random_state=1)
+        plot_spectral_hist_and_law(
+            ensemble=goe,
+            bins=20,
+            savefig_path=TMP_DIR_PATH+"/"+fig_name,
+        )
+        assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name)) == True
+
 
     def test_rand_mtx_max_eigvals(self):
         """Testing getting maximum eigenvalues of an Ensemble object

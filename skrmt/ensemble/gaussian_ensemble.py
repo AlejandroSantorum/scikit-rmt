@@ -9,10 +9,10 @@ Gaussian Unitary Ensemble (GUE) and Gaussian Symplectic Ensemble (GSE).
 
 import numpy as np
 from scipy import sparse, special
-import matplotlib.pyplot as plt
 
 from .base_ensemble import _Ensemble
 from .tridiagonal_utils import tridiag_eigval_hist
+from .spectral_law import WignerSemicircleDistribution
 
 #########################################################################
 ### Gaussian Ensemble = Hermite Ensemble
@@ -104,6 +104,9 @@ class GaussianEnsemble(_Ensemble):
             2: (-2*np.sqrt(2*self.n), 2*np.sqrt(2*self.n)),
             4: (-4*np.sqrt(2*self.n), 4*np.sqrt(2*self.n)),
         }
+
+        # scikit-rmt class implementing the corresponding spectral law
+        self._law_class = WignerSemicircleDistribution(beta=self.beta, center=0.0, sigma=self.sigma)
 
     def set_size(self, n, resample_mtx=True, random_state: int = None):
         # pylint: disable=arguments-differ
@@ -259,6 +262,12 @@ class GaussianEnsemble(_Ensemble):
         return norm_const * self._eigvals
 
     def eigval_hist(self, bins, interval=None, density=False, normalize=False, avoid_img=False):
+        if interval is None:
+            if normalize:
+                interval = (-self.radius, self.radius)
+            else:
+                interval = self._non_normalized_interval[self.beta]
+
         if self.use_tridiagonal:
             if normalize:
                 return tridiag_eigval_hist(
@@ -269,8 +278,9 @@ class GaussianEnsemble(_Ensemble):
                 )
             return tridiag_eigval_hist(self.matrix, bins=bins, interval=interval, density=density)
 
-        return super().eigval_hist(bins, interval=interval, density=density,
-                                   normalize=normalize, avoid_img=avoid_img)
+        return super().eigval_hist(
+            bins, interval=interval, density=density, normalize=normalize, avoid_img=avoid_img
+        )
 
     def plot_eigval_hist(self, bins=100, interval=None, density=False, normalize=False, savefig_path=None):
         """Computes and plots the histogram of the matrix eigenvalues.
@@ -308,38 +318,14 @@ class GaussianEnsemble(_Ensemble):
                 Journal of Mathematical Physics. 43.11 (2002): 5830-5847.
 
         """
-        if interval is None:
-            if normalize:
-                interval = (-self.radius, self.radius)
-            else:
-                interval = self._non_normalized_interval[self.beta]
-
-        if self.use_tridiagonal:
-            # pylint: disable=too-many-arguments
-            observed, bin_edges = self.eigval_hist(
-                bins=bins, interval=interval, density=density, normalize=normalize
-            )
-            width = bin_edges[1]-bin_edges[0]
-            plt.bar(bin_edges[:-1], observed, width=width, align='edge')
-
-            plt.title("Eigenvalue histogram", fontweight="bold")
-            plt.xlabel("x")
-            plt.ylabel("density")
-            # Saving plot or showing it
-            if savefig_path:
-                plt.savefig(savefig_path, dpi=1000)
-            else:
-                plt.show()
-
-        else:
-            # pylint: disable=too-many-arguments
-            super().plot_eigval_hist(
-                bins=bins,
-                interval=interval,
-                density=density,
-                normalize=normalize,
-                savefig_path=savefig_path,
-            )
+        # the default interval will be computed in the method `eigval_hist` if the given interval is None
+        super().plot_eigval_hist(
+            bins=bins,
+            interval=interval,
+            density=density,
+            normalize=normalize,
+            savefig_path=savefig_path,
+        )
 
     def joint_eigval_pdf(self, eigvals=None):
         '''Computes joint eigenvalue pdf.

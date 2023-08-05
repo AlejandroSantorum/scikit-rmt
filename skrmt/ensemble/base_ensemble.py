@@ -170,6 +170,14 @@ class _Ensemble(metaclass=ABCMeta):
         observed, bin_edges = np.histogram(eigvals, bins=bins, range=interval, density=density)
         return observed, bin_edges
 
+    def _plot_eigval_hist(self, bins, interval=None, density=False, normalize=False, avoid_img=False):
+        # computing eigenvalue histogram
+        observed, bin_edges = self.eigval_hist(bins=bins, interval=interval, density=density,
+                                               normalize=normalize, avoid_img=avoid_img)
+        # plotting eigenvalue histogram
+        width = bin_edges[1]-bin_edges[0]
+        plt.bar(bin_edges[:-1], observed, width=width, align='edge')
+        return observed, bin_edges
 
     def plot_eigval_hist(
         self,
@@ -227,17 +235,18 @@ class _Ensemble(metaclass=ABCMeta):
             if not isinstance(interval, tuple):
                 raise ValueError("interval argument must be a tuple")
 
-        observed, bin_edges = self.eigval_hist(bins=bins, interval=interval, density=density,
-                                               normalize=normalize, avoid_img=avoid_img)
-        width = bin_edges[1]-bin_edges[0]
-        plt.bar(bin_edges[:-1], observed, width=width, align='edge')
+        # histogramming and plotting
+        observed, bin_edges = self._plot_eigval_hist(
+            bins=bins, interval=interval, density=density, normalize=normalize, avoid_img=avoid_img
+        )
 
+        # plot labels, title and illustration
         plt.title("Eigenvalue histogram", fontweight="bold")
         plt.xlabel("x")
         plt.ylabel("density")
 
         # Saving plot or showing it
         if savefig_path:
-            plt.savefig(savefig_path, dpi=1200)
+            plt.savefig(savefig_path, dpi=1000)
         else:
             plt.show()
