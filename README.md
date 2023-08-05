@@ -107,7 +107,7 @@ First of all, several random matrix ensembles can be sampled: **Gaussian Ensembl
 a **Gaussian Orthogonal Ensemble (GOE)** random matrix.
 
 ```python
-from skrmt.ensemble import GaussianEnsemble
+from skrmt.ensemble.gaussian_ensemble import GaussianEnsemble
 # sampling a GOE (beta=1) matrix of size 3x3
 goe = GaussianEnsemble(beta=1, n=3)
 print(goe.matrix)
@@ -134,9 +134,11 @@ so a **2D complex histogram** has been implemented in order to study spectral de
 of random matrices. It would be the case, for example, of **Circular Symplectic Ensemble (CSE)**.
 
 ```python
+from skrmt.ensemble.circular_ensemble import CircularEnsemble
+
 # sampling a CSE (beta=4) matrix of size 2000x2000
 cse = CircularEnsemble(beta=4, n=1000)
-cse.plot_eigval_hist(bins=80, interval=(-2.2,2.2))
+cse.plot_eigval_hist(bins=80)
 ```
 ![CSE density plot](https://raw.githubusercontent.com/AlejandroSantorum/scikit-rmt/main/imgs/hist_cse_smooth.png)
 <!---
@@ -162,13 +164,14 @@ On the other hand, for all the supported ensembles, the **joint eigenvalue proba
 
 In addition, several spectral laws can be analyzed using this library, such as Wigner's Semicircle Law,
 Marchenko-Pastur Law and Tracy-Widom Law. The analytical probability density function can also be plotted
-by using the `limit_pdf` argument.
+by using the `plot_law_pdf=True` argument.
 
-Plot of **Wigner's Semicircle Law**, sampling a GOE matrix 5000x5000:
+Plot of **Wigner's Semicircle Law**, sampling 100000 *independent* eigenvalues of a GOE matrix:
 ```python
-from skrmt.ensemble import wigner_semicircular_law
+from skrmt.ensemble.spectral_law import WignerSemicircleDistribution
 
-wigner_semicircular_law(ensemble='goe', n_size=5000, bins=80, density=True)
+wsd = WignerSemicircleDistribution(beta=1)
+wsd.plot_empirical_pdf(sample_size=100000, bins=80, density=True)
 ```
 ![Wigner Semicircle Law](https://raw.githubusercontent.com/AlejandroSantorum/scikit-rmt/main/imgs/scl_goe.png)
 <!---
@@ -176,20 +179,22 @@ wigner_semicircular_law(ensemble='goe', n_size=5000, bins=80, density=True)
 -->
 
 ```python
-from skrmt.ensemble import wigner_semicircular_law
+from skrmt.ensemble.spectral_law import WignerSemicircleDistribution
 
-wigner_semicircular_law(ensemble='goe', n_size=5000, bins=80, density=True, limit_pdf=True)
+wsd = WignerSemicircleDistribution(beta=1)
+wsd.plot_empirical_pdf(sample_size=100000, bins=80, density=True, plot_law_pdf=True)
 ```
 ![Wigner Semicircle Law PDF](https://raw.githubusercontent.com/AlejandroSantorum/scikit-rmt/main/imgs/scl_goe_pdf.png)
 <!---
 <img src="imgs/scl_goe_pdf.png" width=450 height=320 alt="Wigner Semicircle Law PDF">
 -->
 
-Plot of **Marchenko-Pastur Law**, sampling a WRE matrix 5000x5000:
+Plot of **Marchenko-Pastur Law**, sampling 100000 *independent* eigenvalues of a WRE matrix:
 ```python
-from skrmt.ensemble import marchenko_pastur_law
+from skrmt.ensemble.spectral_law import MarchenkoPasturDistribution
 
-marchenko_pastur_law(ensemble='wre', p_size=5000, n_size=15000, bins=80, density=True)
+mpd = MarchenkoPasturDistribution(beta=1, ratio=1/3)
+mpd.plot_empirical_pdf(sample_size=100000, bins=80, density=True)
 ```
 ![Marchenko-Pastur Law](https://raw.githubusercontent.com/AlejandroSantorum/scikit-rmt/main/imgs/mpl_wre.png)
 <!---
@@ -197,20 +202,22 @@ marchenko_pastur_law(ensemble='wre', p_size=5000, n_size=15000, bins=80, density
 -->
 
 ```python
-from skrmt.ensemble import marchenko_pastur_law
+from skrmt.ensemble.spectral_law import MarchenkoPasturDistribution
 
-marchenko_pastur_law(ensemble='wre', p_size=5000, n_size=15000, bins=80, density=True, limit_pdf=True)
+mpd = MarchenkoPasturDistribution(beta=1, ratio=1/3)
+mpd.plot_empirical_pdf(sample_size=100000, bins=80, density=True, plot_law_pdf=True)
 ```
 ![Marchenko-Pastur Law PDF](https://raw.githubusercontent.com/AlejandroSantorum/scikit-rmt/main/imgs/mpl_wre_pdf.png)
 <!---
 <img src="imgs/mpl_wre_pdf.png" width=450 height=320 alt="Marchenko-Pastur Law PDF">
 -->
 
-Plot of **Tracy-Widom Law**, sampling 20000 GOE matrices of size 100x100:
+Plot of **Tracy-Widom Law**, sampling 30000 maximum eigenvalues of GOE matrices:
 ```python
-from skrmt.ensemble import tracy_widom_law
+from skrmt.ensemble.spectral_law import TracyWidomDistribution
 
-tracy_widom_law(ensemble='goe', n_size=500, times=20000, bins=80, density=True)
+twd = TracyWidomDistribution(beta=1)
+twd.plot_empirical_pdf(sample_size=30000, bins=80, density=True)
 ```
 ![Tracy-Widom Law](https://raw.githubusercontent.com/AlejandroSantorum/scikit-rmt/main/imgs/twl_goe.png)
 <!---
@@ -218,26 +225,27 @@ tracy_widom_law(ensemble='goe', n_size=500, times=20000, bins=80, density=True)
 -->
 
 ```python
-from skrmt.ensemble import tracy_widom_law
+from skrmt.ensemble.spectral_law import TracyWidomDistribution
 
-tracy_widom_law(ensemble='goe', n_size=500, times=20000, bins=80, density=True, limit_pdf=True)
+twd = TracyWidomDistribution(beta=1)
+twd.plot_empirical_pdf(sample_size=30000, bins=80, density=True, plot_law_pdf=True)
 ```
 ![Tracy-Widom Law PDF](https://raw.githubusercontent.com/AlejandroSantorum/scikit-rmt/main/imgs/twl_goe_pdf.png)
 <!---
 <img src="imgs/twl_goe_pdf.png" width=450 height=320 alt="Tracy-Widom Law PDF">
 -->
 
-The proposed package **scikit-rmt** also provides support for **computing and analyzing** the **probability density function (PDF)** and **cumulative distribution function (CDF)** of the main random matrix ensembles. In particular, the following classes are implemented in the `ensemble.law` module:
-- `WignerSemicircleDistribution` in `skrmt.ensemble.law`.
-- `MarchenkoPasturDistribution` in `skrmt.ensemble.law`.
-- `TracyWidomDistribution` in `skrmt.ensemble.law`.
-- `ManovaSpectrumDistribution` in `skrmt.ensemble.law`.
+The proposed package **scikit-rmt** also provides support for **computing and analyzing** the **probability density function (PDF)** and **cumulative distribution function (CDF)** of the main random matrix ensembles. In particular, the following classes are implemented in the `ensemble.spectral_law` module:
+- `WignerSemicircleDistribution` in `skrmt.ensemble.spectral_law`.
+- `MarchenkoPasturDistribution` in `skrmt.ensemble.spectral_law`.
+- `TracyWidomDistribution` in `skrmt.ensemble.spectral_law`.
+- `ManovaSpectrumDistribution` in `skrmt.ensemble.spectral_law`.
 
 For example, `WignerSemicircleDistribution` can be used to plot the **Wigner's Semicircle Law PDF**:
 ```python
 import numpy as np
 import matplotlib.pyplot as plt
-from skrmt.ensemble.law import WignerSemicircleDistribution
+from skrmt.ensemble.spectral_law import WignerSemicircleDistribution
 
 x1 = np.linspace(-5, 5, num=1000)
 x2 = np.linspace(-10, 10, num=2000)
@@ -275,7 +283,7 @@ Similarly, `MarchenkoPasturDistribution` can be used to plot the **Marchenko-Pas
 ```python
 import numpy as np
 import matplotlib.pyplot as plt
-from skrmt.ensemble.law import MarchenkoPasturDistribution
+from skrmt.ensemble.spectral_law import MarchenkoPasturDistribution
 
 x1 = np.linspace(0, 4, num=1000)
 x2 = np.linspace(0, 5, num=2000)
@@ -314,7 +322,7 @@ In the following example, we show how we can plot the **PDF and CDF of the Tracy
 ```python
 import numpy as np
 import matplotlib.pyplot as plt
-from skrmt.ensemble.law import TracyWidomDistribution
+from skrmt.ensemble.spectral_law import TracyWidomDistribution
 
 x = np.linspace(-5, 2, num=1000)
 
