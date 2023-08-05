@@ -10,7 +10,6 @@ import matplotlib.pyplot as plt
 from .base_ensemble import _Ensemble
 from .gaussian_ensemble import GaussianEnsemble
 from .tracy_widom_approximator import TW_Approximator
-from .spectral_law import WignerSemicircleDistribution
 from .misc import get_bins_centers_and_contour
 
 
@@ -19,13 +18,17 @@ def plot_spectral_hist_and_law(
     bins: Union[int, Sequence] = 100,
     savefig_path: str = None,
 ):
-    
-    ens = GaussianEnsemble(n=1000, beta=1, random_state=1) # this would be pre-defined
-    observed, bin_edges = ens._plot_eigval_hist(bins=bins, density=True, normalize=True)
-
-    law_class = ens._law_class
+    """TODO
+    """
+    # plotting ensemble spectral histogram
+    observed, bin_edges = ensemble._plot_eigval_hist(bins=bins, density=True, normalize=True)
     centers = np.asarray(get_bins_centers_and_contour(bin_edges))
+
+    # getting the class that implements the ensemble spectral law
+    law_class = ensemble._law_class
+    # computing PDF on the bin centers
     pdf = law_class.pdf(centers)
+    # plotting PDF
     plt.plot(centers, pdf, color='red', linewidth=2)
 
     # Saving plot or showing it
@@ -33,7 +36,6 @@ def plot_spectral_hist_and_law(
         plt.savefig(savefig_path, dpi=1200)
     else:
         plt.show()
-
 
 
 def plot_max_eigvals_tracy_widom(
