@@ -11,7 +11,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy import sparse, special
 
-from ._base_ensemble import _Ensemble
+from .base_ensemble import _Ensemble
 from .tridiagonal_utils import tridiag_eigval_hist
 
 

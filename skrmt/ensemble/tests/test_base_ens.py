@@ -7,7 +7,7 @@ import os
 import pytest
 import shutil
 
-from skrmt.ensemble._base_ensemble import _Ensemble
+from skrmt.ensemble.base_ensemble import _Ensemble
 from skrmt.ensemble.gaussian_ensemble import GaussianEnsemble
 
 

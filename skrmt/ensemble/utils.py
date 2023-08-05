@@ -7,7 +7,7 @@ import numpy as np
 from typing import Union, Sequence
 import matplotlib.pyplot as plt
 
-from ._base_ensemble import _Ensemble
+from .base_ensemble import _Ensemble
 from .tracy_widom_approximator import TW_Approximator
 
 

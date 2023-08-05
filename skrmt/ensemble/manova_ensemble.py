@@ -10,7 +10,7 @@ and Manova Quaternion Ensemble.
 import numpy as np
 from scipy import special
 
-from ._base_ensemble import _Ensemble
+from .base_ensemble import _Ensemble
 
 
 #########################################################################
