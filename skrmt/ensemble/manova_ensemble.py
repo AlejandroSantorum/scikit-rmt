@@ -11,6 +11,7 @@ import numpy as np
 from scipy import special
 
 from .base_ensemble import _Ensemble
+from .spectral_law import ManovaSpectrumDistribution
 
 
 #########################################################################
@@ -95,6 +96,10 @@ class ManovaEnsemble(_Ensemble):
         self.beta = beta
         self._eigvals = None
         self.matrix = self.sample(random_state=random_state)
+        # scikit-rmt class implementing the corresponding spectral law
+        self._law_class = ManovaSpectrumDistribution(
+            beta=self.beta, ratio_a=self.n1/self.m, ratio_b=self.n2/self.m
+        )
 
     def set_size(self, m, n1, n2, resample_mtx=True, random_state: int = None):
         # pylint: disable=arguments-differ
