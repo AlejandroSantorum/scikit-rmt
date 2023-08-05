@@ -67,7 +67,7 @@ def test_goe_set_size():
     assert goe.n == n2_size
     assert goe.matrix.shape == (n1_size,n1_size)
 
-    goe.set_size(n2_size, resample_mtx=True)
+    goe.set_size(n2_size, resample_mtx=True, random_state=1)
     assert goe.n == n2_size
     assert goe.matrix.shape == (n2_size,n2_size)
 
@@ -202,7 +202,7 @@ def test_gue_set_size():
     assert gue.n == n2_size
     assert gue.matrix.shape == (n1_size,n1_size)
 
-    gue.set_size(n2_size, resample_mtx=True)
+    gue.set_size(n2_size, resample_mtx=True, random_state=1)
     assert gue.n == n2_size
     assert gue.matrix.shape == (n2_size,n2_size)
 
@@ -307,7 +307,7 @@ def test_gse_set_size():
     assert gse.n == n2_size
     assert gse.matrix.shape == (2*n1_size,2*n1_size)
 
-    gse.set_size(n2_size, resample_mtx=True)
+    gse.set_size(n2_size, resample_mtx=True, random_state=1)
     assert gse.n == n2_size
     assert gse.matrix.shape == (2*n2_size,2*n2_size)
 

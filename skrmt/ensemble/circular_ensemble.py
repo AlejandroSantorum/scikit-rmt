@@ -11,7 +11,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy import special
 
-from ._base_ensemble import _Ensemble
+from .base_ensemble import _Ensemble
 
 
 
@@ -75,7 +75,7 @@ class CircularEnsemble(_Ensemble):
 
     """
 
-    def __init__(self, beta, n):
+    def __init__(self, beta, n, random_state=None):
         """Constructor for CircularEnsemble class.
 
         Initializes an instance of this class with the given parameters.
@@ -86,6 +86,10 @@ class CircularEnsemble(_Ensemble):
             n (int): random matrix size. Circular ensemble matrices are
                 squared matrices. COE and CUE are of size n times n,
                 and CSE are of size 2n times 2n.
+            random_state (int, default=None): random seed to initialize the pseudo-random
+                number generator of numpy before sampling the random matrix instance. This 
+                has to be any integer between 0 and 2**32 - 1 (inclusive), or None (default).
+                If None, the seed is obtained from the clock.
 
         """
         super().__init__()
@@ -93,9 +97,9 @@ class CircularEnsemble(_Ensemble):
         self.n = n
         self.beta = beta
         self._eigvals = None
-        self.matrix = self.sample()
+        self.matrix = self.sample(random_state=random_state)
 
-    def set_size(self, n, resample_mtx=False):
+    def set_size(self, n, resample_mtx=False, random_state: int = None):
         # pylint: disable=arguments-differ
         """Setter of matrix size.
 
@@ -105,20 +109,28 @@ class CircularEnsemble(_Ensemble):
             n (int): random matrix size. Circular ensemble matrices are
                 squared matrices. COE and CUE are of size n times n,
                 and CSE are of size 2n times 2n.
+            random_state (int, default=None): random seed to initialize the pseudo-random
+                number generator of numpy. This has to be any integer between 0 and 2**32 - 1
+                (inclusive), or None (default). If None, the seed is obtained from the clock.
 
         """
         self.n = n
         if resample_mtx:
-            self.matrix = self.sample()
+            self.matrix = self.sample(random_state=random_state)
 
     # pylint: disable=inconsistent-return-statements
-    def sample(self):
+    def sample(self, random_state: int = None):
         """Samples new Circular Ensemble random matrix.
 
         The sampling algorithm depends on the specification of
         beta parameter. If beta=1, COE matrix is sampled; if
         beta=2 CUE matrix is sampled and if beta=4
         CSE matrix is sampled.
+
+        Args:
+            random_state (int, default=None): random seed to initialize the pseudo-random
+                number generator of numpy. This has to be any integer between 0 and 2**32 - 1
+                (inclusive), or None (default). If None, the seed is obtained from the clock.
 
         Returns:
             numpy array containing new matrix sampled.
@@ -132,6 +144,9 @@ class CircularEnsemble(_Ensemble):
                 en.wikipedia.org/wiki/Circular_ensemble
 
         """
+        if random_state is not None:
+            np.random.seed(random_state)
+
         if self.beta == 1:
             return self._sample_coe()
         if self.beta == 2:
@@ -223,7 +238,7 @@ class CircularEnsemble(_Ensemble):
 
         return norm_const * self._eigvals
 
-    def plot_eigval_hist(self, bins, interval=None, density=False, normalize=True, fig_path=None):
+    def plot_eigval_hist(self, bins, interval=None, density=False, normalize=False, savefig_path=None):
         """Computes and plots the histogram of the matrix eigenvalues.
 
         Calculates and plots the histogram of the current sampled matrix eigenvalues.
@@ -243,11 +258,11 @@ class CircularEnsemble(_Ensemble):
                 number of counts and the bin width, so that the area under the histogram
                 integrates to 1. If set to False, the absolute frequencies of the eigenvalues
                 are returned.
-            normalize (bool, default=True): Whether to normalize the computed eigenvalues
-                by the default normalization constant (see references). Defaults to True, i.e.,
-                the eigenvalues are normalized. Normalization makes the eigenvalues to be in the
-                same support independently of the sample size.
-            fig_path (string, default=None): path to save the created figure. If it is not
+            normalize (bool, default=False): Whether to normalize the computed eigenvalues
+                by the default normalization constant (see references). Defaults to False,
+                i.e., the eigenvalues are normalized. Normalization makes the eigenvalues
+                to be in the same support independently of the sample size.
+            savefig_path (string, default=None): path to save the created figure. If it is not
                 provided, the plot is shown at the end of the routine.
 
         References:
@@ -261,7 +276,7 @@ class CircularEnsemble(_Ensemble):
         # pylint: disable=too-many-locals
         if self.beta == 1:
             return super().plot_eigval_hist(
-                bins=bins, interval=interval, density=density, normalize=normalize, fig_path=fig_path
+                bins=bins, interval=interval, density=density, normalize=normalize, savefig_path=savefig_path
             )
 
         if (interval is not None) and not isinstance(interval, tuple):
@@ -273,6 +288,7 @@ class CircularEnsemble(_Ensemble):
 
         if interval is None:
             rang_val = self.beta/2
+            rang_val += 0.1*rang_val
             rang = ((-rang_val, rang_val), (-rang_val, rang_val))
             extent = [-rang_val, rang_val, -rang_val, rang_val]
         else:
@@ -287,6 +303,7 @@ class CircularEnsemble(_Ensemble):
         axes[0].set_xlim(rang[0][0], rang[0][1])
         axes[0].set_ylim(rang[1][0], rang[1][1])
         axes[0].plot(xvals, yvals, 'o')
+        axes[0].set_aspect('equal', adjustable='box')
         axes[0].set_title('Complex plane')
         axes[0].set_xlabel('real')
         axes[0].set_ylabel('imaginary')
@@ -303,8 +320,8 @@ class CircularEnsemble(_Ensemble):
         plt.suptitle("Complex eigenvalues histogram", fontweight="bold")
 
         # Saving plot or showing it
-        if fig_path:
-            plt.savefig(fig_path, dpi=600)
+        if savefig_path:
+            plt.savefig(savefig_path, dpi=600)
         else:
             plt.show()
 

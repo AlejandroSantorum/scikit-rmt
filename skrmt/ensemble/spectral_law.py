@@ -1,4 +1,4 @@
-"""Law module
+"""Spectral Law module
 
 This module contains classes that implement the main spectral distributions.
 When the limiting behaviour of the spectrum of a random matrix ensemble is
@@ -12,128 +12,12 @@ spectrum of the Manova Ensemble.
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.integrate import quad
+from scipy.stats import rv_continuous
+from scipy import interpolate
 import collections.abc
 
-from .gaussian_ensemble import GaussianEnsemble
-from .wishart_ensemble import WishartEnsemble
-from .manova_ensemble import ManovaEnsemble
 from .tracy_widom_approximator import TW_Approximator
-
-
-def _relu(x):
-    """Element-wise maximum between the value and zero.
-
-    Args:
-        x (ndarray): list of numbers to compute its element-wise maximum.
-    
-    Returns:
-        array_like consisting in the element-wise maximum vector of the given values.
-    """
-    return np.maximum(x, np.zeros_like(x))
-
-
-def _indicator(x, start=None, stop=None, inclusive="both"):
-    r"""Element-wise indicator function within a real interval.
-    The interval can be left-closed, right-closed, closed or open.
-    Visit https://en.wikipedia.org/wiki/Indicator_function for more information.
-
-    Args:
-        x (ndarray): list of numbers to compute its element-wise indicator image.
-        start (double, default=None): left value of the interval. If not provided,
-            the left value is equivalent to :math:`- \infty`.
-        stop (double, default=None): right value of the interval. If not provided,
-            the right value is equivalent to :math:`+ \infty`.
-        inclusive (string, default="both"): type of interval. For left-closed interval
-            use "left", for right-closed interval use "right", for closed interval use
-            "both" and for open interval use "neither".
-
-    Returns:
-        array_like consisting in the element-wise indicator function image of the given values.
-    """
-    if start is None and stop is None:
-        raise ValueError("Error: provide start and/or stop for indicator function.")
-
-    INCLUSIVE_OPTIONS = ["both", "left", "right", "neither"]
-    if inclusive not in INCLUSIVE_OPTIONS:
-        raise ValueError(f"Error: invalid interval inclusive parameter: {inclusive}\n"
-                         "\t inclusive has to be one of the following: {INCLUSIVE_OPTIONS}.")
-
-    if start is not None:
-        if inclusive == "both" or inclusive == "left":
-            condition = (start <= x)
-        elif inclusive == "neither" or inclusive == "right":
-            condition = (start < x)
-    
-    if (start is not None) and (stop is not None):
-        if inclusive == "both" or inclusive == "right":
-            condition = np.logical_and(condition, (x <= stop))
-        elif inclusive == "neither" or inclusive == "left":
-            condition = np.logical_and(condition, (x < stop))
-    elif stop:
-        if inclusive == "both" or inclusive == "right":
-            condition = (x <= stop)
-        elif inclusive == "neither" or inclusive == "left":
-            condition = (x < stop)
-
-    return np.where(condition, 1.0, 0.0)
-
-
-def _plot_func(interval, func, bins=1000, plot_title=None, plot_ylabel=None, savefig_path=None):
-    """Plots a given function (callable) within the provided interval.
-
-    Args:
-        interval (tuple): Delimiters (xmin, xmax) of the histogram.
-        func (callable): Function to be evaluated. The image of the function builds
-            the y-axis values that are plotted.
-        bins (int, default=100): It defines the number of equal-width bins within the
-            provided interval or range.
-        plot_title (string, default=None): Title of the plot.
-        plot_ylabel (string, default=None): Label of the y-axis.
-        savefig_path (string, default=None): path to save the created figure. If it is not
-            provided, the plot is shown at the end of the routine.
-    
-    """
-    if not isinstance(interval, tuple):
-        raise ValueError("interval argument must be a tuple")
-    
-    (xmin, xmax) = interval
-
-    xx = np.linspace(xmin, xmax, num=bins)
-    yy = func(xx)
-
-    plt.plot(xx, yy)
-    plt.xlabel("x")
-    if plot_ylabel:
-        plt.ylabel(plot_ylabel)
-    
-    if plot_title:
-        plt.title(plot_title)
-
-    if savefig_path:
-        plt.savefig(savefig_path, dpi=800)
-    else:
-        plt.show()
-
-
-def _get_bins_centers_and_contour(bins):
-    """Calculates the centers and contour of the given bins.
-
-    Computes the centers of the given bins. Also, the smallest and the largest bin
-    delimitiers are included to define the countour of the representation interval.
-
-    Args:
-        bins (list): list of numbers (floats) that specify each bin delimiter.
-
-    Returns:
-        list of numbers (floats) consisting in the list of bin centers and contour.
-    
-    """
-    centers = [bins[0]] # Adding initial contour
-    l = len(bins)
-    for i in range(l-1):
-        centers.append((bins[i]+bins[i+1])/2) # Adding centers
-    centers.append(bins[-1]) # Adding final contour
-    return centers
+from .misc import relu, indicator, plot_func, get_bins_centers_and_contour
 
 
 class WignerSemicircleDistribution:
@@ -188,19 +72,26 @@ class WignerSemicircleDistribution:
         self.center = center
         self.sigma = sigma
         self.radius = 2.0 * np.sqrt(self.beta) * self.sigma
-    
-    def rvs(self, size):
+        self.default_interval = (self.center - self.radius, self.center + self.radius)
+
+    def rvs(self, size, random_state: int = None):
         """Samples ranfom variates following this distribution.
         This uses the relationship between Wigner Semicircle law and Beta distribution.
 
         Args:
             size (int): sample size.
+            random_state (int, default=None): random seed to initialize the pseudo-random
+                number generator of numpy. This has to be any integer between 0 and 2**32 - 1
+                (inclusive), or None (default). If None, the seed is obtained from the clock.
         
         Returns:
             numpy array with the generated samples.
         """
         if size <= 0:
             raise ValueError(f"Error: invalid sample size. It has to be positive. Provided size = {size}.")
+        
+        if random_state is not None:
+            np.random.seed(random_state)
 
         # Use relationship with beta distribution
         beta_samples = np.random.beta(1.5, 1.5, size=size)
@@ -216,7 +107,7 @@ class WignerSemicircleDistribution:
             float or numpy array with the computed PDF in the given value(s).
         
         """
-        return 2.0 * np.sqrt(_relu(self.radius**2 - (x-self.center)**2)) / (np.pi * self.radius**2)
+        return 2.0 * np.sqrt(relu(self.radius**2 - (x-self.center)**2)) / (np.pi * self.radius**2)
     
     def cdf(self, x):
         """Computes CDF of the Wigner Semicircle Law.
@@ -236,14 +127,14 @@ class WignerSemicircleDistribution:
                          + (np.arcsin((x-self.center)/self.radius)) / np.pi)
             )
     
-    def plot_pdf(self, interval=None, bins=1000, savefig_path=None):
+    def plot_pdf(self, interval=None, num_x_vals=1000, savefig_path=None):
         """Plots the PDF of the Wigner Semicircle Law.
 
         Args:
             interval (tuple, default=None): Delimiters (xmin, xmax) of the histogram. If not
                 provided, the used interval is calculated depending on beta, center, radius and scale.
-            bins (int, default=100): It defines the number of equal-width bins within the
-                provided interval or range.
+            num_x_vals (int, default=100): It defines the number of evenly spaced x values
+                within the given interval or range in which the function (callable) is evaluated.
             savefig_path (string, default=None): path to save the created figure. If it is not
                 provided, the plot is shown at the end of the routine.
         
@@ -251,19 +142,19 @@ class WignerSemicircleDistribution:
         if interval is None:
             interval = (self.center - self.radius - 0.1, self.center + self.radius + 0.1)
         
-        _plot_func(
-            interval, func=self.pdf, bins=bins, plot_title="Wigner Semicircle law PDF", 
+        plot_func(
+            interval, func=self.pdf, num_x_vals=num_x_vals, plot_title="Wigner Semicircle law PDF", 
             plot_ylabel="probability density", savefig_path=savefig_path
         )
     
-    def plot_cdf(self, interval=None, bins=1000, savefig_path=None):
+    def plot_cdf(self, interval=None, num_x_vals=1000, savefig_path=None):
         """Plots the CDF of the Wigner Semicircle Law.
 
         Args:
             interval (tuple, default=None): Delimiters (xmin, xmax) of the histogram. If not
                 provided, the used interval is calculated depending on beta, center, radius and scale.
-            bins (int, default=100): It defines the number of equal-width bins within the
-                provided interval or range.
+            num_x_vals (int, default=100): It defines the number of evenly spaced x values
+                within the given interval or range in which the function (callable) is evaluated.
             savefig_path (string, default=None): path to save the created figure. If it is not
                 provided, the plot is shown at the end of the routine.
         
@@ -271,14 +162,13 @@ class WignerSemicircleDistribution:
         if interval is None:
             interval = (self.center - self.radius - 0.1, self.center + self.radius + 0.1)
         
-        _plot_func(
-            interval, func=self.cdf, bins=bins, plot_title="Wigner Semicircle law CDF",
+        plot_func(
+            interval, func=self.cdf, num_x_vals=num_x_vals, plot_title="Wigner Semicircle law CDF",
             plot_ylabel="cumulative distribution", savefig_path=savefig_path
         )
-    
 
-    def plot_empirical_pdf(self, n_size=10000, bins=100, interval=None, density=False,
-                           plot_law_pdf=False, savefig_path=None):
+    def plot_empirical_pdf(self, sample_size=10000, bins=100, interval=None, density=False,
+                           plot_law_pdf=False, savefig_path=None, random_state=None):
         """Computes and plots Wigner's semicircle empirical law.
 
         Calculates and plots Wigner's semicircle empirical law using random samples generated
@@ -287,7 +177,7 @@ class WignerSemicircleDistribution:
         :math:`\alpha = \beta = 3/2`.
 
         Args:
-            n_size (int, default=1000): number of random samples that can be interpreted as
+            sample_size (int, default=1000): number of random samples that can be interpreted as
                 random eigenvalues of a Wigner matrix. This is the sample size.
             bins (int or sequence, default=100): If bins is an integer, it defines the number
                 of equal-width bins in the range. If bins is a sequence, it defines the
@@ -295,6 +185,8 @@ class WignerSemicircleDistribution:
                 edge of the last bin; in this case, bins may be unequally spaced.
             interval (tuple, default=None): Delimiters (xmin, xmax) of the histogram.
                 The lower and upper range of the bins. Lower and upper outliers are ignored.
+                If one of the bounds of the specified interval is outside of the minimum default
+                interval, this will be adjusted to show the distribution bulk properly.
             density (bool, default=False): If True, draw and return a probability
                 density: each bin will display the bin's raw count divided by the total
                 number of counts and the bin width, so that the area under the histogram
@@ -305,6 +197,9 @@ class WignerSemicircleDistribution:
                 considered when the argument 'density' is set also to True.
             savefig_path (string, default=None): path to save the created figure. If it is not
                 provided, the plot is shown are the end of the routine.
+            random_state (int, default=None): random seed to initialize the pseudo-random
+                number generator of numpy. This has to be any integer between 0 and 2**32 - 1
+                (inclusive), or None (default). If None, the seed is obtained from the clock.
 
         References:
             - Albrecht, J. and Chan, C.P. and Edelman, A.
@@ -316,21 +211,31 @@ class WignerSemicircleDistribution:
 
         """
         # pylint: disable=too-many-arguments
-        if n_size<1:
-            raise ValueError("matrix size must be positive")
+        if sample_size<1:
+            raise ValueError("Negative eigenvalue sample size (given = {sample_size})."
+                             " Please, provide a sample size greater or equal than 1.")
         
         if interval is None:
-            interval = (self.center - self.radius, self.center + self.radius)
+            range_interval = self.default_interval
+        else:
+            xmin = min(interval[0], self.default_interval[0])
+            xmax = max(interval[1], self.default_interval[1])
+            if interval[0] > self.default_interval[0]:
+                print(f"Lower bound of interval too large. Setting lower bound to {xmin}.")
+            if interval[1] < self.default_interval[1]:
+                print(f"Upper bound of interval too large. Setting upper bound to {xmax}.")
+            range_interval = (xmin, xmax)
+            print(f"Setting plot interval to {range_interval}.")
 
-        random_samples = self.rvs(size=n_size)
-        observed, bins = np.histogram(random_samples, bins=bins, range=interval, density=density)
+        random_samples = self.rvs(size=sample_size, random_state=random_state)
+        observed, bin_edges = np.histogram(random_samples, bins=bins, range=range_interval, density=density)
 
-        width = bins[1]-bins[0]
-        plt.bar(bins[:-1], observed, width=width, align='edge')
+        width = bin_edges[1]-bin_edges[0]
+        plt.bar(bin_edges[:-1], observed, width=width, align='edge')
 
         # Plotting Wigner Semicircle Law pdf
         if plot_law_pdf and density:
-            centers = np.asarray(_get_bins_centers_and_contour(bins))
+            centers = np.asarray(get_bins_centers_and_contour(bin_edges))
             pdf = self.pdf(centers)
             plt.plot(centers, pdf, color='red', linewidth=2)
         elif plot_law_pdf and not density:
@@ -348,7 +253,7 @@ class WignerSemicircleDistribution:
 
 
 
-class MarchenkoPasturDistribution:
+class MarchenkoPasturDistribution(rv_continuous):
     """Marchenko-Pastur Distribution class.
 
     The Marchenko-Pastur Law describes the spectrum of the Wishart random matrices.
@@ -395,6 +300,8 @@ class MarchenkoPasturDistribution:
                 corresponds to the standard deviation of the random entries of the sampled matrix.
         
         """
+        super().__init__()
+
         if beta not in [1,2,4]:
             raise ValueError(f"Error: invalid beta. It has to be 1,2 or 4. Provided beta = {beta}.")
         if ratio <= 0:
@@ -406,32 +313,34 @@ class MarchenkoPasturDistribution:
         self.lambda_minus = self.beta * self.sigma**2 * (1 - np.sqrt(self.ratio))**2
         self.lambda_plus = self.beta * self.sigma**2 * (1 + np.sqrt(self.ratio))**2
         self._var = self.beta * self.sigma**2
-        self._wishart_ens = None
+        self._set_default_interval()
+        # when the support is finite (lambda_minus, lambda_plus) it is better
+        # to explicity approximate the inverse of the CDF to implement rvs
+        self._approximate_inv_cdf()
     
-    def rvs(self, size):
-        """Samples ranfom variates following this distribution.
-
-        Args:
-            size (int): sample size :math:`n`.
-        
-        Returns:
-            numpy array with the generated samples.
-        """
-        if size <= 0:
-            raise ValueError(f"Error: invalid sample size. It has to be positive. Provided size = {size}.")
-        
-        _n = int(np.round(size / self.ratio))
-
-        if not self._wishart_ens:
-            self._wishart_ens = WishartEnsemble(beta=self.beta, p=size, n=_n, use_tridiagonal=False, sigma=self.sigma)
+    def _set_default_interval(self):
+        # computing interval according to the matrix size ratio and support
+        if self.ratio <= 1:
+            self.default_interval = (self.lambda_minus, self.lambda_plus)
         else:
-            self._wishart_ens.set_size(p=size, n=_n, resample_mtx=True)
+            self.default_interval = (min(-0.05, self.lambda_minus), self.lambda_plus)
+    
+    def _approximate_inv_cdf(self):
+        # https://gist.github.com/amarvutha/c2a3ea9d42d238551c694480019a6ce1
+        x_vals = np.linspace(self.lambda_minus, self.lambda_plus, 1000)
+        _pdf = self._pdf(x_vals)
+        _cdf = np.cumsum(_pdf)      # approximating CDF
+        cdf_y = _cdf/_cdf.max()     # normalizing approximated CDF to 1.0
+        self._inv_cdf = interpolate.interp1d(cdf_y, x_vals)
 
-        if self.beta == 4:
-            return self._wishart_ens.eigvals(normalize=True)[::2]
-        return self._wishart_ens.eigvals(normalize=True)
+    def _rvs(self, size, random_state, _random_state=None):
+        if _random_state is not None:
+            np.random.seed(_random_state)
 
-    def pdf(self, x):
+        uniform_samples = np.random.random(size=size)
+        return self._inv_cdf(uniform_samples)
+
+    def _pdf(self, x):
         """Computes PDF of the Marchenko-Pastur Law.
 
         Args:
@@ -442,10 +351,10 @@ class MarchenkoPasturDistribution:
         
         """
         with np.errstate(divide='ignore', invalid='ignore'):
-            return np.sqrt(_relu(self.lambda_plus - x) * _relu(x - self.lambda_minus)) \
+            return np.sqrt(relu(self.lambda_plus - x) * relu(x - self.lambda_minus)) \
                 / (2.0 * np.pi * self.ratio * self._var * x)
 
-    def cdf(self, x):
+    def _cdf(self, x):
         """Computes CDF of the Marchenko-Pastur Law.
 
         Args:
@@ -456,19 +365,19 @@ class MarchenkoPasturDistribution:
         
         """
         with np.errstate(divide='ignore', invalid='ignore'):
-            acum = _indicator(x, start=self.lambda_plus, inclusive="left")
-            acum += np.where(_indicator(x, start=self.lambda_minus, stop=self.lambda_plus, inclusive="left"),
+            acum = indicator(x, start=self.lambda_plus, inclusive="left")
+            acum += np.where(indicator(x, start=self.lambda_minus, stop=self.lambda_plus, inclusive="left"),
                             self._cdf_aux_f(x), 0.0)
 
             if self.ratio <= 1:
                 return acum
             
-            acum += np.where(_indicator(x, start=self.lambda_minus, stop=self.lambda_plus, inclusive="left"),
+            acum += np.where(indicator(x, start=self.lambda_minus, stop=self.lambda_plus, inclusive="left"),
                             (self.ratio-1)/(2*self.ratio), 0.0)
 
             ### This would need to be added if the extra density point at zero is measured
             # https://en.wikipedia.org/wiki/Marchenko%E2%80%93Pastur_distribution
-            # acum += np.where(_indicator(x, start=0, stop=self.lambda_minus, inclusive="left"),
+            # acum += np.where(indicator(x, start=0, stop=self.lambda_minus, inclusive="left"),
             #                 (self.ratio-1)/self.ratio, 0.0)
             return acum
 
@@ -484,20 +393,20 @@ class MarchenkoPasturDistribution:
                                                 / (2*self._var*(1-self.ratio)*self._cdf_aux_r(x)))
                                 )
         return 1/(2*np.pi*self.ratio) * (np.pi*self.ratio \
-                                         + (1/self._var)*np.sqrt(_relu(self.lambda_plus-x)*_relu(x-self.lambda_minus)) \
+                                         + (1/self._var)*np.sqrt(relu(self.lambda_plus-x)*relu(x-self.lambda_minus)) \
                                          - (1+self.ratio)*first_arctan_term + (1-self.ratio)*second_arctan_term)
 
     def _cdf_aux_r(self, x):
         return np.sqrt((self.lambda_plus-x)/(x - self.lambda_minus))
 
-    def plot_pdf(self, interval=None, bins=1000, savefig_path=None):
+    def plot_pdf(self, interval=None, num_x_vals=1000, savefig_path=None):
         """Plots the PDF of the Marchenko-Pastur Law.
 
         Args:
             interval (tuple, default=None): Delimiters (xmin, xmax) of the histogram. If not
                 provided, the used interval is calculated depending on beta, ratio, and scale.
-            bins (int, default=100): It defines the number of equal-width bins within the
-                provided interval or range.
+            num_x_vals (int, default=100): It defines the number of evenly spaced x values
+                within the given interval or range in which the function (callable) is evaluated.
             savefig_path (string, default=None): path to save the created figure. If it is not
                 provided, the plot is shown at the end of the routine.
         
@@ -505,19 +414,19 @@ class MarchenkoPasturDistribution:
         if interval is None:
             interval = (self.lambda_minus, self.lambda_plus)
         
-        _plot_func(
-            interval, func=self.pdf, bins=bins, plot_title="Marchenko-Pastur law PDF",
+        plot_func(
+            interval, func=self._pdf, num_x_vals=num_x_vals, plot_title="Marchenko-Pastur law PDF",
             plot_ylabel="probability density", savefig_path=savefig_path
         )
     
-    def plot_cdf(self, interval=None, bins=1000, savefig_path=None):
+    def plot_cdf(self, interval=None, num_x_vals=1000, savefig_path=None):
         """Plots the CDF of the Marchenko-Pastur Law.
 
         Args:
             interval (tuple, default=None): Delimiters (xmin, xmax) of the histogram. If not
                 provided, the used interval is calculated depending on beta, ratio, and scale.
-            bins (int, default=100): It defines the number of equal-width bins within the
-                provided interval or range.
+            num_x_vals (int, default=100): It defines the number of evenly spaced x values
+                within the given interval or range in which the function (callable) is evaluated.
             savefig_path (string, default=None): path to save the created figure. If it is not
                 provided, the plot is shown at the end of the routine.
         
@@ -525,13 +434,13 @@ class MarchenkoPasturDistribution:
         if interval is None:
             interval = (self.lambda_minus, self.lambda_plus)
         
-        _plot_func(
-            interval, func=self.cdf, bins=bins, plot_title="Marchenko-Pastur law CDF",
+        plot_func(
+            interval, func=self._cdf, num_x_vals=num_x_vals, plot_title="Marchenko-Pastur law CDF",
             plot_ylabel="cumulative distribution", savefig_path=savefig_path
         )
 
-    def plot_empirical_pdf(self, n_size=3000, p_size=None, bins=100, interval=None,
-                           density=False, plot_law_pdf=False, savefig_path=None):
+    def plot_empirical_pdf(self, sample_size=1000, bins=100, interval=None, density=False,
+                           plot_law_pdf=False, savefig_path=None, random_state=None):
         """Computes and plots Marchenko-Pastur empirical law using Wishart Ensemble random matrices.
 
         Calculates and plots Marchenko-Pastur empirical law using Wishart Ensemble random matrices.
@@ -560,6 +469,8 @@ class MarchenkoPasturDistribution:
                 edge of the last bin; in this case, bins may be unequally spaced.
             interval (tuple, default=None): Delimiters (xmin, xmax) of the histogram.
                 The lower and upper range of the bins. Lower and upper outliers are ignored.
+                If one of the bounds of the specified interval is outside of the minimum default
+                interval, this will be adjusted to show the distribution bulk properly.
             density (bool, default=False): If True, draw and return a probability
                 density: each bin will display the bin's raw count divided by the total
                 number of counts and the bin width, so that the area under the histogram
@@ -570,6 +481,9 @@ class MarchenkoPasturDistribution:
                 considered when the argument 'density' is set also to True.
             savefig_path (string, default=None): path to save the created figure. If it is not
                 provided, the plot is shown are the end of the routine.
+            random_state (int, default=None): random seed to initialize the pseudo-random
+                number generator of numpy. This has to be any integer between 0 and 2**32 - 1
+                (inclusive), or None (default). If None, the seed is obtained from the clock.
 
         References:
             - Albrecht, J. and Chan, C.P. and Edelman, A.
@@ -581,62 +495,39 @@ class MarchenkoPasturDistribution:
 
         """
         # pylint: disable=too-many-arguments
-        if n_size<1 or (p_size is not None and p_size<1):
-            raise ValueError("matrix size must be positive")
-        
-        if interval and interval[0] == 0:
-            print("Warning: setting the beginning of the interval to zero may generate numerical errors.")
-            print(f"Setting interval to (-0.01, {interval[1]})")
-            interval = (-0.01, interval[1])
+        if sample_size<1:
+            raise ValueError("Negative eigenvalue sample size (given = {sample_size})."
+                             " Please, provide a sample size greater or equal than 1.")
 
-        # calculating constants depending on matrix sizes
-        if p_size is None:
-            p_size = round(self.ratio * n_size)
-
-        # computing an approximated ratio since p_size is rounded to the closest integer        
-        approx_ratio = p_size/n_size
-        lambda_plus = self.beta * self.sigma**2 * (1 + np.sqrt(approx_ratio))**2
-        lambda_minus = self.beta * self.sigma**2 * (1 - np.sqrt(approx_ratio))**2
-        use_tridiag_ratio = (approx_ratio <= 1)
-        if not use_tridiag_ratio:
-            print("Warning: Cannot use tridiagonal histogramming if 'p' (degrees of freedom) is "
-                " greater than 'n' (sample size).\n"
-                f"\t Provided n={n_size} and p={p_size}. Tridiagonal histogramming is therefore deactivated.\n"
-                "\t It is adviced to increase sample size (`n`) to optimize and boost histogramming.")
-
-        # computing interval according to the matrix size ratio and support
         if interval is None:
-            if approx_ratio <= 1:
-                interval = (lambda_minus, lambda_plus)
-            else:
-                interval = (min(-0.05, lambda_minus), lambda_plus)
+            range_interval = self.default_interval
+        else:
+            xmin = min(interval[0], self.default_interval[0])
+            xmax = max(interval[1], self.default_interval[1])
+            if interval[0] > self.default_interval[0]:
+                print(f"Lower bound of interval too large. Setting lower bound to {xmin}.")
+            if interval[1] < self.default_interval[1]:
+                print(f"Upper bound of interval too large. Setting upper bound to {xmax}.")
+            range_interval = (xmin, xmax)
+            print(f"Setting plot interval to {range_interval}.")
         
-        use_tridiag_sigma = (self.sigma == 1.0)
-        if not use_tridiag_sigma:
-            print(f"Warning: The given scale is not the standard (sigma = {self.sigma}).\n"
-                "\t Tridiagonal histogramming is deactivated.\n"
-                "\t It is adviced to set sigma=1.0 to optimize and boost histogramming.")
+        random_samples = self._rvs(size=sample_size, random_state=random_state, _random_state=random_state)
+        observed, bin_edges = np.histogram(random_samples, bins=bins, range=range_interval, density=density)
 
-        ens = WishartEnsemble(beta=self.beta, p=p_size, n=n_size, sigma=self.sigma,
-                            use_tridiagonal=(use_tridiag_ratio and use_tridiag_sigma))
-
-        observed, bins = ens.eigval_hist(bins=bins, interval=interval, density=density, normalize=True)
-
-        width = bins[1]-bins[0]
-        plt.bar(bins[:-1], observed, width=width, align='edge')
+        width = bin_edges[1]-bin_edges[0]
+        plt.bar(bin_edges[:-1], observed, width=width, align='edge')
 
         # Plotting theoretical graphic
         if plot_law_pdf and density:
-            centers = np.array(_get_bins_centers_and_contour(bins))
+            centers = np.asarray(get_bins_centers_and_contour(bin_edges))
             # creating new instance with the approximated ratio depending on the given matrix sizes
-            mpd = MarchenkoPasturDistribution(beta=self.beta, ratio=approx_ratio, sigma=self.sigma)
-            pdf = mpd.pdf(centers)
+            pdf = self._pdf(centers)
             plt.plot(centers, pdf, color='red', linewidth=2)
 
         plt.title("Marchenko-Pastur Law - Eigenvalue histogram", fontweight="bold")
         plt.xlabel("x")
         plt.ylabel("probability density")
-        if approx_ratio > 1:
+        if self.ratio > 1:
             if plot_law_pdf and density:
                 ylim_vals = pdf
             else:
@@ -655,7 +546,7 @@ class MarchenkoPasturDistribution:
 
 
 
-class TracyWidomDistribution:
+class TracyWidomDistribution(rv_continuous):
     """Tracy-Widom Distribution class.
 
     The Tracy-Widom Law describes the behaviour of the largest eigenvalue of the
@@ -700,51 +591,16 @@ class TracyWidomDistribution:
                 For GOE beta=1, for GUE beta=2, for GSE beta=4.
         
         """
+        super().__init__()
+
         if beta not in [1,2,4]:
             raise ValueError(f"Error: invalid beta. It has to be 1,2 or 4. Provided beta = {beta}.")
 
         self.beta = beta
         self.tw_approx = TW_Approximator(beta=self.beta)
+        self.default_interval = (-5, 4-self.beta)
 
-    def rvs(self, size, mtx_size=100):
-        """Samples ranfom variates following this distribution.
-
-        Args:
-            size (int): sample size.
-            mtx_size (int, default=100): matrix size. Remember the Tracy-Widom Law describes the
-                limiting behaviour of the largest eigenvalue of a Wigner matrix. Therefore,
-                a matrix has to be generated to get each sample. This argument specifies the size
-                of the matrix.
-        
-        Returns:
-            numpy array with the generated samples.
-        """
-        if size <= 0:
-            raise ValueError(f"Error: invalid sample size. It has to be positive. Provided size = {size}.")
-        if mtx_size <= 0:
-            raise ValueError(f"Error: invalid matrix size. It has to be positive. Provided matrix size = {mtx_size}.")
-
-        self._gaussian_ens = GaussianEnsemble(beta=self.beta, n=mtx_size, use_tridiagonal=False)
-
-        max_eigvals = []
-        for _ in range(size):
-            max_eigvals.append(self._gaussian_ens.eigvals(normalize=False).max())
-            self._gaussian_ens.sample()
-        max_eigvals = np.asarray(max_eigvals)
-
-        # Tracy-Widom eigenvalue distr. normalization constants
-        eigval_scale = 1.0
-        size_scale = 1.0
-        if self.beta == 2:
-            eigval_scale = 1/np.sqrt(2)
-        if self.beta == 4:
-            eigval_scale = size_scale = 1/np.sqrt(2)
-            mtx_size *= 2
-
-        max_eigvals = size_scale*(mtx_size**(1/6))*(eigval_scale*max_eigvals - (2.0*np.sqrt(mtx_size)))
-        return max_eigvals
-
-    def pdf(self, x):
+    def _pdf(self, x):
         """Computes PDF of the Tracy-Widom Law.
 
         Args:
@@ -756,7 +612,7 @@ class TracyWidomDistribution:
         """
         return self.tw_approx.pdf(x)
 
-    def cdf(self, x):
+    def _cdf(self, x):
         """Computes CDF of the Tracy-Widom Law.
 
         Args:
@@ -768,48 +624,48 @@ class TracyWidomDistribution:
         """
         return self.tw_approx.cdf(x)
 
-    def plot_pdf(self, interval=None, bins=1000, savefig_path=None):
+    def plot_pdf(self, interval=None, num_x_vals=1000, savefig_path=None):
         """Plots the PDF of the Tracy-Widom Law.
 
         Args:
             interval (tuple, default=None): Delimiters (xmin, xmax) of the histogram. If not
                 provided, the used interval is calculated depending on beta.
-            bins (int, default=100): It defines the number of equal-width bins within the
-                provided interval or range.
+            num_x_vals (int, default=100): It defines the number of evenly spaced x values
+                within the given interval or range in which the function (callable) is evaluated.
             savefig_path (string, default=None): path to save the created figure. If it is not
                 provided, the plot is shown at the end of the routine.
         
         """
         if interval is None:
-            interval = (-5, 4-self.beta)
+            interval = self.default_interval
         
-        _plot_func(
-            interval, func=self.pdf, bins=bins, plot_title="Tracy-Widom law PDF",
+        plot_func(
+            interval, func=self._pdf, num_x_vals=num_x_vals, plot_title="Tracy-Widom law PDF",
             plot_ylabel="probability density", savefig_path=savefig_path
         )
     
-    def plot_cdf(self, interval=None, bins=1000, savefig_path=None):
+    def plot_cdf(self, interval=None, num_x_vals=1000, savefig_path=None):
         """Plots the PDF of the Tracy-Widom Law.
 
         Args:
             interval (tuple, default=None): Delimiters (xmin, xmax) of the histogram. If not
                 provided, the used interval is calculated depending on beta.
-            bins (int, default=100): It defines the number of equal-width bins within the
-                provided interval or range.
+            num_x_vals (int, default=100): It defines the number of evenly spaced x values
+                within the given interval or range in which the function (callable) is evaluated.
             savefig_path (string, default=None): path to save the created figure. If it is not
                 provided, the plot is shown at the end of the routine.
         
         """
         if interval is None:
-            interval = (-5, 4-self.beta)
+            interval = self.default_interval
         
-        _plot_func(
-            interval, func=self.cdf, bins=bins, plot_title="Tracy-Widom law CDF",
+        plot_func(
+            interval, func=self._cdf, num_x_vals=num_x_vals, plot_title="Tracy-Widom law CDF",
             plot_ylabel="cumulative distribution", savefig_path=savefig_path
         )
 
-    def plot_empirical_pdf(self, n_size=100, times=1000, bins=100, interval=None,
-                           density=False, plot_law_pdf=False, savefig_path=None):
+    def plot_empirical_pdf(self, sample_size=1000, bins=100, interval=None, density=False,
+                           plot_law_pdf=False, savefig_path=None, random_state=None):
         """Computes and plots Tracy-Widom empirical law using Gaussian Ensemble.
 
         Calculates and plots Tracy-Widom empirical law using Gaussian Ensemble random matrices.
@@ -824,18 +680,23 @@ class TracyWidomDistribution:
                 of equal-width bins in the range. If bins is a sequence, it defines the
                 bin edges, including the left edge of the first bin and the right
                 edge of the last bin; in this case, bins may be unequally spaced.
-            interval (tuple, default=None): Delimiters (xmin, xmax) of the histogram.
-                The lower and upper range of the bins. Lower and upper outliers are ignored.
             density (bool, default=False): If True, draw and return a probability
                 density: each bin will display the bin's raw count divided by the total
                 number of counts and the bin width, so that the area under the histogram
                 integrates to 1. If set to False, the absolute frequencies of the eigenvalues
                 are returned.
+            interval (tuple, default=None): Delimiters (xmin, xmax) of the histogram.
+                The lower and upper range of the bins. Lower and upper outliers are ignored.
+                If one of the bounds of the specified interval is outside of the minimum default
+                interval, this will be adjusted to show the distribution bulk properly.
             plot_law_pdf (bool, default=False): If True, the limiting theoretical law is plotted.
                 If set to False, just the empirical histogram is shown. This parameter is only
                 considered when the argument 'density' is set also to True.
             savefig_path (string, default=None): path to save the created figure. If it is not
                 provided, the plot is shown are the end of the routine.
+            random_state (int, default=None): random seed to initialize the pseudo-random
+                number generator of numpy. This has to be any integer between 0 and 2**32 - 1
+                (inclusive), or None (default). If None, the seed is obtained from the clock.
 
         References:
             - Albrecht, J. and Chan, C.P. and Edelman, A.
@@ -847,41 +708,32 @@ class TracyWidomDistribution:
 
         """
         # pylint: disable=too-many-arguments
-        if n_size<1 or times<1:
-            raise ValueError("matrix size or number of repetitions must be positive")
-
-        ens = GaussianEnsemble(beta=self.beta, n=n_size, use_tridiagonal=False)
-
-        eigvals = []
-        for _ in range(times):
-            eigvals.append(ens.eigvals(normalize=False).max())
-            ens.sample()
-        eigvals = np.asarray(eigvals)
-
-        # Tracy-Widom eigenvalue distr. normalization constants
-        eigval_scale = 1.0
-        size_scale = 1.0
-        if self.beta == 2:
-            eigval_scale = 1/np.sqrt(2)
-        elif self.beta == 4:
-            eigval_scale = size_scale = 1/np.sqrt(2)
-            n_size *= 2
-        eigvals = size_scale*(n_size**(1/6))*(eigval_scale*eigvals - (2.0*np.sqrt(n_size)))
+        if sample_size<1:
+            raise ValueError("Negative eigenvalue sample size (given = {sample_size})."
+                             " Please, provide a sample size greater or equal than 1.")
 
         if interval is None:
-            xmin=eigvals.min()
-            xmax=eigvals.max()
-            interval=(xmin, xmax)
+            range_interval = self.default_interval
+        else:
+            xmin = min(interval[0], self.default_interval[0])
+            xmax = max(interval[1], self.default_interval[1])
+            if interval[0] > self.default_interval[0]:
+                print(f"Lower bound of interval too large. Setting lower bound to {xmin}.")
+            if interval[1] < self.default_interval[1]:
+                print(f"Upper bound of interval too large. Setting upper bound to {xmax}.")
+            range_interval = (xmin, xmax)
+            print(f"Setting plot interval to {range_interval}.")
 
-        # using numpy to obtain histogram in the given interval and no. of bins
-        observed, bins = np.histogram(eigvals, bins=bins, range=interval, density=density)
-        width = bins[1]-bins[0]
-        plt.bar(bins[:-1], observed, width=width, align='edge')
+        random_samples = self.rvs(size=sample_size, random_state=random_state)
+        observed, bin_edges = np.histogram(random_samples, bins=bins, range=range_interval, density=density)
+
+        width = bin_edges[1]-bin_edges[0]
+        plt.bar(bin_edges[:-1], observed, width=width, align='edge')
 
         # Plotting theoretical graphic
         if plot_law_pdf and density:
-            centers = _get_bins_centers_and_contour(bins)
-            pdf = self.pdf(centers)
+            centers = get_bins_centers_and_contour(bin_edges)
+            pdf = self._pdf(centers)
             plt.plot(centers, pdf, color='red', linewidth=2)
 
         plt.title("Tracy-Widom Law - Eigenvalue histogram", fontweight="bold")
@@ -896,7 +748,7 @@ class TracyWidomDistribution:
 
 
 
-class ManovaSpectrumDistribution:
+class ManovaSpectrumDistribution(rv_continuous):
     """Manova Spectrum Distribution class.
 
     The spectrum of the random matrices of the Manova Ensemble converge to a
@@ -929,17 +781,17 @@ class ManovaSpectrumDistribution:
     
     """
 
-    def __init__(self, a, b, beta=1):
+    def __init__(self, ratio_a, ratio_b, beta=1):
         """Constructor for ManovaSpectrumDistribution class.
 
         Initializes an instance of this class with the given parameters.
 
         Args:
-            a (float): first random matrix size ratio. This is the ratio between the
+            ratio_a (float): first random matrix size ratio. This is the ratio between the
                 number of degrees of freedom 'p' and the first sample size 'n1'. The value
                 of a = p/n1. Remember a Manova randon matrix is considered a double-Wishart
                 matrix, that's why there are two sample sizes 'n1' and 'n2' (see below).
-            b (float): second random matrix size ratio. This is the ratio between the
+            ratio_b (float): second random matrix size ratio. This is the ratio between the
                 number of degrees of freedom 'p' and the second sample size 'n2'. The value
                 of b = p/n2. Remember a Manova randon matrix is considered a double-Wishart
                 matrix, that's why there are two sample sizes 'n1' and 'n2'.
@@ -947,50 +799,63 @@ class ManovaSpectrumDistribution:
                 For MRE beta=1, for WME beta=2, for MQE beta=4.
         
         """
+        super().__init__()
+
         if beta not in [1,2,4]:
             raise ValueError(f"Error: invalid beta. It has to be 1,2 or 4. Provided beta = {beta}.")
-        if a <= 0 or b <= 0:
+        if ratio_a <= 0 or ratio_b <= 0:
             raise ValueError("Error: invalid matrix parameters. They have to be both positive.\n"
-                             f"\tProvided a = {a} and b = {b}.")
+                             f"\tProvided a = {ratio_a} and b = {ratio_b}.")
 
-        if a < 1 or b < 1:
-            print(f"Warning: Setting a < 1 (a = {a}) or b < 1 (b = {b}) may cause numerical instability.")
+        if ratio_a < 1 or ratio_b < 1:
+            print(f"Warning: Setting a < 1 (a = {ratio_a}) or b < 1 (b = {ratio_b}) may cause numerical instability.")
 
-        self.a = a
-        self.b = b
+        self.ratio_a = ratio_a
+        self.ratio_b = ratio_b
         self.beta = beta
-        self.lambda_term1 = np.sqrt((a/(a+b)) * (1 - (1/(a+b))))
-        self.lambda_term2 = np.sqrt((1/(a+b)) * (1 - (a/(a+b))))
+        self.lambda_term1 = np.sqrt((ratio_a/(ratio_a + ratio_b)) * (1 - (1/(ratio_a + ratio_b))))
+        self.lambda_term2 = np.sqrt((1/(ratio_a + ratio_b)) * (1 - (ratio_a/(ratio_a + ratio_b))))
         self.lambda_minus = (self.lambda_term1 - self.lambda_term2)**2
         self.lambda_plus = (self.lambda_term1 + self.lambda_term2)**2
-        self._manova_ens = None
+        self._set_default_interval()
+        # when the support is finite (lambda_minus, lambda_plus) it is better
+        # to explicity approximate the inverse of the CDF to implement rvs
+        self._approximate_inv_cdf()
     
-    def rvs(self, size):
-        """Samples random variates following this distribution.
+    def _set_default_interval(self):
+        interval = [self.lambda_minus, self.lambda_plus]
+        if self.ratio_a <= 1:
+            interval[0] = min(-0.05, self.lambda_minus)
+        if self.ratio_b <= 1:
+            interval[1] = max(self.lambda_plus, 1.05)
+        self.default_interval = tuple(interval)
 
-        Args:
-            size (int): sample size.
-        
-        Returns:
-            numpy array with the generated samples.
-        """
-        if size <= 0:
-            raise ValueError(f"Error: invalid sample size. It has to be positive. Provided size = {size}.")
-        
-        _n1 = int(np.round(size * self.a))
-        _n2 = int(np.round(size * self.b))
+    def _approximate_inv_cdf(self):
+        # https://gist.github.com/amarvutha/c2a3ea9d42d238551c694480019a6ce1
+        x_vals = np.linspace(self.lambda_minus, self.lambda_plus, 1000)
+        _pdf = self._pdf(x_vals)
+        _cdf = np.cumsum(_pdf)      # approximating CDF
+        cdf_y = _cdf/_cdf.max()     # normalizing approximated CDF to 1.0
+        self._inv_cdf = interpolate.interp1d(cdf_y, x_vals)
 
-        if not self._manova_ens:
-            self._manova_ens = ManovaEnsemble(beta=self.beta, m=size, n1=_n1, n2=_n2)
-        else:
-            self._manova_ens.set_size(m=size, n1=_n1, n2=_n2, resample_mtx=True)
+    def _rvs(self, size, random_state, _random_state=None):
+        if _random_state is not None:
+            np.random.seed(_random_state)
 
-        # normalization here is not crucial since the default normalization const. of Manova is 1.0
-        if self.beta == 4:
-            return self._manova_ens.eigvals(normalize=True)[::2].real
-        return self._manova_ens.eigvals(normalize=True).real
+        uniform_samples = np.random.random(size=size)
+        return self._inv_cdf(uniform_samples)
     
-    def pdf(self, x):
+    def __pdf_float(self, x):
+        if x <= self.lambda_minus:
+            return 0.0
+
+        if x >= self.lambda_plus:
+            return 0.0
+
+        return (self.ratio_a + self.ratio_b) * np.sqrt((self.lambda_plus - x) * (x - self.lambda_minus)) \
+                                / (2.0 * np.pi * x * (1-x))
+
+    def _pdf(self, x):
         """Computes PDF of the Manova Spectrum distribution.
 
         Args:
@@ -1000,13 +865,17 @@ class ManovaSpectrumDistribution:
             float or numpy array with the computed PDF in the given value(s).
         
         """
-        with np.errstate(divide='ignore', invalid='ignore'): 
-            return np.where(np.logical_and(x > self.lambda_minus, x < self.lambda_plus),
-                            (self.a + self.b) * np.sqrt((self.lambda_plus - x) * (x - self.lambda_minus)) \
-                                / (2.0 * np.pi * x * (1-x)),
-                            0.0)
+        # if x is array-like
+        if isinstance(x, (collections.abc.Sequence, np.ndarray)):
+            # TODO: Vectorize this loop in case x is array-like
+            y_ret = []
+            for val in x:
+                y_ret.append(self.__pdf_float(val))
+            return np.asarray(y_ret)
+        # if x is a number (int or float)
+        return self.__pdf_float(x)
     
-    def __cdf(self, x):
+    def __cdf_float(self, x):
         if x <= self.lambda_minus:
             return 0.0
 
@@ -1015,7 +884,7 @@ class ManovaSpectrumDistribution:
 
         return quad(self.pdf, self.lambda_minus, x)[0]
 
-    def cdf(self, x):
+    def _cdf(self, x):
         """Computes CDF of the Manova Spectrum distribution.
 
         Args:
@@ -1027,22 +896,23 @@ class ManovaSpectrumDistribution:
         """
         # if x is array-like
         if isinstance(x, (collections.abc.Sequence, np.ndarray)):
+            # TODO: Vectorize this loop in case x is array-like
             y_ret = []
             for val in x:
-                y_ret.append(self.__cdf(val))
+                y_ret.append(self.__cdf_float(val))
             return np.asarray(y_ret)
         
         # if x is a number (int or float)
-        return self.__cdf(x)
+        return self.__cdf_float(x)
 
-    def plot_pdf(self, interval=None, bins=1000, savefig_path=None):
+    def plot_pdf(self, interval=None, num_x_vals=1000, savefig_path=None):
         """Plots the PDF of the Manova Spectrum distribution.
 
         Args:
             interval (tuple, default=None): Delimiters (xmin, xmax) of the histogram. If not
                 provided, the used interval is calculated depending on beta, a, and b.
-            bins (int, default=100): It defines the number of equal-width bins within the
-                provided interval or range.
+            num_x_vals (int, default=100): It defines the number of evenly spaced x values
+                within the given interval or range in which the function (callable) is evaluated.
             savefig_path (string, default=None): path to save the created figure. If it is not
                 provided, the plot is shown at the end of the routine.
         
@@ -1050,19 +920,19 @@ class ManovaSpectrumDistribution:
         if interval is None:
             interval = (self.lambda_minus, self.lambda_plus)
         
-        _plot_func(
-            interval, func=self.pdf, bins=bins, plot_title="Manova spectrum PDF",
+        plot_func(
+            interval, func=self._pdf, num_x_vals=num_x_vals, plot_title="Manova spectrum PDF",
             plot_ylabel="probability density", savefig_path=savefig_path
         )
 
-    def plot_cdf(self, interval=None, bins=1000, savefig_path=None):
+    def plot_cdf(self, interval=None, num_x_vals=1000, savefig_path=None):
         """Plots the CDF of the Manova Spectrum distribution.
 
         Args:
             interval (tuple, default=None): Delimiters (xmin, xmax) of the histogram. If not
                 provided, the used interval is calculated depending on beta, a, and b.
-            bins (int, default=100): It defines the number of equal-width bins within the
-                provided interval or range.
+            num_x_vals (int, default=100): It defines the number of evenly spaced x values
+                within the given interval or range in which the function (callable) is evaluated.
             savefig_path (string, default=None): path to save the created figure. If it is not
                 provided, the plot is shown at the end of the routine.
         
@@ -1070,13 +940,13 @@ class ManovaSpectrumDistribution:
         if interval is None:
             interval = (self.lambda_minus, self.lambda_plus)
 
-        _plot_func(
-            interval, func=self.cdf, bins=bins, plot_title="Manova spectrum CDF",
+        plot_func(
+            interval, func=self._cdf, num_x_vals=num_x_vals, plot_title="Manova spectrum CDF",
             plot_ylabel="cumulative distribution", savefig_path=savefig_path
         )
 
-    def plot_empirical_pdf(self, m_size=1000, n1_size=None, n2_size=None, bins=100, interval=None,
-                           density=False, plot_law_pdf=False, savefig_path=None):
+    def plot_empirical_pdf(self, sample_size=1000, bins=100, interval=None, density=False,
+                           plot_law_pdf=False, savefig_path=None, random_state=None):
         """Computes and plots Manova spectrum empirical pdf and analytical distribution.
 
         Calculates and plots Manova spectrum empirical pdf using Manova Ensemble random matrices.
@@ -1108,6 +978,8 @@ class ManovaSpectrumDistribution:
                 edge of the last bin; in this case, bins may be unequally spaced.
             interval (tuple, default=None): Delimiters (xmin, xmax) of the histogram.
                 The lower and upper range of the bins. Lower and upper outliers are ignored.
+                If one of the bounds of the specified interval is outside of the minimum default
+                interval, this will be adjusted to show the distribution bulk properly.
             density (bool, default=False): If True, draw and return a probability
                 density: each bin will display the bin's raw count divided by the total
                 number of counts and the bin width, so that the area under the histogram
@@ -1118,6 +990,9 @@ class ManovaSpectrumDistribution:
                 considered when the argument 'density' is set also to True.
             savefig_path (string, default=None): path to save the created figure. If it is not
                 provided, the plot is shown are the end of the routine.
+            random_state (int, default=None): random seed to initialize the pseudo-random
+                number generator of numpy. This has to be any integer between 0 and 2**32 - 1
+                (inclusive), or None (default). If None, the seed is obtained from the clock.
 
         References:
             - Laszlo, L. and Farrel, B.
@@ -1131,60 +1006,40 @@ class ManovaSpectrumDistribution:
                 Journal of Mathematical Physics. 43.11 (2002): 5830-5847.
 
         """
-        if m_size<1 or (n1_size is not None and n1_size<1) or (n2_size is not None and n2_size<1):
-            raise ValueError("matrix size must be positive")
-
-        if n1_size is None:
-            n1_size = round(self.a * m_size)
-        
-        if n2_size is None:
-            n2_size = round(self.b * m_size)
-
-        ens = ManovaEnsemble(beta=self.beta, m=m_size, n1=n1_size, n2=n2_size)
-
-        # computing approximated ratios since the n1_size and n2_size parameters
-        # could have been rounded previously
-        approx_a = n1_size/m_size
-        approx_b = n2_size/m_size
-        if approx_a <= 1 or approx_b <= 1:
-            print("Warning: sample size ('n1_size' or 'n2_size') too small compared "
-                  "to degrees of freedom ('m_size'). It may cause numerical instability.")
-        lambda_term1 = np.sqrt((approx_a/(approx_a+approx_b)) * (1 - (1/(approx_a+approx_b))))
-        lambda_term2 = np.sqrt((1/(approx_a+approx_b)) * (1 - (approx_a/(approx_a+approx_b))))
-        lambda_minus = (lambda_term1 - lambda_term2)**2
-        lambda_plus = (lambda_term1 + lambda_term2)**2
+        # pylint: disable=too-many-arguments
+        if sample_size<1:
+            raise ValueError("Negative eigenvalue sample size (given = {sample_size})."
+                             " Please, provide a sample size greater or equal than 1.")
 
         if interval is None:
-            interval = [lambda_minus, lambda_plus]
-            if approx_a <= 1:
-                interval[0] = min(-0.05, lambda_minus)
-            if approx_b <= 1:
-                interval[1] = max(lambda_plus, 1.05)
-            interval = tuple(interval)
+            range_interval = self.default_interval
+        else:
+            xmin = min(interval[0], self.default_interval[0])
+            xmax = max(interval[1], self.default_interval[1])
+            if interval[0] > self.default_interval[0]:
+                print(f"Lower bound of interval too large. Setting lower bound to {xmin}.")
+            if interval[1] < self.default_interval[1]:
+                print(f"Upper bound of interval too large. Setting upper bound to {xmax}.")
+            range_interval = (xmin, xmax)
+            print(f"Setting plot interval to {range_interval}.")
 
-        observed, bins = ens.eigval_hist(
-            bins=bins,
-            interval=interval,
-            density=density,
-            normalize=True,
-            avoid_img=True
-        )
+        random_samples = self._rvs(size=sample_size, random_state=random_state, _random_state=random_state)
+        observed, bin_edges = np.histogram(random_samples, bins=bins, range=range_interval, density=density)
 
-        width = bins[1]-bins[0]
-        plt.bar(bins[:-1], observed, width=width, align='edge')
+        width = bin_edges[1]-bin_edges[0]
+        plt.bar(bin_edges[:-1], observed, width=width, align='edge')
 
         # Plotting theoretical graphic
         if plot_law_pdf and density:
-            centers = np.array(_get_bins_centers_and_contour(bins))
+            centers = np.asarray(get_bins_centers_and_contour(bin_edges))
             # creating new instance with the approximated ratios depending on the given matrix sizes
-            msd = ManovaSpectrumDistribution(beta=self.beta, a=approx_a, b=approx_b)
-            pdf = msd.pdf(centers)
+            pdf = self._pdf(centers)
             plt.plot(centers, pdf, color='red', linewidth=2)
 
         plt.title("Manova Spectrum - Eigenvalue histogram", fontweight="bold")
         plt.xlabel("x")
         plt.ylabel("probability density")
-        if approx_a <= 1 or approx_b <= 1:
+        if self.ratio_a <= 1 or self.ratio_b <= 1:
             if plot_law_pdf and density:
                 ylim_vals = pdf
             else:

@@ -52,20 +52,19 @@ goe.plot_eigval_hist(bins=80, interval=(-10, 10), normalize=False)
 import numpy as np
 from skrmt.ensemble import GaussianEnsemble
 
-n=1000
-goe = GaussianEnsemble(beta=1, n=n)
+goe = GaussianEnsemble(beta=1, n=1000)
 goe.plot_eigval_hist(bins=80, interval=(-10, 10), normalize=True)
 
 ##############################################################################
 # Additionally, we can control the plotting interval to get a better picture
 # of the spectral density. In the GOE case, the spectral distribution is
-# concentrated in the (-2,2) interval.
+# concentrated in the (-2,2) interval. Note that the user does *not* need to
+# worry about the interval, **scikit-rmt** uses an adequate interval by default.
 
 import numpy as np
 from skrmt.ensemble import GaussianEnsemble
 
-n=1000
-goe = GaussianEnsemble(beta=1, n=n)
+goe = GaussianEnsemble(beta=1, n=1000)
 goe.plot_eigval_hist(bins=80, interval=(-2, 2), normalize=True)
 
 ##############################################################################
@@ -78,18 +77,16 @@ goe.plot_eigval_hist(bins=80, interval=(-2, 2), normalize=True)
 
 from skrmt.ensemble import WishartEnsemble
 
-p, n = 1000, 3000
-wre = WishartEnsemble(beta=1, p=p, n=n)
+wre = WishartEnsemble(beta=1, p=1000, n=3000)
 wre.plot_eigval_hist(bins=80, interval=(-5,5))
 
 ##############################################################################
-# By default, scikit-rmt takes charge of using the most suitable plotting
+# By default, **scikit-rmt** takes charge of using the most suitable plotting
 # interval and eigenvalue normalization constant.
 
 from skrmt.ensemble import WishartEnsemble
 
-p, n = 1000, 3000
-wre = WishartEnsemble(beta=1, p=p, n=n)
+wre = WishartEnsemble(beta=1, p=1000, n=3000)
 wre.plot_eigval_hist(bins=80)
 
 ##############################################################################
@@ -135,15 +132,15 @@ wre.plot_eigval_hist(bins=80)
 from skrmt.ensemble.spectral_law import WignerSemicircleDistribution
 
 wsd = WignerSemicircleDistribution(beta=1)
-wsd.plot_empirical_pdf(n_size=2000, bins=80)
+wsd.plot_empirical_pdf(sample_size=2000, bins=80)
 
 ##############################################################################
 # We can also study **Marchenko-Pastur Law** as by:
 
 from skrmt.ensemble.spectral_law import MarchenkoPasturDistribution
 
-mpd = MarchenkoPasturDistribution(ratio=1/3, beta=1)
-mpd.plot_empirical_pdf(n_size=6000, bins=80)
+mpd = MarchenkoPasturDistribution(beta=1, ratio=1/3)
+mpd.plot_empirical_pdf(sample_size=2000, bins=80)
 
 ##############################################################################
 # Finally, **Tracy-Widom Law** can be represented using:
@@ -151,7 +148,7 @@ mpd.plot_empirical_pdf(n_size=6000, bins=80)
 from skrmt.ensemble.spectral_law import TracyWidomDistribution
 
 twd = TracyWidomDistribution(beta=1)
-twd.plot_empirical_pdf(n_size=100, times=10000, bins=80)
+twd.plot_empirical_pdf(sample_size=2000, bins=80)
 
 ##############################################################################
 # Spectral laws analytical expression
@@ -171,7 +168,7 @@ twd.plot_empirical_pdf(n_size=100, times=10000, bins=80)
 from skrmt.ensemble.spectral_law import WignerSemicircleDistribution
 
 wsd = WignerSemicircleDistribution(beta=1)
-wsd.plot_empirical_pdf(n_size=2000, bins=80, density=True, plot_law_pdf=True)
+wsd.plot_empirical_pdf(sample_size=2000, bins=80, density=True, plot_law_pdf=True)
 
 ##############################################################################
 # The analytical probability function for the Wishart Ensemble known as
@@ -183,8 +180,8 @@ wsd.plot_empirical_pdf(n_size=2000, bins=80, density=True, plot_law_pdf=True)
 
 from skrmt.ensemble.spectral_law import MarchenkoPasturDistribution
 
-mpd = MarchenkoPasturDistribution(ratio=1/3, beta=1)
-mpd.plot_empirical_pdf(n_size=6000, bins=80, density=True, plot_law_pdf=True)
+mpd = MarchenkoPasturDistribution(beta=1, ratio=1/3)
+mpd.plot_empirical_pdf(sample_size=2000, bins=80, density=True, plot_law_pdf=True)
 
 ##############################################################################
 # In the other hand, the Tracy-Widom Law has a complex analytical expression,
@@ -198,7 +195,7 @@ mpd.plot_empirical_pdf(n_size=6000, bins=80, density=True, plot_law_pdf=True)
 from skrmt.ensemble.spectral_law import TracyWidomDistribution
 
 twd = TracyWidomDistribution(beta=1)
-twd.plot_empirical_pdf(n_size=10, times=5000, bins=80, density=True, plot_law_pdf=True)
+twd.plot_empirical_pdf(sample_size=2000, bins=80, density=True, plot_law_pdf=True)
 
 ##############################################################################
 # Finally, the limiting distribution of the Manova Ensemble is not described
@@ -208,5 +205,5 @@ twd.plot_empirical_pdf(n_size=10, times=5000, bins=80, density=True, plot_law_pd
 
 from skrmt.ensemble.spectral_law import ManovaSpectrumDistribution
 
-msd = ManovaSpectrumDistribution(a=3, b=3, beta=1)
-msd.plot_empirical_pdf(m_size=1000, bins=80, density=True, plot_law_pdf=True)
+msd = ManovaSpectrumDistribution(beta=1, a=3, b=3)
+msd.plot_empirical_pdf(sample_size=2000, bins=80, density=True, plot_law_pdf=True)

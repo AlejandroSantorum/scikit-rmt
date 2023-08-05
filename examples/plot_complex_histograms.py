@@ -25,13 +25,13 @@ from skrmt.ensemble import CircularEnsemble
 # In this example, eigenvalue spectrum of CUE random matrix is shown.
 
 cue = CircularEnsemble(beta=2, n=1000)
-cue.plot_eigval_hist(bins=80, interval=(-2.2,2.2))
+cue.plot_eigval_hist(bins=80)
 
 ##############################################################################
 # And the eigenvalue spectrum of CSE.
 
 cse = CircularEnsemble(beta=4, n=1000)
-cse.plot_eigval_hist(bins=80, interval=(-2.2,2.2))
+cse.plot_eigval_hist(bins=80)
 
 ##############################################################################
 # The provided heatmap gives an illustration of the eigenvalue accumulation.

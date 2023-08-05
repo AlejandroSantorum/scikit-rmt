@@ -36,6 +36,14 @@ skrmt.ensemble.circular\_ensemble module
    :undoc-members:
    :show-inheritance:
 
+skrmt.ensemble.utils module
+----------------------------------------
+
+.. automodule:: skrmt.ensemble.utils
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 skrmt.ensemble.tridiagonal\_utils module
 ----------------------------------------
 

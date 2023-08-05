@@ -11,7 +11,7 @@ import numpy as np
 from scipy import sparse, special
 import matplotlib.pyplot as plt
 
-from ._base_ensemble import _Ensemble
+from .base_ensemble import _Ensemble
 from .tridiagonal_utils import tridiag_eigval_hist
 
 #########################################################################
@@ -59,7 +59,7 @@ class GaussianEnsemble(_Ensemble):
 
     """
 
-    def __init__(self, beta, n, use_tridiagonal=False, sigma=1.0):
+    def __init__(self, beta, n, use_tridiagonal=False, sigma=1.0, random_state=None):
         """Constructor for GaussianEnsemble class.
 
         Initializes an instance of this class with the given parameters.
@@ -76,6 +76,10 @@ class GaussianEnsemble(_Ensemble):
                 its standard form.
             sigma (float, 1.0): scale (standard deviation) of the random entries of the
                 sampled matrix.
+            random_state (int, default=None): random seed to initialize the pseudo-random
+                number generator of numpy before sampling the random matrix instance. This 
+                has to be any integer between 0 and 2**32 - 1 (inclusive), or None (default).
+                If None, the seed is obtained from the clock.
 
         """
         if beta not in [1,2,4]:
@@ -89,7 +93,7 @@ class GaussianEnsemble(_Ensemble):
         self.sigma = sigma
         self.radius = 2 * np.sqrt(self.beta) * self.sigma
         self._eigvals = None
-        self.matrix = self.sample()
+        self.matrix = self.sample(random_state=random_state)
 
         # default eigenvalue normalization constant
         self.eigval_norm_const = 1/np.sqrt(2*self.n) if self.beta==4 else 1/np.sqrt(self.n)
@@ -101,8 +105,7 @@ class GaussianEnsemble(_Ensemble):
             4: (-4*np.sqrt(2*self.n), 4*np.sqrt(2*self.n)),
         }
 
-
-    def set_size(self, n, resample_mtx=True):
+    def set_size(self, n, resample_mtx=True, random_state: int = None):
         # pylint: disable=arguments-differ
         """Setter of matrix size.
 
@@ -114,14 +117,17 @@ class GaussianEnsemble(_Ensemble):
                 GSE are of size 2n times 2n.
             resample_mtx (bool, default=True): If set to True, the ensemble matrix is
                 resampled with the new dimensions.
+            random_state (int, default=None): random seed to initialize the pseudo-random
+                number generator of numpy. This has to be any integer between 0 and 2**32 - 1
+                (inclusive), or None (default). If None, the seed is obtained from the clock.
 
         """
         self.n = n
         if resample_mtx:
-            self.matrix = self.sample()
+            self.matrix = self.sample(random_state=random_state)
 
     # pylint: disable=inconsistent-return-statements
-    def sample(self):
+    def sample(self, random_state: int = None):
         """Samples new Gaussian Ensemble random matrix.
 
         The sampling algorithm depends on the specification of
@@ -130,6 +136,11 @@ class GaussianEnsemble(_Ensemble):
         is sampled. Otherwise, it is sampled using the standard
         form.
 
+        Args:
+            random_state (int, default=None): random seed to initialize the pseudo-random
+                number generator of numpy. This has to be any integer between 0 and 2**32 - 1
+                (inclusive), or None (default). If None, the seed is obtained from the clock.
+
         Returns:
             numpy array containing new matrix sampled.
 
@@ -137,6 +148,9 @@ class GaussianEnsemble(_Ensemble):
             - Dumitriu, I. and Edelman, A. "Matrix Models for Beta Ensembles".
                 Journal of Mathematical Physics. 43.11 (2002): 5830-5847.
         """
+        if random_state is not None:
+            np.random.seed(random_state)
+
         if self.use_tridiagonal:
             return self.sample_tridiagonal()
 
@@ -244,7 +258,7 @@ class GaussianEnsemble(_Ensemble):
         self._eigvals = np.linalg.eigvalsh(self.matrix)
         return norm_const * self._eigvals
 
-    def eigval_hist(self, bins, interval=None, density=False, normalize=True, avoid_img=False):
+    def eigval_hist(self, bins, interval=None, density=False, normalize=False, avoid_img=False):
         if self.use_tridiagonal:
             if normalize:
                 return tridiag_eigval_hist(
@@ -258,7 +272,7 @@ class GaussianEnsemble(_Ensemble):
         return super().eigval_hist(bins, interval=interval, density=density,
                                    normalize=normalize, avoid_img=avoid_img)
 
-    def plot_eigval_hist(self, bins=100, interval=None, density=False, normalize=True, fig_path=None):
+    def plot_eigval_hist(self, bins=100, interval=None, density=False, normalize=False, savefig_path=None):
         """Computes and plots the histogram of the matrix eigenvalues.
 
         Calculates and plots the histogram of the current sampled matrix eigenvalues.
@@ -278,11 +292,11 @@ class GaussianEnsemble(_Ensemble):
                 number of counts and the bin width, so that the area under the histogram
                 integrates to 1. If set to False, the absolute frequencies of the eigenvalues
                 are returned.
-            normalize (bool, default=True): Whether to normalize the computed eigenvalues
-                by the default normalization constant (see references). Defaults to True, i.e.,
-                the eigenvalues are normalized. Normalization makes the eigenvalues to be in the
-                same support independently of the sample size.
-            fig_path (string, default=None): path to save the created figure. If it is not
+            normalize (bool, default=False): Whether to normalize the computed eigenvalues
+                by the default normalization constant (see references). Defaults to False, i.e.,
+                the eigenvalues are not normalized. Normalization makes the eigenvalues to be
+                in the same support independently of the sample size.
+            savefig_path (string, default=None): path to save the created figure. If it is not
                 provided, the plot is shown at the end of the routine.
 
         References:
@@ -302,18 +316,18 @@ class GaussianEnsemble(_Ensemble):
 
         if self.use_tridiagonal:
             # pylint: disable=too-many-arguments
-            observed, bins = self.eigval_hist(
+            observed, bin_edges = self.eigval_hist(
                 bins=bins, interval=interval, density=density, normalize=normalize
             )
+            width = bin_edges[1]-bin_edges[0]
+            plt.bar(bin_edges[:-1], observed, width=width, align='edge')
 
-            width = bins[1]-bins[0]
-            plt.bar(bins[:-1], observed, width=width, align='edge')
             plt.title("Eigenvalue histogram", fontweight="bold")
             plt.xlabel("x")
             plt.ylabel("density")
             # Saving plot or showing it
-            if fig_path:
-                plt.savefig(fig_path, dpi=1000)
+            if savefig_path:
+                plt.savefig(savefig_path, dpi=1000)
             else:
                 plt.show()
 
@@ -324,7 +338,7 @@ class GaussianEnsemble(_Ensemble):
                 interval=interval,
                 density=density,
                 normalize=normalize,
-                fig_path=fig_path,
+                savefig_path=savefig_path,
             )
 
     def joint_eigval_pdf(self, eigvals=None):

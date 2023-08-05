@@ -46,11 +46,16 @@ class _Ensemble(metaclass=ABCMeta):
         self.eigval_norm_const = 1.0
 
     @abstractmethod
-    def sample(self):
+    def sample(self, random_state: int = None):
         """Samples new random matrix.
 
         The sampling algorithm depends on the inherited classes, so it should be
         specified by them.
+
+        Args:
+            random_state (int, default=None): random seed to initialize the pseudo-random
+                number generator of numpy. This has to be any integer between 0 and 2**32 - 1
+                (inclusive), or None (default). If None, the seed is obtained from the clock.
 
         Returns:
             numpy array containing new matrix sampled.
@@ -97,7 +102,7 @@ class _Ensemble(metaclass=ABCMeta):
         bins,
         interval=None,
         density=False,
-        normalize=True,
+        normalize=False,
         avoid_img=False
     ):
         """Calculates the histogram of the matrix eigenvalues.
@@ -121,10 +126,10 @@ class _Ensemble(metaclass=ABCMeta):
                 number of counts and the bin width, so that the area under the histogram
                 integrates to 1. If set to False, the absolute frequencies of the eigenvalues
                 are returned.
-            normalize (bool, default=True): Whether to normalize the computed eigenvalues
-                by the default normalization constant (see references). Defaults to True, i.e.,
-                the eigenvalues are normalized. Normalization makes the eigenvalues to be in the
-                same support independently of the sample size.
+            normalize (bool, default=False): Whether to normalize the computed eigenvalues
+                by the default normalization constant (see references). Defaults to False,
+                i.e., the eigenvalues are normalized. Normalization makes the eigenvalues
+                to be in the same support independently of the sample size.
             avoid_img (bool, default=False): If True, eigenvalue imaginary part is ignored.
                 This should be used when the eigenvalue compatation is expected to generate
                 complex eigenvalues with really small imaginary part because of computing
@@ -136,8 +141,8 @@ class _Ensemble(metaclass=ABCMeta):
                 True these values are the relative frequencies in order to get an area under
                 the histogram equal to 1. Otherwise, this list contains the absolute
                 frequencies of the eigenvalues.
-                bins (array): The edges of the bins. Length nbins + 1 (nbins left edges and
-                right edge of last bin)
+                bin_edges (array): The edges of the bins. Length nbins + 1 (nbins left edges
+                and right edge of last bin)
 
         Raises:
             ValueError if interval is not a tuple.
@@ -161,9 +166,9 @@ class _Ensemble(metaclass=ABCMeta):
         if avoid_img:
             eigvals = eigvals.real
 
-        # using numpy to obtain histogram in the given interval and no. of bins
-        observed, bins = np.histogram(eigvals, bins=bins, range=interval, density=density)
-        return observed, bins
+        # using numpy to obtain histogram in the given interval and bins
+        observed, bin_edges = np.histogram(eigvals, bins=bins, range=interval, density=density)
+        return observed, bin_edges
 
 
     def plot_eigval_hist(
@@ -171,8 +176,8 @@ class _Ensemble(metaclass=ABCMeta):
         bins,
         interval=None,
         density=False,
-        normalize=True,
-        fig_path=None,
+        normalize=False,
+        savefig_path=None,
         avoid_img=False
     ):
         """Computes and plots the histogram of the matrix eigenvalues.
@@ -197,15 +202,15 @@ class _Ensemble(metaclass=ABCMeta):
                 number of counts and the bin width, so that the area under the histogram
                 integrates to 1. If set to False, the absolute frequencies of the eigenvalues
                 are returned.
-            normalize (bool, default=True): Whether to normalize the computed eigenvalues
-                by the default normalization constant (see references). Defaults to True, i.e.,
-                the eigenvalues are normalized. Normalization makes the eigenvalues to be in the
-                same support independently of the sample size.
+            normalize (bool, default=False): Whether to normalize the computed eigenvalues
+                by the default normalization constant (see references). Defaults to False,
+                i.e., the eigenvalues are normalized. Normalization makes the eigenvalues
+                to be in the same support independently of the sample size.
             avoid_img (bool, default=False): If True, eigenvalue imaginary part is ignored.
                 This should be used when the eigenvalue compatation is expected to generate
                 complex eigenvalues with really small imaginary part because of computing
                 rounding errors. E.g.: MANOVA Ensemble eigenvalues.
-            fig_path (string, default=None): path to save the created figure. If it is not
+            savefig_path (string, default=None): path to save the created figure. If it is not
                 provided, the plot is shown at the end of the routine.
 
         References:
@@ -218,20 +223,21 @@ class _Ensemble(metaclass=ABCMeta):
 
         """
         # pylint: disable=too-many-arguments
-        if not isinstance(interval, tuple):
-            raise ValueError("interval argument must be a tuple")
+        if interval is not None:
+            if not isinstance(interval, tuple):
+                raise ValueError("interval argument must be a tuple")
 
-        observed, bins = self.eigval_hist(bins=bins, interval=interval, density=density,
-                                          normalize=normalize, avoid_img=avoid_img)
-        width = bins[1]-bins[0]
-        plt.bar(bins[:-1], observed, width=width, align='edge')
+        observed, bin_edges = self.eigval_hist(bins=bins, interval=interval, density=density,
+                                               normalize=normalize, avoid_img=avoid_img)
+        width = bin_edges[1]-bin_edges[0]
+        plt.bar(bin_edges[:-1], observed, width=width, align='edge')
 
         plt.title("Eigenvalue histogram", fontweight="bold")
         plt.xlabel("x")
         plt.ylabel("density")
 
         # Saving plot or showing it
-        if fig_path:
-            plt.savefig(fig_path, dpi=1200)
+        if savefig_path:
+            plt.savefig(savefig_path, dpi=1200)
         else:
             plt.show()

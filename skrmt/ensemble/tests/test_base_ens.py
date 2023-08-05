@@ -7,7 +7,7 @@ import os
 import pytest
 import shutil
 
-from skrmt.ensemble._base_ensemble import _Ensemble
+from skrmt.ensemble.base_ensemble import _Ensemble
 from skrmt.ensemble.gaussian_ensemble import GaussianEnsemble
 
 
@@ -62,9 +62,9 @@ def test_base_set_eigval_norm_const():
 
 
 def test_base_ens_plot():
-        '''Testing WignerSemicircleDistribution plot pdf
-        '''
-        fig_name = "test_base_ens_plot_eigval_hist.png"
-        goe = GaussianEnsemble(beta=1, n=100, use_tridiagonal=False)
-        goe.plot_eigval_hist(fig_path=TMP_DIR_PATH+"/"+fig_name)
-        assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name)) == True
+    """Testing plot eigval hist
+    """
+    fig_name = "test_base_ens_plot_eigval_hist.png"
+    goe = GaussianEnsemble(beta=1, n=100, use_tridiagonal=False)
+    goe.plot_eigval_hist(savefig_path=TMP_DIR_PATH+"/"+fig_name)
+    assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name)) == True

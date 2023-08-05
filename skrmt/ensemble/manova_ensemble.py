@@ -10,7 +10,7 @@ and Manova Quaternion Ensemble.
 import numpy as np
 from scipy import special
 
-from ._base_ensemble import _Ensemble
+from .base_ensemble import _Ensemble
 
 
 #########################################################################
@@ -67,7 +67,7 @@ class ManovaEnsemble(_Ensemble):
 
     """
 
-    def __init__(self, beta, m, n1, n2):
+    def __init__(self, beta, m, n1, n2, random_state=None):
         """Constructor for ManovaEnsemble class.
 
         Initializes an instance of this class with the given parameters.
@@ -81,6 +81,10 @@ class ManovaEnsemble(_Ensemble):
                 that generates the matrix of the corresponding ensemble.
             n2 (int): number of columns of the second random guassian matrix
                 that generates the matrix of the corresponding ensemble.
+            random_state (int, default=None): random seed to initialize the pseudo-random
+                number generator of numpy before sampling the random matrix instance. This 
+                has to be any integer between 0 and 2**32 - 1 (inclusive), or None (default).
+                If None, the seed is obtained from the clock.
 
         """
         super().__init__()
@@ -90,9 +94,9 @@ class ManovaEnsemble(_Ensemble):
         self.n2 = n2
         self.beta = beta
         self._eigvals = None
-        self.matrix = self.sample()
+        self.matrix = self.sample(random_state=random_state)
 
-    def set_size(self, m, n1, n2, resample_mtx=True):
+    def set_size(self, m, n1, n2, resample_mtx=True, random_state: int = None):
         # pylint: disable=arguments-differ
         """Setter of matrix size.
 
@@ -107,22 +111,30 @@ class ManovaEnsemble(_Ensemble):
                 that generates the matrix of the corresponding ensemble.
             resample_mtx (bool, default=True): If set to True, the ensemble matrix is
                 resampled with the new dimensions.
+            random_state (int, default=None): random seed to initialize the pseudo-random
+                number generator of numpy. This has to be any integer between 0 and 2**32 - 1
+                (inclusive), or None (default). If None, the seed is obtained from the clock.
 
         """
         self.m = m
         self.n1 = n1
         self.n2 = n2
         if resample_mtx:
-            self.matrix = self.sample()
+            self.matrix = self.sample(random_state=random_state)
 
     # pylint: disable=inconsistent-return-statements
-    def sample(self):
+    def sample(self, random_state: int = None):
         """Samples new Manova Ensemble random matrix.
 
         The sampling algorithm depends on the specification of
         beta parameter. If beta=1, Manova Real is sampled; if
         beta=2 Manova Complex is sampled and if beta=4
         Manova Quaternion is sampled.
+
+        Args:
+            random_state (int, default=None): random seed to initialize the pseudo-random
+                number generator of numpy. This has to be any integer between 0 and 2**32 - 1
+                (inclusive), or None (default). If None, the seed is obtained from the clock.
 
         Returns:
             numpy array containing new matrix sampled.
@@ -132,6 +144,9 @@ class ManovaEnsemble(_Ensemble):
                 Journal of Mathematical Physics. 43.11 (2002): 5830-5847.
 
         """
+        if random_state is not None:
+            np.random.seed(random_state)
+
         if self.beta == 1:
             return self._sample_mre()
         if self.beta == 2:
@@ -226,7 +241,7 @@ class ManovaEnsemble(_Ensemble):
         self._eigvals = np.linalg.eigvals(self.matrix)
         return norm_const * self._eigvals
 
-    def plot_eigval_hist(self, bins, interval=(0,1), density=False, normalize=True, fig_path=None):
+    def plot_eigval_hist(self, bins, interval=(0,1), density=False, normalize=False, savefig_path=None):
         """Computes and plots the histogram of the matrix eigenvalues
 
         Calculates and plots the histogram of the current sampled matrix eigenvalues.
@@ -243,11 +258,11 @@ class ManovaEnsemble(_Ensemble):
                 number of counts and the bin width, so that the area under the histogram
                 integrates to 1. If set to False, the absolute frequencies of the eigenvalues
                 are returned.
-            normalize (bool, default=True): Whether to normalize the computed eigenvalues
-                by the default normalization constant (see references). Defaults to True, i.e.,
-                the eigenvalues are normalized. Normalization makes the eigenvalues to be in the
-                same support independently of the sample size.
-            fig_path (string, default=None): path to save the created figure. If it is not
+            normalize (bool, default=False): Whether to normalize the computed eigenvalues
+                by the default normalization constant (see references). Defaults to False, i.e.,
+                the eigenvalues are not normalized. Normalization makes the eigenvalues to be
+                in the same support independently of the sample size.
+            savefig_path (string, default=None): path to save the created figure. If it is not
                 provided, the plot is shown at the end of the routine.
 
         References:
@@ -265,7 +280,7 @@ class ManovaEnsemble(_Ensemble):
             interval=interval,
             density=density,
             normalize=normalize,
-            fig_path=fig_path,
+            savefig_path=savefig_path,
             avoid_img=True,
         )
 
