@@ -271,7 +271,7 @@ fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12,4))
 
 for a in [1.0, 1.2, 1.4, 1.6]:
     for b in [2.0]:
-        msd = ManovaSpectrumDistribution(beta=1, a=a, b=b)
+        msd = ManovaSpectrumDistribution(beta=1, ratio_a=a, ratio_b=b)
 
         y1 = msd.pdf(x1)
         y2 = msd.pdf(x2)

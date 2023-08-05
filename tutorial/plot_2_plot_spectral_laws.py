@@ -205,5 +205,5 @@ twd.plot_empirical_pdf(sample_size=2000, bins=80, density=True, plot_law_pdf=Tru
 
 from skrmt.ensemble.spectral_law import ManovaSpectrumDistribution
 
-msd = ManovaSpectrumDistribution(beta=1, a=3, b=3)
+msd = ManovaSpectrumDistribution(beta=1, ratio_a=3, ratio_b=3)
 msd.plot_empirical_pdf(sample_size=2000, bins=80, density=True, plot_law_pdf=True)
