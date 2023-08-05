@@ -8,8 +8,32 @@ from typing import Union, Sequence
 import matplotlib.pyplot as plt
 
 from .base_ensemble import _Ensemble
+from .gaussian_ensemble import GaussianEnsemble
 from .tracy_widom_approximator import TW_Approximator
+from .spectral_law import WignerSemicircleDistribution
 from .misc import get_bins_centers_and_contour
+
+
+def plot_spectral_hist_and_law(
+    ensemble: _Ensemble,
+    bins: Union[int, Sequence] = 100,
+    savefig_path: str = None,
+):
+    
+    ens = GaussianEnsemble(n=1000, beta=1, random_state=1) # this would be pre-defined
+    observed, bin_edges = ens._plot_eigval_hist(bins=bins, density=True, normalize=True)
+
+    law_class = ens._law_class
+    centers = np.asarray(get_bins_centers_and_contour(bin_edges))
+    pdf = law_class.pdf(centers)
+    plt.plot(centers, pdf, color='red', linewidth=2)
+
+    # Saving plot or showing it
+    if savefig_path:
+        plt.savefig(savefig_path, dpi=1200)
+    else:
+        plt.show()
+
 
 
 def plot_max_eigvals_tracy_widom(
@@ -70,7 +94,6 @@ def plot_max_eigvals_tracy_widom(
         plt.savefig(savefig_path, dpi=1200)
     else:
         plt.show()
-
 
 
 def rand_mtx_max_eigvals(
