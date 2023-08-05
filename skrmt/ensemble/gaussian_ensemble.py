@@ -107,7 +107,7 @@ class GaussianEnsemble(_Ensemble):
         }
 
         # scikit-rmt class implementing the corresponding spectral law
-        self._law_class = WignerSemicircleDistribution(beta=self.beta, center=0.0, sigma=self.sigma) 
+        self._law_class = WignerSemicircleDistribution(beta=self.beta, center=0.0, sigma=self.sigma)
 
     def set_size(self, n, resample_mtx=True, random_state: int = None):
         # pylint: disable=arguments-differ
