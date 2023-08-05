@@ -17,7 +17,7 @@ from scipy import interpolate
 import collections.abc
 
 from .tracy_widom_approximator import TW_Approximator
-from .utils import relu, indicator, plot_func, get_bins_centers_and_contour
+from .misc import relu, indicator, plot_func, get_bins_centers_and_contour
 
 
 class WignerSemicircleDistribution:

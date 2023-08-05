@@ -12,7 +12,7 @@ from skrmt.ensemble import WignerSemicircleDistribution
 from skrmt.ensemble import MarchenkoPasturDistribution
 from skrmt.ensemble import TracyWidomDistribution
 from skrmt.ensemble import ManovaSpectrumDistribution
-from skrmt.ensemble.utils import indicator
+from skrmt.ensemble.misc import indicator
 
 
 TMP_DIR_PATH = os.path.join(os.getcwd(), "skrmt/ensemble/tests/tmp")
