@@ -1,5 +1,5 @@
 """
-Eigenvalue Independence
+Eigenvalue independence
 =======================
 
 In this tutorial, we highlight the fact that eigenvalues of a random matrix
@@ -68,7 +68,7 @@ plot_spectral_hist_and_law(ensemble=wre, bins=60)
 
 from skrmt.ensemble.spectral_law import MarchenkoPasturDistribution
 
-mpd = MarchenkoPasturDistribution(beta=1, ratio=3)
+mpd = MarchenkoPasturDistribution(beta=1, ratio=1/3)
 mpd.plot_empirical_pdf(
     sample_size=1000,
     bins=60,
