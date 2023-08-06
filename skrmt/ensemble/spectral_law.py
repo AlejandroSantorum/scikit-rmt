@@ -306,6 +306,8 @@ class MarchenkoPasturDistribution(rv_continuous):
             raise ValueError(f"Error: invalid beta. It has to be 1,2 or 4. Provided beta = {beta}.")
         if ratio <= 0:
             raise ValueError(f"Error: invalid ratio. It has to be positive. Provided ratio = {ratio}.")
+        if ratio >= 1:
+            print(f"Warning: setting ratio >= 1.0 may cause numerical instability. Provided ratio = {ratio}.")
 
         self.ratio = ratio
         self.beta = beta
