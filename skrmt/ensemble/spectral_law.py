@@ -144,7 +144,7 @@ class WignerSemicircleDistribution:
         
         plot_func(
             interval, func=self.pdf, num_x_vals=num_x_vals, plot_title="Wigner Semicircle law PDF", 
-            plot_ylabel="probability density", savefig_path=savefig_path
+            plot_ylabel="density", savefig_path=savefig_path
         )
     
     def plot_cdf(self, interval=None, num_x_vals=1000, savefig_path=None):
@@ -243,7 +243,7 @@ class WignerSemicircleDistribution:
 
         plt.title("Wigner Semicircle Law - Eigenvalue histogram", fontweight="bold")
         plt.xlabel("x")
-        plt.ylabel("probability density")
+        plt.ylabel("density")
 
         # Saving plot or showing it
         if savefig_path:
@@ -418,7 +418,7 @@ class MarchenkoPasturDistribution(rv_continuous):
         
         plot_func(
             interval, func=self._pdf, num_x_vals=num_x_vals, plot_title="Marchenko-Pastur law PDF",
-            plot_ylabel="probability density", savefig_path=savefig_path
+            plot_ylabel="density", savefig_path=savefig_path
         )
     
     def plot_cdf(self, interval=None, num_x_vals=1000, savefig_path=None):
@@ -528,7 +528,7 @@ class MarchenkoPasturDistribution(rv_continuous):
 
         plt.title("Marchenko-Pastur Law - Eigenvalue histogram", fontweight="bold")
         plt.xlabel("x")
-        plt.ylabel("probability density")
+        plt.ylabel("density")
         if self.ratio > 1:
             if plot_law_pdf and density:
                 ylim_vals = pdf
@@ -643,7 +643,7 @@ class TracyWidomDistribution(rv_continuous):
         
         plot_func(
             interval, func=self._pdf, num_x_vals=num_x_vals, plot_title="Tracy-Widom law PDF",
-            plot_ylabel="probability density", savefig_path=savefig_path
+            plot_ylabel="density", savefig_path=savefig_path
         )
     
     def plot_cdf(self, interval=None, num_x_vals=1000, savefig_path=None):
@@ -740,7 +740,7 @@ class TracyWidomDistribution(rv_continuous):
 
         plt.title("Tracy-Widom Law - Eigenvalue histogram", fontweight="bold")
         plt.xlabel("x")
-        plt.ylabel("probability density")
+        plt.ylabel("density")
 
         # Saving plot or showing it
         if savefig_path:
@@ -924,7 +924,7 @@ class ManovaSpectrumDistribution(rv_continuous):
         
         plot_func(
             interval, func=self._pdf, num_x_vals=num_x_vals, plot_title="Manova spectrum PDF",
-            plot_ylabel="probability density", savefig_path=savefig_path
+            plot_ylabel="density", savefig_path=savefig_path
         )
 
     def plot_cdf(self, interval=None, num_x_vals=1000, savefig_path=None):
@@ -1040,7 +1040,7 @@ class ManovaSpectrumDistribution(rv_continuous):
 
         plt.title("Manova Spectrum - Eigenvalue histogram", fontweight="bold")
         plt.xlabel("x")
-        plt.ylabel("probability density")
+        plt.ylabel("density")
         if self.ratio_a <= 1 or self.ratio_b <= 1:
             if plot_law_pdf and density:
                 ylim_vals = pdf
