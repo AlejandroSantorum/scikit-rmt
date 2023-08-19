@@ -48,7 +48,7 @@ class WishartEnsemble(_Ensemble):
             the matrix of the corresponding ensemble.
         n (int): number of columns of the guassian matrix that generates
             the matrix of the corresponding ensemble.
-        use_tridiagonal (bool): if set to True, Gaussian Ensemble
+        tridiagonal_form (bool): if set to True, Gaussian Ensemble
             matrices are sampled in its tridiagonal form, which has the same
             eigenvalues than its standard form. Otherwise, it is sampled using
             its standard form.
@@ -67,7 +67,7 @@ class WishartEnsemble(_Ensemble):
 
     """
 
-    def __init__(self, beta, p, n, use_tridiagonal=False, sigma=1.0, random_state=None):
+    def __init__(self, beta, p, n, tridiagonal_form=False, sigma=1.0, random_state=None):
         """Constructor for WishartEnsemble class.
 
         Initializes an instance of this class with the given parameters.
@@ -79,7 +79,7 @@ class WishartEnsemble(_Ensemble):
                 the matrix of the corresponding ensemble.
             n (int): number of columns of the guassian matrix that generates
                 the matrix of the corresponding ensemble.
-            use_tridiagonal (bool, default=False): if set to True, Wishart Ensemble
+            tridiagonal_form (bool, default=False): if set to True, Wishart Ensemble
                 matrices are sampled in its tridiagonal form, which has the same
                 eigenvalues than its standard form.
             sigma (float, 1.0): scale (standard deviation) of the random entries of the
@@ -98,7 +98,7 @@ class WishartEnsemble(_Ensemble):
         self.p = p
         self.n = n
         self.beta = beta
-        self.use_tridiagonal = use_tridiagonal
+        self.tridiagonal_form = tridiagonal_form
         self.sigma = sigma
         self._eigvals = None
         self.matrix = self.sample(random_state=random_state)
@@ -143,10 +143,10 @@ class WishartEnsemble(_Ensemble):
         """Samples new Wishart Ensemble random matrix.
 
         The sampling algorithm depends on the specification of
-        use_tridiagonal parameter. If use_tridiagonal is set to True,
-        a Wishart Ensemble random matrix in its tridiagonal form
-        is sampled. Otherwise, it is sampled using the standard
-        form.
+        ``tridiagonal_form`` parameter. If ``tridiagonal_form`` is
+        set to True, a Wishart Ensemble random matrix in its
+        tridiagonal form is sampled. Otherwise, it is sampled
+        using the standard form.
 
         Args:
             random_state (int, default=None): random seed to initialize the pseudo-random
@@ -163,12 +163,12 @@ class WishartEnsemble(_Ensemble):
         if random_state is not None:
             np.random.seed(random_state)
 
-        if self.use_tridiagonal:
+        if self.tridiagonal_form:
             if self.p > self.n:  # check reference ("Matrix Models for Beta Ensembles"): page 5, table 1.
                 raise ValueError("Error: cannot use tridiagonal form if 'p' (degrees of freedom)"
                                  " is greater than 'n' (sample size).\n"
                                  f"\t Provided n={self.n} and p={self.p}."
-                                 " Set `use_tridiagonal=False` or increase sample size (`n`).")
+                                 " Set `tridiagonal_form=False` or increase sample size (`n`).")
             
             if self.sigma != 1.0:
                 raise ValueError("Error: cannot sample tridiagonal random matrix using non-unitary scale"
@@ -288,7 +288,7 @@ class WishartEnsemble(_Ensemble):
             else:
                 interval = (self.n*self.lambda_minus, self.n*self.lambda_plus)
 
-        if self.use_tridiagonal:
+        if self.tridiagonal_form:
             if normalize:
                 return tridiag_eigval_hist(
                     self.eigval_norm_const * self.matrix,
@@ -346,31 +346,6 @@ class WishartEnsemble(_Ensemble):
             normalize=normalize,
             savefig_path=savefig_path,
         )
-
-        # if self.use_tridiagonal:
-        #     observed, bin_edges = self.eigval_hist(
-        #         bins=bins, interval=interval, density=density, normalize=normalize
-        #     )
-        #     width = bin_edges[1]-bin_edges[0]
-        #     plt.bar(bin_edges[:-1], observed, width=width, align='edge')
-
-        #     plt.title("Eigenvalue histogram", fontweight="bold")
-        #     plt.xlabel("x")
-        #     plt.ylabel("density")
-        #     # Saving plot or showing it
-        #     if savefig_path:
-        #         plt.savefig(savefig_path, dpi=1000)
-        #     else:
-        #         plt.show()
-
-        # else:
-        #     super().plot_eigval_hist(
-        #         bins=bins,
-        #         interval=interval,
-        #         density=density,
-        #         normalize=normalize,
-        #         savefig_path=savefig_path,
-        #     )
 
     def joint_eigval_pdf(self, eigvals=None):
         '''Computes joint eigenvalue pdf.
