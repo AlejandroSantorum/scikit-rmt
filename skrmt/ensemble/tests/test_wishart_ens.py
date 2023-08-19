@@ -21,11 +21,11 @@ def test_init_exception():
 
 def test_tridiagonal_ratio_exception():
     with pytest.raises(ValueError):
-        _ = WishartEnsemble(beta=1, p=300, n=100, use_tridiagonal=True)
+        _ = WishartEnsemble(beta=1, p=300, n=100, tridiagonal_form=True)
 
 def test_tridiagonal_sigma_exception():
     with pytest.raises(ValueError):
-        _ = WishartEnsemble(beta=1, p=100, n=300, sigma=2.0, use_tridiagonal=True)
+        _ = WishartEnsemble(beta=1, p=100, n=300, sigma=2.0, tridiagonal_form=True)
 
 
 ##########################################
@@ -89,7 +89,7 @@ def test_wre_build_tridiagonal():
 
     # sampling WishartReal tridiagonal
     np.random.seed(1)
-    wre = WishartEnsemble(beta=1, p=p_size, n=n_size, use_tridiagonal=True)
+    wre = WishartEnsemble(beta=1, p=p_size, n=n_size, tridiagonal_form=True)
 
     # sampling chi-squares and finding tridiagonal matrix in two ways
     np.random.seed(1)
@@ -135,8 +135,8 @@ def test_wre_tridiag_hist():
     '''Testing tridiagonal histogram of WRE
     '''
     p_size, n_size = 50, 100
-    wre1 = WishartEnsemble(beta=1, p=p_size, n=n_size, use_tridiagonal=False)
-    wre2 = WishartEnsemble(beta=1, p=p_size, n=n_size, use_tridiagonal=True)
+    wre1 = WishartEnsemble(beta=1, p=p_size, n=n_size, tridiagonal_form=False)
+    wre2 = WishartEnsemble(beta=1, p=p_size, n=n_size, tridiagonal_form=True)
 
     wre1.matrix = wre2.matrix
 
@@ -241,7 +241,7 @@ def test_wce_build_tridiagonal():
 
     # sampling WishartComplex tridiagonal
     np.random.seed(1)
-    wce = WishartEnsemble(beta=2, p=p_size, n=n_size, use_tridiagonal=True)
+    wce = WishartEnsemble(beta=2, p=p_size, n=n_size, tridiagonal_form=True)
 
     # sampling chi-squares and finding tridiagonal matrix in two ways
     np.random.seed(1)
@@ -271,8 +271,8 @@ def test_wce_tridiag_hist():
     '''Testing tridiagonal histogram of WCE
     '''
     p_size, n_size = 50, 100
-    wce1 = WishartEnsemble(beta=2, p=p_size, n=n_size, use_tridiagonal=False)
-    wce2 = WishartEnsemble(beta=2, p=p_size, n=n_size, use_tridiagonal=True)
+    wce1 = WishartEnsemble(beta=2, p=p_size, n=n_size, tridiagonal_form=False)
+    wce2 = WishartEnsemble(beta=2, p=p_size, n=n_size, tridiagonal_form=True)
 
     wce1.matrix = wce2.matrix
 
@@ -369,7 +369,7 @@ def test_wqe_build_tridiagonal():
 
     # sampling WishartQuaternion tridiagonal
     np.random.seed(1)
-    wqe = WishartEnsemble(beta=4, p=p_size, n=n_size, use_tridiagonal=True)
+    wqe = WishartEnsemble(beta=4, p=p_size, n=n_size, tridiagonal_form=True)
 
     # sampling chi-squares and finding tridiagonal matrix in two ways
     np.random.seed(1)
@@ -399,8 +399,8 @@ def test_wqe_tridiag_hist():
     '''Testing tridiagonal histogram of WQE
     '''
     p_size, n_size = 50, 100
-    wqe1 = WishartEnsemble(beta=4, p=p_size, n=n_size, use_tridiagonal=False)
-    wqe2 = WishartEnsemble(beta=4, p=p_size, n=n_size, use_tridiagonal=True)
+    wqe1 = WishartEnsemble(beta=4, p=p_size, n=n_size, tridiagonal_form=False)
+    wqe2 = WishartEnsemble(beta=4, p=p_size, n=n_size, tridiagonal_form=True)
 
     wqe1.matrix = wqe2.matrix
 
