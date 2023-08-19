@@ -28,7 +28,7 @@ of a spectral law (e.g. Wigner's Semicircle law) are actually drawn independentl
 from skrmt.ensemble.gaussian_ensemble import GaussianEnsemble
 from skrmt.ensemble.utils import plot_spectral_hist_and_law
 
-goe = GaussianEnsemble(beta=1, n=3000, use_tridiagonal=True)
+goe = GaussianEnsemble(beta=1, n=3000, tridiagonal_form=True)
 plot_spectral_hist_and_law(ensemble=goe, bins=60)
 
 ##############################################################################
@@ -59,7 +59,7 @@ wsd.plot_empirical_pdf(
 from skrmt.ensemble.wishart_ensemble import WishartEnsemble
 from skrmt.ensemble.utils import plot_spectral_hist_and_law
 
-wre = WishartEnsemble(beta=1, p=1000, n=3000, use_tridiagonal=True)
+wre = WishartEnsemble(beta=1, p=1000, n=3000, tridiagonal_form=True)
 plot_spectral_hist_and_law(ensemble=wre, bins=60)
 
 ##############################################################################
