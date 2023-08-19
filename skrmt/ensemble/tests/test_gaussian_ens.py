@@ -52,7 +52,6 @@ def test_goe_symmetric():
     assert (m_mtx.transpose() == m_mtx).all()
 
 
-
 def test_goe_set_size():
     '''Testing setter to change matrix sizes of GOE
     '''
@@ -70,6 +69,21 @@ def test_goe_set_size():
     goe.set_size(n2_size, resample_mtx=True, random_state=1)
     assert goe.n == n2_size
     assert goe.matrix.shape == (n2_size,n2_size)
+
+
+def test_goe_resample():
+    '''Testing resample of GOE
+    '''
+    n_size = 5
+    goe = GaussianEnsemble(beta=1, n=n_size, random_state=1)
+    assert goe.tridiagonal_form == False
+    
+    prev_mtx = np.copy(goe.matrix)
+    goe.resample(random_state=1)
+    assert_array_equal(prev_mtx, goe.matrix)
+
+    goe.resample(tridiagonal_form=True, random_state=1)
+    assert goe.tridiagonal_form == True
 
 
 def test_goe_build_tridiagonal():
@@ -207,6 +221,21 @@ def test_gue_set_size():
     assert gue.matrix.shape == (n2_size,n2_size)
 
 
+def test_gue_resample():
+    '''Testing resample of GUE
+    '''
+    n_size = 5
+    gue = GaussianEnsemble(beta=2, n=n_size, random_state=1)
+    assert gue.tridiagonal_form == False
+    
+    prev_mtx = np.copy(gue.matrix)
+    gue.resample(random_state=1)
+    assert_array_equal(prev_mtx, gue.matrix)
+
+    gue.resample(tridiagonal_form=True, random_state=1)
+    assert gue.tridiagonal_form == True
+
+
 def test_gue_build_tridiagonal():
     '''Testing tridiagonal form of GUE
     '''
@@ -310,6 +339,21 @@ def test_gse_set_size():
     gse.set_size(n2_size, resample_mtx=True, random_state=1)
     assert gse.n == n2_size
     assert gse.matrix.shape == (2*n2_size,2*n2_size)
+
+
+def test_gse_resample():
+    '''Testing resample of GSE
+    '''
+    n_size = 5
+    gse = GaussianEnsemble(beta=4, n=n_size, random_state=1)
+    assert gse.tridiagonal_form == False
+    
+    prev_mtx = np.copy(gse.matrix)
+    gse.resample(random_state=1)
+    assert_array_equal(prev_mtx, gse.matrix)
+
+    gse.resample(tridiagonal_form=True, random_state=1)
+    assert gse.tridiagonal_form == True
 
 
 def test_gse_build_tridiagonal():

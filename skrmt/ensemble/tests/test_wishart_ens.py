@@ -81,6 +81,22 @@ def test_wre_set_size():
     assert ens.matrix.shape == (p2_size,p2_size)
 
 
+def test_wre_resample():
+    '''Testing resample of WRE
+    '''
+    p_size = 3
+    n_size = 5
+    wre = WishartEnsemble(beta=1, p=p_size, n=n_size, random_state=1)
+    assert wre.tridiagonal_form == False
+    
+    prev_mtx = np.copy(wre.matrix)
+    wre.resample(random_state=1)
+    assert_array_equal(prev_mtx, wre.matrix)
+
+    wre.resample(tridiagonal_form=True, random_state=1)
+    assert wre.tridiagonal_form == True
+
+
 def test_wre_build_tridiagonal():
     '''Testing tridiagonal form of WRE
     '''
@@ -233,6 +249,22 @@ def test_wce_set_size():
     assert ens.matrix.shape == (p2_size,p2_size)
 
 
+def test_wce_resample():
+    '''Testing resample of WCE
+    '''
+    p_size = 3
+    n_size = 5
+    wce = WishartEnsemble(beta=2, p=p_size, n=n_size, random_state=1)
+    assert wce.tridiagonal_form == False
+    
+    prev_mtx = np.copy(wce.matrix)
+    wce.resample(random_state=1)
+    assert_array_equal(prev_mtx, wce.matrix)
+
+    wce.resample(tridiagonal_form=True, random_state=1)
+    assert wce.tridiagonal_form == True
+
+
 def test_wce_build_tridiagonal():
     '''Testing tridiagonal form of WCE
     '''
@@ -359,6 +391,22 @@ def test_wqe_set_size():
     assert ens.p == p_size2
     assert ens.n == n_size2
     assert ens.matrix.shape == (2*p_size2,2*p_size2)
+
+
+def test_wqe_resample():
+    '''Testing resample of WQE
+    '''
+    p_size = 3
+    n_size = 5
+    wqe = WishartEnsemble(beta=4, p=p_size, n=n_size, random_state=1)
+    assert wqe.tridiagonal_form == False
+    
+    prev_mtx = np.copy(wqe.matrix)
+    wqe.resample(random_state=1)
+    assert_array_equal(prev_mtx, wqe.matrix)
+
+    wqe.resample(tridiagonal_form=True, random_state=1)
+    assert wqe.tridiagonal_form == True
 
 
 def test_wqe_build_tridiagonal():

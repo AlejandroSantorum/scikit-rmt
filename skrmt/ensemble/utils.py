@@ -150,7 +150,7 @@ def rand_mtx_max_eigvals(
 
     max_eigvals = []
     for _ in range(n_eigvals):
-        ensemble.sample(random_state=None)
+        ensemble.resample(random_state=None)
         max_eigval = ensemble.eigvals(normalize=False).max()
         max_eigvals.append(max_eigval)
     
