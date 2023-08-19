@@ -64,6 +64,24 @@ class _Ensemble(metaclass=ABCMeta):
         pass
 
     @abstractmethod
+    def resample(self, random_state: int = None):
+        """This is an alias for the method ``sample``. It samples new random matrix.
+
+        The sampling algorithm depends on the inherited classes, so it should be
+        specified by them.
+
+        Args:
+            random_state (int, default=None): random seed to initialize the pseudo-random
+                number generator of numpy. This has to be any integer between 0 and 2**32 - 1
+                (inclusive), or None (default). If None, the seed is obtained from the clock.
+
+        Returns:
+            numpy array containing new matrix sampled.
+        """
+        # pylint: disable=unnecessary-pass
+        pass
+
+    @abstractmethod
     def set_size(self):
         # pylint: disable=unnecessary-pass
         # pylint: disable=missing-function-docstring

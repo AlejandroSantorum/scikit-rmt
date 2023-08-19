@@ -127,7 +127,37 @@ class GaussianEnsemble(_Ensemble):
         """
         self.n = n
         if resample_mtx:
-            self.matrix = self.sample(random_state=random_state)
+            self.resample(random_state=random_state)
+
+    def resample(self, tridiagonal_form: bool = None, random_state: int = None):
+        """Re-samples a random matrix from the Gaussian ensemble with the specified form.
+
+        It re-samples a random matrix from the Gaussian ensemble with the specified form.
+        If the specified form is different than the original form (tridiagonal vs standard)
+        the property ``self.tridiagonal_form`` is updated and the random matrix is sampled
+        with the updated form. If ``tridiagonal_form`` is not specified, this methods returns
+        a re-sampled random matrix of the initialized form by calling the method ``sample``.
+
+        Args:
+            tridiagonal_form (bool, default=None): form to generate the new random matrix sample.
+                If set to True, a random matrix in tridiagonal form is returned. Otherwise, the
+                random matrix is sampled in standard form.
+            random_state (int, default=None): random seed to initialize the pseudo-random
+                    number generator of numpy. This has to be any integer between 0 and 2**32 - 1
+                    (inclusive), or None (default). If None, the seed is obtained from the clock.
+
+        Returns:
+            (ndarray) numpy array containing new matrix sampled.
+
+        References:
+            - Dumitriu, I. and Edelman, A. "Matrix Models for Beta Ensembles".
+                Journal of Mathematical Physics. 43.11 (2002): 5830-5847.
+        """
+        if tridiagonal_form is not None:
+            # The type of sampled matrix can be specified, changing the random matrix
+            # form if the argument ``tridiagonal_form`` is provided.
+            self.tridiagonal_form = tridiagonal_form
+        return self.sample(random_state=random_state)
 
     # pylint: disable=inconsistent-return-statements
     def sample(self, random_state: int = None):
@@ -145,7 +175,7 @@ class GaussianEnsemble(_Ensemble):
                 (inclusive), or None (default). If None, the seed is obtained from the clock.
 
         Returns:
-            numpy array containing new matrix sampled.
+            (ndarray) numpy array containing new matrix sampled.
 
         References:
             - Dumitriu, I. and Edelman, A. "Matrix Models for Beta Ensembles".
