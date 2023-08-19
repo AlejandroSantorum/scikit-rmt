@@ -106,7 +106,7 @@ def plot_max_eigvals_tracy_widom(
 
     plt.title("Comparing maximum eigenvalues histogram with Tracy-Widom law", fontweight="bold")
     plt.xlabel("x")
-    plt.ylabel("probability density")
+    plt.ylabel("density")
 
     # Saving plot or showing it
     if savefig_path:

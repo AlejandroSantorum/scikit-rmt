@@ -261,7 +261,7 @@ class _Ensemble(metaclass=ABCMeta):
         # plot labels, title and illustration
         plt.title("Eigenvalue histogram", fontweight="bold")
         plt.xlabel("x")
-        plt.ylabel("density")
+        plt.ylabel("density") if density else plt.ylabel("frequency")
 
         # Saving plot or showing it
         if savefig_path:
