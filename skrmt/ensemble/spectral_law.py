@@ -15,7 +15,9 @@ from scipy.integrate import quad
 from scipy.stats import rv_continuous
 from scipy import interpolate
 import collections.abc
+from typing import Union, Sequence
 
+from .base_ensemble import _Ensemble
 from .tracy_widom_approximator import TW_Approximator
 from .misc import relu, indicator, plot_func, get_bins_centers_and_contour
 
@@ -732,7 +734,96 @@ class TracyWidomDistribution(rv_continuous):
         else:
             plt.show()
 
+    def plot_ensemble_max_eigvals(
+        self,
+        ensemble: _Ensemble,
+        n_eigvals: int = 1,
+        bins: Union[int, Sequence] = 100,
+        random_state: int = None,
+        savefig_path: str = None,
+    ):
+        """Plots the histogram of the maximum eigenvalues of a random ensemble with the
+        Tracy-Widom PDF.
+
+        It computes samples of normalized maximum eigenvalues of the specified random matrix
+        ensemble and plots their histogram alongside the Tracy-Widom PDF. Note that only
+        random matrices from the Gaussian ensemble are Wigner matrices, so only the largest
+        eigenvalue of these type of random matrices follow Tracy-Widom distribution. This library
+        provides this method to compare Tracy-Widom law with the distirbution of the largest
+        eigenvalue of any type of random ensemble for comparison.
+
+        Args:
+            ensemble (_Ensemble): a random matrix ensemble instance.
+            n_eigvals (int, default=1): number of maximum eigenvalues to compute. This is the number
+                of times the random matrix is re-sampled in order to get several samples of the maximum
+                eigenvalue.
+            bins (int or sequence, default=100): If bins is an integer, it defines the number of
+                equal-width bins in the range. If bins is a sequence, it defines the
+                bin edges, including the left edge of the first bin and the right
+                edge of the last bin; in this case, bins may be unequally spaced.
+            random_state (int, default=None): random seed to initialize the pseudo-random
+                number generator of numpy. This has to be any integer between 0 and 2**32 - 1
+                (inclusive), or None (default). If None, the seed is obtained from the clock.
+            savefig_path (string, default=None): path to save the created figure. If it is not
+                provided, the plot is shown at the end of the routine.
+        
+        """
+        if random_state is not None:
+            np.random.seed(random_state)
+        
+        max_eigvals = []
+        for _ in range(n_eigvals):
+            ensemble.resample(random_state=None)
+            max_eigval = ensemble.eigvals(normalize=False).max()
+            max_eigvals.append(max_eigval)
+        max_eigvals = np.asarray(max_eigvals)
+
+        max_eigvals = self.normalize_eigvals(
+            max_eigvals=max_eigvals,                # Max. eigenvalues to normalize
+            matrix_size=ensemble.matrix.shape[1],   # Sample size. Usually shape[0] = shape[1]
+            other_beta=ensemble.beta                # In case `ensemble` was created with a different beta
+        )
+
+        interval = (max_eigvals.min(), max_eigvals.max())
+
+        observed, bin_edges = np.histogram(max_eigvals, bins=bins, range=interval, density=True)
+        width = bin_edges[1]-bin_edges[0]
+        plt.bar(bin_edges[:-1], observed, width=width, align='edge')
+
+        centers = get_bins_centers_and_contour(bin_edges)
+
+        tw_approx = TW_Approximator(beta=ensemble.beta)
+        tw_pdf = tw_approx.pdf(centers)
+
+        plt.plot(centers, tw_pdf, color='red', linewidth=2)
+
+        plt.title("Comparing maximum eigenvalues histogram with Tracy-Widom law", fontweight="bold")
+        plt.xlabel("x")
+        plt.ylabel("density")
+
+        # Saving plot or showing it
+        if savefig_path:
+            plt.savefig(savefig_path, dpi=1200)
+        else:
+            plt.show()
+
     def normalize_eigvals(self, max_eigvals: np.ndarray, matrix_size: int, other_beta: int = None):
+        """Normalizes set of eigenvalues using Tracy-Widom scale and normalization constants.
+
+        This method normalizes the provided eigenvalues (they are supposed to be a set of largest
+        eigenvalues) using the scale and normalization constants to fit Tracy-Widom law.
+
+        Args:
+            max_eigvals (ndarray): numpy array with the eigenvalues to scale and normalize.
+            matrix_size (int): the original matrix size. Remember that Tracy-Widom law describes
+                the limiting behaviour of the largest eigenvalue of a Wigner matrix.
+            other_beta (optional, default=None): beta of the ensemble that corresponds to the
+                sampled eigenvalues. If None, the property ``beta`` of this class is used.
+        
+        Returns:
+            (ndarray) numpy array containing the scaled and normalized eigenvalues.
+
+        """
         if other_beta is None:
             _beta = self.beta
         else:
