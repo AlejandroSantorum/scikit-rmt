@@ -48,6 +48,10 @@ def plot_spectral_hist_and_law(
     # plotting PDF
     plt.plot(centers, pdf, color='red', linewidth=2)
 
+    plt.xlabel("x")
+    plt.ylabel("density")
+    plt.title("Ensemble spectral histogram vs law PDF", fontweight="bold")
+
     # Saving plot or showing it
     if savefig_path:
         plt.savefig(savefig_path, dpi=1200)
