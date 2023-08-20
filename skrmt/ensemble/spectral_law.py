@@ -443,28 +443,15 @@ class MarchenkoPasturDistribution(rv_continuous):
 
     def plot_empirical_pdf(self, sample_size=1000, bins=100, interval=None, density=False,
                            plot_law_pdf=False, savefig_path=None, random_state=None):
-        """Computes and plots Marchenko-Pastur empirical law using Wishart Ensemble random matrices.
+        """Computes and plots Marchenko-Pastur empirical PDF.
 
-        Calculates and plots Marchenko-Pastur empirical law using Wishart Ensemble random matrices.
-        The size of the sampled matrix will depend on the `n_size` (:math:`n`) parameter and on the
-        ratio :math:`\lambda` given when instantiating this class, unless the parameter `p_size` (:math:`p`)
-        is also given. In this last case, the ratio :math:`\lambda` for the empirical pdf plotting is
-        computed as :math:`\lambda = p/n`. If only the sample size :math:`n` is provided, the number
-        of degrees of freedom :math:`p` is computed as :math:`[\lambda * n]`.
-        Wishart (Laguerre) ensemble has improved routines (using tridiagonal forms and Sturm
-        sequences) to avoid calculating the eigenvalues, so the histogram is built using certain
-        techniques to boost efficiency. This optimization is only used when the ratio p_size/n_size
-        is less or equal than 1.
+        Calculates and plots Marchenko-Pastur law by generating samples from the
+        known Marchenko-Pastur PDF. Remember that the ``ratio`` (a.k.a. :math:`[\lambda]`)
+        specified when instantiating the class will determine the shape of the distribution.
 
         Args:
-            n_size (int, default=3000): number of columns of the guassian matrix that generates
-                the matrix of the corresponding ensemble. This is the sample size. The number of
-                degrees of freedom is computed depending on this argument and on the given ratio,
-                unless the argument `p_size` is also provided, which in this case the ratio is
-                re-computed as ratio=p_size/n_size.
-            p_size (int, default=None): number of rows of the guassian matrix that generates
-                the matrix of the corresponding ensemble. If provided, the current ratio is ignored
-                (but not replaced) and the new ratio=p_size/n_size is used instead.
+            sample_size (int, default=1000): number of random samples that can be interpreted as
+                random eigenvalues of a Wigner matrix. This is the sample size.
             bins (int or sequence, default=100): If bins is an integer, it defines the number
                 of equal-width bins in the range. If bins is a sequence, it defines the
                 bin edges, including the left edge of the first bin and the right
@@ -478,7 +465,7 @@ class MarchenkoPasturDistribution(rv_continuous):
                 number of counts and the bin width, so that the area under the histogram
                 integrates to 1. If set to False, the absolute frequencies of the eigenvalues
                 are returned.
-            plot_law_pdf (bool, default=False): If True, the limiting theoretical law is plotted.
+            plot_law_pdf (bool, default=False): If True, the theoretical law is plotted.
                 If set to False, just the empirical histogram is shown. This parameter is only
                 considered when the argument 'density' is set also to True.
             savefig_path (string, default=None): path to save the created figure. If it is not
@@ -668,30 +655,27 @@ class TracyWidomDistribution(rv_continuous):
 
     def plot_empirical_pdf(self, sample_size=1000, bins=100, interval=None, density=False,
                            plot_law_pdf=False, savefig_path=None, random_state=None):
-        """Computes and plots Tracy-Widom empirical law using Gaussian Ensemble.
+        """Computes and plots Tracy-Widom empirical law.
 
-        Calculates and plots Tracy-Widom empirical law using Gaussian Ensemble random matrices.
-        Because we need to obtain the largest eigenvalue of each sampled random matrix,
-        we need to sample a certain amount them. For each random matrix sammpled, its
-        largest eigenvalue is calcualted in order to simulate its density.
+        Calculates and plots Tracy-Widom law by generating samples from the Tracy-Widom PDF.
 
         Args:
-            n_size (int, default=100): random matrix size n times n. This is the sample size.
-            times (int, default=1000): number of times to sample a random matrix.
+            sample_size (int, default=1000): number of random samples that can be interpreted as
+                random eigenvalues of a Wigner matrix. This is the sample size.
             bins (int or sequence, default=100): If bins is an integer, it defines the number
                 of equal-width bins in the range. If bins is a sequence, it defines the
                 bin edges, including the left edge of the first bin and the right
                 edge of the last bin; in this case, bins may be unequally spaced.
+            interval (tuple, default=None): Delimiters (xmin, xmax) of the histogram.
+                The lower and upper range of the bins. Lower and upper outliers are ignored.
+                If one of the bounds of the specified interval is outside of the minimum default
+                interval, this will be adjusted to show the distribution bulk properly.
             density (bool, default=False): If True, draw and return a probability
                 density: each bin will display the bin's raw count divided by the total
                 number of counts and the bin width, so that the area under the histogram
                 integrates to 1. If set to False, the absolute frequencies of the eigenvalues
                 are returned.
-            interval (tuple, default=None): Delimiters (xmin, xmax) of the histogram.
-                The lower and upper range of the bins. Lower and upper outliers are ignored.
-                If one of the bounds of the specified interval is outside of the minimum default
-                interval, this will be adjusted to show the distribution bulk properly.
-            plot_law_pdf (bool, default=False): If True, the limiting theoretical law is plotted.
+            plot_law_pdf (bool, default=False): If True, the theoretical law is plotted.
                 If set to False, just the empirical histogram is shown. This parameter is only
                 considered when the argument 'density' is set also to True.
             savefig_path (string, default=None): path to save the created figure. If it is not
@@ -748,6 +732,24 @@ class TracyWidomDistribution(rv_continuous):
         else:
             plt.show()
 
+    def normalize_eigvals(self, max_eigvals: np.ndarray, matrix_size: int, other_beta: int = None):
+        if other_beta is None:
+            _beta = self.beta
+        else:
+            _beta = other_beta
+
+        # Tracy-Widom eigenvalue normalization constants
+        eigval_scale = 1.0/np.sqrt(_beta)
+        size_scale = 1.0
+        if _beta == 4:
+            size_scale = 1/np.sqrt(2)
+        
+        max_eigvals = (
+            size_scale
+            * (matrix_size**(1/6))
+            * (eigval_scale * max_eigvals - (2.0 * np.sqrt(matrix_size)))
+        )
+        return max_eigvals
 
 
 class ManovaSpectrumDistribution(rv_continuous):
@@ -755,8 +757,8 @@ class ManovaSpectrumDistribution(rv_continuous):
 
     The spectrum of the random matrices of the Manova Ensemble converge to a
     well-defined function implemented in this class. The class provides methods
-    to sample eigenvalues of the Manova Ensemble, computing the PDF, computing
-    the CDF and simple methods to plot the former two.
+    to sample values following the Manova spectrum distribution, computing the PDF,
+    computing the CDF and simple methods to plot the former two.
 
     Attributes:
         a (float): first random matrix size ratio. This is the ratio between the
@@ -949,31 +951,15 @@ class ManovaSpectrumDistribution(rv_continuous):
 
     def plot_empirical_pdf(self, sample_size=1000, bins=100, interval=None, density=False,
                            plot_law_pdf=False, savefig_path=None, random_state=None):
-        """Computes and plots Manova spectrum empirical pdf and analytical distribution.
+        """Computes and plots Manova spectrum empirical pdf.
 
-        Calculates and plots Manova spectrum empirical pdf using Manova Ensemble random matrices.
-        The size of the sampeld matrices will depend on the `m_size` (:math:`m`) parameter (no. of
-        degrees of freedom) and on the ratios :math:`a` and :math:`b` given when instantiating this
-        class, unless the parameters `n1_size` (:math:`n_1`) and/or `n2_size` (:math:`n_2`) are also
-        given. In this last case, the new ratio :math:`a` for the empirical pdf plotting is computed
-        as :math:`a = n_1/m`, and the new ratio :math:`b` is calculated as :math:`b = n_2/m`. If only
-        the number of degrees of freedom :math:`m` is provided, the sample sizes :math:`n_1` and :math:`n_2`
-        are computed as :math:`n_1 = [a * m]` and :math:`n_2 = [b * m]` respectively.
+        Calculates and plots the Manova spectrum empirical distribution by sampling
+        random values from the Manova spectrum PDF equation. Remember that ``ratio_a``
+        and ``ratio_b`` will determine the shape of the distribution.
 
         Args:
-            m_size (int, default=1000): number of rows of the two Wishart Ensemble matrices that
-                generates the matrix of the corresponding ensemble. This is the number of degrees
-                of freedom (:math:`m`). The sample sizes (:math:`n_1` and :math:`n_2`) of the two
-                matrices are computed from this value and the ratios :math:`a` and :math:`b` given
-                to instantiate this class.
-            n1_size (int, default=None): number of columns of the first Wishart Ensemble matrix
-                that generates the matrix of the corresponding ensemble (:math:`n_1`). If provided,
-                the ratio :math:`a` is ignored (but not replaced) and the new ratio :math:`a = n_1/m`
-                is used instead to plot the empirical pdf.
-            n2_size (int, default=None): number of columns of the second Wishart Ensemble matrix
-                that generates the matrix of the corresponding ensemble (:math:`n_2`). If provided,
-                the ratio :math:`b` is ignored (but not replaced) and the new ratio :math:`b = n_2/m`
-                is used instead to plot the empirical pdf.
+            sample_size (int, default=1000): number of random samples that can be interpreted as
+                random eigenvalues of a Wigner matrix. This is the sample size.
             bins (int or sequence, default=100): If bins is an integer, it defines the number
                 of equal-width bins in the range. If bins is a sequence, it defines the
                 bin edges, including the left edge of the first bin and the right
@@ -987,7 +973,7 @@ class ManovaSpectrumDistribution(rv_continuous):
                 number of counts and the bin width, so that the area under the histogram
                 integrates to 1. If set to False, the absolute frequencies of the eigenvalues
                 are returned.
-            plot_law_pdf (bool, default=False): If True, the limiting theoretical law is plotted.
+            plot_law_pdf (bool, default=False): If True, the theoretical law is plotted.
                 If set to False, just the empirical histogram is shown. This parameter is only
                 considered when the argument 'density' is set also to True.
             savefig_path (string, default=None): path to save the created figure. If it is not
