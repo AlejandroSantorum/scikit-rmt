@@ -266,6 +266,10 @@ class ManovaEnsemble(_Ensemble):
         self._eigvals = np.linalg.eigvals(self.matrix)
         return norm_const * self._eigvals
 
+    def _plot_eigval_hist(self, bins, interval=(0,1), density=False, normalize=False, avoid_img=True):
+        return super()._plot_eigval_hist(bins=bins, interval=interval, density=density,
+                                         normalize=normalize, avoid_img=True)
+
     def plot_eigval_hist(self, bins, interval=(0,1), density=False, normalize=False, savefig_path=None):
         """Computes and plots the histogram of the matrix eigenvalues
 
