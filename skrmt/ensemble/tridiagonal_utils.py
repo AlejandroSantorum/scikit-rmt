@@ -19,6 +19,14 @@ def tridiag_eigval_neg(tridiag_mtx):
 
     Returns:
         integer representing the number of negative eigenvalues.
+    
+    References:
+        - Albrecht, J. and Chan, C.P. and Edelman, A.
+            "Sturm sequences and random eigenvalue distributions".
+            Foundations of Computational Mathematics. 9.4 (2008): 461-483.
+        - Dumitriu, I. and Edelman, A. "Matrix Models for Beta Ensembles".
+            Journal of Mathematical Physics. 43.11 (2002): 5830-5847.
+
     """
     n_size = len(tridiag_mtx) # number of rows = number of columns
     sturm_seq = np.zeros(n_size)
@@ -61,7 +69,15 @@ def tridiag_eigval_hist(tridiag_mtx, interval, bins=100, density=False):
             the histogram equal to 1. Otherwise, this list contains the absolute
             frequencies of the eigenvalues.
             bin_delimiters (array): The edges of the bins. Length nbins + 1 (nbins left edges
-            and right edge of last bin)
+            and right edge of last bin).
+    
+    References:
+        - Albrecht, J. and Chan, C.P. and Edelman, A.
+            "Sturm sequences and random eigenvalue distributions".
+            Foundations of Computational Mathematics. 9.4 (2008): 461-483.
+        - Dumitriu, I. and Edelman, A. "Matrix Models for Beta Ensembles".
+            Journal of Mathematical Physics. 43.11 (2002): 5830-5847.
+
     """
     if not isinstance(interval, tuple):
         raise ValueError("interval argument must be a tuple")

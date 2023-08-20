@@ -9,6 +9,7 @@ import shutil
 from skrmt.ensemble.gaussian_ensemble import GaussianEnsemble
 from skrmt.ensemble.utils import (
     plot_spectral_hist_and_law,
+    standard_vs_tridiag_hist,
 )
 
 
@@ -53,5 +54,20 @@ class TestUtils:
             ensemble=goe,
             bins=20,
             savefig_path=TMP_DIR_PATH+"/"+fig_name,
+        )
+        assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name)) == True
+    
+    def test_standard_vs_tridiag_hist(self):
+        """Testing plotting the spectral histogram of a random matrix ensemble
+        in its standard form vs its corresponding tridiagonal form.
+        """
+        fig_name = "test_standard_vs_tridiag_hist.png"
+
+        goe = GaussianEnsemble(beta=1, n=5)
+        standard_vs_tridiag_hist(
+            ensemble=goe,
+            bins=10,
+            random_state=1,
+            savefig_path=TMP_DIR_PATH+"/"+fig_name
         )
         assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name)) == True
