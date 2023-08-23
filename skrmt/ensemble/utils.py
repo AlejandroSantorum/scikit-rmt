@@ -122,7 +122,10 @@ def standard_vs_tridiag_hist(
     ax1.set_title("Standard matrix form")
     ax2.set_title("Tridiagonal matrix form")
 
-    fig.suptitle("Spectral histogram of random matrices in standard form vs tridiagonal form", fontweight="bold")
+    # fig.suptitle(
+    #     "Spectral histogram of random matrices in standard form vs tridiagonal form",
+    #     fontweight="bold",
+    # )
     
     # Saving plot or showing it
     if savefig_path:
