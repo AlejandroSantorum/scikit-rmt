@@ -88,7 +88,7 @@ class _Ensemble(metaclass=ABCMeta):
         # this will be commented at inherited classes
         pass
 
-    def set_eigval_norm_const(self, eigval_norm_const):
+    def _set_eigval_norm_const(self, eigval_norm_const):
         """Sets a custom eigenvalue normalization constant.
 
         This updates the normalization constant applied to the computed eigenvalues.

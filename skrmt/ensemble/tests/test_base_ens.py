@@ -53,10 +53,10 @@ def test_base_set_eigval_norm_const():
 
     assert goe.eigval_norm_const is not None
 
-    goe.set_eigval_norm_const(100.0)
+    goe._set_eigval_norm_const(100.0)
     assert goe.eigval_norm_const == 100.0
 
-    goe.set_eigval_norm_const(0.1)
+    goe._set_eigval_norm_const(0.1)
     assert goe.eigval_norm_const == 0.1
 
 
