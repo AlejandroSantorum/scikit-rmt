@@ -749,8 +749,8 @@ class TracyWidomDistribution(rv_continuous):
         ensemble and plots their histogram alongside the Tracy-Widom PDF. Note that only
         random matrices from the Gaussian ensemble are Wigner matrices, so only the largest
         eigenvalue of these type of random matrices follow Tracy-Widom distribution. This library
-        provides this method to compare Tracy-Widom law with the distirbution of the largest
-        eigenvalue of any type of random ensemble for comparison.
+        provides this method to compare Tracy-Widom law with the distribution of the largest
+        eigenvalue of any type of random ensemble.
 
         Args:
             ensemble (_Ensemble): a random matrix ensemble instance.
