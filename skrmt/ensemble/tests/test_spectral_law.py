@@ -12,6 +12,7 @@ from skrmt.ensemble import WignerSemicircleDistribution
 from skrmt.ensemble import MarchenkoPasturDistribution
 from skrmt.ensemble import TracyWidomDistribution
 from skrmt.ensemble import ManovaSpectrumDistribution
+from skrmt.ensemble.gaussian_ensemble import GaussianEnsemble
 from skrmt.ensemble.misc import indicator
 
 
@@ -855,8 +856,8 @@ class TestTracyWidomDistribution:
     
     def test_twd_plot_tiny_interval_adjusted(self):
         fig_name = "test_twd_plot_tiny_interval_adjusted.png"
-        mpd = TracyWidomDistribution(beta=1)
-        mpd.plot_empirical_pdf(
+        twd = TracyWidomDistribution(beta=1)
+        twd.plot_empirical_pdf(
             sample_size=10,
             bins=10,
             interval=(-0.2, -0.1),
@@ -865,6 +866,28 @@ class TestTracyWidomDistribution:
             savefig_path=TMP_DIR_PATH+"/"+fig_name
         )
         assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name)) == True
+    
+    def test_twd_plot_ensemble_max_eigvals(self):
+        '''Testing plotting max eigenvalues histogram of an ensemble and comparing it
+        with Tracy-Widom distribution
+        '''
+        fig_name = "test_twd_plot_ensemble_max_eigvals.png"
+        beta = 1
+
+        twd = TracyWidomDistribution(beta=beta)
+        ens = GaussianEnsemble(beta=beta, n=10)
+        twd.plot_ensemble_max_eigvals(
+            ensemble=ens, n_eigvals=1, bins=10, random_state=1, savefig_path=TMP_DIR_PATH+"/"+fig_name,
+        )
+        assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name)) == True
+
+        fig_name2 = "test_twd_plot_ensemble_max_eigvals_other_beta.png"
+        twd = TracyWidomDistribution(beta=1)
+        ens2 = GaussianEnsemble(beta=2, n=10)  # note beta is different than TWD instance
+        twd.plot_ensemble_max_eigvals(
+            ensemble=ens2, n_eigvals=1, bins=10, random_state=1, savefig_path=TMP_DIR_PATH+"/"+fig_name2,
+        )
+        assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name2)) == True
     
     def test_twd_plot_size_exception(self):
         with pytest.raises(ValueError):

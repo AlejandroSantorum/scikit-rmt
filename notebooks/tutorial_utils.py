@@ -99,13 +99,13 @@ def gaussian_tridiagonal_sim(N_list, bins_list, nreps=10):
     for (i, n) in enumerate(N_list):
         for (j, m) in enumerate(bins_list):
             for _ in range(nreps):
-                goe1 = GaussianEnsemble(beta=1, n=n, use_tridiagonal=False)
+                goe1 = GaussianEnsemble(beta=1, n=n, tridiagonal_form=False)
                 t1 = time.time()
                 eig_hist_nt, bins_nt = goe1.eigval_hist(bins=m, interval=interval, density=to_norm)
                 t2 = time.time()
                 times_naive[i][j] += (t2 - t1)*1000 # ms
 
-                goe2 = GaussianEnsemble(beta=1, n=n, use_tridiagonal=True)
+                goe2 = GaussianEnsemble(beta=1, n=n, tridiagonal_form=True)
                 t1 = time.time()
                 eig_hist_nt, bins_nt = goe2.eigval_hist(bins=m, interval=interval, density=to_norm)
                 t2 = time.time()
@@ -131,13 +131,13 @@ def wishart_tridiagonal_sim(N_list, bins_list, nreps=10):
     for (i, n) in enumerate(N_list):
         for (j, m) in enumerate(bins_list):
             for _ in range(nreps):
-                wre1 = WishartEnsemble(beta=1, p=n, n=3*n, use_tridiagonal=False)
+                wre1 = WishartEnsemble(beta=1, p=n, n=3*n, tridiagonal_form=False)
                 t1 = time.time()
                 eig_hist_nt, bins_nt = wre1.eigval_hist(bins=m, interval=interval, density=to_norm)
                 t2 = time.time()
                 times_naive[i][j] += (t2 - t1)*1000 # ms
 
-                wre2 = WishartEnsemble(beta=1, p=n, n=3*n, use_tridiagonal=True)
+                wre2 = WishartEnsemble(beta=1, p=n, n=3*n, tridiagonal_form=True)
                 t1 = time.time()
                 eig_hist_nt, bins_nt = wre2.eigval_hist(bins=m, interval=interval, density=to_norm)
                 t2 = time.time()

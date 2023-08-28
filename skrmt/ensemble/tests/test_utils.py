@@ -8,9 +8,8 @@ import shutil
 
 from skrmt.ensemble.gaussian_ensemble import GaussianEnsemble
 from skrmt.ensemble.utils import (
-    rand_mtx_max_eigvals,
     plot_spectral_hist_and_law,
-    plot_max_eigvals_tracy_widom,
+    standard_vs_tridiag_hist,
 )
 
 
@@ -57,36 +56,18 @@ class TestUtils:
             savefig_path=TMP_DIR_PATH+"/"+fig_name,
         )
         assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name)) == True
-
-
-    def test_rand_mtx_max_eigvals(self):
-        """Testing getting maximum eigenvalues of an Ensemble object
+    
+    def test_standard_vs_tridiag_hist(self):
+        """Testing plotting the spectral histogram of a random matrix ensemble
+        in its standard form vs its corresponding tridiagonal form.
         """
-        goe = GaussianEnsemble(beta=4, n=10, random_state=1)
+        fig_name = "test_standard_vs_tridiag_hist.png"
 
-        max_eigval = goe.eigvals().max()
-
-        max_vals = rand_mtx_max_eigvals(goe, n_eigvals=1, normalize=False, random_state=1)
-        assert max_eigval == max_vals[0]
-
-        max_vals_norm = rand_mtx_max_eigvals(goe, n_eigvals=1, normalize=True, random_state=1)
-        # now it has to be different since it was normalized by Tracy-Widom distr. constants
-        assert max_eigval != max_vals_norm[0]
-
-
-    def test_plot_max_eigvals_tracy_widom(self):
-        '''Testing plotting max eigenvalues histogram of an ensemble and comparing it
-        with Tracy-Widom distribution
-        '''
-        fig_name = "test_plot_max_eigvals_tracy_widom.png"
-
-        ens = GaussianEnsemble(beta=1, n=10)
-
-        plot_max_eigvals_tracy_widom(
-            ensemble=ens,
-            n_eigvals=1,
+        goe = GaussianEnsemble(beta=1, n=5)
+        standard_vs_tridiag_hist(
+            ensemble=goe,
             bins=10,
             random_state=1,
-            savefig_path=TMP_DIR_PATH+"/"+fig_name,
+            savefig_path=TMP_DIR_PATH+"/"+fig_name
         )
         assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name)) == True

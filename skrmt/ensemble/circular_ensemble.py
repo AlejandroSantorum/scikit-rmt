@@ -116,7 +116,27 @@ class CircularEnsemble(_Ensemble):
         """
         self.n = n
         if resample_mtx:
-            self.matrix = self.sample(random_state=random_state)
+            self.resample(random_state=random_state)
+
+    def resample(self, random_state: int = None):
+        """Re-samples new Circular Ensemble random matrix.
+
+        It re-samples a new random matrix from the Circular ensemble. This is an alias
+        for method ``sample``.
+
+        Args:
+            random_state (int, default=None): random seed to initialize the pseudo-random
+                number generator of numpy. This has to be any integer between 0 and 2**32 - 1
+                (inclusive), or None (default). If None, the seed is obtained from the clock.
+
+        Returns:
+            (ndarray) numpy array containing new matrix sampled.
+
+        References:
+            - Dumitriu, I. and Edelman, A. "Matrix Models for Beta Ensembles".
+                Journal of Mathematical Physics. 43.11 (2002): 5830-5847.
+        """
+        return self.sample(random_state=random_state)
 
     # pylint: disable=inconsistent-return-statements
     def sample(self, random_state: int = None):
@@ -133,7 +153,7 @@ class CircularEnsemble(_Ensemble):
                 (inclusive), or None (default). If None, the seed is obtained from the clock.
 
         Returns:
-            numpy array containing new matrix sampled.
+            (ndarray) numpy array containing new matrix sampled.
 
         References:
             - Killip, R. and Zozhan, R.

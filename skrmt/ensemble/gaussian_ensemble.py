@@ -43,7 +43,7 @@ class GaussianEnsemble(_Ensemble):
         n (int): random matrix size. Gaussian ensemble matrices are
             squared matrices. GOE and GUE are of size n times n,
             and GSE are of size 2n times 2n.
-        use_tridiagonal (bool): if set to True, Gaussian Ensemble
+        tridiagonal_form (bool): if set to True, Gaussian Ensemble
             matrices are sampled in its tridiagonal form, which has the same
             eigenvalues than its standard form. Otherwise, it is sampled using
             its standard form.
@@ -59,7 +59,7 @@ class GaussianEnsemble(_Ensemble):
 
     """
 
-    def __init__(self, beta, n, use_tridiagonal=False, sigma=1.0, random_state=None):
+    def __init__(self, beta, n, tridiagonal_form=False, sigma=1.0, random_state=None):
         """Constructor for GaussianEnsemble class.
 
         Initializes an instance of this class with the given parameters.
@@ -70,7 +70,7 @@ class GaussianEnsemble(_Ensemble):
             n (int): random matrix size. Gaussian ensemble matrices are
                 squared matrices. GOE and GUE are of size n times n,
                 and GSE are of size 2n times 2n.
-            use_tridiagonal (bool, default=False): if set to True, Gaussian Ensemble
+            tridiagonal_form (bool, default=False): if set to True, Gaussian Ensemble
                 matrices are sampled in its tridiagonal form, which has the same
                 eigenvalues than its standard form. Otherwise, it is sampled using
                 its standard form.
@@ -89,7 +89,7 @@ class GaussianEnsemble(_Ensemble):
         # pylint: disable=invalid-name
         self.n = n
         self.beta = beta
-        self.use_tridiagonal = use_tridiagonal
+        self.tridiagonal_form = tridiagonal_form
         self.sigma = sigma
         self.radius = 2 * np.sqrt(self.beta) * self.sigma
         self._eigvals = None
@@ -127,17 +127,47 @@ class GaussianEnsemble(_Ensemble):
         """
         self.n = n
         if resample_mtx:
-            self.matrix = self.sample(random_state=random_state)
+            self.resample(random_state=random_state)
+
+    def resample(self, tridiagonal_form: bool = None, random_state: int = None):
+        """Re-samples a random matrix from the Gaussian ensemble with the specified form.
+
+        It re-samples a random matrix from the Gaussian ensemble with the specified form.
+        If the specified form is different than the original form (tridiagonal vs standard)
+        the property ``self.tridiagonal_form`` is updated and the random matrix is sampled
+        with the updated form. If ``tridiagonal_form`` is not specified, this methods returns
+        a re-sampled random matrix of the initialized form by calling the method ``sample``.
+
+        Args:
+            tridiagonal_form (bool, default=None): form to generate the new random matrix sample.
+                If set to True, a random matrix in tridiagonal form is returned. Otherwise, the
+                random matrix is sampled in standard form.
+            random_state (int, default=None): random seed to initialize the pseudo-random
+                    number generator of numpy. This has to be any integer between 0 and 2**32 - 1
+                    (inclusive), or None (default). If None, the seed is obtained from the clock.
+
+        Returns:
+            (ndarray) numpy array containing new matrix sampled.
+
+        References:
+            - Dumitriu, I. and Edelman, A. "Matrix Models for Beta Ensembles".
+                Journal of Mathematical Physics. 43.11 (2002): 5830-5847.
+        """
+        if tridiagonal_form is not None:
+            # The type of sampled matrix can be specified, changing the random matrix
+            # form if the argument ``tridiagonal_form`` is provided.
+            self.tridiagonal_form = tridiagonal_form
+        return self.sample(random_state=random_state)
 
     # pylint: disable=inconsistent-return-statements
     def sample(self, random_state: int = None):
         """Samples new Gaussian Ensemble random matrix.
 
         The sampling algorithm depends on the specification of
-        use_tridiagonal parameter. If use_tridiagonal is set to True,
-        a Gaussian Ensemble random matrix in its tridiagonal form
-        is sampled. Otherwise, it is sampled using the standard
-        form.
+        ``tridiagonal_form`` parameter. If ``tridiagonal_form`` is 
+        set to True, a Gaussian Ensemble random matrix in its
+        tridiagonal form is sampled. Otherwise, it is sampled using 
+        the standard form.
 
         Args:
             random_state (int, default=None): random seed to initialize the pseudo-random
@@ -145,7 +175,7 @@ class GaussianEnsemble(_Ensemble):
                 (inclusive), or None (default). If None, the seed is obtained from the clock.
 
         Returns:
-            numpy array containing new matrix sampled.
+            (ndarray) numpy array containing new matrix sampled.
 
         References:
             - Dumitriu, I. and Edelman, A. "Matrix Models for Beta Ensembles".
@@ -154,7 +184,7 @@ class GaussianEnsemble(_Ensemble):
         if random_state is not None:
             np.random.seed(random_state)
 
-        if self.use_tridiagonal:
+        if self.tridiagonal_form:
             return self.sample_tridiagonal()
 
         if self.beta == 1:
@@ -268,7 +298,7 @@ class GaussianEnsemble(_Ensemble):
             else:
                 interval = self._non_normalized_interval[self.beta]
 
-        if self.use_tridiagonal:
+        if self.tridiagonal_form:
             if normalize:
                 return tridiag_eigval_hist(
                     self.eigval_norm_const * self.matrix,

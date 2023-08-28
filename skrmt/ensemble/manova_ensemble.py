@@ -125,7 +125,27 @@ class ManovaEnsemble(_Ensemble):
         self.n1 = n1
         self.n2 = n2
         if resample_mtx:
-            self.matrix = self.sample(random_state=random_state)
+            self.resample(random_state=random_state)
+
+    def resample(self, random_state: int = None):
+        """Re-samples new Manova Ensemble random matrix.
+
+        It re-samples a new random matrix from the Manova ensemble. This is an alias
+        for method ``sample``.
+
+        Args:
+            random_state (int, default=None): random seed to initialize the pseudo-random
+                number generator of numpy. This has to be any integer between 0 and 2**32 - 1
+                (inclusive), or None (default). If None, the seed is obtained from the clock.
+
+        Returns:
+            (ndarray) numpy array containing new matrix sampled.
+
+        References:
+            - Dumitriu, I. and Edelman, A. "Matrix Models for Beta Ensembles".
+                Journal of Mathematical Physics. 43.11 (2002): 5830-5847.
+        """
+        return self.sample(random_state=random_state)
 
     # pylint: disable=inconsistent-return-statements
     def sample(self, random_state: int = None):
@@ -142,7 +162,7 @@ class ManovaEnsemble(_Ensemble):
                 (inclusive), or None (default). If None, the seed is obtained from the clock.
 
         Returns:
-            numpy array containing new matrix sampled.
+            (ndarray) numpy array containing new matrix sampled.
 
         References:
             - Dumitriu, I. and Edelman, A. "Matrix Models for Beta Ensembles".
@@ -245,6 +265,10 @@ class ManovaEnsemble(_Ensemble):
         # always storing non-normalized eigenvalues
         self._eigvals = np.linalg.eigvals(self.matrix)
         return norm_const * self._eigvals
+
+    def _plot_eigval_hist(self, bins, interval=(0,1), density=False, normalize=False, avoid_img=True):
+        return super()._plot_eigval_hist(bins=bins, interval=interval, density=density,
+                                         normalize=normalize, avoid_img=True)
 
     def plot_eigval_hist(self, bins, interval=(0,1), density=False, normalize=False, savefig_path=None):
         """Computes and plots the histogram of the matrix eigenvalues

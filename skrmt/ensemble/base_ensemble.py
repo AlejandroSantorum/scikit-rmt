@@ -64,13 +64,31 @@ class _Ensemble(metaclass=ABCMeta):
         pass
 
     @abstractmethod
+    def resample(self, random_state: int = None):
+        """This is an alias for the method ``sample``. It samples new random matrix.
+
+        The sampling algorithm depends on the inherited classes, so it should be
+        specified by them.
+
+        Args:
+            random_state (int, default=None): random seed to initialize the pseudo-random
+                number generator of numpy. This has to be any integer between 0 and 2**32 - 1
+                (inclusive), or None (default). If None, the seed is obtained from the clock.
+
+        Returns:
+            numpy array containing new matrix sampled.
+        """
+        # pylint: disable=unnecessary-pass
+        pass
+
+    @abstractmethod
     def set_size(self):
         # pylint: disable=unnecessary-pass
         # pylint: disable=missing-function-docstring
         # this will be commented at inherited classes
         pass
 
-    def set_eigval_norm_const(self, eigval_norm_const):
+    def _set_eigval_norm_const(self, eigval_norm_const):
         """Sets a custom eigenvalue normalization constant.
 
         This updates the normalization constant applied to the computed eigenvalues.
@@ -243,7 +261,7 @@ class _Ensemble(metaclass=ABCMeta):
         # plot labels, title and illustration
         plt.title("Eigenvalue histogram", fontweight="bold")
         plt.xlabel("x")
-        plt.ylabel("density")
+        plt.ylabel("density") if density else plt.ylabel("frequency")
 
         # Saving plot or showing it
         if savefig_path:

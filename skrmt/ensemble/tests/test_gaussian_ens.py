@@ -20,7 +20,7 @@ def test_init_exception():
 
 def test_build_tridiagonal_exception():
     with pytest.raises(ValueError):
-        _ = GaussianEnsemble(beta=1, n=100, sigma=2.0, use_tridiagonal=True)
+        _ = GaussianEnsemble(beta=1, n=100, sigma=2.0, tridiagonal_form=True)
 
 
 ##########################################
@@ -52,7 +52,6 @@ def test_goe_symmetric():
     assert (m_mtx.transpose() == m_mtx).all()
 
 
-
 def test_goe_set_size():
     '''Testing setter to change matrix sizes of GOE
     '''
@@ -72,6 +71,21 @@ def test_goe_set_size():
     assert goe.matrix.shape == (n2_size,n2_size)
 
 
+def test_goe_resample():
+    '''Testing resample of GOE
+    '''
+    n_size = 5
+    goe = GaussianEnsemble(beta=1, n=n_size, random_state=1)
+    assert goe.tridiagonal_form == False
+    
+    prev_mtx = np.copy(goe.matrix)
+    goe.resample(random_state=1)
+    assert_array_equal(prev_mtx, goe.matrix)
+
+    goe.resample(tridiagonal_form=True, random_state=1)
+    assert goe.tridiagonal_form == True
+
+
 def test_goe_build_tridiagonal():
     '''Testing tridiagonal form of GSE
     '''
@@ -79,7 +93,7 @@ def test_goe_build_tridiagonal():
     beta = 1
 
     np.random.seed(1)
-    goe = GaussianEnsemble(beta=1, n=n_size, use_tridiagonal=True)
+    goe = GaussianEnsemble(beta=1, n=n_size, tridiagonal_form=True)
 
     np.random.seed(1)
     normals = np.random.normal(loc=0, scale=1, size=n_size)
@@ -113,8 +127,8 @@ def test_goe_tridiag_hist():
     '''Testing tridiagonal histogram of GOE
     '''
     n_size = 50
-    goe1 = GaussianEnsemble(beta=1, n=n_size, use_tridiagonal=False)
-    goe2 = GaussianEnsemble(beta=1, n=n_size, use_tridiagonal=True)
+    goe1 = GaussianEnsemble(beta=1, n=n_size, tridiagonal_form=False)
+    goe2 = GaussianEnsemble(beta=1, n=n_size, tridiagonal_form=True)
 
     goe1.matrix = goe2.matrix
 
@@ -207,6 +221,21 @@ def test_gue_set_size():
     assert gue.matrix.shape == (n2_size,n2_size)
 
 
+def test_gue_resample():
+    '''Testing resample of GUE
+    '''
+    n_size = 5
+    gue = GaussianEnsemble(beta=2, n=n_size, random_state=1)
+    assert gue.tridiagonal_form == False
+    
+    prev_mtx = np.copy(gue.matrix)
+    gue.resample(random_state=1)
+    assert_array_equal(prev_mtx, gue.matrix)
+
+    gue.resample(tridiagonal_form=True, random_state=1)
+    assert gue.tridiagonal_form == True
+
+
 def test_gue_build_tridiagonal():
     '''Testing tridiagonal form of GUE
     '''
@@ -214,7 +243,7 @@ def test_gue_build_tridiagonal():
     beta = 2
 
     np.random.seed(1)
-    gue = GaussianEnsemble(beta=2, n=n_size, use_tridiagonal=True)
+    gue = GaussianEnsemble(beta=2, n=n_size, tridiagonal_form=True)
 
     np.random.seed(1)
     normals = np.random.normal(loc=0, scale=1, size=n_size)
@@ -232,8 +261,8 @@ def test_gue_tridiag_hist():
     '''Testing tridiagonal histogram of GUE
     '''
     n_size = 50
-    gue1 = GaussianEnsemble(beta=2, n=n_size, use_tridiagonal=False)
-    gue2 = GaussianEnsemble(beta=2, n=n_size, use_tridiagonal=True)
+    gue1 = GaussianEnsemble(beta=2, n=n_size, tridiagonal_form=False)
+    gue2 = GaussianEnsemble(beta=2, n=n_size, tridiagonal_form=True)
 
     gue1.matrix = gue2.matrix
 
@@ -312,6 +341,21 @@ def test_gse_set_size():
     assert gse.matrix.shape == (2*n2_size,2*n2_size)
 
 
+def test_gse_resample():
+    '''Testing resample of GSE
+    '''
+    n_size = 5
+    gse = GaussianEnsemble(beta=4, n=n_size, random_state=1)
+    assert gse.tridiagonal_form == False
+    
+    prev_mtx = np.copy(gse.matrix)
+    gse.resample(random_state=1)
+    assert_array_equal(prev_mtx, gse.matrix)
+
+    gse.resample(tridiagonal_form=True, random_state=1)
+    assert gse.tridiagonal_form == True
+
+
 def test_gse_build_tridiagonal():
     '''Testing tridiagonal form of GSE
     '''
@@ -319,7 +363,7 @@ def test_gse_build_tridiagonal():
     beta = 4
 
     np.random.seed(1)
-    gse = GaussianEnsemble(beta=4, n=n_size, use_tridiagonal=True)
+    gse = GaussianEnsemble(beta=4, n=n_size, tridiagonal_form=True)
 
     np.random.seed(1)
     n_size *= 2  # WQE matrices are 2p times 2p
@@ -338,8 +382,8 @@ def test_gse_tridiag_hist():
     '''Testing tridiagonal histogram of GSE
     '''
     n_size = 50
-    gse1 = GaussianEnsemble(beta=4, n=n_size, use_tridiagonal=False)
-    gse2 = GaussianEnsemble(beta=4, n=n_size, use_tridiagonal=True)
+    gse1 = GaussianEnsemble(beta=4, n=n_size, tridiagonal_form=False)
+    gse2 = GaussianEnsemble(beta=4, n=n_size, tridiagonal_form=True)
 
     gse1.matrix = gse2.matrix
 
