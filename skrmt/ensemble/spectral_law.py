@@ -778,7 +778,7 @@ class TracyWidomDistribution(rv_continuous):
             max_eigvals.append(max_eigval)
         max_eigvals = np.asarray(max_eigvals)
 
-        max_eigvals = self.normalize_eigvals(
+        max_eigvals = self._normalize_eigvals(
             max_eigvals=max_eigvals,                # Max. eigenvalues to normalize
             matrix_size=ensemble.matrix.shape[1],   # Sample size. Usually shape[0] = shape[1]
             other_beta=ensemble.beta                # In case `ensemble` was created with a different beta
@@ -807,7 +807,7 @@ class TracyWidomDistribution(rv_continuous):
         else:
             plt.show()
 
-    def normalize_eigvals(self, max_eigvals: np.ndarray, matrix_size: int, other_beta: int = None):
+    def _normalize_eigvals(self, max_eigvals: np.ndarray, matrix_size: int, other_beta: int = None):
         """Normalizes set of eigenvalues using Tracy-Widom scale and normalization constants.
 
         This method normalizes the provided eigenvalues (they are supposed to be a set of largest
