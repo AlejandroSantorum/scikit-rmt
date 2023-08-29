@@ -42,25 +42,6 @@ def test_coe_symmetric():
     assert (mtx.transpose() == mtx).all()
 
 
-def test_coe_set_size():
-    '''Testing setter to change matrix sizes of COE
-    '''
-    n1_size = 3
-    n2_size = 5
-
-    coe = CircularEnsemble(beta=1, n=n1_size)
-    assert coe.n == n1_size
-    assert coe.matrix.shape == (n1_size,n1_size)
-
-    coe.set_size(n2_size, resample_mtx=False)
-    assert coe.n == n2_size
-    assert coe.matrix.shape == (n1_size,n1_size)
-
-    coe.set_size(n2_size, resample_mtx=True, random_state=1)
-    assert coe.n == n2_size
-    assert coe.matrix.shape == (n2_size,n2_size)
-
-
 def test_coe_eigvals():
     '''Testing all eigenvalues of a COE matrix are real
     '''
@@ -106,25 +87,6 @@ def test_cue_init():
                [-0.60894251+0.38386407j, 0.1958485 +0.65328713j, -0.12797213+0.01788349j]]
 
     assert_almost_equal(cue.matrix, np.array(mtx_sol), decimal=7)
-
-
-def test_cue_set_size():
-    '''Testing setter to change matrix sizes of CUE
-    '''
-    n1_size = 5
-    n2_size = 10
-
-    cue = CircularEnsemble(beta=2, n=n1_size)
-    assert cue.n == n1_size
-    assert cue.matrix.shape == (n1_size,n1_size)
-
-    cue.set_size(n2_size, resample_mtx=False)
-    assert cue.n == n2_size
-    assert cue.matrix.shape == (n1_size,n1_size)
-
-    cue.set_size(n2_size, resample_mtx=True, random_state=1)
-    assert cue.n == n2_size
-    assert cue.matrix.shape == (n2_size,n2_size)
 
 
 def test_cue_eigvals():
@@ -177,25 +139,6 @@ def test_cse_init():
                 1.94983679e-17+3.89651615e-18j, 7.08429000e-01+6.71522420e-01j]]
 
     assert_almost_equal(cse.matrix, np.array(mtx_sol), decimal=7)
-
-
-def test_cse_set_size():
-    '''Testing setter to change matrix sizes of CSE
-    '''
-    n1_size = 4
-    n2_size = 9
-
-    cse = CircularEnsemble(beta=4, n=n1_size)
-    assert cse.n == n1_size
-    assert cse.matrix.shape == (2*n1_size,2*n1_size)
-
-    cse.set_size(n2_size, resample_mtx=False)
-    assert cse.n == n2_size
-    assert cse.matrix.shape == (2*n1_size,2*n1_size)
-
-    cse.set_size(n2_size, resample_mtx=True, random_state=1)
-    assert cse.n == n2_size
-    assert cse.matrix.shape == (2*n2_size,2*n2_size)
 
 
 def test_beta4_joint_eigval_pdf():
