@@ -108,27 +108,6 @@ class GaussianEnsemble(_Ensemble):
         # scikit-rmt class implementing the corresponding spectral law
         self._law_class = WignerSemicircleDistribution(beta=self.beta, center=0.0, sigma=self.sigma)
 
-    def set_size(self, n, resample_mtx=True, random_state: int = None):
-        # pylint: disable=arguments-differ
-        """Setter of matrix size.
-
-        Sets the matrix size. Useful if it has been initialized with a different value.
-
-        Args:
-            n (int): new random matrix size. Gaussian ensemble matrices are
-                squared matrices. GOE and GUE are of size n times n, and
-                GSE are of size 2n times 2n.
-            resample_mtx (bool, default=True): If set to True, the ensemble matrix is
-                resampled with the new dimensions.
-            random_state (int, default=None): random seed to initialize the pseudo-random
-                number generator of numpy. This has to be any integer between 0 and 2**32 - 1
-                (inclusive), or None (default). If None, the seed is obtained from the clock.
-
-        """
-        self.n = n
-        if resample_mtx:
-            self.resample(random_state=random_state)
-
     def resample(self, tridiagonal_form: bool = None, random_state: int = None):
         """Re-samples a random matrix from the Gaussian ensemble with the specified form.
 

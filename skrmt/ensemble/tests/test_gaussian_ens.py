@@ -52,25 +52,6 @@ def test_goe_symmetric():
     assert (m_mtx.transpose() == m_mtx).all()
 
 
-def test_goe_set_size():
-    '''Testing setter to change matrix sizes of GOE
-    '''
-    n1_size = 3
-    n2_size = 5
-
-    goe = GaussianEnsemble(beta=1, n=n1_size)
-    assert goe.n == n1_size
-    assert goe.matrix.shape == (n1_size,n1_size)
-
-    goe.set_size(n2_size, resample_mtx=False)
-    assert goe.n == n2_size
-    assert goe.matrix.shape == (n1_size,n1_size)
-
-    goe.set_size(n2_size, resample_mtx=True, random_state=1)
-    assert goe.n == n2_size
-    assert goe.matrix.shape == (n2_size,n2_size)
-
-
 def test_goe_resample():
     '''Testing resample of GOE
     '''
@@ -202,25 +183,6 @@ def test_gue_hermitian():
     assert (m_mtx.transpose().conj() == m_mtx).all()
 
 
-def test_gue_set_size():
-    '''Testing setter to change matrix sizes of GUE
-    '''
-    n1_size = 5
-    n2_size = 8
-
-    gue = GaussianEnsemble(beta=2, n=n1_size)
-    assert gue.n == n1_size
-    assert gue.matrix.shape == (n1_size,n1_size)
-
-    gue.set_size(n2_size, resample_mtx=False)
-    assert gue.n == n2_size
-    assert gue.matrix.shape == (n1_size,n1_size)
-
-    gue.set_size(n2_size, resample_mtx=True, random_state=1)
-    assert gue.n == n2_size
-    assert gue.matrix.shape == (n2_size,n2_size)
-
-
 def test_gue_resample():
     '''Testing resample of GUE
     '''
@@ -320,25 +282,6 @@ def test_gse_hermitian():
 
     m_tx = gse.matrix
     assert (m_tx.transpose().conj() == m_tx).all()
-
-
-def test_gse_set_size():
-    '''Testing setter to change matrix sizes of GSE
-    '''
-    n1_size = 4
-    n2_size = 9
-
-    gse = GaussianEnsemble(beta=4, n=n1_size)
-    assert gse.n == n1_size
-    assert gse.matrix.shape == (2*n1_size,2*n1_size)
-
-    gse.set_size(n2_size, resample_mtx=False)
-    assert gse.n == n2_size
-    assert gse.matrix.shape == (2*n1_size,2*n1_size)
-
-    gse.set_size(n2_size, resample_mtx=True, random_state=1)
-    assert gse.n == n2_size
-    assert gse.matrix.shape == (2*n2_size,2*n2_size)
 
 
 def test_gse_resample():

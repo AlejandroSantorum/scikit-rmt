@@ -81,13 +81,6 @@ class _Ensemble(metaclass=ABCMeta):
         # pylint: disable=unnecessary-pass
         pass
 
-    @abstractmethod
-    def set_size(self):
-        # pylint: disable=unnecessary-pass
-        # pylint: disable=missing-function-docstring
-        # this will be commented at inherited classes
-        pass
-
     def _set_eigval_norm_const(self, eigval_norm_const):
         """Sets a custom eigenvalue normalization constant.
 
