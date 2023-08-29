@@ -114,30 +114,6 @@ class WishartEnsemble(_Ensemble):
         self.lambda_plus = self.beta * self.sigma**2 * (1 + np.sqrt(self.ratio))**2
         self.lambda_minus = self.beta * self.sigma**2 * (1 - np.sqrt(self.ratio))**2
 
-    def set_size(self, p, n, resample_mtx=True, random_state: int = None):
-        # pylint: disable=arguments-differ
-        """Setter of matrix size.
-
-        Sets the matrix size. Useful if it has been initialized with a different value.
-
-        Args:
-            p (int): number of rows of the guassian matrix that generates
-                the matrix of the corresponding ensemble.
-            n (int): number of columns of the guassian matrix that generates
-                the matrix of the corresponding ensemble.
-            resample_mtx (bool, default=True): If set to True, the ensemble matrix is
-                resampled with the new dimensions.
-            random_state (int, default=None): random seed to initialize the pseudo-random
-                number generator of numpy. This has to be any integer between 0 and 2**32 - 1
-                (inclusive), or None (default). If None, the seed is obtained from the clock.
-
-        """
-        self.p = p
-        self.n = n
-        self._compute_parameters()
-        if resample_mtx:
-            self.resample(random_state=random_state)
-
     def resample(self, tridiagonal_form: bool = None, random_state: int = None):
         """Re-samples a random matrix from the Wishart ensemble with the specified form.
 
