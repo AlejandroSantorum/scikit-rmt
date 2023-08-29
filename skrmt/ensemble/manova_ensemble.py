@@ -101,32 +101,6 @@ class ManovaEnsemble(_Ensemble):
             beta=self.beta, ratio_a=self.n1/self.m, ratio_b=self.n2/self.m
         )
 
-    def set_size(self, m, n1, n2, resample_mtx=True, random_state: int = None):
-        # pylint: disable=arguments-differ
-        """Setter of matrix size.
-
-        Sets the matrix size. Useful if it has been initialized with a different value.
-
-        Args:
-            m (int): number of rows of the random guassian matrices that
-                generates the matrix of the corresponding ensemble.
-            n1 (int): number of columns of the first random guassian matrix
-                that generates the matrix of the corresponding ensemble.
-            n2 (int): number of columns of the second random guassian matrix
-                that generates the matrix of the corresponding ensemble.
-            resample_mtx (bool, default=True): If set to True, the ensemble matrix is
-                resampled with the new dimensions.
-            random_state (int, default=None): random seed to initialize the pseudo-random
-                number generator of numpy. This has to be any integer between 0 and 2**32 - 1
-                (inclusive), or None (default). If None, the seed is obtained from the clock.
-
-        """
-        self.m = m
-        self.n1 = n1
-        self.n2 = n2
-        if resample_mtx:
-            self.resample(random_state=random_state)
-
     def resample(self, random_state: int = None):
         """Re-samples new Manova Ensemble random matrix.
 
