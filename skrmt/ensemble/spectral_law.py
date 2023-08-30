@@ -734,6 +734,41 @@ class TracyWidomDistribution(rv_continuous):
         else:
             plt.show()
 
+    def _normalize_eigvals(self, max_eigvals: np.ndarray, matrix_size: int, other_beta: int = None):
+        """Normalizes set of eigenvalues using Tracy-Widom scale and normalization constants.
+
+        This method normalizes the provided eigenvalues (they are supposed to be a set of largest
+        eigenvalues) using the scale and normalization constants to fit Tracy-Widom law.
+
+        Args:
+            max_eigvals (ndarray): numpy array with the eigenvalues to scale and normalize.
+            matrix_size (int): the original matrix size. Remember that Tracy-Widom law describes
+                the limiting behaviour of the largest eigenvalue of a Wigner matrix.
+            other_beta (optional, default=None): beta of the ensemble that corresponds to the
+                sampled eigenvalues. If None, the property ``beta`` of this class is used.
+        
+        Returns:
+            (ndarray) numpy array containing the scaled and normalized eigenvalues.
+
+        """
+        if other_beta is None:
+            _beta = self.beta
+        else:
+            _beta = other_beta
+
+        # Tracy-Widom eigenvalue normalization constants
+        eigval_scale = 1.0/np.sqrt(_beta)
+        size_scale = 1.0
+        if _beta == 4:
+            size_scale = 1/np.sqrt(2)
+        
+        max_eigvals = (
+            size_scale
+            * (matrix_size**(1/6))
+            * (eigval_scale * max_eigvals - (2.0 * np.sqrt(matrix_size)))
+        )
+        return max_eigvals
+
     def plot_ensemble_max_eigvals(
         self,
         ensemble: _Ensemble,
@@ -807,40 +842,6 @@ class TracyWidomDistribution(rv_continuous):
         else:
             plt.show()
 
-    def _normalize_eigvals(self, max_eigvals: np.ndarray, matrix_size: int, other_beta: int = None):
-        """Normalizes set of eigenvalues using Tracy-Widom scale and normalization constants.
-
-        This method normalizes the provided eigenvalues (they are supposed to be a set of largest
-        eigenvalues) using the scale and normalization constants to fit Tracy-Widom law.
-
-        Args:
-            max_eigvals (ndarray): numpy array with the eigenvalues to scale and normalize.
-            matrix_size (int): the original matrix size. Remember that Tracy-Widom law describes
-                the limiting behaviour of the largest eigenvalue of a Wigner matrix.
-            other_beta (optional, default=None): beta of the ensemble that corresponds to the
-                sampled eigenvalues. If None, the property ``beta`` of this class is used.
-        
-        Returns:
-            (ndarray) numpy array containing the scaled and normalized eigenvalues.
-
-        """
-        if other_beta is None:
-            _beta = self.beta
-        else:
-            _beta = other_beta
-
-        # Tracy-Widom eigenvalue normalization constants
-        eigval_scale = 1.0/np.sqrt(_beta)
-        size_scale = 1.0
-        if _beta == 4:
-            size_scale = 1/np.sqrt(2)
-        
-        max_eigvals = (
-            size_scale
-            * (matrix_size**(1/6))
-            * (eigval_scale * max_eigvals - (2.0 * np.sqrt(matrix_size)))
-        )
-        return max_eigvals
 
 
 class ManovaSpectrumDistribution(rv_continuous):
