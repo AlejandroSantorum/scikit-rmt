@@ -1,5 +1,6 @@
 import os
 import sys
+import time
 from importlib import reload
 import numpy as np
 import matplotlib
@@ -146,7 +147,7 @@ def plot_figure_5():
 
 
 def plot_figure_6():
-    print(f"Generating images of Figure 6. This may take {BOLD_CHAR}several minutes (~45 mins.){END_CHAR}...")
+    print(f"Generating images of Figure 6. This may take {BOLD_CHAR}several minutes (~45 mins.){END_CHAR} ...")
 
     # matrix sizes
     n_list = [100, 250, 500, 750, 1000, 1250, 1500, 1750, 2000]
@@ -165,7 +166,7 @@ def plot_figure_6():
 
 
 def plot_figure_7():
-    print(f"Generating images of Figure 7. This may take {BOLD_CHAR}several minutes (~50 mins.){END_CHAR}...")
+    print(f"Generating images of Figure 7. This may take {BOLD_CHAR}several minutes (~50 mins.){END_CHAR} ...")
 
     # matrix sizes
     n_list = [100, 250, 500, 750, 1000, 1250, 1500, 1750, 2000]
@@ -575,10 +576,12 @@ def plot_figure_17():
 def plot_figure_18():
     print(f"Generating images of Figure 18. This may take {BOLD_CHAR}some seconds{END_CHAR}...")
 
+    np.random.seed(1)
+
     plt.rcParams['figure.dpi'] = 100
 
-    x1 = np.linspace(0, 1, num=100)
-    x2 = np.linspace(0, 1, num=100)
+    x1 = np.linspace(0, 1, num=1000)
+    x2 = np.linspace(0, 1, num=1000)
 
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12,4))
 
@@ -586,21 +589,22 @@ def plot_figure_18():
         for b in [2.0]:
             msd = ManovaSpectrumDistribution(beta=1, ratio_a=a, ratio_b=b)
 
-            y1 = msd.cdf(x1)
-            y2 = msd.cdf(x2)
+            y1 = msd.pdf(x1)
+            y2 = msd.pdf(x2)
 
             ax1.plot(x1, y1, label=f"$a$ = {a}, $b$ = {b}")
             ax2.plot(x2, y2, label=f"$a$ = {a}, $b$ = {b}")
 
     ax1.legend()
     ax1.set_xlabel("x", fontweight="bold")
-    ax1.set_ylabel("probability", fontweight="bold")
+    ax1.set_ylabel("density", fontweight="bold")
 
     ax2.legend()
+    ax2.set_ylim(0, 4)
     ax2.set_xlabel("x", fontweight="bold")
-    ax2.set_ylabel("probability", fontweight="bold")
+    ax2.set_ylabel("density", fontweight="bold")
 
-    fig.suptitle("Manova spectrum cumulative distribution function (CDF)", fontweight="bold")
+    fig.suptitle("Manova spectrum probability density function (PDF)", fontweight="bold")
 
     figpath = os.path.join(SCRIPT_PATH, IMGS_DIRNAME, "fig18_msd_pdf.png")
     plt.savefig(figpath)
@@ -652,19 +656,19 @@ def plot_figure_19():
 
 
 def plot_figure_20():
-    print(f"Generating images of Figure 20. This may take {BOLD_CHAR}some seconds{END_CHAR}...")
+    print(f"Generating images of Figure 20. This may take {BOLD_CHAR}some minutes (~5 mins.){END_CHAR} ...")
 
-    mre = ManovaEnsemble(beta=1, m=100, n1=200, n2=200, tridiagonal_form=True, random_state=1)
+    mre = ManovaEnsemble(beta=1, m=100, n1=200, n2=200, random_state=1)
     ens_figpath = os.path.join(SCRIPT_PATH, IMGS_DIRNAME, "fig20_mre_100.png")
     plot_spectral_hist_and_law(ensemble=mre, bins=60, savefig_path=ens_figpath)
     __restore_plt()
 
-    mre = ManovaEnsemble(beta=1, m=1000, n1=2000, n2=2000, tridiagonal_form=True, random_state=1)
+    mre = ManovaEnsemble(beta=1, m=1000, n1=2000, n2=2000, random_state=1)
     ens_figpath = os.path.join(SCRIPT_PATH, IMGS_DIRNAME, "fig20_mre_1000.png")
     plot_spectral_hist_and_law(ensemble=mre, bins=60, savefig_path=ens_figpath)
     __restore_plt()
 
-    mre = ManovaEnsemble(beta=1, m=10000, n1=20000, n2=20000, tridiagonal_form=True, random_state=1)
+    mre = ManovaEnsemble(beta=1, m=10000, n1=20000, n2=20000, random_state=1)
     ens_figpath = os.path.join(SCRIPT_PATH, IMGS_DIRNAME, "fig20_mre_10000.png")
     plot_spectral_hist_and_law(ensemble=mre, bins=60, savefig_path=ens_figpath)
     __restore_plt()
@@ -687,7 +691,7 @@ def __plot_times(N_list, bins_list, times_naive, times_tridiag, savefig_path):
     fig.subplots_adjust(hspace=.5)
 
     # labels for plots and nodes for interpolation
-    labels = _build_m_labels(bins_list)
+    labels = __build_m_labels(bins_list)
     nodes = np.linspace(N_list[0], N_list[-1], 1000)
 
     # Fitting line naive computation
@@ -803,8 +807,8 @@ def main():
     # plot_figure_5()
 
     # Tridiagonal optimization
-    # plot_figure_6()
-    # plot_figure_7()
+    plot_figure_6()
+    plot_figure_7()
 
     # # Joint eigenvalue PDF
     # plot_figure_8()
@@ -815,19 +819,19 @@ def main():
     # plot_figure_11()
 
     # Tracy-Widom law
-    plot_figure_12()
-    plot_figure_13()
-    plot_figure_14()
+    # plot_figure_12()
+    # plot_figure_13()
+    # plot_figure_14()
 
-    # Marchenko-Pastur law
-    plot_figure_15()
-    plot_figure_16()
-    plot_figure_17()
+    # # Marchenko-Pastur law
+    # plot_figure_15()
+    # plot_figure_16()
+    # plot_figure_17()
 
-    # Manova Spectrum distr.
-    plot_figure_18()
-    plot_figure_19()
-    plot_figure_20()
+    # # Manova Spectrum distr.
+    # plot_figure_18()
+    # plot_figure_19()
+    # plot_figure_20()
 
 
 
