@@ -1,6 +1,8 @@
 import os
 import sys
+from importlib import reload
 import numpy as np
+import matplotlib
 import matplotlib.pyplot as plt
 
 dirname = os.path.dirname(__file__)
@@ -16,13 +18,15 @@ from skrmt.ensemble.spectral_law import (
     TracyWidomDistribution,
     ManovaSpectrumDistribution,
 )
-from skrmt.ensemble.utils import standard_vs_tridiag_hist
+from skrmt.ensemble.utils import (
+    standard_vs_tridiag_hist, plot_spectral_hist_and_law,
+)
 
 IMGS_DIRNAME = "skrmt_sim_imgs"
 SCRIPT_PATH = os.path.dirname(__file__)
 
 
-def setup_img_dir():
+def _setup_img_dir():
     """Creates a directory (if ti does not exist) in the same locations
     as this script for the simulation images of scikit-rmt.
     """
@@ -35,23 +39,31 @@ def setup_img_dir():
     print(f"The images of the Figures will be stored at {imgs_dir_path}")
 
 
+def __restore_plt():
+    reload(matplotlib)
+    reload(plt)
+    plt.clf()
+    plt.rcParams.update(matplotlib.rcParamsDefault)
+    matplotlib.rcdefaults()
+
+
 def plot_figure_1():
     print("Generating images of Figure 1. This may take some seconds...")
 
     ens = GaussianEnsemble(beta=1, n=1000, random_state=1)
     ens_figpath = os.path.join(SCRIPT_PATH, IMGS_DIRNAME, "fig1_goe_1000.png")
     ens.plot_eigval_hist(bins=80, density=True, savefig_path=ens_figpath)
-    plt.clf()
+    __restore_plt()
 
     ens = GaussianEnsemble(beta=2, n=1000, random_state=1)
     ens_figpath = os.path.join(SCRIPT_PATH, IMGS_DIRNAME, "fig1_gue_1000.png")
     ens.plot_eigval_hist(bins=80, density=True, savefig_path=ens_figpath)
-    plt.clf()
+    __restore_plt()
 
     ens = GaussianEnsemble(beta=4, n=1000, random_state=1)
     ens_figpath = os.path.join(SCRIPT_PATH, IMGS_DIRNAME, "fig1_gse_1000.png")
     ens.plot_eigval_hist(bins=80, density=True, savefig_path=ens_figpath)
-    plt.clf()
+    __restore_plt()
 
     print("[DONE] - Images Figure 1")
 
@@ -62,17 +74,17 @@ def plot_figure_2():
     ens = WishartEnsemble(beta=1, p=1000, n=5000, random_state=1)
     ens_figpath = os.path.join(SCRIPT_PATH, IMGS_DIRNAME, "fig2_wre_1000.png")
     ens.plot_eigval_hist(bins=80, density=True, savefig_path=ens_figpath)
-    plt.clf()
+    __restore_plt()
 
     ens = WishartEnsemble(beta=2, p=1000, n=5000, random_state=1)
     ens_figpath = os.path.join(SCRIPT_PATH, IMGS_DIRNAME, "fig2_wce_1000.png")
     ens.plot_eigval_hist(bins=80, density=True, savefig_path=ens_figpath)
-    plt.clf()
+    __restore_plt()
 
     ens = WishartEnsemble(beta=4, p=1000, n=5000, random_state=1)
     ens_figpath = os.path.join(SCRIPT_PATH, IMGS_DIRNAME, "fig2_wqe_1000.png")
     ens.plot_eigval_hist(bins=80, density=True, savefig_path=ens_figpath)
-    plt.clf()
+    __restore_plt()
 
     print("[DONE] - Images Figure 2")
 
@@ -83,17 +95,17 @@ def plot_figure_3():
     ens = ManovaEnsemble(beta=1, m=1000, n1=2000, n2=2000, random_state=1)
     ens_figpath = os.path.join(SCRIPT_PATH, IMGS_DIRNAME, "fig3_mre_1000.png")
     ens.plot_eigval_hist(bins=80, density=True, savefig_path=ens_figpath)
-    plt.clf()
+    __restore_plt()
 
     ens = ManovaEnsemble(beta=2, m=1000, n1=2000, n2=2000, random_state=1)
     ens_figpath = os.path.join(SCRIPT_PATH, IMGS_DIRNAME, "fig3_mce_1000.png")
     ens.plot_eigval_hist(bins=80, density=True, savefig_path=ens_figpath)
-    plt.clf()
+    __restore_plt()
 
     ens = ManovaEnsemble(beta=4, m=1000, n1=2000, n2=2000, random_state=1)
     ens_figpath = os.path.join(SCRIPT_PATH, IMGS_DIRNAME, "fig3_mqe_1000.png")
     ens.plot_eigval_hist(bins=80, density=True, savefig_path=ens_figpath)
-    plt.clf()
+    __restore_plt()
 
     print("[DONE] - Images Figure 3")
 
@@ -104,17 +116,17 @@ def plot_figure_4():
     ens = CircularEnsemble(beta=1, n=1000, random_state=1)
     ens_figpath = os.path.join(SCRIPT_PATH, IMGS_DIRNAME, "fig4_coe_1000.png")
     ens.plot_eigval_hist(bins=80, density=True, savefig_path=ens_figpath)
-    plt.clf()
+    __restore_plt()
 
     ens = CircularEnsemble(beta=2, n=1000, random_state=1)
     ens_figpath = os.path.join(SCRIPT_PATH, IMGS_DIRNAME, "fig4_cue_1000.png")
     ens.plot_eigval_hist(bins=80, density=True, savefig_path=ens_figpath)
-    plt.clf()
+    __restore_plt()
 
     ens = CircularEnsemble(beta=4, n=1000, random_state=1)
     ens_figpath = os.path.join(SCRIPT_PATH, IMGS_DIRNAME, "fig4_cse_1000.png")
     ens.plot_eigval_hist(bins=80, density=True, savefig_path=ens_figpath)
-    plt.clf()
+    __restore_plt()
 
     print("[DONE] - Images Figure 4")
 
@@ -125,6 +137,7 @@ def plot_figure_5():
     ens_figpath = os.path.join(SCRIPT_PATH, IMGS_DIRNAME, "fig5_goe_1000.png")
     ens = GaussianEnsemble(beta=1, n=1000)
     standard_vs_tridiag_hist(ensemble=ens, bins=60, random_state=10, savefig_path=ens_figpath)
+    __restore_plt()
 
     print("[DONE] - Images Figure 5")
 
@@ -204,13 +217,116 @@ def plot_figure_8():
 
     figpath = os.path.join(SCRIPT_PATH, IMGS_DIRNAME, "fig8_goe_2x2.png")
     plt.savefig(figpath)
+    __restore_plt()
 
     print("[DONE] - Images Figure 8")
 
 
+def plot_figure_9():
+    print("Generating images of Figure 9. This may take some seconds...")
+
+    plt.rcParams['figure.dpi'] = 100
+
+    xx = np.linspace(-10, 10, num=4000)
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12,4))
+
+    for sigma in [0.5, 1.0, 2.0, 4.0]:
+        wsd = WignerSemicircleDistribution(beta=1, center=0.0, sigma=sigma)
+
+        # computing pdf
+        y1 = wsd.pdf(xx)
+        # computing cdf    
+        y2 = wsd.cdf(xx)
+
+        ax1.plot(xx, y1, label=f"$\sigma$ = {sigma} (R = ${wsd.radius}$)")
+        ax2.plot(xx, y2, label=f"$\sigma$ = {sigma} (R = ${wsd.radius}$)")
+
+    ax1.legend()
+    ax1.set_xlabel("x", fontweight="bold")
+    ax1.set_xticks([-10, -8, -6, -4, -2, 0, 2, 4, 6, 8, 10])
+    ax1.set_ylabel("density", fontweight="bold")
+    ax1.set_title("Probability density function (PDF)")
+
+    ax2.legend()
+    ax2.set_xlabel("x", fontweight="bold")
+    ax2.set_xticks([-10, -8, -6, -4, -2, 0, 2, 4, 6, 8, 10])
+    ax2.set_ylabel("probability", fontweight="bold")
+    ax2.set_title("Cumulative distribution function (CDF)")
+
+    fig.suptitle("Wigner Semicircle law", fontweight="bold")
+
+    figpath = os.path.join(SCRIPT_PATH, IMGS_DIRNAME, "fig9_wsl_pdf_cdf.png")
+    plt.savefig(figpath)
+    __restore_plt()
+
+    print("[DONE] - Images Figure 9")
+
+
+def plot_figure_10():
+    print("Generating images of Figure 10. This may take some seconds...")
+
+    wsd1 = WignerSemicircleDistribution(beta=1)
+    ens_figpath = os.path.join(SCRIPT_PATH, IMGS_DIRNAME, "fig10_wsl_beta1.png")
+    wsd1.plot_empirical_pdf(
+        sample_size=10000,
+        bins=60,
+        density=True,
+        plot_law_pdf=True,
+        random_state=1,
+        savefig_path=ens_figpath,
+    )
+    __restore_plt()
+
+    wsd2 = WignerSemicircleDistribution(beta=2)
+    ens_figpath = os.path.join(SCRIPT_PATH, IMGS_DIRNAME, "fig10_wsl_beta2.png")
+    wsd2.plot_empirical_pdf(
+        sample_size=10000,
+        bins=60,
+        density=True,
+        plot_law_pdf=True,
+        random_state=2,
+        savefig_path=ens_figpath,
+    )
+    __restore_plt()
+
+    wsd4 = WignerSemicircleDistribution(beta=4)
+    ens_figpath = os.path.join(SCRIPT_PATH, IMGS_DIRNAME, "fig10_wsl_beta4.png")
+    wsd4.plot_empirical_pdf(
+        sample_size=10000,
+        bins=60,
+        density=True,
+        plot_law_pdf=True,
+        random_state=4,
+        savefig_path=ens_figpath,
+    )
+    __restore_plt()
+
+    print("[DONE] - Images Figure 10")
+
+
+def plot_figure_11():
+    print("Generating images of Figure 11. This may take some seconds...")
+
+    goe = GaussianEnsemble(beta=1, n=100, tridiagonal_form=True, random_state=1)
+    ens_figpath = os.path.join(SCRIPT_PATH, IMGS_DIRNAME, "fig11_goe_100.png")
+    plot_spectral_hist_and_law(ensemble=goe, bins=60, savefig_path=ens_figpath)
+    __restore_plt()
+
+    goe = GaussianEnsemble(beta=1, n=1000, tridiagonal_form=True, random_state=1)
+    ens_figpath = os.path.join(SCRIPT_PATH, IMGS_DIRNAME, "fig11_goe_1000.png")
+    plot_spectral_hist_and_law(ensemble=goe, bins=60, savefig_path=ens_figpath)
+    __restore_plt()
+
+    goe = GaussianEnsemble(beta=1, n=10000, tridiagonal_form=True, random_state=1)
+    ens_figpath = os.path.join(SCRIPT_PATH, IMGS_DIRNAME, "fig11_goe_10000.png")
+    plot_spectral_hist_and_law(ensemble=goe, bins=60, savefig_path=ens_figpath)
+    __restore_plt()
+
+    print("[DONE] - Images Figure 11")
+
 
 def main():
-    setup_img_dir()
+    _setup_img_dir()
     # plot_figure_1()
     # plot_figure_2()
     # plot_figure_3()
@@ -221,7 +337,12 @@ def main():
     # TODO: Figure 6 !!!!
     # TODO: Figure 7 !!!!
 
-    plot_figure_8()
+    # plot_figure_8()
+
+    plot_figure_9()
+
+    plot_figure_10()
+    plot_figure_11()
 
 
 
