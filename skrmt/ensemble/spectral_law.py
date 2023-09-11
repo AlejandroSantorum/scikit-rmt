@@ -76,12 +76,13 @@ class WignerSemicircleDistribution:
         self.radius = 2.0 * np.sqrt(self.beta) * self.sigma
         self.default_interval = (self.center - self.radius, self.center + self.radius)
 
-    def rvs(self, size, random_state: int = None):
+    def rvs(self, size=None, random_state: int = None):
         """Samples ranfom variates following this distribution.
         This uses the relationship between Wigner Semicircle law and Beta distribution.
 
         Args:
-            size (int): sample size.
+            size (int or tuple of ints, default=None): sample size. If None, a single value
+                is returned.
             random_state (int, default=None): random seed to initialize the pseudo-random
                 number generator of numpy. This has to be any integer between 0 and 2**32 - 1
                 (inclusive), or None (default). If None, the seed is obtained from the clock.
