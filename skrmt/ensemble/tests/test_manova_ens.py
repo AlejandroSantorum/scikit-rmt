@@ -32,31 +32,6 @@ def test_manova_real_init():
                         decimal=7)
 
 
-def test_mre_set_size():
-    '''Testing setter to change matrix sizes of MRE
-    '''
-    m1_size, n11_size, n12_size = 3, 5, 8
-    m2_size, n21_size, n22_size = 2, 4, 6
-
-    mre = ManovaEnsemble(beta=1, m=m1_size, n1=n11_size, n2=n12_size)
-    assert mre.m == m1_size
-    assert mre.n1 == n11_size
-    assert mre.n2 == n12_size
-    assert mre.matrix.shape == (m1_size,m1_size)
-
-    mre.set_size(m=m2_size, n1=n21_size, n2=n22_size, resample_mtx=False)
-    assert mre.m == m2_size
-    assert mre.n1 == n21_size
-    assert mre.n2 == n22_size
-    assert mre.matrix.shape == (m1_size,m1_size)
-
-    mre.set_size(m=m2_size, n1=n21_size, n2=n22_size, resample_mtx=True, random_state=1)
-    assert mre.m == m2_size
-    assert mre.n1 == n21_size
-    assert mre.n2 == n22_size
-    assert mre.matrix.shape == (m2_size,m2_size)
-
-
 def test_beta1_joint_eigval_pdf():
     '''Testing joint eigenvalue pdf
     '''
@@ -90,31 +65,6 @@ def test_manova_complex_init():
                         decimal=7)
 
 
-def test_mce_set_size():
-    '''Testing setter to change matrix sizes of MCE
-    '''
-    m1_size, n11_size, n12_size = 4, 6, 8
-    m2_size, n21_size, n22_size = 3, 9, 12
-
-    mce = ManovaEnsemble(beta=2, m=m1_size, n1=n11_size, n2=n12_size)
-    assert mce.m == m1_size
-    assert mce.n1 == n11_size
-    assert mce.n2 == n12_size
-    assert mce.matrix.shape == (m1_size,m1_size)
-
-    mce.set_size(m=m2_size, n1=n21_size, n2=n22_size, resample_mtx=False)
-    assert mce.m == m2_size
-    assert mce.n1 == n21_size
-    assert mce.n2 == n22_size
-    assert mce.matrix.shape == (m1_size,m1_size)
-
-    mce.set_size(m=m2_size, n1=n21_size, n2=n22_size, resample_mtx=True, random_state=1)
-    assert mce.m == m2_size
-    assert mce.n1 == n21_size
-    assert mce.n2 == n22_size
-    assert mce.matrix.shape == (m2_size,m2_size)
-
-
 ##########################################
 ### Manova Quaternion Ensemble = MQE
 
@@ -140,28 +90,3 @@ def test_manova_quatern_init():
                 0.05675906-0.06962803j, 0.30129103+0.01333821j]]
 
     assert_almost_equal(mqe.matrix, np.array(mtx_sol), decimal=7)
-
-
-def test_mqe_set_size():
-    '''Testing setter to change matrix sizes of MQE
-    '''
-    m1_size, n11_size, n12_size = 2, 5, 7
-    m2_size, n21_size, n22_size = 4, 5, 6
-
-    mqe = ManovaEnsemble(beta=4, m=m1_size, n1=n11_size, n2=n12_size)
-    assert mqe.m == m1_size
-    assert mqe.n1 == n11_size
-    assert mqe.n2 == n12_size
-    assert mqe.matrix.shape == (2*m1_size,2*m1_size)
-
-    mqe.set_size(m=m2_size, n1=n21_size, n2=n22_size, resample_mtx=False)
-    assert mqe.m == m2_size
-    assert mqe.n1 == n21_size
-    assert mqe.n2 == n22_size
-    assert mqe.matrix.shape == (2*m1_size,2*m1_size)
-
-    mqe.set_size(m=m2_size, n1=n21_size, n2=n22_size, resample_mtx=True, random_state=1)
-    assert mqe.m == m2_size
-    assert mqe.n1 == n21_size
-    assert mqe.n2 == n22_size
-    assert mqe.matrix.shape == (2*m2_size,2*m2_size)

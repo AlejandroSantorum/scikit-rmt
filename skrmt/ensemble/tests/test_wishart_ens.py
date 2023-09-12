@@ -59,28 +59,6 @@ def test_wre_symmetric():
     assert (mtx.transpose() == mtx).all()
 
 
-def test_wre_set_size():
-    '''Testing setter to change matrix sizes of WRE
-    '''
-    p1_size, n1_size = 3, 5
-    p2_size, n2_size = 4, 6
-
-    ens = WishartEnsemble(beta=1, p=p1_size, n=n1_size)
-    assert ens.p == p1_size
-    assert ens.n == n1_size
-    assert ens.matrix.shape == (p1_size,p1_size)
-
-    ens.set_size(p=p2_size, n=n2_size, resample_mtx=False)
-    assert ens.p == p2_size
-    assert ens.n == n2_size
-    assert ens.matrix.shape == (p1_size,p1_size)
-
-    ens.set_size(p=p2_size, n=n2_size, resample_mtx=True, random_state=1)
-    assert ens.p == p2_size
-    assert ens.n == n2_size
-    assert ens.matrix.shape == (p2_size,p2_size)
-
-
 def test_wre_resample():
     '''Testing resample of WRE
     '''
@@ -227,28 +205,6 @@ def test_wce_hermitian():
     assert_almost_equal(mtx.transpose().conj(), mtx, decimal=7)
 
 
-def test_wce_set_size():
-    '''Testing setter to change matrix sizes of WCE
-    '''
-    p1_size, n1_size = 5, 10
-    p2_size, n2_size = 7, 14
-
-    ens = WishartEnsemble(beta=2, p=p1_size, n=n1_size)
-    assert ens.p == p1_size
-    assert ens.n == n1_size
-    assert ens.matrix.shape == (p1_size,p1_size)
-
-    ens.set_size(p=p2_size, n=n2_size, resample_mtx=False)
-    assert ens.p == p2_size
-    assert ens.n == n2_size
-    assert ens.matrix.shape == (p1_size,p1_size)
-
-    ens.set_size(p=p2_size, n=n2_size, resample_mtx=True, random_state=1)
-    assert ens.p == p2_size
-    assert ens.n == n2_size
-    assert ens.matrix.shape == (p2_size,p2_size)
-
-
 def test_wce_resample():
     '''Testing resample of WCE
     '''
@@ -369,28 +325,6 @@ def test_wqe_hermitian():
 
     mtx = wqe.matrix
     assert_almost_equal(mtx, mtx.transpose().conj(), decimal=7)
-
-
-def test_wqe_set_size():
-    '''Testing setter to change matrix sizes of WQE
-    '''
-    p_size1, n_size1 = 2, 3
-    p_size2, n_size2 = 4, 5
-
-    ens = WishartEnsemble(beta=4, p=p_size1, n=n_size1)
-    assert ens.p == p_size1
-    assert ens.n == n_size1
-    assert ens.matrix.shape == (2*p_size1,2*p_size1)
-
-    ens.set_size(p=p_size2, n=n_size2, resample_mtx=False)
-    assert ens.p == p_size2
-    assert ens.n == n_size2
-    assert ens.matrix.shape == (2*p_size1,2*p_size1)
-
-    ens.set_size(p=p_size2, n=n_size2, resample_mtx=True, random_state=1)
-    assert ens.p == p_size2
-    assert ens.n == n_size2
-    assert ens.matrix.shape == (2*p_size2,2*p_size2)
 
 
 def test_wqe_resample():

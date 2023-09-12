@@ -76,12 +76,13 @@ class WignerSemicircleDistribution:
         self.radius = 2.0 * np.sqrt(self.beta) * self.sigma
         self.default_interval = (self.center - self.radius, self.center + self.radius)
 
-    def rvs(self, size, random_state: int = None):
+    def rvs(self, size=None, random_state: int = None):
         """Samples ranfom variates following this distribution.
         This uses the relationship between Wigner Semicircle law and Beta distribution.
 
         Args:
-            size (int): sample size.
+            size (int or tuple of ints, default=None): sample size. If None, a single value
+                is returned.
             random_state (int, default=None): random seed to initialize the pseudo-random
                 number generator of numpy. This has to be any integer between 0 and 2**32 - 1
                 (inclusive), or None (default). If None, the seed is obtained from the clock.
@@ -270,7 +271,7 @@ class MarchenkoPasturDistribution(rv_continuous):
             number of degrees of freedom 'p' and the sample size 'n'. The value
             of ratio = p/n.
         beta (int): descriptive integer of the Wishart ensemble type.
-            For WRE beta=1, for WCEE beta=2, for WQE beta=4.
+            For WRE beta=1, for WCE beta=2, for WQE beta=4.
         sigma (float): scale of the distribution. This value also corresponds
             to the standard deviation of the random entries of the sampled matrix.
         lambda_minus (float): lower bound of the support of the Marchenko-Pastur Law.
@@ -293,12 +294,12 @@ class MarchenkoPasturDistribution(rv_continuous):
         Initializes an instance of this class with the given parameters.
 
         Args:
-            ratio (float): random matrix size ratio (:math:`\lambda`). This is the ratio
+            ratio (float): random matrix size ratio (:math:`\\lambda`). This is the ratio
                 between the number of degrees of freedom :math:`p` and the sample size :math:`n`.
-                The value of ratio is computed as :math:`\lambda = p/n`.
+                The value of ratio is computed as :math:`\\lambda = p/n`.
             beta (int, default=1): descriptive integer of the Wishart ensemble type (:math:`\beta`).
                 For WRE beta=1, for WCE beta=2, for WQE beta=4.
-            sigma (float, default=1.0): scale of the distribution (:math:`\sigma`). This value also
+            sigma (float, default=1.0): scale of the distribution (:math:`\\sigma`). This value also
                 corresponds to the standard deviation of the random entries of the sampled matrix.
         
         """
@@ -321,7 +322,7 @@ class MarchenkoPasturDistribution(rv_continuous):
         # when the support is finite (lambda_minus, lambda_plus) it is better
         # to explicity approximate the inverse of the CDF to implement rvs
         self._approximate_inv_cdf()
-    
+
     def _set_default_interval(self):
         # computing interval according to the matrix size ratio and support
         if self.ratio <= 1:
@@ -443,13 +444,15 @@ class MarchenkoPasturDistribution(rv_continuous):
             plot_ylabel="cumulative distribution", savefig_path=savefig_path
         )
 
-    def plot_empirical_pdf(self, sample_size=1000, bins=100, interval=None, density=False,
-                           plot_law_pdf=False, savefig_path=None, random_state=None):
+    def plot_empirical_pdf(
+        self, sample_size=1000, bins=100, interval=None, density=False,
+        plot_law_pdf=False, savefig_path=None, random_state=None
+    ):
         """Computes and plots Marchenko-Pastur empirical PDF.
-
+        
         Calculates and plots Marchenko-Pastur law by generating samples from the
-        known Marchenko-Pastur PDF. Remember that the ``ratio`` (a.k.a. :math:`[\lambda]`)
-        specified when instantiating the class will determine the shape of the distribution.
+        known Marchenko-Pastur PDF. Remember that the ``ratio`` specified when
+        instantiating the class will determine the shape of the distribution.
 
         Args:
             sample_size (int, default=1000): number of random samples that can be interpreted as
@@ -734,6 +737,41 @@ class TracyWidomDistribution(rv_continuous):
         else:
             plt.show()
 
+    def _normalize_eigvals(self, max_eigvals: np.ndarray, matrix_size: int, other_beta: int = None):
+        """Normalizes set of eigenvalues using Tracy-Widom scale and normalization constants.
+
+        This method normalizes the provided eigenvalues (they are supposed to be a set of largest
+        eigenvalues) using the scale and normalization constants to fit Tracy-Widom law.
+
+        Args:
+            max_eigvals (ndarray): numpy array with the eigenvalues to scale and normalize.
+            matrix_size (int): the original matrix size. Remember that Tracy-Widom law describes
+                the limiting behaviour of the largest eigenvalue of a Wigner matrix.
+            other_beta (optional, default=None): beta of the ensemble that corresponds to the
+                sampled eigenvalues. If None, the property ``beta`` of this class is used.
+        
+        Returns:
+            (ndarray) numpy array containing the scaled and normalized eigenvalues.
+
+        """
+        if other_beta is None:
+            _beta = self.beta
+        else:
+            _beta = other_beta
+
+        # Tracy-Widom eigenvalue normalization constants
+        eigval_scale = 1.0/np.sqrt(_beta)
+        size_scale = 1.0
+        if _beta == 4:
+            size_scale = 1/np.sqrt(2)
+        
+        max_eigvals = (
+            size_scale
+            * (matrix_size**(1/6))
+            * (eigval_scale * max_eigvals - (2.0 * np.sqrt(matrix_size)))
+        )
+        return max_eigvals
+
     def plot_ensemble_max_eigvals(
         self,
         ensemble: _Ensemble,
@@ -778,7 +816,7 @@ class TracyWidomDistribution(rv_continuous):
             max_eigvals.append(max_eigval)
         max_eigvals = np.asarray(max_eigvals)
 
-        max_eigvals = self.normalize_eigvals(
+        max_eigvals = self._normalize_eigvals(
             max_eigvals=max_eigvals,                # Max. eigenvalues to normalize
             matrix_size=ensemble.matrix.shape[1],   # Sample size. Usually shape[0] = shape[1]
             other_beta=ensemble.beta                # In case `ensemble` was created with a different beta
@@ -807,40 +845,6 @@ class TracyWidomDistribution(rv_continuous):
         else:
             plt.show()
 
-    def normalize_eigvals(self, max_eigvals: np.ndarray, matrix_size: int, other_beta: int = None):
-        """Normalizes set of eigenvalues using Tracy-Widom scale and normalization constants.
-
-        This method normalizes the provided eigenvalues (they are supposed to be a set of largest
-        eigenvalues) using the scale and normalization constants to fit Tracy-Widom law.
-
-        Args:
-            max_eigvals (ndarray): numpy array with the eigenvalues to scale and normalize.
-            matrix_size (int): the original matrix size. Remember that Tracy-Widom law describes
-                the limiting behaviour of the largest eigenvalue of a Wigner matrix.
-            other_beta (optional, default=None): beta of the ensemble that corresponds to the
-                sampled eigenvalues. If None, the property ``beta`` of this class is used.
-        
-        Returns:
-            (ndarray) numpy array containing the scaled and normalized eigenvalues.
-
-        """
-        if other_beta is None:
-            _beta = self.beta
-        else:
-            _beta = other_beta
-
-        # Tracy-Widom eigenvalue normalization constants
-        eigval_scale = 1.0/np.sqrt(_beta)
-        size_scale = 1.0
-        if _beta == 4:
-            size_scale = 1/np.sqrt(2)
-        
-        max_eigvals = (
-            size_scale
-            * (matrix_size**(1/6))
-            * (eigval_scale * max_eigvals - (2.0 * np.sqrt(matrix_size)))
-        )
-        return max_eigvals
 
 
 class ManovaSpectrumDistribution(rv_continuous):

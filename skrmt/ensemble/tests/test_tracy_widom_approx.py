@@ -3,6 +3,7 @@
 Testing module that checks Tracy-Widom distribution approximator.
 '''
 
+import warnings
 from numpy.testing import assert_almost_equal
 
 from skrmt.ensemble.tracy_widom_approximator import TW_Approximator
@@ -12,6 +13,8 @@ def test_cdf_approximation():
     
     The PDF is not tested since it is the derivative of the CDF.
     """
+    warnings.filterwarnings("ignore", category=DeprecationWarning)
+
     tw = TW_Approximator(beta=2)
 
     assert_almost_equal(tw.cdf(0.1), 0.9754704606594619, decimal=5)

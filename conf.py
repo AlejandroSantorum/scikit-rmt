@@ -46,7 +46,8 @@ extensions = [
     'sphinx.ext.napoleon',
     'sphinx.ext.viewcode',
     'sphinx.ext.autosummary',
-    'sphinx_gallery.gen_gallery'
+    'sphinx_gallery.gen_gallery',
+    'sphinx.ext.mathbase', # https://sphinx-rtd-trial.readthedocs.io/en/latest/ext/math.html
 ]
 
 # Napoleon settings

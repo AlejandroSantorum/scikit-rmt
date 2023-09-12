@@ -99,25 +99,6 @@ class CircularEnsemble(_Ensemble):
         self._eigvals = None
         self.matrix = self.sample(random_state=random_state)
 
-    def set_size(self, n, resample_mtx=False, random_state: int = None):
-        # pylint: disable=arguments-differ
-        """Setter of matrix size.
-
-        Sets the matrix size. Useful if it has been initialized with a different value.
-
-        Args:
-            n (int): random matrix size. Circular ensemble matrices are
-                squared matrices. COE and CUE are of size n times n,
-                and CSE are of size 2n times 2n.
-            random_state (int, default=None): random seed to initialize the pseudo-random
-                number generator of numpy. This has to be any integer between 0 and 2**32 - 1
-                (inclusive), or None (default). If None, the seed is obtained from the clock.
-
-        """
-        self.n = n
-        if resample_mtx:
-            self.resample(random_state=random_state)
-
     def resample(self, random_state: int = None):
         """Re-samples new Circular Ensemble random matrix.
 
