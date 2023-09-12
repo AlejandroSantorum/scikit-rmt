@@ -294,12 +294,12 @@ class MarchenkoPasturDistribution(rv_continuous):
         Initializes an instance of this class with the given parameters.
 
         Args:
-            ratio (float): random matrix size ratio (:math:`\lambda`). This is the ratio
+            ratio (float): random matrix size ratio (:math:`\\lambda`). This is the ratio
                 between the number of degrees of freedom :math:`p` and the sample size :math:`n`.
-                The value of ratio is computed as :math:`\lambda = p/n`.
+                The value of ratio is computed as :math:`\\lambda = p/n`.
             beta (int, default=1): descriptive integer of the Wishart ensemble type (:math:`\beta`).
                 For WRE beta=1, for WCE beta=2, for WQE beta=4.
-            sigma (float, default=1.0): scale of the distribution (:math:`\sigma`). This value also
+            sigma (float, default=1.0): scale of the distribution (:math:`\\sigma`). This value also
                 corresponds to the standard deviation of the random entries of the sampled matrix.
         
         """
@@ -322,7 +322,7 @@ class MarchenkoPasturDistribution(rv_continuous):
         # when the support is finite (lambda_minus, lambda_plus) it is better
         # to explicity approximate the inverse of the CDF to implement rvs
         self._approximate_inv_cdf()
-    
+
     def _set_default_interval(self):
         # computing interval according to the matrix size ratio and support
         if self.ratio <= 1:
@@ -444,13 +444,15 @@ class MarchenkoPasturDistribution(rv_continuous):
             plot_ylabel="cumulative distribution", savefig_path=savefig_path
         )
 
-    def plot_empirical_pdf(self, sample_size=1000, bins=100, interval=None, density=False,
-                           plot_law_pdf=False, savefig_path=None, random_state=None):
+    def plot_empirical_pdf(
+        self, sample_size=1000, bins=100, interval=None, density=False,
+        plot_law_pdf=False, savefig_path=None, random_state=None
+    ):
         """Computes and plots Marchenko-Pastur empirical PDF.
-
+        
         Calculates and plots Marchenko-Pastur law by generating samples from the
-        known Marchenko-Pastur PDF. Remember that the ``ratio`` (a.k.a. :math:`[\lambda]`)
-        specified when instantiating the class will determine the shape of the distribution.
+        known Marchenko-Pastur PDF. Remember that the ``ratio`` specified when
+        instantiating the class will determine the shape of the distribution.
 
         Args:
             sample_size (int, default=1000): number of random samples that can be interpreted as
