@@ -219,7 +219,7 @@ class TW_Approximator(object):
 
     def pdf(self, x):
         """Return the probability distribution function at x.
-        :math:`pdf(x) = \frac{d}{dx} \mathbb{P}(TW < x)`.
+        :math:`pdf(x) = {\frac{d}{dx}} \mathbb{P}(TW < x)`.
 
         Args:
             x (float or array-like): value to evaluate the pdf.

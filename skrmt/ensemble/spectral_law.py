@@ -177,7 +177,7 @@ class WignerSemicircleDistribution:
         Calculates and plots Wigner's semicircle empirical law using random samples generated
         using the relationship between the Wigner Semicircle law and the Beta distribution:
         the Wigner's Semicircle distribution it is a scaled Beta distribution with parameters
-        :math:`\alpha = \beta = 3/2`.
+        :math:`{\alpha} = {\beta} = 3/2`.
 
         Args:
             sample_size (int, default=1000): number of random samples that can be interpreted as
@@ -294,12 +294,12 @@ class MarchenkoPasturDistribution(rv_continuous):
         Initializes an instance of this class with the given parameters.
 
         Args:
-            ratio (float): random matrix size ratio (:math:`\\lambda`). This is the ratio
+            ratio (float): random matrix size ratio (:math:`{\lambda}`). This is the ratio
                 between the number of degrees of freedom :math:`p` and the sample size :math:`n`.
-                The value of ratio is computed as :math:`\\lambda = p/n`.
-            beta (int, default=1): descriptive integer of the Wishart ensemble type (:math:`\beta`).
+                The value of ratio is computed as :math:`{\lambda} = p/n`.
+            beta (int, default=1): descriptive integer of the Wishart ensemble type (:math:`\{beta}`).
                 For WRE beta=1, for WCE beta=2, for WQE beta=4.
-            sigma (float, default=1.0): scale of the distribution (:math:`\\sigma`). This value also
+            sigma (float, default=1.0): scale of the distribution (:math:`{\sigma}`). This value also
                 corresponds to the standard deviation of the random entries of the sampled matrix.
         
         """

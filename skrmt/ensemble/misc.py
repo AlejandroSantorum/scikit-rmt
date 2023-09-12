@@ -62,9 +62,9 @@ def indicator(x, start=None, stop=None, inclusive="both"):
     Args:
         x (ndarray): list of numbers to compute its element-wise indicator image.
         start (double, default=None): left value of the interval. If not provided,
-            the left value is equivalent to :math:`- \infty`.
+            the left value is equivalent to :math:`- {\infty}`.
         stop (double, default=None): right value of the interval. If not provided,
-            the right value is equivalent to :math:`+ \infty`.
+            the right value is equivalent to :math:`+ {\infty}`.
         inclusive (string, default="both"): type of interval. For left-closed interval
             use "left", for right-closed interval use "right", for closed interval use
             "both" and for open interval use "neither".
