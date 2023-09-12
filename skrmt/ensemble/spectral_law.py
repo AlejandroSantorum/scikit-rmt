@@ -271,7 +271,7 @@ class MarchenkoPasturDistribution(rv_continuous):
             number of degrees of freedom 'p' and the sample size 'n'. The value
             of ratio = p/n.
         beta (int): descriptive integer of the Wishart ensemble type.
-            For WRE beta=1, for WCEE beta=2, for WQE beta=4.
+            For WRE beta=1, for WCE beta=2, for WQE beta=4.
         sigma (float): scale of the distribution. This value also corresponds
             to the standard deviation of the random entries of the sampled matrix.
         lambda_minus (float): lower bound of the support of the Marchenko-Pastur Law.
