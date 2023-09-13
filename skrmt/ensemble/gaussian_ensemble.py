@@ -308,7 +308,7 @@ class GaussianEnsemble(_Ensemble):
 
     def plot_eigval_hist(
         self,
-        bins: Union[int, Sequence],
+        bins: Union[int, Sequence] = 100,
         interval: Tuple = None,
         density: bool = False,
         normalize: bool = False,

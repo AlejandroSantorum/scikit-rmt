@@ -111,7 +111,7 @@ class _Ensemble(metaclass=ABCMeta):
 
     def eigval_hist(
         self,
-        bins: Union[int, Sequence],
+        bins: Union[int, Sequence] = 100,
         interval: Tuple = None,
         density: bool = False,
         normalize: bool = False,
@@ -127,7 +127,7 @@ class _Ensemble(metaclass=ABCMeta):
         if the matrix eigenvalues are complex, they are casted to its real part.
 
         Args:
-            bins (int or sequence): If bins is an integer, it defines the number of
+            bins (int or sequence, default=100): If bins is an integer, it defines the number of
                 equal-width bins in the range. If bins is a sequence, it defines the
                 bin edges, including the left edge of the first bin and the right
                 edge of the last bin; in this case, bins may be unequally spaced.
