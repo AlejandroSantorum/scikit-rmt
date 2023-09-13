@@ -7,18 +7,18 @@ measure estimators quality.
 import numpy as np
 
 
-def loss_mv(sigma_tilde, sigma):
+def loss_mv(sigma_tilde: np.ndarray, sigma: np.ndarray) -> float:
     """Computes minimum variance loss function.
 
     Computes minimum variance loss function between estimated covariance
     matrix (Sigma tilde) and population covariance matrix (Sigma).
 
     Args:
-        sigma_tilde (numpy array): estimated covariance matrix.
-        sigma (numpy array): population covariance matrix.
+        sigma_tilde (np.ndarray): estimated covariance matrix.
+        sigma (np.ndarray): population covariance matrix.
 
     Returns:
-        loss (double): calculated minimum variance loss.
+        loss (float): calculated minimum variance loss.
 
     References:
         Ledoit, O. and Wolf, M.
@@ -45,18 +45,18 @@ def loss_mv(sigma_tilde, sigma):
     return loss
 
 
-def loss_frobenius(sigma_tilde, sigma):
+def loss_frobenius(sigma_tilde: np.ndarray, sigma: np.ndarray) -> float:
     """Computes Fröbenius loss function.
 
     Computes Fröbenius loss function between estimated covariance
     matrix (Sigma tilde) and population covariance matrix (Sigma).
 
     Args:
-        sigma_tilde (numpy array): estimated covariance matrix.
-        sigma (numpy array): population covariance matrix.
+        sigma_tilde (np.ndarray): estimated covariance matrix.
+        sigma (np.ndarray): population covariance matrix.
 
     Returns:
-        loss (double): calculated Fröbenius loss.
+        loss (float): calculated Fröbenius loss.
 
     References:
         Ledoit, O. and Wolf, M.
@@ -69,7 +69,7 @@ def loss_frobenius(sigma_tilde, sigma):
     return loss
 
 
-def prial_mv(exp_sample, exp_sigma_tilde, exp_fsopt):
+def prial_mv(exp_sample: float, exp_sigma_tilde: float, exp_fsopt: float) -> float:
     """Computes percentage relative improvement in average loss.
 
     Computes percentage relative improvement in average loss using
@@ -77,16 +77,16 @@ def prial_mv(exp_sample, exp_sigma_tilde, exp_fsopt):
     calculated using Monte Carlo simulations.
 
     Args:
-        exp_sample (double): expected MV loss between sample covariance
+        exp_sample (float): expected MV loss between sample covariance
             matrix and population matrix.
-        exp_sigma_tilde (double): expected MV loss between estimated covariance
+        exp_sigma_tilde (float): expected MV loss between estimated covariance
             matrix and population matrix.
-        exp_fsopt (double): expected MV loss between S^* covariance
+        exp_fsopt (float): expected MV loss between S^* covariance
             matrix (i.e., finite-sample optimal covariance matrix)
             and population matrix.
 
     Returns:
-        prial (double): calculated percentage relative improvement in average loss.
+        prial (float): calculated percentage relative improvement in average loss.
 
     References:
         Ledoit, O. and Wolf, M.
