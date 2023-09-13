@@ -60,7 +60,6 @@ def test_base_set_eigval_norm_const():
     assert goe.eigval_norm_const == 0.1
 
 
-
 def test_base_ens_plot():
     """Testing plot eigval hist
     """
@@ -68,3 +67,19 @@ def test_base_ens_plot():
     goe = GaussianEnsemble(beta=1, n=100, tridiagonal_form=False)
     goe.plot_eigval_hist(savefig_path=TMP_DIR_PATH+"/"+fig_name)
     assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name)) == True
+
+
+def test_base_ens_eigval_hist_raises():
+    """Testing raising an exception for invalid ``interval`` type.
+    """
+    goe = GaussianEnsemble(beta=1, n=10, tridiagonal_form=False)
+    with pytest.raises(ValueError):
+        goe.eigval_hist(bins=10, interval="invalid interval type")
+
+
+def test_base_ens_plot_eigval_hist_raises():
+    """Testing raising an exception for invalid ``interval`` type.
+    """
+    goe = GaussianEnsemble(beta=1, n=10, tridiagonal_form=False)
+    with pytest.raises(ValueError):
+        goe.plot_eigval_hist(bins=10, interval="invalid interval type")

@@ -172,7 +172,7 @@ class WignerSemicircleDistribution:
 
     def plot_empirical_pdf(self, sample_size=10000, bins=100, interval=None, density=False,
                            plot_law_pdf=False, savefig_path=None, random_state=None):
-        """Computes and plots Wigner's semicircle empirical law.
+        r"""Computes and plots Wigner's semicircle empirical law.
 
         Calculates and plots Wigner's semicircle empirical law using random samples generated
         using the relationship between the Wigner Semicircle law and the Beta distribution:
@@ -289,7 +289,7 @@ class MarchenkoPasturDistribution(rv_continuous):
     ARCTAN_OF_INFTY = np.pi/2
 
     def __init__(self, ratio, beta=1, sigma=1.0):
-        """Constructor for MarchenkoPasturDistribution class.
+        r"""Constructor for MarchenkoPasturDistribution class.
 
         Initializes an instance of this class with the given parameters.
 

@@ -1,6 +1,6 @@
 '''Tridiagonalization Test module
 
-Testing tridiagonalization using Householder reduction
+Testing tridiagonalization using Householder reduction.
 '''
 
 import numpy as np
@@ -20,6 +20,25 @@ def test_householder_reduction():
     reduction = householder_reduction(mtx)
 
     assert_almost_equal(reduction, sol, decimal=7)
+
+
+def test_ret_householder_reduction():
+    '''Testing householder reduction method for tridiagonalization and returned values
+    '''
+    mtx = np.asarray([[4,2,-2,1], [2,3,2,1], [-2,2,1,0], [1,1,0,2]])
+    sol = np.asarray([[4, -3, 0, 0], [-3, 2/3, 5/3, 0], [0, 5/3, 3, 4/3], [0,0,4/3, 7/3]])
+
+    reduction, mtx_list, rot_list = householder_reduction(mtx, ret_iterations=True)
+
+    assert_almost_equal(reduction, sol, decimal=7)
+
+    assert isinstance(mtx_list, list)
+    assert len(mtx_list) >= 1
+    assert isinstance(mtx_list[0], np.ndarray)
+
+    assert isinstance(rot_list, list)
+    assert len(rot_list) >= 1
+    assert isinstance(rot_list[0], np.ndarray)
 
 
 def test_householder_reduction_eigvals():

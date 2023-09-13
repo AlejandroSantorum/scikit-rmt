@@ -882,13 +882,18 @@ class TestTracyWidomDistribution:
         assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name)) == True
 
         fig_name2 = "test_twd_plot_ensemble_max_eigvals_other_beta.png"
-        twd = TracyWidomDistribution(beta=1)
-        ens2 = GaussianEnsemble(beta=2, n=10)  # note beta is different than TWD instance
+        twd = TracyWidomDistribution(beta=beta)
+        ens2 = GaussianEnsemble(beta=4, n=10)  # note beta is different than TWD instance
         twd.plot_ensemble_max_eigvals(
             ensemble=ens2, n_eigvals=1, bins=10, random_state=1, savefig_path=TMP_DIR_PATH+"/"+fig_name2,
         )
         assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name2)) == True
     
+    def test_twd__normalize_eigvals_return_type(self):
+        twd = TracyWidomDistribution(beta=4)
+        norm_eigvals = twd._normalize_eigvals(max_eigvals=np.asarray([1.0]), matrix_size=1)
+        assert isinstance(norm_eigvals, np.ndarray)
+
     def test_twd_plot_size_exception(self):
         with pytest.raises(ValueError):
             twd = TracyWidomDistribution(beta=1)

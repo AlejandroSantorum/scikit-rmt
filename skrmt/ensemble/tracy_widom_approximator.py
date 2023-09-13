@@ -197,7 +197,7 @@ class TW_Approximator(object):
 
 
     def cdf(self, x):
-        """Return the cumulative distribution function at x.
+        r"""Return the cumulative distribution function at x.
         :math:`cdf(x) = \mathbb{P}(TW < x)`.
 
         Args:
@@ -218,7 +218,7 @@ class TW_Approximator(object):
 
 
     def pdf(self, x):
-        """Return the probability distribution function at x.
+        r"""Return the probability distribution function at x.
         :math:`pdf(x) = {\frac{d}{dx}} \mathbb{P}(TW < x)`.
 
         Args:

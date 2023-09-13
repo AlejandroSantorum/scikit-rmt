@@ -103,7 +103,8 @@ def tridiag_eigval_hist(tridiag_mtx, interval, bins=100, density=False):
     aux_mtx[diag_1+1, diag_1] = tridiag_mtx[diag_1+1, diag_1]
 
     prev = 0
-    for i in range(bins+1): # O(m)
+    #for i in range(bins+1): # O(m)
+    for i in range(len(bin_delimiters)): # O(m)
         aux_mtx[diag, diag] = tridiag_mtx[diag, diag] - bin_delimiters[i]
         current = tridiag_eigval_neg(aux_mtx) # O(n)
         histogram[i] = current - prev
