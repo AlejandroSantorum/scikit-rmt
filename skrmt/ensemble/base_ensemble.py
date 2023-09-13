@@ -40,7 +40,7 @@ class _Ensemble(metaclass=ABCMeta):
     """
 
     @abstractmethod
-    def __init__(self):
+    def __init__(self) -> None:
         self.matrix = None
         self._eigvals = None
         # default eigenvalue normalization constant
@@ -103,7 +103,7 @@ class _Ensemble(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def joint_eigval_pdf(self) -> float:
+    def joint_eigval_pdf(self, eigvals: np.ndarray = None) -> float:
         # pylint: disable=unnecessary-pass
         # pylint: disable=missing-function-docstring
         # this will be commented at inherited classes

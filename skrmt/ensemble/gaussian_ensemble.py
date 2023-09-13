@@ -7,6 +7,7 @@ Gaussian Unitary Ensemble (GUE) and Gaussian Symplectic Ensemble (GSE).
 
 """
 
+from typing import Union, Sequence, Tuple
 import numpy as np
 from scipy import sparse, special
 
@@ -59,7 +60,14 @@ class GaussianEnsemble(_Ensemble):
 
     """
 
-    def __init__(self, beta, n, tridiagonal_form=False, sigma=1.0, random_state=None):
+    def __init__(
+        self,
+        beta: int,
+        n: int,
+        tridiagonal_form: bool = False,
+        sigma: float = 1.0,
+        random_state: int = None,
+    ) -> None:
         """Constructor for GaussianEnsemble class.
 
         Initializes an instance of this class with the given parameters.
@@ -108,7 +116,7 @@ class GaussianEnsemble(_Ensemble):
         # scikit-rmt class implementing the corresponding spectral law
         self._law_class = WignerSemicircleDistribution(beta=self.beta, center=0.0, sigma=self.sigma)
 
-    def resample(self, tridiagonal_form: bool = None, random_state: int = None):
+    def resample(self, tridiagonal_form: bool = None, random_state: int = None) -> np.ndarray:
         """Re-samples a random matrix from the Gaussian ensemble with the specified form.
 
         It re-samples a random matrix from the Gaussian ensemble with the specified form.
@@ -139,7 +147,7 @@ class GaussianEnsemble(_Ensemble):
         return self.sample(random_state=random_state)
 
     # pylint: disable=inconsistent-return-statements
-    def sample(self, random_state: int = None):
+    def sample(self, random_state: int = None) -> np.ndarray:
         """Samples new Gaussian Ensemble random matrix.
 
         The sampling algorithm depends on the specification of
@@ -173,7 +181,7 @@ class GaussianEnsemble(_Ensemble):
         if self.beta == 4:
             return self._sample_gse()
 
-    def _sample_goe(self):
+    def _sample_goe(self) -> np.ndarray:
         # n by n matrix of random Gaussians
         mtx = np.random.randn(self.n,self.n) * self.sigma
         # symmetrize matrix
@@ -182,7 +190,7 @@ class GaussianEnsemble(_Ensemble):
         self._eigvals = None
         return self.matrix
 
-    def _sample_gue(self):
+    def _sample_gue(self) -> np.ndarray:
         size = self.n
         # n by n random complex matrix
         mtx = np.random.randn(size,size)*self.sigma + 1j*np.random.randn(size,size)*self.sigma
@@ -192,7 +200,7 @@ class GaussianEnsemble(_Ensemble):
         self._eigvals = None
         return self.matrix
 
-    def _sample_gse(self):
+    def _sample_gse(self) -> np.ndarray:
         size = self.n
         # n by n random complex matrix
         x_mtx = np.random.randn(size,size)*self.sigma + 1j*np.random.randn(size,size)*self.sigma
@@ -210,7 +218,7 @@ class GaussianEnsemble(_Ensemble):
         self._eigvals = None
         return self.matrix
 
-    def sample_tridiagonal(self):
+    def sample_tridiagonal(self) -> np.ndarray:
         '''Samples a Gaussian Ensemble random matrix in its tridiagonal form.
 
         Samples a random matrix of the specified Gaussian Ensemble (remember,
@@ -251,7 +259,7 @@ class GaussianEnsemble(_Ensemble):
         self._eigvals = None
         return self.matrix
 
-    def eigvals(self, normalize=False):
+    def eigvals(self, normalize: bool = False) -> np.ndarray:
         """Computes the random matrix eigenvalues.
 
         Calculates the random matrix eigenvalues using numpy standard procedure.
@@ -270,7 +278,14 @@ class GaussianEnsemble(_Ensemble):
         self._eigvals = np.linalg.eigvalsh(self.matrix)
         return norm_const * self._eigvals
 
-    def eigval_hist(self, bins, interval=None, density=False, normalize=False, avoid_img=False):
+    def eigval_hist(
+        self,
+        bins: Union[int, Sequence],
+        interval: Tuple = None,
+        density: bool = False,
+        normalize: bool = False,
+        avoid_img: bool = False,
+    ) -> Tuple[np.ndarray, np.ndarray]:
         if interval is None:
             if normalize:
                 interval = (-self.radius, self.radius)
@@ -291,7 +306,14 @@ class GaussianEnsemble(_Ensemble):
             bins, interval=interval, density=density, normalize=normalize, avoid_img=avoid_img
         )
 
-    def plot_eigval_hist(self, bins=100, interval=None, density=False, normalize=False, savefig_path=None):
+    def plot_eigval_hist(
+        self,
+        bins: Union[int, Sequence],
+        interval: Tuple = None,
+        density: bool = False,
+        normalize: bool = False,
+        savefig_path: str = None,
+    ) -> None:
         """Computes and plots the histogram of the matrix eigenvalues.
 
         Calculates and plots the histogram of the current sampled matrix eigenvalues.
@@ -336,7 +358,7 @@ class GaussianEnsemble(_Ensemble):
             savefig_path=savefig_path,
         )
 
-    def joint_eigval_pdf(self, eigvals=None):
+    def joint_eigval_pdf(self, eigvals: np.ndarray = None) -> float:
         '''Computes joint eigenvalue pdf.
 
         Calculates joint eigenvalue probability density function given an array of
