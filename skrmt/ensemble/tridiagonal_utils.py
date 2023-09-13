@@ -5,10 +5,11 @@ tridiagonal matrices.
 
 """
 
+from typing import Tuple, Union, Sequence
 import numpy as np
 
 
-def tridiag_eigval_neg(tridiag_mtx):
+def tridiag_eigval_neg(tridiag_mtx: np.ndarray) -> int:
     """Calculates number of negative eigenvalues.
 
     Given a tridiagonal matrix, this function calculates the
@@ -40,7 +41,12 @@ def tridiag_eigval_neg(tridiag_mtx):
     return (sturm_seq<0).sum()
 
 
-def tridiag_eigval_hist(tridiag_mtx, interval, bins=100, density=False):
+def tridiag_eigval_hist(
+    tridiag_mtx: np.ndarray,
+    interval: Tuple,
+    bins: Union[int, Sequence] = 100,
+    density: bool = False,
+) -> Tuple[np.ndarray, np.ndarray]:
     """Computes efficiently eigenvalue histogram.
 
     Calculates the eigenvalue histogram of the given matrix, using the
@@ -118,7 +124,10 @@ def tridiag_eigval_hist(tridiag_mtx, interval, bins=100, density=False):
     return histogram[1:], bin_delimiters
 
 
-def householder_reduction(mtx, ret_iterations=False):
+def householder_reduction(
+    mtx: np.ndarray,
+    ret_iterations: bool = False
+) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     """Householder reduction method for tridiagonalization.
 
     Computes Householder reduction method for tridiagonalization. It
@@ -134,7 +143,7 @@ def householder_reduction(mtx, ret_iterations=False):
         (tuple) tuple containing:
             mtx (nparray): tridiagonalized matrix.
             mtx_list (nparray): list of matrices representing the evolution of the given matrix
-            after each rotation. Only returned if ret_iterations is set to True.
+                after each rotation. Only returned if ret_iterations is set to True.
             rot_list (nparray): list of applied rotation matrices. Only returned if
             ret_iterations is set to True.
 

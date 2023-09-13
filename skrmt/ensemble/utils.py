@@ -17,7 +17,7 @@ def plot_spectral_hist_and_law(
     ensemble: _Ensemble,
     bins: Union[int, Sequence] = 100,
     savefig_path: str = None,
-):
+) -> None:
     """Plots the spectrum histogram of a random matrix ensemble alongside the
     PDF of the corresponding spectral law.
 
@@ -65,7 +65,7 @@ def standard_vs_tridiag_hist(
     bins: Union[int, Sequence] = 100,
     savefig_path: str = None,
     random_state: int = None,
-):
+) -> None:
     """Plots and compares the spectral histogram of a random matrix using its
     standard form vs using the corresponding tridiagonal form.
 

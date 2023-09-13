@@ -1,8 +1,16 @@
+from typing import Tuple, Union, List, Callable
 import numpy as np
 import matplotlib.pyplot as plt
 
 
-def plot_func(interval, func, num_x_vals=1000, plot_title=None, plot_ylabel=None, savefig_path=None):
+def plot_func(
+    interval: Tuple,
+    func: Callable,
+    num_x_vals: int = 1000,
+    plot_title: str = None,
+    plot_ylabel: str = None,
+    savefig_path: str = None,
+) -> None:
     """Plots a given 1D function (callable) within the provided interval.
 
     It plots a given 1-dimensional function (python Callable) within the provided interval.
@@ -42,7 +50,7 @@ def plot_func(interval, func, num_x_vals=1000, plot_title=None, plot_ylabel=None
         plt.show()
 
 
-def relu(x):
+def relu(x: Union[float,np.ndarray]):
     """Element-wise maximum between the value and zero.
 
     Args:
@@ -54,7 +62,12 @@ def relu(x):
     return np.maximum(x, np.zeros_like(x))
 
 
-def indicator(x, start=None, stop=None, inclusive="both"):
+def indicator(
+    x: float,
+    start: float = None,
+    stop: float = None,
+    inclusive: str = "both"
+) -> np.ndarray:
     r"""Element-wise indicator function within a real interval.
     The interval can be left-closed, right-closed, closed or open.
     Visit https://en.wikipedia.org/wiki/Indicator_function for more information.
@@ -100,7 +113,7 @@ def indicator(x, start=None, stop=None, inclusive="both"):
     return np.where(condition, 1.0, 0.0)
 
 
-def get_bins_centers_and_contour(bin_edges):
+def get_bins_centers_and_contour(bin_edges: List[float]) -> List[float]:
     """Calculates the centers and contour of the given the bins edges.
 
     Computes the centers of the given the bins edges. Also, the smallest and the largest
