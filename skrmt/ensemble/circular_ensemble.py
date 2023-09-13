@@ -239,12 +239,12 @@ class CircularEnsemble(_Ensemble):
 
     def plot_eigval_hist(
         self,
-        bins: Union[int, Sequence],
+        bins: Union[int, Sequence] = 100,
         interval: Tuple = None,
         density: bool = False,
         normalize: bool = False,
         savefig_path: str = None,
-    ) -> None:
+    ) -> None:  # pragma: no cover
         """Computes and plots the histogram of the matrix eigenvalues.
 
         Calculates and plots the histogram of the current sampled matrix eigenvalues.
@@ -253,7 +253,7 @@ class CircularEnsemble(_Ensemble):
         complex plane next to a heap map to study eigenvalue density.
 
         Args:
-            bins (int or sequence): If bins is an integer, it defines the number of
+            bins (int or sequence, default=100): If bins is an integer, it defines the number of
                 equal-width bins in the range. If bins is a sequence, it defines the
                 bin edges, including the left edge of the first bin and the right
                 edge of the last bin; in this case, bins may be unequally spaced.
@@ -278,8 +278,6 @@ class CircularEnsemble(_Ensemble):
                 Communications in Mathematical Physics. 349 (2017): 991-1027.
 
         """
-        # pylint: disable=too-many-arguments
-        # pylint: disable=too-many-locals
         if self.beta == 1:
             return super().plot_eigval_hist(
                 bins=bins, interval=interval, density=density, normalize=normalize, savefig_path=savefig_path
