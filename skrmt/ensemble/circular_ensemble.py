@@ -7,6 +7,7 @@ and Circular Symplectic Ensemble (CSE).
 
 """
 
+from typing import Union, Sequence, Tuple
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy import special
@@ -15,7 +16,7 @@ from .base_ensemble import _Ensemble
 
 
 
-def _sample_haar_mtx(size):
+def _sample_haar_mtx(size: int) -> np.ndarray:
     """Samples Haar-distributed matrices.
 
     Samples Haar-distributed matrices that are useful to generate
@@ -75,7 +76,7 @@ class CircularEnsemble(_Ensemble):
 
     """
 
-    def __init__(self, beta, n, random_state=None):
+    def __init__(self, beta: int, n: int, random_state: int = None) -> None:
         """Constructor for CircularEnsemble class.
 
         Initializes an instance of this class with the given parameters.
@@ -99,7 +100,7 @@ class CircularEnsemble(_Ensemble):
         self._eigvals = None
         self.matrix = self.sample(random_state=random_state)
 
-    def resample(self, random_state: int = None):
+    def resample(self, random_state: int = None) -> np.ndarray:
         """Re-samples new Circular Ensemble random matrix.
 
         It re-samples a new random matrix from the Circular ensemble. This is an alias
@@ -120,7 +121,7 @@ class CircularEnsemble(_Ensemble):
         return self.sample(random_state=random_state)
 
     # pylint: disable=inconsistent-return-statements
-    def sample(self, random_state: int = None):
+    def sample(self, random_state: int = None) -> np.ndarray:
         """Samples new Circular Ensemble random matrix.
 
         The sampling algorithm depends on the specification of
@@ -155,7 +156,7 @@ class CircularEnsemble(_Ensemble):
         if self.beta == 4:
             return self._sample_cse()
 
-    def _sample_coe(self):
+    def _sample_coe(self) -> np.ndarray:
         # sampling unitary Haar-distributed matrix
         u_mtx = _sample_haar_mtx(self.n)
         # mapping to Circular Orthogonal Ensemble
@@ -164,14 +165,14 @@ class CircularEnsemble(_Ensemble):
         self._eigvals = None
         return self.matrix
 
-    def _sample_cue(self):
+    def _sample_cue(self) -> np.ndarray:
         # sampling unitary Haar-distributed matrix
         self.matrix = _sample_haar_mtx(self.n)
         # setting array of eigenvalues to None to force re-computing them
         self._eigvals = None
         return self.matrix
 
-    def _sample_cse(self):
+    def _sample_cse(self) -> np.ndarray:
         # sampling unitary Haar-distributed matrix of size 2n
         u_mtx = _sample_haar_mtx(2*self.n)
         # mapping to Circular Symplectic Ensemble
@@ -185,15 +186,12 @@ class CircularEnsemble(_Ensemble):
         self._eigvals = None
         return self.matrix
 
-    def _build_j_mtx(self):
+    def _build_j_mtx(self) -> np.ndarray:
         """Creates an useful matrix to sample CSE matrices.
 
         Creates matrix J of zeros but with the upper-diagonal
         set to -1 and the lower-diagonal set to 1. This matrix
         is useful in the sampling algorithm of CSE matrices.
-
-        Args:
-            n (int): matrix size.
 
         Returns:
             numpy array containing J matrix.
@@ -216,7 +214,7 @@ class CircularEnsemble(_Ensemble):
         j_mtx[inds+1, inds] = 1
         return j_mtx
 
-    def eigvals(self, normalize=False):
+    def eigvals(self, normalize: bool = False) -> np.ndarray:
         """Calculates the random matrix eigenvalues.
 
         Calculates the random matrix eigenvalues using numpy standard procedure.
@@ -239,7 +237,14 @@ class CircularEnsemble(_Ensemble):
 
         return norm_const * self._eigvals
 
-    def plot_eigval_hist(self, bins, interval=None, density=False, normalize=False, savefig_path=None):
+    def plot_eigval_hist(
+        self,
+        bins: Union[int, Sequence],
+        interval: Tuple = None,
+        density: bool = False,
+        normalize: bool = False,
+        savefig_path: str = None,
+    ) -> None:
         """Computes and plots the histogram of the matrix eigenvalues.
 
         Calculates and plots the histogram of the current sampled matrix eigenvalues.
@@ -327,7 +332,7 @@ class CircularEnsemble(_Ensemble):
             plt.show()
 
 
-    def joint_eigval_pdf(self, eigvals=None):
+    def joint_eigval_pdf(self, eigvals: np.ndarray = None) -> float:
         '''Computes joint eigenvalue pdf.
 
         Calculates joint eigenvalue probability density function given an array of
