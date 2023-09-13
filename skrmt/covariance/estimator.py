@@ -7,15 +7,15 @@ estimators given n observations of size p.
 import numpy as np
 
 
-def sample_estimator(data_mtx, shrink=None):
+def sample_estimator(data_mtx: np.ndarray, shrink: int = None) -> np.ndarray:
     """Estimates sample covariance matrix.
 
     Estimates sample covariance matrix given data matrix of size nxp.
 
     Args:
-        data_mtx: data matrix containing n observations of size p, i.e.,
-            data_mtx is a n times p matrix.
-        shrink: number of degrees of freedom to substract.
+        data_mtx (np.ndarray): data matrix containing n observations of size p,
+            i.e., data_mtx is a n times p matrix.
+        shrink (int): number of degrees of freedom to substract.
 
     Returns:
         numpy array representing sample covariance matrix.
@@ -42,7 +42,7 @@ def sample_estimator(data_mtx, shrink=None):
 
 
 
-def fsopt_estimator(data_mtx, sigma):
+def fsopt_estimator(data_mtx: np.ndarray, sigma: np.ndarray) -> np.ndarray:
     """Estimates FSOpt estimator.
 
     Estimates finite-sample optimal estimator (FSOpt estimator), also
@@ -52,9 +52,9 @@ def fsopt_estimator(data_mtx, sigma):
     Carlo simulations.
 
     Args:
-        data_mtx: data matrix containing n observations of size p, i.e.,
-            data_mtx is a n times p matrix.
-        sigma: population covariance matrix.
+        data_mtx (np.ndarray): data matrix containing n observations of size p,
+            i.e., data_mtx is a n times p matrix.
+        sigma (np.ndarray): population covariance matrix.
 
     Returns:
         numpy array representing sample covariance matrix.
@@ -81,7 +81,7 @@ def fsopt_estimator(data_mtx, sigma):
 
 
 
-def linear_shrinkage_estimator(data_mtx, shrink=None):
+def linear_shrinkage_estimator(data_mtx: np.ndarray, shrink: int = None) -> np.ndarray:
     """Estimates linear shrinkage estimator.
 
     When the dimension p is greater than the number of observations n,
@@ -94,9 +94,9 @@ def linear_shrinkage_estimator(data_mtx, shrink=None):
     estimator and the sample covariance matrix.
 
     Args:
-        data_mtx: data matrix containing n observations of size p, i.e.,
-            data_mtx is a n times p matrix.
-        shrink: shrinkage value. If it is not provided, this routine
+        data_mtx (np.ndarray): data matrix containing n observations of size p,
+            i.e., data_mtx is a n times p matrix.
+        shrink (int): shrinkage value. If it is not provided, this routine
             calculates the shrinkage value selected by Ledoit and Wolf
             (see reference).
 
@@ -139,7 +139,7 @@ def linear_shrinkage_estimator(data_mtx, shrink=None):
 
 
 
-def analytical_shrinkage_estimator(data_mtx, shrink=None):
+def analytical_shrinkage_estimator(data_mtx: np.ndarray, shrink: int = None) -> np.ndarray:
     """Estimates analytical shrinkage estimator.
     This estimator combines the best qualities of three different estimators:
     the speed of linear shrinkage, the accuracy of the well-known QuEST function
@@ -148,9 +148,9 @@ def analytical_shrinkage_estimator(data_mtx, shrink=None):
     density of the sample eigenvalues and its Hilbert transform.
 
     Args:
-        data_mtx (numpy array): data matrix containing n observations of size p, i.e.,
+        data_mtx (np.ndarray): data matrix containing n observations of size p, i.e.,
             data_mtx is a n times p matrix.
-        shrink (integer): number of degrees of freedom to substract.
+        shrink (int): number of degrees of freedom to substract.
 
     Returns:
         numpy array representing sample covariance matrix.
@@ -202,7 +202,7 @@ def analytical_shrinkage_estimator(data_mtx, shrink=None):
 
 
 
-def empirical_bayesian_estimator(data_mtx):
+def empirical_bayesian_estimator(data_mtx: np.ndarray) -> np.ndarray:
     """Estimates empirical bayesian estimator.
 
     The empirical bayesian estimator is a linear combination of sample
@@ -211,8 +211,8 @@ def empirical_bayesian_estimator(data_mtx):
     should be used when the criterion is the mean squared error.
 
     Args:
-        data_mtx: data matrix containing n observations of size p, i.e.,
-            data_mtx is a n times p matrix.
+        data_mtx (np.ndarray): data matrix containing n observations of size p,
+            i.e., data_mtx is a n times p matrix.
 
     Returns:
         numpy array representing sample covariance matrix.
@@ -240,7 +240,7 @@ def empirical_bayesian_estimator(data_mtx):
 
 
 
-def minimax_estimator(data_mtx):
+def minimax_estimator(data_mtx: np.ndarray) -> np.ndarray:
     """Estimates minimax estimator.
 
     Minimax estimator has the lowest worst-case error. The minimax
@@ -251,8 +251,8 @@ def minimax_estimator(data_mtx):
     descending order.
 
     Args:
-        data_mtx: data matrix containing n observations of size p, i.e.,
-            data_mtx is a n times p matrix.
+        data_mtx (np.ndarray): data matrix containing n observations of size p,
+            i.e., data_mtx is a n times p matrix.
 
     Returns:
         numpy array representing sample covariance matrix.
