@@ -75,6 +75,7 @@ Modifications by Alejandro Santorum under the following license:
     OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
+from typing import Union
 import numpy as np
 from scipy.interpolate import interp1d
 from scipy.misc import derivative
@@ -143,7 +144,7 @@ class TW_Approximator(object):
             Random Matrices: Theory and Applications. 01.03. (2012).
     """
 
-    def __init__(self, beta=1):
+    def __init__(self, beta: int = 1) -> None:
         """Construnct a TW_Approximator class for a given beta.
 
         Args:
@@ -181,22 +182,18 @@ class TW_Approximator(object):
         self.__para_n = _para_n[ib] \
                 + list(_find_u_v(-x[1], y[1], dlnf, *_para_n[ib]))
         self.__asym_n = lambda xx: _f(-xx, *self.__para_n)
-        self.__asym_inv_n = lambda yy: -(_finv(yy, *self.__para_n))
 
         dlnf = derivative(lambda xx: np.log(1.-self.__cdf(xx)), x[-2], \
                 dx=3.33e-3, order=7)
         self.__para_p = _para_p[ib] + list(_find_u_v(x[-2], 1.-y[-2], dlnf, \
                 *_para_p[ib]))
         self.__asym_p = lambda xx: 1.-_f(xx, *self.__para_p)
-        self.__asym_inv_p = lambda yy: _finv(1.-yy, *self.__para_p)
 
         x = np.linspace(-8, 4, 2401)
         y = self.cdf(x)
-        self.__ylim = (y[0], y[-1])
-        self.__cdfinv = interp1d(self.cdf(x), x, bounds_error=False)
 
 
-    def cdf(self, x):
+    def cdf(self, x: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
         r"""Return the cumulative distribution function at x.
         :math:`cdf(x) = \mathbb{P}(TW < x)`.
 
@@ -217,7 +214,7 @@ class TW_Approximator(object):
         return y[0] if scalar else y
 
 
-    def pdf(self, x):
+    def pdf(self, x: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
         r"""Return the probability distribution function at x.
         :math:`pdf(x) = {\frac{d}{dx}} \mathbb{P}(TW < x)`.
 

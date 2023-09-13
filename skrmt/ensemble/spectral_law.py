@@ -9,6 +9,7 @@ spectrum of the Manova Ensemble.
 
 """
 
+from typing import Union, Sequence, Tuple
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.integrate import quad
@@ -53,7 +54,7 @@ class WignerSemicircleDistribution:
     
     """
 
-    def __init__(self, beta=1, center=0.0, sigma=1.0):
+    def __init__(self, beta: int = 1, center: float = 0.0, sigma: float = 1.0) -> None:
         """Constructor for WignerSemicircleDistribution class.
 
         Initializes an instance of this class with the given parameters.
@@ -76,7 +77,11 @@ class WignerSemicircleDistribution:
         self.radius = 2.0 * np.sqrt(self.beta) * self.sigma
         self.default_interval = (self.center - self.radius, self.center + self.radius)
 
-    def rvs(self, size=None, random_state: int = None):
+    def rvs(
+        self,
+        size: Union[int, Tuple[int]] = None,
+        random_state: int = None
+    ) -> np.ndarray:
         """Samples ranfom variates following this distribution.
         This uses the relationship between Wigner Semicircle law and Beta distribution.
 
@@ -100,7 +105,7 @@ class WignerSemicircleDistribution:
         beta_samples = np.random.beta(1.5, 1.5, size=size)
         return self.center + 2*self.radius*beta_samples - self.radius
 
-    def pdf(self, x):
+    def pdf(self, x: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
         """Computes PDF of the Wigner Semicircle Law.
 
         Args:
@@ -112,7 +117,7 @@ class WignerSemicircleDistribution:
         """
         return 2.0 * np.sqrt(relu(self.radius**2 - (x-self.center)**2)) / (np.pi * self.radius**2)
     
-    def cdf(self, x):
+    def cdf(self, x: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
         """Computes CDF of the Wigner Semicircle Law.
 
         Args:
@@ -130,13 +135,18 @@ class WignerSemicircleDistribution:
                          + (np.arcsin((x-self.center)/self.radius)) / np.pi)
             )
     
-    def plot_pdf(self, interval=None, num_x_vals=1000, savefig_path=None):
+    def plot_pdf(
+        self,
+        interval: Tuple = None,
+        num_x_vals: int = 1000,
+        savefig_path: str = None,
+    ) -> None:
         """Plots the PDF of the Wigner Semicircle Law.
 
         Args:
             interval (tuple, default=None): Delimiters (xmin, xmax) of the histogram. If not
                 provided, the used interval is calculated depending on beta, center, radius and scale.
-            num_x_vals (int, default=100): It defines the number of evenly spaced x values
+            num_x_vals (int, default=1000): It defines the number of evenly spaced x values
                 within the given interval or range in which the function (callable) is evaluated.
             savefig_path (string, default=None): path to save the created figure. If it is not
                 provided, the plot is shown at the end of the routine.
@@ -150,13 +160,18 @@ class WignerSemicircleDistribution:
             plot_ylabel="density", savefig_path=savefig_path
         )
     
-    def plot_cdf(self, interval=None, num_x_vals=1000, savefig_path=None):
+    def plot_cdf(
+        self,
+        interval: Tuple = None,
+        num_x_vals: int = 1000,
+        savefig_path: str = None,
+    ) -> None:
         """Plots the CDF of the Wigner Semicircle Law.
 
         Args:
             interval (tuple, default=None): Delimiters (xmin, xmax) of the histogram. If not
                 provided, the used interval is calculated depending on beta, center, radius and scale.
-            num_x_vals (int, default=100): It defines the number of evenly spaced x values
+            num_x_vals (int, default=1000): It defines the number of evenly spaced x values
                 within the given interval or range in which the function (callable) is evaluated.
             savefig_path (string, default=None): path to save the created figure. If it is not
                 provided, the plot is shown at the end of the routine.
@@ -170,8 +185,16 @@ class WignerSemicircleDistribution:
             plot_ylabel="cumulative distribution", savefig_path=savefig_path
         )
 
-    def plot_empirical_pdf(self, sample_size=10000, bins=100, interval=None, density=False,
-                           plot_law_pdf=False, savefig_path=None, random_state=None):
+    def plot_empirical_pdf(
+        self,
+        sample_size: int = 10000,
+        bins: Union[int, Sequence] = 100,
+        interval: Tuple = None,
+        density: bool = False,
+        plot_law_pdf: bool = False,
+        savefig_path: str = None,
+        random_state: int = None,
+    ) -> None:
         r"""Computes and plots Wigner's semicircle empirical law.
 
         Calculates and plots Wigner's semicircle empirical law using random samples generated
@@ -288,7 +311,7 @@ class MarchenkoPasturDistribution(rv_continuous):
 
     ARCTAN_OF_INFTY = np.pi/2
 
-    def __init__(self, ratio, beta=1, sigma=1.0):
+    def __init__(self, ratio: float, beta: int = 1, sigma: float = 1.0) -> None:
         r"""Constructor for MarchenkoPasturDistribution class.
 
         Initializes an instance of this class with the given parameters.
@@ -323,14 +346,14 @@ class MarchenkoPasturDistribution(rv_continuous):
         # to explicity approximate the inverse of the CDF to implement rvs
         self._approximate_inv_cdf()
 
-    def _set_default_interval(self):
+    def _set_default_interval(self) -> None:
         # computing interval according to the matrix size ratio and support
         if self.ratio <= 1:
             self.default_interval = (self.lambda_minus, self.lambda_plus)
         else:
             self.default_interval = (min(-0.05, self.lambda_minus), self.lambda_plus)
     
-    def _approximate_inv_cdf(self):
+    def _approximate_inv_cdf(self) -> None:
         # https://gist.github.com/amarvutha/c2a3ea9d42d238551c694480019a6ce1
         x_vals = np.linspace(self.lambda_minus, self.lambda_plus, 1000)
         _pdf = self._pdf(x_vals)
@@ -338,14 +361,19 @@ class MarchenkoPasturDistribution(rv_continuous):
         cdf_y = _cdf/_cdf.max()     # normalizing approximated CDF to 1.0
         self._inv_cdf = interpolate.interp1d(cdf_y, x_vals)
 
-    def _rvs(self, size, random_state, _random_state=None):
+    def _rvs(
+        self,
+        size: Union[int, Tuple[int]],
+        random_state: int,
+        _random_state: int = None,
+    ) -> np.ndarray:
         if _random_state is not None:
             np.random.seed(_random_state)
 
         uniform_samples = np.random.random(size=size)
         return self._inv_cdf(uniform_samples)
 
-    def _pdf(self, x):
+    def _pdf(self, x: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
         """Computes PDF of the Marchenko-Pastur Law.
 
         Args:
@@ -359,7 +387,7 @@ class MarchenkoPasturDistribution(rv_continuous):
             return np.sqrt(relu(self.lambda_plus - x) * relu(x - self.lambda_minus)) \
                 / (2.0 * np.pi * self.ratio * self._var * x)
 
-    def _cdf(self, x):
+    def _cdf(self, x: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
         """Computes CDF of the Marchenko-Pastur Law.
 
         Args:
@@ -386,7 +414,7 @@ class MarchenkoPasturDistribution(rv_continuous):
             #                 (self.ratio-1)/self.ratio, 0.0)
             return acum
 
-    def _cdf_aux_f(self, x):
+    def _cdf_aux_f(self, x: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
         first_arctan_term = np.where(x == self.lambda_minus,
                                     MarchenkoPasturDistribution.ARCTAN_OF_INFTY,
                                     np.arctan((self._cdf_aux_r(x)**2 - 1)/(2 * self._cdf_aux_r(x)))
@@ -401,16 +429,21 @@ class MarchenkoPasturDistribution(rv_continuous):
                                          + (1/self._var)*np.sqrt(relu(self.lambda_plus-x)*relu(x-self.lambda_minus)) \
                                          - (1+self.ratio)*first_arctan_term + (1-self.ratio)*second_arctan_term)
 
-    def _cdf_aux_r(self, x):
+    def _cdf_aux_r(self, x: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
         return np.sqrt((self.lambda_plus-x)/(x - self.lambda_minus))
 
-    def plot_pdf(self, interval=None, num_x_vals=1000, savefig_path=None):
+    def plot_pdf(
+        self,
+        interval: Tuple = None,
+        num_x_vals: int = 1000,
+        savefig_path: str = None,
+    ) -> None:
         """Plots the PDF of the Marchenko-Pastur Law.
 
         Args:
             interval (tuple, default=None): Delimiters (xmin, xmax) of the histogram. If not
                 provided, the used interval is calculated depending on beta, ratio, and scale.
-            num_x_vals (int, default=100): It defines the number of evenly spaced x values
+            num_x_vals (int, default=1000): It defines the number of evenly spaced x values
                 within the given interval or range in which the function (callable) is evaluated.
             savefig_path (string, default=None): path to save the created figure. If it is not
                 provided, the plot is shown at the end of the routine.
@@ -424,13 +457,18 @@ class MarchenkoPasturDistribution(rv_continuous):
             plot_ylabel="density", savefig_path=savefig_path
         )
     
-    def plot_cdf(self, interval=None, num_x_vals=1000, savefig_path=None):
+    def plot_cdf(
+        self,
+        interval: Tuple = None,
+        num_x_vals: int = 1000,
+        savefig_path: str = None,
+    ) -> None:
         """Plots the CDF of the Marchenko-Pastur Law.
 
         Args:
             interval (tuple, default=None): Delimiters (xmin, xmax) of the histogram. If not
                 provided, the used interval is calculated depending on beta, ratio, and scale.
-            num_x_vals (int, default=100): It defines the number of evenly spaced x values
+            num_x_vals (int, default=1000): It defines the number of evenly spaced x values
                 within the given interval or range in which the function (callable) is evaluated.
             savefig_path (string, default=None): path to save the created figure. If it is not
                 provided, the plot is shown at the end of the routine.
@@ -445,9 +483,15 @@ class MarchenkoPasturDistribution(rv_continuous):
         )
 
     def plot_empirical_pdf(
-        self, sample_size=1000, bins=100, interval=None, density=False,
-        plot_law_pdf=False, savefig_path=None, random_state=None
-    ):
+        self,
+        sample_size: int = 1000,
+        bins: Union[int, Sequence] = 100,
+        interval: Tuple = None,
+        density: bool = False,
+        plot_law_pdf: bool = False,
+        savefig_path: str = None,
+        random_state: int = None,
+    ) -> None:
         """Computes and plots Marchenko-Pastur empirical PDF.
         
         Calculates and plots Marchenko-Pastur law by generating samples from the
@@ -575,7 +619,7 @@ class TracyWidomDistribution(rv_continuous):
     
     """
 
-    def __init__(self, beta=1):
+    def __init__(self, beta: int = 1):
         """Constructor for TracyWidomDistribution class.
 
         Initializes an instance of this class with the given parameters.
@@ -594,7 +638,7 @@ class TracyWidomDistribution(rv_continuous):
         self.tw_approx = TW_Approximator(beta=self.beta)
         self.default_interval = (-5, 4-self.beta)
 
-    def _pdf(self, x):
+    def _pdf(self, x: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
         """Computes PDF of the Tracy-Widom Law.
 
         Args:
@@ -606,7 +650,7 @@ class TracyWidomDistribution(rv_continuous):
         """
         return self.tw_approx.pdf(x)
 
-    def _cdf(self, x):
+    def _cdf(self, x: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
         """Computes CDF of the Tracy-Widom Law.
 
         Args:
@@ -618,13 +662,18 @@ class TracyWidomDistribution(rv_continuous):
         """
         return self.tw_approx.cdf(x)
 
-    def plot_pdf(self, interval=None, num_x_vals=1000, savefig_path=None):
+    def plot_pdf(
+        self,
+        interval: Tuple = None,
+        num_x_vals: int = 1000,
+        savefig_path: str = None,
+    ) -> None:
         """Plots the PDF of the Tracy-Widom Law.
 
         Args:
             interval (tuple, default=None): Delimiters (xmin, xmax) of the histogram. If not
                 provided, the used interval is calculated depending on beta.
-            num_x_vals (int, default=100): It defines the number of evenly spaced x values
+            num_x_vals (int, default=1000): It defines the number of evenly spaced x values
                 within the given interval or range in which the function (callable) is evaluated.
             savefig_path (string, default=None): path to save the created figure. If it is not
                 provided, the plot is shown at the end of the routine.
@@ -638,13 +687,18 @@ class TracyWidomDistribution(rv_continuous):
             plot_ylabel="density", savefig_path=savefig_path
         )
     
-    def plot_cdf(self, interval=None, num_x_vals=1000, savefig_path=None):
+    def plot_cdf(
+        self,
+        interval: Tuple = None,
+        num_x_vals: int = 1000,
+        savefig_path: str = None,
+    ) -> None:
         """Plots the PDF of the Tracy-Widom Law.
 
         Args:
             interval (tuple, default=None): Delimiters (xmin, xmax) of the histogram. If not
                 provided, the used interval is calculated depending on beta.
-            num_x_vals (int, default=100): It defines the number of evenly spaced x values
+            num_x_vals (int, default=1000): It defines the number of evenly spaced x values
                 within the given interval or range in which the function (callable) is evaluated.
             savefig_path (string, default=None): path to save the created figure. If it is not
                 provided, the plot is shown at the end of the routine.
@@ -658,8 +712,16 @@ class TracyWidomDistribution(rv_continuous):
             plot_ylabel="cumulative distribution", savefig_path=savefig_path
         )
 
-    def plot_empirical_pdf(self, sample_size=1000, bins=100, interval=None, density=False,
-                           plot_law_pdf=False, savefig_path=None, random_state=None):
+    def plot_empirical_pdf(
+        self,
+        sample_size: int = 1000,
+        bins: Union[int, Sequence] = 100,
+        interval: Tuple = None,
+        density: bool = False,
+        plot_law_pdf: bool = False,
+        savefig_path: str = None,
+        random_state: int = None,
+    ) -> None:
         """Computes and plots Tracy-Widom empirical law.
 
         Calculates and plots Tracy-Widom law by generating samples from the Tracy-Widom PDF.
@@ -737,7 +799,12 @@ class TracyWidomDistribution(rv_continuous):
         else:
             plt.show()
 
-    def _normalize_eigvals(self, max_eigvals: np.ndarray, matrix_size: int, other_beta: int = None):
+    def _normalize_eigvals(
+        self,
+        max_eigvals: np.ndarray,
+        matrix_size: int,
+        other_beta: int = None
+    ) -> np.ndarray:
         """Normalizes set of eigenvalues using Tracy-Widom scale and normalization constants.
 
         This method normalizes the provided eigenvalues (they are supposed to be a set of largest
@@ -779,7 +846,7 @@ class TracyWidomDistribution(rv_continuous):
         bins: Union[int, Sequence] = 100,
         random_state: int = None,
         savefig_path: str = None,
-    ):
+    ) -> None:
         """Plots the histogram of the maximum eigenvalues of a random ensemble with the
         Tracy-Widom PDF.
 
@@ -880,7 +947,7 @@ class ManovaSpectrumDistribution(rv_continuous):
     
     """
 
-    def __init__(self, ratio_a, ratio_b, beta=1):
+    def __init__(self, ratio_a: float, ratio_b: float, beta: int = 1):
         """Constructor for ManovaSpectrumDistribution class.
 
         Initializes an instance of this class with the given parameters.
@@ -921,7 +988,7 @@ class ManovaSpectrumDistribution(rv_continuous):
         # to explicity approximate the inverse of the CDF to implement rvs
         self._approximate_inv_cdf()
     
-    def _set_default_interval(self):
+    def _set_default_interval(self) -> None:
         interval = [self.lambda_minus, self.lambda_plus]
         if self.ratio_a <= 1:
             interval[0] = min(-0.05, self.lambda_minus)
@@ -929,7 +996,7 @@ class ManovaSpectrumDistribution(rv_continuous):
             interval[1] = max(self.lambda_plus, 1.05)
         self.default_interval = tuple(interval)
 
-    def _approximate_inv_cdf(self):
+    def _approximate_inv_cdf(self) -> None:
         # https://gist.github.com/amarvutha/c2a3ea9d42d238551c694480019a6ce1
         x_vals = np.linspace(self.lambda_minus, self.lambda_plus, 1000)
         _pdf = self._pdf(x_vals)
@@ -937,14 +1004,19 @@ class ManovaSpectrumDistribution(rv_continuous):
         cdf_y = _cdf/_cdf.max()     # normalizing approximated CDF to 1.0
         self._inv_cdf = interpolate.interp1d(cdf_y, x_vals)
 
-    def _rvs(self, size, random_state, _random_state=None):
+    def _rvs(
+        self,
+        size: Union[int, Tuple[int]],
+        random_state: int,
+        _random_state: int = None,
+    ) -> np.ndarray:
         if _random_state is not None:
             np.random.seed(_random_state)
 
         uniform_samples = np.random.random(size=size)
         return self._inv_cdf(uniform_samples)
     
-    def __pdf_float(self, x):
+    def __pdf_float(self, x: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
         if x <= self.lambda_minus:
             return 0.0
 
@@ -954,7 +1026,7 @@ class ManovaSpectrumDistribution(rv_continuous):
         return (self.ratio_a + self.ratio_b) * np.sqrt((self.lambda_plus - x) * (x - self.lambda_minus)) \
                                 / (2.0 * np.pi * x * (1-x))
 
-    def _pdf(self, x):
+    def _pdf(self, x: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
         """Computes PDF of the Manova Spectrum distribution.
 
         Args:
@@ -974,7 +1046,7 @@ class ManovaSpectrumDistribution(rv_continuous):
         # if x is a number (int or float)
         return self.__pdf_float(x)
     
-    def __cdf_float(self, x):
+    def __cdf_float(self, x: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
         if x <= self.lambda_minus:
             return 0.0
 
@@ -983,7 +1055,7 @@ class ManovaSpectrumDistribution(rv_continuous):
 
         return quad(self.pdf, self.lambda_minus, x)[0]
 
-    def _cdf(self, x):
+    def _cdf(self, x: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
         """Computes CDF of the Manova Spectrum distribution.
 
         Args:
@@ -1004,13 +1076,18 @@ class ManovaSpectrumDistribution(rv_continuous):
         # if x is a number (int or float)
         return self.__cdf_float(x)
 
-    def plot_pdf(self, interval=None, num_x_vals=1000, savefig_path=None):
+    def plot_pdf(
+        self,
+        interval: Tuple = None,
+        num_x_vals: int = 1000,
+        savefig_path: str = None,
+    ) -> None:
         """Plots the PDF of the Manova Spectrum distribution.
 
         Args:
             interval (tuple, default=None): Delimiters (xmin, xmax) of the histogram. If not
                 provided, the used interval is calculated depending on beta, a, and b.
-            num_x_vals (int, default=100): It defines the number of evenly spaced x values
+            num_x_vals (int, default=1000): It defines the number of evenly spaced x values
                 within the given interval or range in which the function (callable) is evaluated.
             savefig_path (string, default=None): path to save the created figure. If it is not
                 provided, the plot is shown at the end of the routine.
@@ -1024,13 +1101,18 @@ class ManovaSpectrumDistribution(rv_continuous):
             plot_ylabel="density", savefig_path=savefig_path
         )
 
-    def plot_cdf(self, interval=None, num_x_vals=1000, savefig_path=None):
+    def plot_cdf(
+        self,
+        interval: Tuple = None,
+        num_x_vals: int = 1000,
+        savefig_path: str = None,
+    ) -> None:
         """Plots the CDF of the Manova Spectrum distribution.
 
         Args:
             interval (tuple, default=None): Delimiters (xmin, xmax) of the histogram. If not
                 provided, the used interval is calculated depending on beta, a, and b.
-            num_x_vals (int, default=100): It defines the number of evenly spaced x values
+            num_x_vals (int, default=1000): It defines the number of evenly spaced x values
                 within the given interval or range in which the function (callable) is evaluated.
             savefig_path (string, default=None): path to save the created figure. If it is not
                 provided, the plot is shown at the end of the routine.
@@ -1044,8 +1126,16 @@ class ManovaSpectrumDistribution(rv_continuous):
             plot_ylabel="cumulative distribution", savefig_path=savefig_path
         )
 
-    def plot_empirical_pdf(self, sample_size=1000, bins=100, interval=None, density=False,
-                           plot_law_pdf=False, savefig_path=None, random_state=None):
+    def plot_empirical_pdf(
+        self,
+        sample_size: int = 1000,
+        bins: Union[int, Sequence] = 100,
+        interval: Tuple = None,
+        density: bool = False,
+        plot_law_pdf: bool = False,
+        savefig_path: str = None,
+        random_state: int = None,
+    ) -> None:
         """Computes and plots Manova spectrum empirical pdf.
 
         Calculates and plots the Manova spectrum empirical distribution by sampling

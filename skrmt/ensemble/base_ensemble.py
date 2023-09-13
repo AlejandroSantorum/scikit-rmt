@@ -7,6 +7,7 @@ supported by inherited classes.
 
 """
 
+from typing import Union, Sequence, Tuple
 from abc import ABCMeta, abstractmethod
 
 import numpy as np
@@ -39,14 +40,14 @@ class _Ensemble(metaclass=ABCMeta):
     """
 
     @abstractmethod
-    def __init__(self):
+    def __init__(self) -> None:
         self.matrix = None
         self._eigvals = None
         # default eigenvalue normalization constant
         self.eigval_norm_const = 1.0
 
     @abstractmethod
-    def sample(self, random_state: int = None):
+    def sample(self, random_state: int = None) -> np.ndarray:
         """Samples new random matrix.
 
         The sampling algorithm depends on the inherited classes, so it should be
@@ -64,7 +65,7 @@ class _Ensemble(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def resample(self, random_state: int = None):
+    def resample(self, random_state: int = None) -> np.ndarray:
         """This is an alias for the method ``sample``. It samples new random matrix.
 
         The sampling algorithm depends on the inherited classes, so it should be
@@ -81,7 +82,7 @@ class _Ensemble(metaclass=ABCMeta):
         # pylint: disable=unnecessary-pass
         pass
 
-    def _set_eigval_norm_const(self, eigval_norm_const):
+    def _set_eigval_norm_const(self, eigval_norm_const: float) -> None:
         """Sets a custom eigenvalue normalization constant.
 
         This updates the normalization constant applied to the computed eigenvalues.
@@ -95,14 +96,14 @@ class _Ensemble(metaclass=ABCMeta):
         self.eigval_norm_const = eigval_norm_const
 
     @abstractmethod
-    def eigvals(self, normalize=False):
+    def eigvals(self, normalize: bool = False) -> np.ndarray:
         # pylint: disable=unnecessary-pass
         # pylint: disable=missing-function-docstring
         # this will be commented at inherited classes
         pass
 
     @abstractmethod
-    def joint_eigval_pdf(self):
+    def joint_eigval_pdf(self, eigvals: np.ndarray = None) -> float:
         # pylint: disable=unnecessary-pass
         # pylint: disable=missing-function-docstring
         # this will be commented at inherited classes
@@ -110,12 +111,12 @@ class _Ensemble(metaclass=ABCMeta):
 
     def eigval_hist(
         self,
-        bins,
-        interval=None,
-        density=False,
-        normalize=False,
-        avoid_img=False
-    ):
+        bins: Union[int, Sequence] = 100,
+        interval: Tuple = None,
+        density: bool = False,
+        normalize: bool = False,
+        avoid_img: bool = False,
+    ) -> Tuple[np.ndarray, np.ndarray]:
         """Calculates the histogram of the matrix eigenvalues.
 
         Calculates the histogram of the current sampled matrix eigenvalues. Some ensembles
@@ -126,7 +127,7 @@ class _Ensemble(metaclass=ABCMeta):
         if the matrix eigenvalues are complex, they are casted to its real part.
 
         Args:
-            bins (int or sequence): If bins is an integer, it defines the number of
+            bins (int or sequence, default=100): If bins is an integer, it defines the number of
                 equal-width bins in the range. If bins is a sequence, it defines the
                 bin edges, including the left edge of the first bin and the right
                 edge of the last bin; in this case, bins may be unequally spaced.
@@ -192,13 +193,13 @@ class _Ensemble(metaclass=ABCMeta):
 
     def plot_eigval_hist(
         self,
-        bins,
-        interval=None,
-        density=False,
-        normalize=False,
-        savefig_path=None,
-        avoid_img=False
-    ):
+        bins: Union[int, Sequence],
+        interval: Tuple = None,
+        density: bool = False,
+        normalize: bool = False,
+        savefig_path: str = None,
+        avoid_img: bool = False,
+    ) -> None:
         """Computes and plots the histogram of the matrix eigenvalues.
 
         Calculates and plots the histogram of the current sampled matrix eigenvalues.
