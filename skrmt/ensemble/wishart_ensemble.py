@@ -7,6 +7,7 @@ and Wishart Quaternion Ensemble.
 
 """
 
+from typing import Union, Sequence, Tuple
 import numpy as np
 from scipy import sparse, special
 
@@ -67,7 +68,15 @@ class WishartEnsemble(_Ensemble):
 
     """
 
-    def __init__(self, beta, p, n, tridiagonal_form=False, sigma=1.0, random_state=None):
+    def __init__(
+        self,
+        beta: int,
+        p: int,
+        n: int,
+        tridiagonal_form: bool = False,
+        sigma: float = 1.0,
+        random_state: int = None
+    ) -> None:
         """Constructor for WishartEnsemble class.
 
         Initializes an instance of this class with the given parameters.
@@ -108,13 +117,13 @@ class WishartEnsemble(_Ensemble):
         # scikit-rmt class implementing the corresponding spectral law
         self._law_class = MarchenkoPasturDistribution(beta=self.beta, ratio=self.ratio, sigma=self.sigma)
 
-    def _compute_parameters(self):
+    def _compute_parameters(self) -> None:
         # calculating constants depending on matrix sizes
         self.ratio = self.p/self.n
         self.lambda_plus = self.beta * self.sigma**2 * (1 + np.sqrt(self.ratio))**2
         self.lambda_minus = self.beta * self.sigma**2 * (1 - np.sqrt(self.ratio))**2
 
-    def resample(self, tridiagonal_form: bool = None, random_state: int = None):
+    def resample(self, tridiagonal_form: bool = None, random_state: int = None) -> np.ndarray:
         """Re-samples a random matrix from the Wishart ensemble with the specified form.
 
         It re-samples a random matrix from the Wishart ensemble with the specified form.
@@ -145,7 +154,7 @@ class WishartEnsemble(_Ensemble):
         return self.sample(random_state=random_state)
 
     # pylint: disable=inconsistent-return-statements
-    def sample(self, random_state: int = None):
+    def sample(self, random_state: int = None) -> np.ndarray:
         """Samples new Wishart Ensemble random matrix.
 
         The sampling algorithm depends on the specification of
@@ -190,7 +199,7 @@ class WishartEnsemble(_Ensemble):
         if self.beta == 4:
             return self._sample_wqe()
 
-    def _sample_wre(self):
+    def _sample_wre(self) -> np.ndarray:
         p_size = self.p
         n_size = self.n
         # p by n matrix of random Gaussians
@@ -201,7 +210,7 @@ class WishartEnsemble(_Ensemble):
         self._eigvals = None
         return self.matrix
 
-    def _sample_wce(self):
+    def _sample_wce(self) -> np.ndarray:
         p_size = self.p
         n_size = self.n
         # p by n random complex matrix of random Gaussians
@@ -212,7 +221,7 @@ class WishartEnsemble(_Ensemble):
         self._eigvals = None
         return self.matrix
 
-    def _sample_wqe(self):
+    def _sample_wqe(self) -> np.ndarray:
         p_size = self.p
         n_size = self.n
         # p by n random complex matrix of random Gaussians
@@ -230,7 +239,7 @@ class WishartEnsemble(_Ensemble):
         self._eigvals = None
         return self.matrix
 
-    def sample_tridiagonal(self):
+    def sample_tridiagonal(self) -> np.ndarray:
         '''Samples a Wishart Ensemble random matrix in its tridiagonal form.
 
         Samples a random matrix of the specified Wishart Ensemble (remember,
@@ -267,7 +276,7 @@ class WishartEnsemble(_Ensemble):
         self._eigvals = None
         return self.matrix
 
-    def eigvals(self, normalize=False):
+    def eigvals(self, normalize: bool = False) -> np.ndarray:
         """Computes the random matrix eigenvalues.
 
         Calculates the random matrix eigenvalues using numpy standard procedure.
@@ -286,7 +295,14 @@ class WishartEnsemble(_Ensemble):
         self._eigvals = np.linalg.eigvalsh(self.matrix)
         return norm_const * self._eigvals
 
-    def eigval_hist(self, bins, interval=None, density=False, normalize=False, avoid_img=False):
+    def eigval_hist(
+        self,
+        bins: Union[int, Sequence],
+        interval: Tuple = None,
+        density: bool = False,
+        normalize: bool = False,
+        avoid_img: bool = False,
+    ) -> Tuple[np.ndarray, np.ndarray]:
         # pylint: disable=too-many-arguments
         if interval is None:
             if normalize:
@@ -308,7 +324,14 @@ class WishartEnsemble(_Ensemble):
             bins, interval=interval, density=density, normalize=normalize, avoid_img=avoid_img
         )
 
-    def plot_eigval_hist(self, bins=100, interval=None, density=False, normalize=False, savefig_path=None):
+    def plot_eigval_hist(
+        self,
+        bins: Union[int, Sequence] = 100,
+        interval: Tuple = None,
+        density: bool = False,
+        normalize: bool = False,
+        savefig_path: str = None,
+    ) -> None:
         """Computes and plots the histogram of the matrix eigenvalues.
 
         Calculates and plots the histogram of the current sampled matrix eigenvalues.
@@ -353,7 +376,7 @@ class WishartEnsemble(_Ensemble):
             savefig_path=savefig_path,
         )
 
-    def joint_eigval_pdf(self, eigvals=None):
+    def joint_eigval_pdf(self, eigvals: np.ndarray = None) -> float:
         '''Computes joint eigenvalue pdf.
 
         Calculates joint eigenvalue probability density function given an array of
