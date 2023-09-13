@@ -7,6 +7,7 @@ and Manova Quaternion Ensemble.
 
 """
 
+from typing import Union, Sequence, Tuple
 import numpy as np
 from scipy import special
 
@@ -68,7 +69,7 @@ class ManovaEnsemble(_Ensemble):
 
     """
 
-    def __init__(self, beta, m, n1, n2, random_state=None):
+    def __init__(self, beta: int, m: int, n1: int, n2: int, random_state: int = None) -> None:
         """Constructor for ManovaEnsemble class.
 
         Initializes an instance of this class with the given parameters.
@@ -101,7 +102,7 @@ class ManovaEnsemble(_Ensemble):
             beta=self.beta, ratio_a=self.n1/self.m, ratio_b=self.n2/self.m
         )
 
-    def resample(self, random_state: int = None):
+    def resample(self, random_state: int = None) -> np.ndarray:
         """Re-samples new Manova Ensemble random matrix.
 
         It re-samples a new random matrix from the Manova ensemble. This is an alias
@@ -122,7 +123,7 @@ class ManovaEnsemble(_Ensemble):
         return self.sample(random_state=random_state)
 
     # pylint: disable=inconsistent-return-statements
-    def sample(self, random_state: int = None):
+    def sample(self, random_state: int = None) -> np.ndarray:
         """Samples new Manova Ensemble random matrix.
 
         The sampling algorithm depends on the specification of
@@ -153,7 +154,7 @@ class ManovaEnsemble(_Ensemble):
         if self.beta == 4:
             return self._sample_mqe()
 
-    def _sample_mre(self):
+    def _sample_mre(self) -> np.ndarray:
         m_size = self.m
         n1_size = self.n1
         n2_size = self.n2
@@ -171,7 +172,7 @@ class ManovaEnsemble(_Ensemble):
         self._eigvals = None
         return self.matrix
 
-    def _sample_mce(self):
+    def _sample_mce(self) -> np.ndarray:
         m_size = self.m
         n1_size = self.n1
         n2_size = self.n2
@@ -189,7 +190,7 @@ class ManovaEnsemble(_Ensemble):
         self._eigvals = None
         return self.matrix
 
-    def _sample_mqe(self):
+    def _sample_mqe(self) -> np.ndarray:
         m_size = self.m
         n1_size = self.n1
         n2_size = self.n2
@@ -221,7 +222,7 @@ class ManovaEnsemble(_Ensemble):
         self._eigvals = None
         return self.matrix
 
-    def eigvals(self, normalize=False):
+    def eigvals(self, normalize: bool = False) -> np.ndarray:
         """Computes the random matrix eigenvalues.
 
         Calculates the random matrix eigenvalues using numpy standard procedure.
@@ -240,17 +241,32 @@ class ManovaEnsemble(_Ensemble):
         self._eigvals = np.linalg.eigvals(self.matrix)
         return norm_const * self._eigvals
 
-    def _plot_eigval_hist(self, bins, interval=(0,1), density=False, normalize=False, avoid_img=True):
-        return super()._plot_eigval_hist(bins=bins, interval=interval, density=density,
-                                         normalize=normalize, avoid_img=True)
+    def _plot_eigval_hist(
+        self,
+        bins: Union[int, Sequence],
+        interval: Tuple = (0,1),
+        density: bool = False,
+        normalize: bool = False,
+        avoid_img: bool = True,
+    ) -> None:
+        return super()._plot_eigval_hist(
+            bins=bins, interval=interval, density=density, normalize=normalize, avoid_img=avoid_img,
+        )
 
-    def plot_eigval_hist(self, bins, interval=(0,1), density=False, normalize=False, savefig_path=None):
+    def plot_eigval_hist(
+        self,
+        bins: Union[int, Sequence] = 100,
+        interval: Tuple = (0,1),
+        density: bool = False,
+        normalize: bool = False,
+        savefig_path: str = None,
+    ) -> None:
         """Computes and plots the histogram of the matrix eigenvalues
 
         Calculates and plots the histogram of the current sampled matrix eigenvalues.
 
         Args:
-            bins (int or sequence): If bins is an integer, it defines the number of
+            bins (int or sequence, default=100): If bins is an integer, it defines the number of
                 equal-width bins in the range. If bins is a sequence, it defines the
                 bin edges, including the left edge of the first bin and the right
                 edge of the last bin; in this case, bins may be unequally spaced.
@@ -287,7 +303,7 @@ class ManovaEnsemble(_Ensemble):
             avoid_img=True,
         )
 
-    def joint_eigval_pdf(self, eigvals=None):
+    def joint_eigval_pdf(self, eigvals: np.ndarray = None) -> float:
         '''Computes joint eigenvalue pdf.
 
         Calculates joint eigenvalue probability density function given an array of
