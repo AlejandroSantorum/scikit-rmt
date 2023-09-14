@@ -20,7 +20,10 @@ from typing import Union, Sequence
 
 from .base_ensemble import _Ensemble
 from .tracy_widom_approximator import TW_Approximator
-from .misc import relu, indicator, plot_func, get_bins_centers_and_contour
+from .misc import relu, indicator, plot_func, get_bins_centers_and_contour, get_logger
+
+
+_logger = get_logger(__name__)
 
 
 class WignerSemicircleDistribution:
@@ -247,11 +250,11 @@ class WignerSemicircleDistribution:
             xmin = min(interval[0], self.default_interval[0])
             xmax = max(interval[1], self.default_interval[1])
             if interval[0] > self.default_interval[0]:
-                print(f"Lower bound of interval too large. Setting lower bound to {xmin}.")
+                _logger.warning(f"Lower bound of interval too large. Setting lower bound to {xmin}.")
             if interval[1] < self.default_interval[1]:
-                print(f"Upper bound of interval too large. Setting upper bound to {xmax}.")
+                _logger.warning(f"Upper bound of interval too small. Setting upper bound to {xmax}.")
             range_interval = (xmin, xmax)
-            print(f"Setting plot interval to {range_interval}.")
+            _logger.info(f"Setting plot interval to {range_interval}.")
 
         random_samples = self.rvs(size=sample_size, random_state=random_state)
         observed, bin_edges = np.histogram(random_samples, bins=bins, range=range_interval, density=density)
@@ -265,7 +268,7 @@ class WignerSemicircleDistribution:
             pdf = self.pdf(centers)
             plt.plot(centers, pdf, color='red', linewidth=2)
         elif plot_law_pdf and not density:
-            print("Warning: Wigner's Semicircle Law PDF is only plotted when density is True.")
+            _logger.warning("Wigner's Semicircle Law PDF is only plotted when density is True.")  # pragma: no cover
 
         plt.title("Wigner Semicircle Law - Eigenvalue histogram", fontweight="bold")
         plt.xlabel("x")
@@ -333,7 +336,7 @@ class MarchenkoPasturDistribution(rv_continuous):
         if ratio <= 0:
             raise ValueError(f"Error: invalid ratio. It has to be positive. Provided ratio = {ratio}.")
         if ratio >= 1:
-            print(f"Warning: setting ratio >= 1.0 may cause numerical instability. Provided ratio = {ratio}.")
+            _logger.warning(f"Setting ratio >= 1.0 may cause numerical instability. Provided ratio = {ratio}.")
 
         self.ratio = ratio
         self.beta = beta
@@ -543,11 +546,11 @@ class MarchenkoPasturDistribution(rv_continuous):
             xmin = min(interval[0], self.default_interval[0])
             xmax = max(interval[1], self.default_interval[1])
             if interval[0] > self.default_interval[0]:
-                print(f"Lower bound of interval too large. Setting lower bound to {xmin}.")
+                _logger.warning(f"Lower bound of interval too large. Setting lower bound to {xmin}.")
             if interval[1] < self.default_interval[1]:
-                print(f"Upper bound of interval too large. Setting upper bound to {xmax}.")
+                _logger.warning(f"Upper bound of interval too small. Setting upper bound to {xmax}.")
             range_interval = (xmin, xmax)
-            print(f"Setting plot interval to {range_interval}.")
+            _logger.info(f"Setting plot interval to {range_interval}.")
         
         random_samples = self._rvs(size=sample_size, random_state=random_state, _random_state=random_state)
         observed, bin_edges = np.histogram(random_samples, bins=bins, range=range_interval, density=density)
@@ -561,6 +564,8 @@ class MarchenkoPasturDistribution(rv_continuous):
             # creating new instance with the approximated ratio depending on the given matrix sizes
             pdf = self._pdf(centers)
             plt.plot(centers, pdf, color='red', linewidth=2)
+        elif plot_law_pdf and not density:
+            _logger.warning("Marchenko-Pastur Law PDF is only plotted when density is True.")  # pragma: no cover
 
         plt.title("Marchenko-Pastur Law - Eigenvalue histogram", fontweight="bold")
         plt.xlabel("x")
@@ -771,11 +776,11 @@ class TracyWidomDistribution(rv_continuous):
             xmin = min(interval[0], self.default_interval[0])
             xmax = max(interval[1], self.default_interval[1])
             if interval[0] > self.default_interval[0]:
-                print(f"Lower bound of interval too large. Setting lower bound to {xmin}.")
+                _logger.warning(f"Lower bound of interval too large. Setting lower bound to {xmin}.")
             if interval[1] < self.default_interval[1]:
-                print(f"Upper bound of interval too large. Setting upper bound to {xmax}.")
+                _logger.warning(f"Upper bound of interval too small. Setting upper bound to {xmax}.")
             range_interval = (xmin, xmax)
-            print(f"Setting plot interval to {range_interval}.")
+            _logger.info(f"Setting plot interval to {range_interval}.")
 
         random_samples = self.rvs(size=sample_size, random_state=random_state)
         observed, bin_edges = np.histogram(random_samples, bins=bins, range=range_interval, density=density)
@@ -788,6 +793,8 @@ class TracyWidomDistribution(rv_continuous):
             centers = get_bins_centers_and_contour(bin_edges)
             pdf = self._pdf(centers)
             plt.plot(centers, pdf, color='red', linewidth=2)
+        elif plot_law_pdf and not density:
+            _logger.warning("Tracy-Widom Law PDF is only plotted when density is True.")  # pragma: no cover
 
         plt.title("Tracy-Widom Law - Eigenvalue histogram", fontweight="bold")
         plt.xlabel("x")
@@ -974,7 +981,7 @@ class ManovaSpectrumDistribution(rv_continuous):
                              f"\tProvided a = {ratio_a} and b = {ratio_b}.")
 
         if ratio_a < 1 or ratio_b < 1:
-            print(f"Warning: Setting a < 1 (a = {ratio_a}) or b < 1 (b = {ratio_b}) may cause numerical instability.")
+            _logger.warning(f"Setting a < 1 (a = {ratio_a}) or b < 1 (b = {ratio_b}) may cause numerical instability.")
 
         self.ratio_a = ratio_a
         self.ratio_b = ratio_b
@@ -1190,11 +1197,11 @@ class ManovaSpectrumDistribution(rv_continuous):
             xmin = min(interval[0], self.default_interval[0])
             xmax = max(interval[1], self.default_interval[1])
             if interval[0] > self.default_interval[0]:
-                print(f"Lower bound of interval too large. Setting lower bound to {xmin}.")
+                _logger.warning(f"Lower bound of interval too large. Setting lower bound to {xmin}.")
             if interval[1] < self.default_interval[1]:
-                print(f"Upper bound of interval too large. Setting upper bound to {xmax}.")
+                _logger.warning(f"Upper bound of interval too small. Setting upper bound to {xmax}.")
             range_interval = (xmin, xmax)
-            print(f"Setting plot interval to {range_interval}.")
+            _logger.info(f"Setting plot interval to {range_interval}.")
 
         random_samples = self._rvs(size=sample_size, random_state=random_state, _random_state=random_state)
         observed, bin_edges = np.histogram(random_samples, bins=bins, range=range_interval, density=density)
@@ -1208,6 +1215,8 @@ class ManovaSpectrumDistribution(rv_continuous):
             # creating new instance with the approximated ratios depending on the given matrix sizes
             pdf = self._pdf(centers)
             plt.plot(centers, pdf, color='red', linewidth=2)
+        elif plot_law_pdf and not density:
+            _logger.warning("Manova Spectrum Distribution PDF is only plotted when density is True.")  # pragma: no cover
 
         plt.title("Manova Spectrum - Eigenvalue histogram", fontweight="bold")
         plt.xlabel("x")

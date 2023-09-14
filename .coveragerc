@@ -9,3 +9,5 @@ exclude_lines =
     pass
     # this method generates a figure, not an output
     plot_eigval_hist
+    # function that creates and sets up the logger
+    get_logger
