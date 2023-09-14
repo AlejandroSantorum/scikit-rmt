@@ -1,4 +1,5 @@
 from typing import Tuple, Union, List, Callable
+import logging
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -132,3 +133,20 @@ def get_bins_centers_and_contour(bin_edges: List[float]) -> List[float]:
         centers.append((bin_edges[i]+bin_edges[i+1])/2) # Adding centers
     centers.append(bin_edges[-1]) # Adding final contour
     return centers
+
+
+def get_logger(logger_name: str) -> logging.Logger:
+    log_formatter = logging.Formatter(
+        "[{levelname: <7} - {module: >10}]: {message}", style='{'
+    )
+    log_level = logging.INFO
+
+    handler = logging.StreamHandler()
+    handler.setFormatter(log_formatter)
+    handler.setLevel(log_level)
+
+    logger = logging.getLogger(logger_name)
+    logger.setLevel(log_level)
+    logger.addHandler(handler)
+
+    return logger
