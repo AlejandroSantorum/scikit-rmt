@@ -3,8 +3,8 @@
 Testing utils sub-module
 '''
 import os
-import pytest
 import shutil
+import pytest
 
 from skrmt.ensemble.gaussian_ensemble import GaussianEnsemble
 from skrmt.ensemble.utils import (
@@ -26,7 +26,7 @@ def _setup_tmp_dir(request):
     # if the directory already exists, it is deleted
     if os.path.exists(TMP_DIR_PATH):
         shutil.rmtree(TMP_DIR_PATH)
-    # creating temporary directory  
+    # creating temporary directory
     os.mkdir(TMP_DIR_PATH)
 
     # specifying a function that will be run after all tests are completed
@@ -42,6 +42,8 @@ def _remove_tmp_dir():
 
 
 class TestUtils:
+    """Test scikit-rmt ensemble utils
+    """
 
     def test_plot_spectral_hist_and_law(self):
         """Testing plotting the spectral histogram of a random matrix ensemble
@@ -55,8 +57,8 @@ class TestUtils:
             bins=20,
             savefig_path=TMP_DIR_PATH+"/"+fig_name,
         )
-        assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name)) == True
-    
+        assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name))
+
     def test_standard_vs_tridiag_hist(self):
         """Testing plotting the spectral histogram of a random matrix ensemble
         in its standard form vs its corresponding tridiagonal form.
@@ -70,4 +72,4 @@ class TestUtils:
             random_state=1,
             savefig_path=TMP_DIR_PATH+"/"+fig_name
         )
-        assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name)) == True
+        assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name))
