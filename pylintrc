@@ -60,7 +60,7 @@ confidence=
 # --enable=similarities". If you want to run only the classes checker, but have
 # no Warning level messages displayed, use "--disable=all --enable=classes
 # --disable=W".
-disable=R0801,C0103,R0904,C0302,R0913,W0106,R0914
+disable=R0801,C0103,R0904,C0302,R0913,W0106,R0914,R0902
 #R0801 -> similar lines in different files
 #C0103 -> invalid variable name (too short)
 #R0904 -> too many public methods
@@ -68,6 +68,8 @@ disable=R0801,C0103,R0904,C0302,R0913,W0106,R0914
 #R0913 -> too many function arguments
 #W0106 -> return/expression not assigned (e.g. plt.ylabel("foo"))
 #R0914 -> too many local variables
+#R0902 -> too many instance attributes
+
 
 # Enable the message, report, category or checker with the given id(s). You can
 # either give multiple identifier separated by comma (,) or put this option

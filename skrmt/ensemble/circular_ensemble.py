@@ -278,6 +278,7 @@ class CircularEnsemble(_Ensemble):
                 Communications in Mathematical Physics. 349 (2017): 991-1027.
 
         """
+        # pylint: disable=arguments-differ
         if self.beta == 1:
             return super().plot_eigval_hist(
                 bins=bins,

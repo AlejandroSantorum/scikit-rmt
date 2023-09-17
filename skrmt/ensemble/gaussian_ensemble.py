@@ -140,6 +140,7 @@ class GaussianEnsemble(_Ensemble):
             - Dumitriu, I. and Edelman, A. "Matrix Models for Beta Ensembles".
                 Journal of Mathematical Physics. 43.11 (2002): 5830-5847.
         """
+        # pylint: disable=arguments-renamed
         if tridiagonal_form is not None:
             # The type of sampled matrix can be specified, changing the random matrix
             # form if the argument ``tridiagonal_form`` is provided.
@@ -237,9 +238,11 @@ class GaussianEnsemble(_Ensemble):
 
         '''
         if self.sigma != 1.0:
-            raise ValueError("Error: cannot sample tridiagonal random matrix using non-unitary scale"
-                             f" (sigma = {self.sigma}).\n"
-                             "\t Set `sigma=1.0` (default) or deactivate tridiagonal sampling.")
+            raise ValueError(
+                "Error: cannot sample tridiagonal random matrix using non-unitary scale"
+                f" (sigma = {self.sigma}).\n"
+                "\t Set `sigma=1.0` (default) or deactivate tridiagonal sampling."
+            )
 
         size = 2*self.n if self.beta==4 else self.n
         # sampling diagonal normals
@@ -286,6 +289,7 @@ class GaussianEnsemble(_Ensemble):
         normalize: bool = False,
         avoid_img: bool = False,
     ) -> Tuple[np.ndarray, np.ndarray]:
+        # pylint: disable=signature-differs
         if interval is None:
             if normalize:
                 interval = (-self.radius, self.radius)
@@ -349,7 +353,8 @@ class GaussianEnsemble(_Ensemble):
                 Journal of Mathematical Physics. 43.11 (2002): 5830-5847.
 
         """
-        # the default interval will be computed in the method `eigval_hist` if the given interval is None
+        # pylint: disable=arguments-differ
+        # the default interval will be computed in the method `eigval_hist` if interval is None
         super().plot_eigval_hist(
             bins=bins,
             interval=interval,
