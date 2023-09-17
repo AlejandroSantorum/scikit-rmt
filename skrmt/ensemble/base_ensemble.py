@@ -182,7 +182,14 @@ class _Ensemble(metaclass=ABCMeta):
         observed, bin_edges = np.histogram(eigvals, bins=bins, range=interval, density=density)
         return observed, bin_edges
 
-    def _plot_eigval_hist(self, bins, interval=None, density=False, normalize=False, avoid_img=False):
+    def _plot_eigval_hist(
+        self,
+        bins,
+        interval=None,
+        density=False,
+        normalize=False,
+        avoid_img=False,
+    ):
         # computing eigenvalue histogram
         observed, bin_edges = self.eigval_hist(bins=bins, interval=interval, density=density,
                                                normalize=normalize, avoid_img=avoid_img)
@@ -248,7 +255,7 @@ class _Ensemble(metaclass=ABCMeta):
                 raise ValueError("interval argument must be a tuple")
 
         # histogramming and plotting
-        observed, bin_edges = self._plot_eigval_hist(
+        self._plot_eigval_hist(
             bins=bins, interval=interval, density=density, normalize=normalize, avoid_img=avoid_img
         )
 
