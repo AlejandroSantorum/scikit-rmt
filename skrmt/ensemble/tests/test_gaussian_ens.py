@@ -1,7 +1,7 @@
-'''Gaussian Ensemble Test module
+"""Gaussian Ensemble Test module
 
 Testing GaussianEnsemble module
-'''
+"""
 
 import pytest
 import numpy as np
@@ -15,10 +15,14 @@ from skrmt.ensemble import GaussianEnsemble
 
 
 def test_init_exception():
+    """Test invalid beta value
+    """
     with pytest.raises(ValueError):
         _ = GaussianEnsemble(beta=3, n=100)
 
 def test_build_tridiagonal_exception():
+    """Test invalid value of sigma != 1.0 in tridiagonal form
+    """
     with pytest.raises(ValueError):
         _ = GaussianEnsemble(beta=1, n=100, sigma=2.0, tridiagonal_form=True)
 
@@ -27,8 +31,8 @@ def test_build_tridiagonal_exception():
 ### Gaussian Orthogonal Ensemble = GOE
 
 def test_goe_init():
-    '''Testing GOE init
-    '''
+    """Testing GOE init
+    """
     n_size = 3
 
     np.random.seed(1)
@@ -43,8 +47,8 @@ def test_goe_init():
 
 
 def test_goe_symmetric():
-    '''Testing that GOE matrix is symmetric
-    '''
+    """Testing that GOE matrix is symmetric
+    """
     n_size = 5
     goe = GaussianEnsemble(beta=1, n=n_size)
 
@@ -53,23 +57,23 @@ def test_goe_symmetric():
 
 
 def test_goe_resample():
-    '''Testing resample of GOE
-    '''
+    """Testing resample of GOE
+    """
     n_size = 5
     goe = GaussianEnsemble(beta=1, n=n_size, random_state=1)
-    assert goe.tridiagonal_form == False
-    
+    assert not goe.tridiagonal_form
+
     prev_mtx = np.copy(goe.matrix)
     goe.resample(random_state=1)
     assert_array_equal(prev_mtx, goe.matrix)
 
     goe.resample(tridiagonal_form=True, random_state=1)
-    assert goe.tridiagonal_form == True
+    assert goe.tridiagonal_form
 
 
 def test_goe_build_tridiagonal():
-    '''Testing tridiagonal form of GSE
-    '''
+    """Testing tridiagonal form of GSE
+    """
     n_size = 5
     beta = 1
 
@@ -89,8 +93,8 @@ def test_goe_build_tridiagonal():
 
 
 def test_beta1_joint_eigval_pdf():
-    '''Testing joint eigenvalue pdf
-    '''
+    """Testing joint eigenvalue pdf
+    """
     n_size = 3
     goe = GaussianEnsemble(beta=1, n=n_size)
 
@@ -105,8 +109,8 @@ def test_beta1_joint_eigval_pdf():
 
 
 def test_goe_tridiag_hist():
-    '''Testing tridiagonal histogram of GOE
-    '''
+    """Testing tridiagonal histogram of GOE
+    """
     n_size = 50
     goe1 = GaussianEnsemble(beta=1, n=n_size, tridiagonal_form=False)
     goe2 = GaussianEnsemble(beta=1, n=n_size, tridiagonal_form=True)
@@ -153,8 +157,8 @@ def test_goe_tridiag_hist():
 ### Gaussian Unitary Ensemble = GUE
 
 def test_gue_init():
-    '''Testing GUE init
-    '''
+    """Testing GUE init
+    """
     n_size = 3
 
     np.random.seed(1)
@@ -174,8 +178,8 @@ def test_gue_init():
 
 
 def test_gue_hermitian():
-    '''Testing that GUE matrix is hermitian
-    '''
+    """Testing that GUE matrix is hermitian
+    """
     n_size = 5
     gue = GaussianEnsemble(beta=2, n=n_size)
 
@@ -184,23 +188,23 @@ def test_gue_hermitian():
 
 
 def test_gue_resample():
-    '''Testing resample of GUE
-    '''
+    """Testing resample of GUE
+    """
     n_size = 5
     gue = GaussianEnsemble(beta=2, n=n_size, random_state=1)
-    assert gue.tridiagonal_form == False
-    
+    assert not gue.tridiagonal_form
+
     prev_mtx = np.copy(gue.matrix)
     gue.resample(random_state=1)
     assert_array_equal(prev_mtx, gue.matrix)
 
     gue.resample(tridiagonal_form=True, random_state=1)
-    assert gue.tridiagonal_form == True
+    assert gue.tridiagonal_form
 
 
 def test_gue_build_tridiagonal():
-    '''Testing tridiagonal form of GUE
-    '''
+    """Testing tridiagonal form of GUE
+    """
     n_size = 5
     beta = 2
 
@@ -220,8 +224,8 @@ def test_gue_build_tridiagonal():
 
 
 def test_gue_tridiag_hist():
-    '''Testing tridiagonal histogram of GUE
-    '''
+    """Testing tridiagonal histogram of GUE
+    """
     n_size = 50
     gue1 = GaussianEnsemble(beta=2, n=n_size, tridiagonal_form=False)
     gue2 = GaussianEnsemble(beta=2, n=n_size, tridiagonal_form=True)
@@ -255,8 +259,8 @@ def test_gue_tridiag_hist():
 ### Gaussian Symplectic Ensemble = GSE
 
 def test_gse_init():
-    '''Testing GSE init
-    '''
+    """Testing GSE init
+    """
     n_size = 2
     np.random.seed(1)
     gse = GaussianEnsemble(beta=4, n=n_size)
@@ -275,8 +279,8 @@ def test_gse_init():
 
 
 def test_gse_hermitian():
-    '''Testing that GSE matrix is hermitian
-    '''
+    """Testing that GSE matrix is hermitian
+    """
     n_size = 5
     gse = GaussianEnsemble(beta=4, n=n_size)
 
@@ -285,23 +289,23 @@ def test_gse_hermitian():
 
 
 def test_gse_resample():
-    '''Testing resample of GSE
-    '''
+    """Testing resample of GSE
+    """
     n_size = 5
     gse = GaussianEnsemble(beta=4, n=n_size, random_state=1)
-    assert gse.tridiagonal_form == False
-    
+    assert not gse.tridiagonal_form
+
     prev_mtx = np.copy(gse.matrix)
     gse.resample(random_state=1)
     assert_array_equal(prev_mtx, gse.matrix)
 
     gse.resample(tridiagonal_form=True, random_state=1)
-    assert gse.tridiagonal_form == True
+    assert gse.tridiagonal_form
 
 
 def test_gse_build_tridiagonal():
-    '''Testing tridiagonal form of GSE
-    '''
+    """Testing tridiagonal form of GSE
+    """
     n_size = 5
     beta = 4
 
@@ -322,8 +326,8 @@ def test_gse_build_tridiagonal():
 
 
 def test_gse_tridiag_hist():
-    '''Testing tridiagonal histogram of GSE
-    '''
+    """Testing tridiagonal histogram of GSE
+    """
     n_size = 50
     gse1 = GaussianEnsemble(beta=4, n=n_size, tridiagonal_form=False)
     gse2 = GaussianEnsemble(beta=4, n=n_size, tridiagonal_form=True)
