@@ -294,6 +294,7 @@ class ManovaEnsemble(_Ensemble):
 
         """
         # pylint: disable=too-many-arguments
+        # pylint: disable=arguments-differ
         return super().plot_eigval_hist(
             bins=bins,
             interval=interval,
