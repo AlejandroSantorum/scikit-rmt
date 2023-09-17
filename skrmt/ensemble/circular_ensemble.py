@@ -280,7 +280,11 @@ class CircularEnsemble(_Ensemble):
         """
         if self.beta == 1:
             return super().plot_eigval_hist(
-                bins=bins, interval=interval, density=density, normalize=normalize, savefig_path=savefig_path
+                bins=bins,
+                interval=interval,
+                density=density,
+                normalize=normalize,
+                savefig_path=savefig_path,
             )
 
         if (interval is not None) and not isinstance(interval, tuple):
