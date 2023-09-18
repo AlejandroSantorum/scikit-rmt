@@ -94,7 +94,7 @@ class WishartEnsemble(_Ensemble):
             sigma (float, 1.0): scale (standard deviation) of the random entries of the
                 sampled matrix.
             random_state (int, default=None): random seed to initialize the pseudo-random
-                number generator of numpy before sampling the random matrix instance. This 
+                number generator of numpy before sampling the random matrix instance. This
                 has to be any integer between 0 and 2**32 - 1 (inclusive), or None (default).
                 If None, the seed is obtained from the clock.
 
@@ -115,7 +115,9 @@ class WishartEnsemble(_Ensemble):
         self.eigval_norm_const = 1/self.n
         self._compute_parameters()
         # scikit-rmt class implementing the corresponding spectral law
-        self._law_class = MarchenkoPasturDistribution(beta=self.beta, ratio=self.ratio, sigma=self.sigma)
+        self._law_class = MarchenkoPasturDistribution(
+            beta=self.beta, ratio=self.ratio, sigma=self.sigma
+        )
 
     def _compute_parameters(self) -> None:
         # calculating constants depending on matrix sizes
@@ -147,6 +149,7 @@ class WishartEnsemble(_Ensemble):
             - Dumitriu, I. and Edelman, A. "Matrix Models for Beta Ensembles".
                 Journal of Mathematical Physics. 43.11 (2002): 5830-5847.
         """
+        # pylint: disable=arguments-renamed
         if tridiagonal_form is not None:
             # The type of sampled matrix can be specified, changing the random matrix
             # form if the argument ``tridiagonal_form`` is provided.
@@ -179,16 +182,21 @@ class WishartEnsemble(_Ensemble):
             np.random.seed(random_state)
 
         if self.tridiagonal_form:
-            if self.p > self.n:  # check reference ("Matrix Models for Beta Ensembles"): page 5, table 1.
-                raise ValueError("Error: cannot use tridiagonal form if 'p' (degrees of freedom)"
-                                 " is greater than 'n' (sample size).\n"
-                                 f"\t Provided n={self.n} and p={self.p}."
-                                 " Set `tridiagonal_form=False` or increase sample size (`n`).")
-            
+            if self.p > self.n:
+                # check reference ("Matrix Models for Beta Ensembles"): page 5, table 1.
+                raise ValueError(
+                    "Error: cannot use tridiagonal form if 'p' (degrees of freedom)"
+                    " is greater than 'n' (sample size).\n"
+                    f"\t Provided n={self.n} and p={self.p}."
+                    " Set `tridiagonal_form=False` or increase sample size (`n`)."
+                )
+
             if self.sigma != 1.0:
-                raise ValueError("Error: cannot sample tridiagonal random matrix using non-unitary scale"
-                                f" (sigma = {self.sigma}).\n"
-                                "\t Set `sigma=1.0` (default) or deactivate tridiagonal sampling.")
+                raise ValueError(
+                    "Error: cannot sample tridiagonal random matrix using non-unitary scale"
+                    f" (sigma = {self.sigma}).\n"
+                    "\t Set `sigma=1.0` (default) or deactivate tridiagonal sampling."
+                )
 
             return self.sample_tridiagonal()
 
@@ -214,7 +222,8 @@ class WishartEnsemble(_Ensemble):
         p_size = self.p
         n_size = self.n
         # p by n random complex matrix of random Gaussians
-        mtx = np.random.randn(p_size,n_size)*self.sigma + 1j*np.random.randn(p_size,n_size)*self.sigma
+        mtx = np.random.randn(p_size,n_size) * self.sigma \
+              + 1j*np.random.randn(p_size,n_size) * self.sigma
         # hermitian matrix
         self.matrix = np.matmul(mtx, mtx.transpose().conj())
         # setting array of eigenvalues to None to force re-computing them
@@ -225,9 +234,11 @@ class WishartEnsemble(_Ensemble):
         p_size = self.p
         n_size = self.n
         # p by n random complex matrix of random Gaussians
-        x_mtx = np.random.randn(p_size,n_size)*self.sigma + 1j*np.random.randn(p_size,n_size)*self.sigma
+        x_mtx = np.random.randn(p_size,n_size) * self.sigma \
+                + 1j*np.random.randn(p_size,n_size) * self.sigma
         # p by n random complex matrix of random Gaussians
-        y_mtx = np.random.randn(p_size,n_size)*self.sigma + 1j*np.random.randn(p_size,n_size)*self.sigma
+        y_mtx = np.random.randn(p_size,n_size) * self.sigma \
+                + 1j*np.random.randn(p_size,n_size) * self.sigma
         # [X Y; -conj(Y) conj(X)]
         mtx = np.block([
                         [x_mtx              , y_mtx],
@@ -303,7 +314,7 @@ class WishartEnsemble(_Ensemble):
         normalize: bool = False,
         avoid_img: bool = False,
     ) -> Tuple[np.ndarray, np.ndarray]:
-        # pylint: disable=too-many-arguments
+        # pylint: disable=signature-differs
         if interval is None:
             if normalize:
                 interval = (self.lambda_minus, self.lambda_plus)
@@ -367,7 +378,9 @@ class WishartEnsemble(_Ensemble):
                 Journal of Mathematical Physics. 43.11 (2002): 5830-5847.
 
         """
-        # the default interval will be computed in the method `eigval_hist` if the given interval is None
+        # pylint: disable=arguments-differ
+        # the default interval will be computed in the method `eigval_hist`
+        # if the given interval is None
         super().plot_eigval_hist(
             bins=bins,
             interval=interval,
