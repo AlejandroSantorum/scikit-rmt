@@ -1,3 +1,6 @@
+"""
+    Miscellaneous - useful functions
+"""
 from typing import Tuple, Union, List, Callable
 import logging
 import numpy as np
@@ -27,11 +30,11 @@ def plot_func(
         plot_ylabel (string, default=None): Label of the y-axis.
         savefig_path (string, default=None): path to save the created figure. If it is not
             provided, the plot is shown at the end of the routine.
-    
+
     """
     if not isinstance(interval, tuple):
         raise ValueError("interval argument must be a tuple")
-    
+
     (xmin, xmax) = interval
 
     xx = np.linspace(xmin, xmax, num=num_x_vals)
@@ -41,7 +44,7 @@ def plot_func(
     plt.xlabel("x")
     if plot_ylabel:
         plt.ylabel(plot_ylabel)
-    
+
     if plot_title:
         plt.title(plot_title)
 
@@ -56,7 +59,7 @@ def relu(x: Union[float,np.ndarray]):
 
     Args:
         x (ndarray): list of numbers to compute its element-wise maximum.
-    
+
     Returns:
         array_like consisting in the element-wise maximum vector of the given values.
     """
@@ -89,27 +92,27 @@ def indicator(
     if start is None and stop is None:
         raise ValueError("Error: provide start and/or stop for indicator function.")
 
-    INCLUSIVE_OPTIONS = ["both", "left", "right", "neither"]
+    INCLUSIVE_OPTIONS = set(["both", "left", "right", "neither"])
     if inclusive not in INCLUSIVE_OPTIONS:
         raise ValueError(f"Error: invalid interval inclusive parameter: {inclusive}\n"
                          "\t inclusive has to be one of the following: {INCLUSIVE_OPTIONS}.")
 
     if start is not None:
-        if inclusive == "both" or inclusive == "left":
-            condition = (start <= x)
-        elif inclusive == "neither" or inclusive == "right":
-            condition = (start < x)
-    
+        if inclusive in ["both", "left"]:
+            condition = start <= x
+        elif inclusive in ["neither", "right"]:
+            condition = start < x
+
     if (start is not None) and (stop is not None):
-        if inclusive == "both" or inclusive == "right":
+        if inclusive in ["both", "right"]:
             condition = np.logical_and(condition, (x <= stop))
-        elif inclusive == "neither" or inclusive == "left":
+        elif inclusive in ["neither", "left"]:
             condition = np.logical_and(condition, (x < stop))
     elif stop:
-        if inclusive == "both" or inclusive == "right":
-            condition = (x <= stop)
-        elif inclusive == "neither" or inclusive == "left":
-            condition = (x < stop)
+        if inclusive in ["both", "right"]:
+            condition = x <= stop
+        elif inclusive in ["neither", "left"]:
+            condition = x < stop
 
     return np.where(condition, 1.0, 0.0)
 
@@ -125,7 +128,7 @@ def get_bins_centers_and_contour(bin_edges: List[float]) -> List[float]:
 
     Returns:
         list of numbers (floats) consisting in the list of bin centers and contour.
-    
+
     """
     centers = [bin_edges[0]] # Adding initial contour
     l = len(bin_edges)
@@ -136,6 +139,8 @@ def get_bins_centers_and_contour(bin_edges: List[float]) -> List[float]:
 
 
 def get_logger(logger_name: str) -> logging.Logger:
+    """Get a pre-configured logger
+    """
     log_formatter = logging.Formatter(
         "[{levelname: <7} - {module: >10}]: {message}", style='{'
     )

@@ -1,7 +1,7 @@
-'''Wishart Ensemble Test module
+"""Wishart Ensemble Test module
 
 Testing WishartEnsemble module
-'''
+"""
 
 import pytest
 import numpy as np
@@ -16,14 +16,20 @@ from skrmt.ensemble import WishartEnsemble
 
 
 def test_init_exception():
+    """Test init exception - invalid beta
+    """
     with pytest.raises(ValueError):
         _ = WishartEnsemble(beta=3, p=100, n=300)
 
 def test_tridiagonal_ratio_exception():
+    """Test tridiagonal ratio exception (ratio has to be < 1 if tridiagonal_form=True)
+    """
     with pytest.raises(ValueError):
         _ = WishartEnsemble(beta=1, p=300, n=100, tridiagonal_form=True)
 
 def test_tridiagonal_sigma_exception():
+    """Test tridiagonal sigma exception
+    """
     with pytest.raises(ValueError):
         _ = WishartEnsemble(beta=1, p=100, n=300, sigma=2.0, tridiagonal_form=True)
 
@@ -32,8 +38,8 @@ def test_tridiagonal_sigma_exception():
 ### Wishart Real Ensemble = WRE
 
 def test_wishart_real_init():
-    '''Testing WRE init
-    '''
+    """Testing WRE init
+    """
     p_size = 3
     n_size = 5
 
@@ -49,8 +55,8 @@ def test_wishart_real_init():
 
 
 def test_wre_symmetric():
-    '''Testing that WRE matrix is symmetric
-    '''
+    """Testing that WRE matrix is symmetric
+    """
     p_size = 3
     n_size = 5
     wre = WishartEnsemble(beta=1, p=p_size, n=n_size)
@@ -60,24 +66,24 @@ def test_wre_symmetric():
 
 
 def test_wre_resample():
-    '''Testing resample of WRE
-    '''
+    """Testing resample of WRE
+    """
     p_size = 3
     n_size = 5
     wre = WishartEnsemble(beta=1, p=p_size, n=n_size, random_state=1)
-    assert wre.tridiagonal_form == False
-    
+    assert not wre.tridiagonal_form
+
     prev_mtx = np.copy(wre.matrix)
     wre.resample(random_state=1)
     assert_array_equal(prev_mtx, wre.matrix)
 
     wre.resample(tridiagonal_form=True, random_state=1)
-    assert wre.tridiagonal_form == True
+    assert wre.tridiagonal_form
 
 
 def test_wre_build_tridiagonal():
-    '''Testing tridiagonal form of WRE
-    '''
+    """Testing tridiagonal form of WRE
+    """
     p_size, n_size = 3, 5
     beta = 1
 
@@ -110,8 +116,8 @@ def test_wre_build_tridiagonal():
 
 
 def test_beta1_joint_eigval_pdf():
-    '''Testing joint eigenvalue pdf
-    '''
+    """Testing joint eigenvalue pdf
+    """
     p_size, n_size = 3, 5
     wre = WishartEnsemble(beta=1, p=p_size, n=n_size)
 
@@ -126,8 +132,8 @@ def test_beta1_joint_eigval_pdf():
 
 
 def test_wre_tridiag_hist():
-    '''Testing tridiagonal histogram of WRE
-    '''
+    """Testing tridiagonal histogram of WRE
+    """
     p_size, n_size = 50, 100
     wre1 = WishartEnsemble(beta=1, p=p_size, n=n_size, tridiagonal_form=False)
     wre2 = WishartEnsemble(beta=1, p=p_size, n=n_size, tridiagonal_form=True)
@@ -174,8 +180,8 @@ def test_wre_tridiag_hist():
 ### Wishart Complex Ensemble = WCE
 
 def test_wishart_complex_init():
-    '''Testing WCE init
-    '''
+    """Testing WCE init
+    """
     p_size = 3
     n_size = 8
 
@@ -195,8 +201,8 @@ def test_wishart_complex_init():
 
 
 def test_wce_hermitian():
-    '''Testing that WCE matrix is hermitian
-    '''
+    """Testing that WCE matrix is hermitian
+    """
     p_size = 3
     n_size = 5
     wce = WishartEnsemble(beta=2, p=p_size, n=n_size)
@@ -206,24 +212,24 @@ def test_wce_hermitian():
 
 
 def test_wce_resample():
-    '''Testing resample of WCE
-    '''
+    """Testing resample of WCE
+    """
     p_size = 3
     n_size = 5
     wce = WishartEnsemble(beta=2, p=p_size, n=n_size, random_state=1)
-    assert wce.tridiagonal_form == False
-    
+    assert not wce.tridiagonal_form
+
     prev_mtx = np.copy(wce.matrix)
     wce.resample(random_state=1)
     assert_array_equal(prev_mtx, wce.matrix)
 
     wce.resample(tridiagonal_form=True, random_state=1)
-    assert wce.tridiagonal_form == True
+    assert wce.tridiagonal_form
 
 
 def test_wce_build_tridiagonal():
-    '''Testing tridiagonal form of WCE
-    '''
+    """Testing tridiagonal form of WCE
+    """
     p_size, n_size = 3, 5
     beta = 2
 
@@ -256,8 +262,8 @@ def test_wce_build_tridiagonal():
 
 
 def test_wce_tridiag_hist():
-    '''Testing tridiagonal histogram of WCE
-    '''
+    """Testing tridiagonal histogram of WCE
+    """
     p_size, n_size = 50, 100
     wce1 = WishartEnsemble(beta=2, p=p_size, n=n_size, tridiagonal_form=False)
     wce2 = WishartEnsemble(beta=2, p=p_size, n=n_size, tridiagonal_form=True)
@@ -294,8 +300,8 @@ def test_wce_tridiag_hist():
 ### Wishart Quaternion Ensemble = WQE
 
 def test_wishart_quatern_init():
-    '''Testing WQE init
-    '''
+    """Testing WQE init
+    """
     p_size = 2
     n_size = 5
 
@@ -317,8 +323,8 @@ def test_wishart_quatern_init():
 
 
 def test_wqe_hermitian():
-    '''Testing that WQE matrix is hermitian
-    '''
+    """Testing that WQE matrix is hermitian
+    """
     p_size = 3
     n_size = 5
     wqe = WishartEnsemble(beta=4, p=p_size, n=n_size)
@@ -328,24 +334,24 @@ def test_wqe_hermitian():
 
 
 def test_wqe_resample():
-    '''Testing resample of WQE
-    '''
+    """Testing resample of WQE
+    """
     p_size = 3
     n_size = 5
     wqe = WishartEnsemble(beta=4, p=p_size, n=n_size, random_state=1)
-    assert wqe.tridiagonal_form == False
-    
+    assert not wqe.tridiagonal_form
+
     prev_mtx = np.copy(wqe.matrix)
     wqe.resample(random_state=1)
     assert_array_equal(prev_mtx, wqe.matrix)
 
     wqe.resample(tridiagonal_form=True, random_state=1)
-    assert wqe.tridiagonal_form == True
+    assert wqe.tridiagonal_form
 
 
 def test_wqe_build_tridiagonal():
-    '''Testing tridiagonal form of WQE
-    '''
+    """Testing tridiagonal form of WQE
+    """
     p_size, n_size = 2, 5
     beta = 4
 
@@ -378,8 +384,8 @@ def test_wqe_build_tridiagonal():
 
 
 def test_wqe_tridiag_hist():
-    '''Testing tridiagonal histogram of WQE
-    '''
+    """Testing tridiagonal histogram of WQE
+    """
     p_size, n_size = 50, 100
     wqe1 = WishartEnsemble(beta=4, p=p_size, n=n_size, tridiagonal_form=False)
     wqe2 = WishartEnsemble(beta=4, p=p_size, n=n_size, tridiagonal_form=True)

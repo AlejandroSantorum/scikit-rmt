@@ -3,8 +3,8 @@
 This sub-module contains several useful functions to run and manage various simulations.
 """
 
-import numpy as np
 from typing import Union, Sequence
+import numpy as np
 import matplotlib.pyplot as plt
 
 from .base_ensemble import _Ensemble
@@ -39,11 +39,11 @@ def plot_spectral_hist_and_law(
             provided, the plot is shown at the end of the routine.
     """
     # plotting ensemble spectral histogram
-    observed, bin_edges = ensemble._plot_eigval_hist(bins=bins, density=True, normalize=True)
+    _, bin_edges = ensemble._plot_eigval_hist(bins=bins, density=True, normalize=True)  # pylint: disable=protected-access
     centers = np.asarray(get_bins_centers_and_contour(bin_edges))
 
     # getting the class that implements the ensemble spectral law
-    law_class = ensemble._law_class
+    law_class = ensemble._law_class  # pylint: disable=protected-access
     # computing PDF on the bin centers
     pdf = law_class.pdf(centers)
     # plotting PDF
@@ -87,17 +87,17 @@ def standard_vs_tridiag_hist(
         random_state (int, default=None): random seed to initialize the pseudo-random
                 number generator of numpy. This has to be any integer between 0 and 2**32 - 1
                 (inclusive), or None (default). If None, the seed is obtained from the clock.
-    
+
     References:
         - Albrecht, J. and Chan, C.P. and Edelman, A.
             "Sturm sequences and random eigenvalue distributions".
             Foundations of Computational Mathematics. 9.4 (2008): 461-483.
         - Dumitriu, I. and Edelman, A. "Matrix Models for Beta Ensembles".
             Journal of Mathematical Physics. 43.11 (2002): 5830-5847.
-    
+
     """
     plt.rcParams['figure.dpi'] = 100
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 4.5))
+    _, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 4.5))
 
     ### Standard form
     ensemble.resample(tridiagonal_form=False, random_state=random_state)
@@ -122,11 +122,6 @@ def standard_vs_tridiag_hist(
     ax1.set_title("Standard matrix form")
     ax2.set_title("Tridiagonal matrix form")
 
-    # fig.suptitle(
-    #     "Spectral histogram of random matrices in standard form vs tridiagonal form",
-    #     fontweight="bold",
-    # )
-    
     # Saving plot or showing it
     if savefig_path:
         plt.savefig(savefig_path, dpi=1000)
