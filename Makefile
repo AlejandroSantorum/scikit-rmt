@@ -10,6 +10,9 @@ help:
 	@echo "\tmake pytest - executes pytest in the scikit-rmt library"
 	@echo "\tmake coverage - executes pytest-cov in the scikit-rmt library"
 	@echo "\tmake cov_html - executes pytest-cov in the scikit-rmt library and generates html report files"
+	@echo "\tmake build - builds the library in the 'dist' directory"
+	@echo "\tmake deploy_pypi - uploads the built package to PyPi"
+	@echo "\tmake clean_deploy - deletes the package builds inside 'dist' directory"
 
 
 activate:
@@ -21,7 +24,7 @@ deactivate:
 
 
 requirements:
-	@echo "===> NON-STANDARD LIBRARIES TO BE INSTALLED <==="	
+	@echo "===> NON-STANDARD LIBRARIES TO BE INSTALLED <==="
 	@echo "\t numpy: Library for efficient mathematical calculus for Python"
 	@echo "\t scipy: Python-based library for mathematics, science, and engineering"
 	@echo "\t matplotlib: Python plotting library"
@@ -30,7 +33,8 @@ requirements:
 	@echo "\t pytest: Python testing library"
 	@echo "\t pytest-cov: Python testing coverage library"
 	@echo "\t sphinx: Python library for auto-generation of documentation"
-	@echo "\t pylint: Python code style linter"	
+	@echo "\t pylint: Python code style linter"
+	@echo "\t twine: utility for publishing Python packages on PyPI"
 
 
 
@@ -51,6 +55,21 @@ coverage:
 .PHONY: cov_html
 cov_html:
 	pytest --cov-report html --cov=skrmt
+
+####################################
+
+### build and upload library to PyPI ###
+.PHONY: build
+build:
+	python3 setup.py sdist
+
+.PHONY: deploy_pypi
+deploy_pypi:
+	twine upload dist/*
+
+.PHONY: clean_deploy
+clean_deploy:
+	rm -rf ./dist/*
 
 ####################################
 
