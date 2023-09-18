@@ -10,13 +10,12 @@ spectrum of the Manova Ensemble.
 """
 
 from typing import Union, Sequence, Tuple
+import collections.abc
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.integrate import quad
 from scipy.stats import rv_continuous
 from scipy import interpolate
-import collections.abc
-from typing import Union, Sequence
 
 from .base_ensemble import _Ensemble
 from .tracy_widom_approximator import TW_Approximator
@@ -46,7 +45,7 @@ class WignerSemicircleDistribution:
             to the standard deviation of the random entries of the sampled matrix.
         radius (float): radius of the semicircle of the Wigner law. This depends on
             the scale (sigma) and on beta.
-    
+
     References:
         - Wigner, E.
             "Characteristic Vectors of Bordered Matrices With Infinite Dimensions".
@@ -54,7 +53,7 @@ class WignerSemicircleDistribution:
         - Wigner, E.
             "On the Distribution of the Roots of Certain Symmetric Matrices".
             Annals of Mathematics. 67.2. (1958).
-    
+
     """
 
     def __init__(self, beta: int = 1, center: float = 0.0, sigma: float = 1.0) -> None:
@@ -69,7 +68,7 @@ class WignerSemicircleDistribution:
                 has the shape of a semicircle, the center corresponds to its center.
             sigma (float, default=1.0): scale of the distribution. This value also corresponds
                 to the standard deviation of the random entries of the sampled matrix.
-        
+
         """
         if beta not in [1,2,4]:
             raise ValueError(f"Error: invalid beta. It has to be 1,2 or 4. Provided beta = {beta}.")
@@ -94,13 +93,15 @@ class WignerSemicircleDistribution:
             random_state (int, default=None): random seed to initialize the pseudo-random
                 number generator of numpy. This has to be any integer between 0 and 2**32 - 1
                 (inclusive), or None (default). If None, the seed is obtained from the clock.
-        
+
         Returns:
             numpy array with the generated samples.
         """
         if size <= 0:
-            raise ValueError(f"Error: invalid sample size. It has to be positive. Provided size = {size}.")
-        
+            raise ValueError(
+                f"Error: invalid sample size. It has to be positive. Provided size = {size}."
+            )
+
         if random_state is not None:
             np.random.seed(random_state)
 
@@ -113,23 +114,24 @@ class WignerSemicircleDistribution:
 
         Args:
             x (float or ndarray): value or (numpy) array of values in which compute the PDF.
-        
+
         Returns:
             float or numpy array with the computed PDF in the given value(s).
-        
+
         """
         return 2.0 * np.sqrt(relu(self.radius**2 - (x-self.center)**2)) / (np.pi * self.radius**2)
-    
+
     def cdf(self, x: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
         """Computes CDF of the Wigner Semicircle Law.
 
         Args:
             x (float or ndarray): value or (numpy) array of values in which compute the CDF.
-        
+
         Returns:
             float or numpy array with the computed CDF in the given value(s).
-        
+
         """
+        # pylint: disable=line-too-long
         with np.errstate(divide='ignore', invalid='ignore'):
             return np.select(
                 condlist=[x >= (self.center + self.radius), x <= (self.center - self.radius)],
@@ -137,7 +139,7 @@ class WignerSemicircleDistribution:
                 default=(0.5 + ((x-self.center) * np.sqrt(self.radius**2 - (x-self.center)**2))/(np.pi * self.radius**2) \
                          + (np.arcsin((x-self.center)/self.radius)) / np.pi)
             )
-    
+
     def plot_pdf(
         self,
         interval: Tuple = None,
@@ -148,21 +150,22 @@ class WignerSemicircleDistribution:
 
         Args:
             interval (tuple, default=None): Delimiters (xmin, xmax) of the histogram. If not
-                provided, the used interval is calculated depending on beta, center, radius and scale.
+                provided, the used interval is calculated depending on beta, center, radius
+                and scale.
             num_x_vals (int, default=1000): It defines the number of evenly spaced x values
                 within the given interval or range in which the function (callable) is evaluated.
             savefig_path (string, default=None): path to save the created figure. If it is not
                 provided, the plot is shown at the end of the routine.
-        
+
         """
         if interval is None:
             interval = (self.center - self.radius - 0.1, self.center + self.radius + 0.1)
-        
+
         plot_func(
-            interval, func=self.pdf, num_x_vals=num_x_vals, plot_title="Wigner Semicircle law PDF", 
+            interval, func=self.pdf, num_x_vals=num_x_vals, plot_title="Wigner Semicircle law PDF",
             plot_ylabel="density", savefig_path=savefig_path
         )
-    
+
     def plot_cdf(
         self,
         interval: Tuple = None,
@@ -173,16 +176,17 @@ class WignerSemicircleDistribution:
 
         Args:
             interval (tuple, default=None): Delimiters (xmin, xmax) of the histogram. If not
-                provided, the used interval is calculated depending on beta, center, radius and scale.
+                provided, the used interval is calculated depending on beta, center, radius
+                and scale.
             num_x_vals (int, default=1000): It defines the number of evenly spaced x values
                 within the given interval or range in which the function (callable) is evaluated.
             savefig_path (string, default=None): path to save the created figure. If it is not
                 provided, the plot is shown at the end of the routine.
-        
+
         """
         if interval is None:
             interval = (self.center - self.radius - 0.1, self.center + self.radius + 0.1)
-        
+
         plot_func(
             interval, func=self.cdf, num_x_vals=num_x_vals, plot_title="Wigner Semicircle law CDF",
             plot_ylabel="cumulative distribution", savefig_path=savefig_path
@@ -243,21 +247,27 @@ class WignerSemicircleDistribution:
         if sample_size<1:
             raise ValueError("Negative eigenvalue sample size (given = {sample_size})."
                              " Please, provide a sample size greater or equal than 1.")
-        
+
         if interval is None:
             range_interval = self.default_interval
         else:
             xmin = min(interval[0], self.default_interval[0])
             xmax = max(interval[1], self.default_interval[1])
             if interval[0] > self.default_interval[0]:
-                _logger.warning(f"Lower bound of interval too large. Setting lower bound to {xmin}.")
+                _logger.warning(
+                    f"Lower bound of interval too large. Setting lower bound to {xmin}."
+                )
             if interval[1] < self.default_interval[1]:
-                _logger.warning(f"Upper bound of interval too small. Setting upper bound to {xmax}.")
+                _logger.warning(
+                    f"Upper bound of interval too small. Setting upper bound to {xmax}."
+                )
             range_interval = (xmin, xmax)
             _logger.info(f"Setting plot interval to {range_interval}.")
 
         random_samples = self.rvs(size=sample_size, random_state=random_state)
-        observed, bin_edges = np.histogram(random_samples, bins=bins, range=range_interval, density=density)
+        observed, bin_edges = np.histogram(
+            random_samples, bins=bins, range=range_interval, density=density,
+        )
 
         width = bin_edges[1]-bin_edges[0]
         plt.bar(bin_edges[:-1], observed, width=width, align='edge')
@@ -268,7 +278,9 @@ class WignerSemicircleDistribution:
             pdf = self.pdf(centers)
             plt.plot(centers, pdf, color='red', linewidth=2)
         elif plot_law_pdf and not density:
-            _logger.warning("Wigner's Semicircle Law PDF is only plotted when density is True.")  # pragma: no cover
+            _logger.warning(
+                "Wigner's Semicircle Law PDF is only plotted when density is True."
+            )  # pragma: no cover
 
         plt.title("Wigner Semicircle Law - Eigenvalue histogram", fontweight="bold")
         plt.xlabel("x")
@@ -304,12 +316,12 @@ class MarchenkoPasturDistribution(rv_continuous):
             It depends on beta, on the scale (sigma) and on the ratio.
         lambda_plus (float): upper bound of the support of the Marchenko-Pastur Law.
             It depends on beta, on the scale (sigma) and on the ratio.
-    
+
     References:
         - Bar, Z.D. and Silverstain, J.W.
             "Spectral Analysis of Large Dimensional Random Matrices".
             2nd edition. Springer. (2010).
-    
+
     """
 
     ARCTAN_OF_INFTY = np.pi/2
@@ -323,20 +335,27 @@ class MarchenkoPasturDistribution(rv_continuous):
             ratio (float): random matrix size ratio (:math:`{\lambda}`). This is the ratio
                 between the number of degrees of freedom :math:`p` and the sample size :math:`n`.
                 The value of ratio is computed as :math:`{\lambda} = p/n`.
-            beta (int, default=1): descriptive integer of the Wishart ensemble type (:math:`\{beta}`).
-                For WRE beta=1, for WCE beta=2, for WQE beta=4.
-            sigma (float, default=1.0): scale of the distribution (:math:`{\sigma}`). This value also
-                corresponds to the standard deviation of the random entries of the sampled matrix.
-        
+            beta (int, default=1): descriptive integer of the Wishart ensemble type
+                (:math:`\{beta}`). For WRE beta=1, for WCE beta=2, for WQE beta=4.
+            sigma (float, default=1.0): scale of the distribution (:math:`{\sigma}`). This
+                value also corresponds to the standard deviation of the random entries of
+                the sampled matrix.
+
         """
         super().__init__()
 
         if beta not in [1,2,4]:
-            raise ValueError(f"Error: invalid beta. It has to be 1,2 or 4. Provided beta = {beta}.")
+            raise ValueError(
+                f"Error: invalid beta. It has to be 1,2 or 4. Provided beta = {beta}."
+            )
         if ratio <= 0:
-            raise ValueError(f"Error: invalid ratio. It has to be positive. Provided ratio = {ratio}.")
+            raise ValueError(
+                f"Error: invalid ratio. It has to be positive. Provided ratio = {ratio}."
+            )
         if ratio >= 1:
-            _logger.warning(f"Setting ratio >= 1.0 may cause numerical instability. Provided ratio = {ratio}.")
+            _logger.warning(
+                f"Setting ratio >= 1.0 may cause numerical instability. Provided ratio = {ratio}."
+            )
 
         self.ratio = ratio
         self.beta = beta
@@ -355,7 +374,7 @@ class MarchenkoPasturDistribution(rv_continuous):
             self.default_interval = (self.lambda_minus, self.lambda_plus)
         else:
             self.default_interval = (min(-0.05, self.lambda_minus), self.lambda_plus)
-    
+
     def _approximate_inv_cdf(self) -> None:
         # https://gist.github.com/amarvutha/c2a3ea9d42d238551c694480019a6ce1
         x_vals = np.linspace(self.lambda_minus, self.lambda_plus, 1000)
@@ -370,6 +389,7 @@ class MarchenkoPasturDistribution(rv_continuous):
         random_state: int,
         _random_state: int = None,
     ) -> np.ndarray:
+        # pylint: disable=arguments-differ
         if _random_state is not None:
             np.random.seed(_random_state)
 
@@ -381,11 +401,12 @@ class MarchenkoPasturDistribution(rv_continuous):
 
         Args:
             x (float or ndarray): value or (numpy) array of values in which compute the PDF.
-        
+
         Returns:
             float or numpy array with the computed PDF in the given value(s).
-        
+
         """
+        # pylint: disable=arguments-differ
         with np.errstate(divide='ignore', invalid='ignore'):
             return np.sqrt(relu(self.lambda_plus - x) * relu(x - self.lambda_minus)) \
                 / (2.0 * np.pi * self.ratio * self._var * x)
@@ -395,21 +416,38 @@ class MarchenkoPasturDistribution(rv_continuous):
 
         Args:
             x (float or ndarray): value or (numpy) array of values in which compute the CDF.
-        
+
         Returns:
             float or numpy array with the computed CDF in the given value(s).
-        
+
         """
+        # pylint: disable=arguments-differ
         with np.errstate(divide='ignore', invalid='ignore'):
             acum = indicator(x, start=self.lambda_plus, inclusive="left")
-            acum += np.where(indicator(x, start=self.lambda_minus, stop=self.lambda_plus, inclusive="left"),
-                            self._cdf_aux_f(x), 0.0)
+            acum += np.where(
+                indicator(
+                    x,
+                    start=self.lambda_minus,
+                    stop=self.lambda_plus,
+                    inclusive="left",
+                ),
+                self._cdf_aux_f(x),
+                0.0,
+            )
 
             if self.ratio <= 1:
                 return acum
-            
-            acum += np.where(indicator(x, start=self.lambda_minus, stop=self.lambda_plus, inclusive="left"),
-                            (self.ratio-1)/(2*self.ratio), 0.0)
+
+            acum += np.where(
+                indicator(
+                    x,
+                    start=self.lambda_minus,
+                    stop=self.lambda_plus,
+                    inclusive="left",
+                ),
+                (self.ratio-1)/(2*self.ratio),
+                0.0,
+            )
 
             ### This would need to be added if the extra density point at zero is measured
             # https://en.wikipedia.org/wiki/Marchenko%E2%80%93Pastur_distribution
@@ -418,6 +456,7 @@ class MarchenkoPasturDistribution(rv_continuous):
             return acum
 
     def _cdf_aux_f(self, x: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
+        # pylint: disable=line-too-long
         first_arctan_term = np.where(x == self.lambda_minus,
                                     MarchenkoPasturDistribution.ARCTAN_OF_INFTY,
                                     np.arctan((self._cdf_aux_r(x)**2 - 1)/(2 * self._cdf_aux_r(x)))
@@ -450,16 +489,16 @@ class MarchenkoPasturDistribution(rv_continuous):
                 within the given interval or range in which the function (callable) is evaluated.
             savefig_path (string, default=None): path to save the created figure. If it is not
                 provided, the plot is shown at the end of the routine.
-        
+
         """
         if interval is None:
             interval = (self.lambda_minus, self.lambda_plus)
-        
+
         plot_func(
             interval, func=self._pdf, num_x_vals=num_x_vals, plot_title="Marchenko-Pastur law PDF",
             plot_ylabel="density", savefig_path=savefig_path
         )
-    
+
     def plot_cdf(
         self,
         interval: Tuple = None,
@@ -475,11 +514,11 @@ class MarchenkoPasturDistribution(rv_continuous):
                 within the given interval or range in which the function (callable) is evaluated.
             savefig_path (string, default=None): path to save the created figure. If it is not
                 provided, the plot is shown at the end of the routine.
-        
+
         """
         if interval is None:
             interval = (self.lambda_minus, self.lambda_plus)
-        
+
         plot_func(
             interval, func=self._cdf, num_x_vals=num_x_vals, plot_title="Marchenko-Pastur law CDF",
             plot_ylabel="cumulative distribution", savefig_path=savefig_path
@@ -496,7 +535,7 @@ class MarchenkoPasturDistribution(rv_continuous):
         random_state: int = None,
     ) -> None:
         """Computes and plots Marchenko-Pastur empirical PDF.
-        
+
         Calculates and plots Marchenko-Pastur law by generating samples from the
         known Marchenko-Pastur PDF. Remember that the ``ratio`` specified when
         instantiating the class will determine the shape of the distribution.
@@ -536,6 +575,7 @@ class MarchenkoPasturDistribution(rv_continuous):
 
         """
         # pylint: disable=too-many-arguments
+        # pylint: disable=too-many-branches
         if sample_size<1:
             raise ValueError("Negative eigenvalue sample size (given = {sample_size})."
                              " Please, provide a sample size greater or equal than 1.")
@@ -546,14 +586,22 @@ class MarchenkoPasturDistribution(rv_continuous):
             xmin = min(interval[0], self.default_interval[0])
             xmax = max(interval[1], self.default_interval[1])
             if interval[0] > self.default_interval[0]:
-                _logger.warning(f"Lower bound of interval too large. Setting lower bound to {xmin}.")
+                _logger.warning(
+                    f"Lower bound of interval too large. Setting lower bound to {xmin}."
+                )
             if interval[1] < self.default_interval[1]:
-                _logger.warning(f"Upper bound of interval too small. Setting upper bound to {xmax}.")
+                _logger.warning(
+                    f"Upper bound of interval too small. Setting upper bound to {xmax}."
+                )
             range_interval = (xmin, xmax)
             _logger.info(f"Setting plot interval to {range_interval}.")
-        
-        random_samples = self._rvs(size=sample_size, random_state=random_state, _random_state=random_state)
-        observed, bin_edges = np.histogram(random_samples, bins=bins, range=range_interval, density=density)
+
+        random_samples = self._rvs(
+            size=sample_size, random_state=random_state, _random_state=random_state
+        )
+        observed, bin_edges = np.histogram(
+            random_samples, bins=bins, range=range_interval, density=density,
+        )
 
         width = bin_edges[1]-bin_edges[0]
         plt.bar(bin_edges[:-1], observed, width=width, align='edge')
@@ -565,7 +613,9 @@ class MarchenkoPasturDistribution(rv_continuous):
             pdf = self._pdf(centers)
             plt.plot(centers, pdf, color='red', linewidth=2)
         elif plot_law_pdf and not density:
-            _logger.warning("Marchenko-Pastur Law PDF is only plotted when density is True.")  # pragma: no cover
+            _logger.warning(
+                "Marchenko-Pastur Law PDF is only plotted when density is True."
+            )  # pragma: no cover
 
         plt.title("Marchenko-Pastur Law - Eigenvalue histogram", fontweight="bold")
         plt.xlabel("x")
@@ -604,7 +654,7 @@ class TracyWidomDistribution(rv_continuous):
     Attributes:
         beta (int): descriptive integer of the Gaussian ensemble type.
             For GOE beta=1, for GUE beta=2, for GSE beta=4.
-    
+
     References:
         - Bauman, S.
             "The Tracy-Widom Distribution and its Application to Statistical Physics".
@@ -621,7 +671,7 @@ class TracyWidomDistribution(rv_continuous):
         - Borot, G. and Nadal, C.
             "Right tail expansion of Tracy-Widom beta laws".
             Random Matrices: Theory and Applications. 01.03. (2012).
-    
+
     """
 
     def __init__(self, beta: int = 1):
@@ -632,7 +682,7 @@ class TracyWidomDistribution(rv_continuous):
         Args:
             beta (int, default=1): descriptive integer of the Gaussian ensemble type.
                 For GOE beta=1, for GUE beta=2, for GSE beta=4.
-        
+
         """
         super().__init__()
 
@@ -648,11 +698,12 @@ class TracyWidomDistribution(rv_continuous):
 
         Args:
             x (float or ndarray): value or (numpy) array of values in which compute the PDF.
-        
+
         Returns:
             float or numpy array with the computed PDF in the given value(s).
-        
+
         """
+        # pylint: disable=arguments-differ
         return self.tw_approx.pdf(x)
 
     def _cdf(self, x: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
@@ -660,11 +711,12 @@ class TracyWidomDistribution(rv_continuous):
 
         Args:
             x (float or ndarray): value or (numpy) array of values in which compute the CDF.
-        
+
         Returns:
             float or numpy array with the computed CDF in the given value(s).
-        
+
         """
+        # pylint: disable=arguments-differ
         return self.tw_approx.cdf(x)
 
     def plot_pdf(
@@ -682,16 +734,16 @@ class TracyWidomDistribution(rv_continuous):
                 within the given interval or range in which the function (callable) is evaluated.
             savefig_path (string, default=None): path to save the created figure. If it is not
                 provided, the plot is shown at the end of the routine.
-        
+
         """
         if interval is None:
             interval = self.default_interval
-        
+
         plot_func(
             interval, func=self._pdf, num_x_vals=num_x_vals, plot_title="Tracy-Widom law PDF",
             plot_ylabel="density", savefig_path=savefig_path
         )
-    
+
     def plot_cdf(
         self,
         interval: Tuple = None,
@@ -707,11 +759,11 @@ class TracyWidomDistribution(rv_continuous):
                 within the given interval or range in which the function (callable) is evaluated.
             savefig_path (string, default=None): path to save the created figure. If it is not
                 provided, the plot is shown at the end of the routine.
-        
+
         """
         if interval is None:
             interval = self.default_interval
-        
+
         plot_func(
             interval, func=self._cdf, num_x_vals=num_x_vals, plot_title="Tracy-Widom law CDF",
             plot_ylabel="cumulative distribution", savefig_path=savefig_path
@@ -776,14 +828,20 @@ class TracyWidomDistribution(rv_continuous):
             xmin = min(interval[0], self.default_interval[0])
             xmax = max(interval[1], self.default_interval[1])
             if interval[0] > self.default_interval[0]:
-                _logger.warning(f"Lower bound of interval too large. Setting lower bound to {xmin}.")
+                _logger.warning(
+                    f"Lower bound of interval too large. Setting lower bound to {xmin}."
+                )
             if interval[1] < self.default_interval[1]:
-                _logger.warning(f"Upper bound of interval too small. Setting upper bound to {xmax}.")
+                _logger.warning(
+                    f"Upper bound of interval too small. Setting upper bound to {xmax}."
+                )
             range_interval = (xmin, xmax)
             _logger.info(f"Setting plot interval to {range_interval}.")
 
         random_samples = self.rvs(size=sample_size, random_state=random_state)
-        observed, bin_edges = np.histogram(random_samples, bins=bins, range=range_interval, density=density)
+        observed, bin_edges = np.histogram(
+            random_samples, bins=bins, range=range_interval, density=density,
+        )
 
         width = bin_edges[1]-bin_edges[0]
         plt.bar(bin_edges[:-1], observed, width=width, align='edge')
@@ -794,7 +852,9 @@ class TracyWidomDistribution(rv_continuous):
             pdf = self._pdf(centers)
             plt.plot(centers, pdf, color='red', linewidth=2)
         elif plot_law_pdf and not density:
-            _logger.warning("Tracy-Widom Law PDF is only plotted when density is True.")  # pragma: no cover
+            _logger.warning(
+                "Tracy-Widom Law PDF is only plotted when density is True."
+            )  # pragma: no cover
 
         plt.title("Tracy-Widom Law - Eigenvalue histogram", fontweight="bold")
         plt.xlabel("x")
@@ -823,7 +883,7 @@ class TracyWidomDistribution(rv_continuous):
                 the limiting behaviour of the largest eigenvalue of a Wigner matrix.
             other_beta (optional, default=None): beta of the ensemble that corresponds to the
                 sampled eigenvalues. If None, the property ``beta`` of this class is used.
-        
+
         Returns:
             (ndarray) numpy array containing the scaled and normalized eigenvalues.
 
@@ -838,7 +898,7 @@ class TracyWidomDistribution(rv_continuous):
         size_scale = 1.0
         if _beta == 4:
             size_scale = 1/np.sqrt(2)
-        
+
         max_eigvals = (
             size_scale
             * (matrix_size**(1/6))
@@ -866,9 +926,9 @@ class TracyWidomDistribution(rv_continuous):
 
         Args:
             ensemble (_Ensemble): a random matrix ensemble instance.
-            n_eigvals (int, default=1): number of maximum eigenvalues to compute. This is the number
-                of times the random matrix is re-sampled in order to get several samples of the maximum
-                eigenvalue.
+            n_eigvals (int, default=1): number of maximum eigenvalues to compute. This is the
+                number of times the random matrix is re-sampled in order to get several
+                samples of the maximum eigenvalue.
             bins (int or sequence, default=100): If bins is an integer, it defines the number of
                 equal-width bins in the range. If bins is a sequence, it defines the
                 bin edges, including the left edge of the first bin and the right
@@ -878,11 +938,11 @@ class TracyWidomDistribution(rv_continuous):
                 (inclusive), or None (default). If None, the seed is obtained from the clock.
             savefig_path (string, default=None): path to save the created figure. If it is not
                 provided, the plot is shown at the end of the routine.
-        
+
         """
         if random_state is not None:
             np.random.seed(random_state)
-        
+
         max_eigvals = []
         for _ in range(n_eigvals):
             ensemble.resample(random_state=None)
@@ -893,12 +953,14 @@ class TracyWidomDistribution(rv_continuous):
         max_eigvals = self._normalize_eigvals(
             max_eigvals=max_eigvals,                # Max. eigenvalues to normalize
             matrix_size=ensemble.matrix.shape[1],   # Sample size. Usually shape[0] = shape[1]
-            other_beta=ensemble.beta                # In case `ensemble` was created with a different beta
+            other_beta=ensemble.beta                # In case `ensemble` was created with a different beta  # pylint: disable=line-too-long
         )
 
         interval = (max_eigvals.min(), max_eigvals.max())
 
-        observed, bin_edges = np.histogram(max_eigvals, bins=bins, range=interval, density=True)
+        observed, bin_edges = np.histogram(
+            max_eigvals, bins=bins, range=interval, density=True
+        )
         width = bin_edges[1]-bin_edges[0]
         plt.bar(bin_edges[:-1], observed, width=width, align='edge')
 
@@ -909,7 +971,10 @@ class TracyWidomDistribution(rv_continuous):
 
         plt.plot(centers, tw_pdf, color='red', linewidth=2)
 
-        plt.title("Comparing maximum eigenvalues histogram with Tracy-Widom law", fontweight="bold")
+        plt.title(
+            "Comparing maximum eigenvalues histogram with Tracy-Widom law",
+            fontweight="bold",
+        )
         plt.xlabel("x")
         plt.ylabel("density")
 
@@ -946,12 +1011,12 @@ class ManovaSpectrumDistribution(rv_continuous):
             It depends on beta, on the scale (sigma) and on the ratio.
         lambda_plus (float): upper bound of the support of the Manova spectrum distribution.
             It depends on beta, on the scale (sigma) and on the ratio.
-    
+
     References:
         - Erdos, L. and Farrell, B.
             "Local Eigenvalue Density for General MANOVA Matrices".
             Journal of Statistical Physics. 152.6 (2013): 1003-1032.
-    
+
     """
 
     def __init__(self, ratio_a: float, ratio_b: float, beta: int = 1):
@@ -970,7 +1035,7 @@ class ManovaSpectrumDistribution(rv_continuous):
                 matrix, that's why there are two sample sizes 'n1' and 'n2'.
             beta (int, default=1): descriptive integer of the Manova ensemble type.
                 For MRE beta=1, for WME beta=2, for MQE beta=4.
-        
+
         """
         super().__init__()
 
@@ -981,7 +1046,10 @@ class ManovaSpectrumDistribution(rv_continuous):
                              f"\tProvided a = {ratio_a} and b = {ratio_b}.")
 
         if ratio_a < 1 or ratio_b < 1:
-            _logger.warning(f"Setting a < 1 (a = {ratio_a}) or b < 1 (b = {ratio_b}) may cause numerical instability.")
+            _logger.warning(
+                f"Setting a < 1 (a = {ratio_a}) or b < 1 (b = {ratio_b}) "
+                "may cause numerical instability."
+            )
 
         self.ratio_a = ratio_a
         self.ratio_b = ratio_b
@@ -994,7 +1062,7 @@ class ManovaSpectrumDistribution(rv_continuous):
         # when the support is finite (lambda_minus, lambda_plus) it is better
         # to explicity approximate the inverse of the CDF to implement rvs
         self._approximate_inv_cdf()
-    
+
     def _set_default_interval(self) -> None:
         interval = [self.lambda_minus, self.lambda_plus]
         if self.ratio_a <= 1:
@@ -1017,13 +1085,15 @@ class ManovaSpectrumDistribution(rv_continuous):
         random_state: int,
         _random_state: int = None,
     ) -> np.ndarray:
+        # pylint: disable=arguments-differ
         if _random_state is not None:
             np.random.seed(_random_state)
 
         uniform_samples = np.random.random(size=size)
         return self._inv_cdf(uniform_samples)
-    
+
     def __pdf_float(self, x: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
+        # pylint: disable=line-too-long
         if x <= self.lambda_minus:
             return 0.0
 
@@ -1038,11 +1108,12 @@ class ManovaSpectrumDistribution(rv_continuous):
 
         Args:
             x (float or ndarray): value or (numpy) array of values in which compute the PDF.
-        
+
         Returns:
             float or numpy array with the computed PDF in the given value(s).
-        
+
         """
+        # pylint: disable=arguments-differ
         # if x is array-like
         if isinstance(x, (collections.abc.Sequence, np.ndarray)):
             # TODO: Vectorize this loop in case x is array-like
@@ -1052,7 +1123,7 @@ class ManovaSpectrumDistribution(rv_continuous):
             return np.asarray(y_ret)
         # if x is a number (int or float)
         return self.__pdf_float(x)
-    
+
     def __cdf_float(self, x: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
         if x <= self.lambda_minus:
             return 0.0
@@ -1067,11 +1138,12 @@ class ManovaSpectrumDistribution(rv_continuous):
 
         Args:
             x (float or ndarray): value or (numpy) array of values in which compute the CDF.
-        
+
         Returns:
             float or numpy array with the computed CDF in the given value(s).
-        
+
         """
+        # pylint: disable=arguments-differ
         # if x is array-like
         if isinstance(x, (collections.abc.Sequence, np.ndarray)):
             # TODO: Vectorize this loop in case x is array-like
@@ -1079,7 +1151,7 @@ class ManovaSpectrumDistribution(rv_continuous):
             for val in x:
                 y_ret.append(self.__cdf_float(val))
             return np.asarray(y_ret)
-        
+
         # if x is a number (int or float)
         return self.__cdf_float(x)
 
@@ -1098,11 +1170,11 @@ class ManovaSpectrumDistribution(rv_continuous):
                 within the given interval or range in which the function (callable) is evaluated.
             savefig_path (string, default=None): path to save the created figure. If it is not
                 provided, the plot is shown at the end of the routine.
-        
+
         """
         if interval is None:
             interval = (self.lambda_minus, self.lambda_plus)
-        
+
         plot_func(
             interval, func=self._pdf, num_x_vals=num_x_vals, plot_title="Manova spectrum PDF",
             plot_ylabel="density", savefig_path=savefig_path
@@ -1123,7 +1195,7 @@ class ManovaSpectrumDistribution(rv_continuous):
                 within the given interval or range in which the function (callable) is evaluated.
             savefig_path (string, default=None): path to save the created figure. If it is not
                 provided, the plot is shown at the end of the routine.
-        
+
         """
         if interval is None:
             interval = (self.lambda_minus, self.lambda_plus)
@@ -1187,6 +1259,7 @@ class ManovaSpectrumDistribution(rv_continuous):
 
         """
         # pylint: disable=too-many-arguments
+        # pylint: disable=too-many-branches
         if sample_size<1:
             raise ValueError("Negative eigenvalue sample size (given = {sample_size})."
                              " Please, provide a sample size greater or equal than 1.")
@@ -1197,14 +1270,22 @@ class ManovaSpectrumDistribution(rv_continuous):
             xmin = min(interval[0], self.default_interval[0])
             xmax = max(interval[1], self.default_interval[1])
             if interval[0] > self.default_interval[0]:
-                _logger.warning(f"Lower bound of interval too large. Setting lower bound to {xmin}.")
+                _logger.warning(
+                    f"Lower bound of interval too large. Setting lower bound to {xmin}."
+                )
             if interval[1] < self.default_interval[1]:
-                _logger.warning(f"Upper bound of interval too small. Setting upper bound to {xmax}.")
+                _logger.warning(
+                    f"Upper bound of interval too small. Setting upper bound to {xmax}."
+                )
             range_interval = (xmin, xmax)
             _logger.info(f"Setting plot interval to {range_interval}.")
 
-        random_samples = self._rvs(size=sample_size, random_state=random_state, _random_state=random_state)
-        observed, bin_edges = np.histogram(random_samples, bins=bins, range=range_interval, density=density)
+        random_samples = self._rvs(
+            size=sample_size, random_state=random_state, _random_state=random_state,
+        )
+        observed, bin_edges = np.histogram(
+            random_samples, bins=bins, range=range_interval, density=density,
+        )
 
         width = bin_edges[1]-bin_edges[0]
         plt.bar(bin_edges[:-1], observed, width=width, align='edge')
@@ -1216,7 +1297,9 @@ class ManovaSpectrumDistribution(rv_continuous):
             pdf = self._pdf(centers)
             plt.plot(centers, pdf, color='red', linewidth=2)
         elif plot_law_pdf and not density:
-            _logger.warning("Manova Spectrum Distribution PDF is only plotted when density is True.")  # pragma: no cover
+            _logger.warning(
+                "Manova Spectrum Distribution PDF is only plotted when density is True."
+            )  # pragma: no cover
 
         plt.title("Manova Spectrum - Eigenvalue histogram", fontweight="bold")
         plt.xlabel("x")
