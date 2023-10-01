@@ -11,7 +11,7 @@ from typing import Union, Sequence, Tuple
 import numpy as np
 from scipy import sparse, special
 
-from .base_ensemble import _Ensemble
+from .base_ensemble import BaseEnsemble
 from .tridiagonal_utils import tridiag_eigval_hist
 from .spectral_law import MarchenkoPasturDistribution
 
@@ -19,7 +19,7 @@ from .spectral_law import MarchenkoPasturDistribution
 #########################################################################
 ### Wishart Ensemble = Laguerre Ensemble
 
-class WishartEnsemble(_Ensemble):
+class WishartEnsemble(BaseEnsemble):
     """General Wishart Ensemble class.
 
     This class contains common attributes and methods for all the
