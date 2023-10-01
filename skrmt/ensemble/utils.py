@@ -7,14 +7,14 @@ from typing import Union, Sequence
 import numpy as np
 import matplotlib.pyplot as plt
 
-from .base_ensemble import _Ensemble
+from .base_ensemble import BaseEnsemble
 from .gaussian_ensemble import GaussianEnsemble
 from .wishart_ensemble import WishartEnsemble
 from .misc import get_bins_centers_and_contour
 
 
 def plot_spectral_hist_and_law(
-    ensemble: _Ensemble,
+    ensemble: BaseEnsemble,
     bins: Union[int, Sequence] = 100,
     savefig_path: str = None,
 ) -> None:
@@ -29,7 +29,7 @@ def plot_spectral_hist_and_law(
     formulated by Wachter.
 
     Args:
-        ensemble (_Ensemble): a random matrix ensemble instance. The only supported types
+        ensemble (BaseEnsemble): a random matrix ensemble instance. The only supported types
             are `GaussianEnsemble`, `WishartEnsemble` and `ManovaEnsemble`.
         bins (int or sequence, default=100): If bins is an integer, it defines the number of
             equal-width bins in the range. If bins is a sequence, it defines the
@@ -75,7 +75,7 @@ def standard_vs_tridiag_hist(
     types of matrix have the same spectral distribution.
 
     Args:
-        ensemble (_Ensemble): a random matrix ensemble instance. The only supported types
+        ensemble (BaseEnsemble): a random matrix ensemble instance. The only supported types
             are `GaussianEnsemble` and `WishartEnsemble`, since spectral optimizations
             based on their tridiagonal forms are known.
         bins (int or sequence, default=100): If bins is an integer, it defines the number of

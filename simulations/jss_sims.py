@@ -6,9 +6,6 @@ import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
 
-dirname = os.path.dirname(__file__)
-sys.path.append(dirname[:dirname.rfind("/")])  # TODO: Remove
-
 from skrmt.ensemble.gaussian_ensemble import GaussianEnsemble
 from skrmt.ensemble.wishart_ensemble import WishartEnsemble
 from skrmt.ensemble.manova_ensemble import ManovaEnsemble
@@ -25,6 +22,8 @@ from skrmt.ensemble.utils import (
 
 IMGS_DIRNAME = "skrmt_sim_imgs"
 SCRIPT_PATH = os.path.dirname(__file__)
+# This will add the directory of the script to the Python path
+sys.path.append(SCRIPT_PATH)
 
 BOLD_CHAR = '\033[1m'
 END_CHAR = '\033[0m'
@@ -677,13 +676,16 @@ def plot_figure_20():
 
 
 
-# Auxiliary function
 def __build_m_labels(M):
+    """Auxiliary function to build plot labels
+    """
     labels = [("m = "+str(m)) for m in M]
     return labels
-    
-# Useful function to plot the tridiagonal optimization simulations
+
+
 def __plot_times(N_list, bins_list, times_naive, times_tridiag, savefig_path):
+    """Useful function to plot the tridiagonal optimization simulations
+    """
     # creating subplots
     fig, axes = plt.subplots(nrows=1, ncols=2)
     fig.set_figheight(5)
@@ -725,9 +727,10 @@ def __plot_times(N_list, bins_list, times_naive, times_tridiag, savefig_path):
 
     plt.savefig(savefig_path)
 
-    
-# Creating graphic using GOE (tridiagonal vs standard)
+
 def _gaussian_tridiagonal_sim(N_list, bins_list, savefig_path, nreps=10):
+    """Creating tridiagonal simulation graphic using GOE (tridiagonal vs standard)
+    """
     # time lists
     times_naive = np.zeros((len(N_list), len(bins_list)))
     times_tridiag = np.zeros((len(N_list), len(bins_list)))
@@ -757,9 +760,10 @@ def _gaussian_tridiagonal_sim(N_list, bins_list, savefig_path, nreps=10):
     
     __plot_times(N_list, bins_list, times_naive, times_tridiag, savefig_path)
     
-    
-# Creating graphic using WRE (tridiagonal vs standard)
+
 def _wishart_tridiagonal_sim(N_list, bins_list, savefig_path, nreps=10):
+    """Creating tridiagonal simulation graphic using WRE (tridiagonal vs standard)
+    """
     # time lists
     times_naive = np.zeros((len(N_list), len(bins_list)))
     times_tridiag = np.zeros((len(N_list), len(bins_list)))
@@ -790,49 +794,49 @@ def _wishart_tridiagonal_sim(N_list, bins_list, savefig_path, nreps=10):
     __plot_times(N_list, bins_list, times_naive, times_tridiag, savefig_path)
 
 
-### MAIN FUNCTION
+
 def main():
+    """MAIN FUNCTION"""
     _setup_img_dir()
 
-    # # Gaussian ensemble
-    # plot_figure_1()
-    # # Wishart ensemble
-    # plot_figure_2()
-    # # Manova ensemble
-    # plot_figure_3()
-    # # Circular ensemble
-    # plot_figure_4()
+    # Gaussian ensemble
+    plot_figure_1()
+    # Wishart ensemble
+    plot_figure_2()
+    # Manova ensemble
+    plot_figure_3()
+    # Circular ensemble
+    plot_figure_4()
 
-    # # Standard vs tridiagonal histograms 
-    # plot_figure_5()
+    # Standard vs tridiagonal histograms 
+    plot_figure_5()
 
     # Tridiagonal optimization
     plot_figure_6()
     plot_figure_7()
 
-    # # Joint eigenvalue PDF
-    # plot_figure_8()
+    # Joint eigenvalue PDF
+    plot_figure_8()
 
-    # # Wigner Semicircle law
-    # plot_figure_9()
-    # plot_figure_10()
-    # plot_figure_11()
+    # Wigner Semicircle law
+    plot_figure_9()
+    plot_figure_10()
+    plot_figure_11()
 
     # Tracy-Widom law
-    # plot_figure_12()
-    # plot_figure_13()
-    # plot_figure_14()
+    plot_figure_12()
+    plot_figure_13()
+    plot_figure_14()
 
-    # # Marchenko-Pastur law
-    # plot_figure_15()
-    # plot_figure_16()
-    # plot_figure_17()
+    # Marchenko-Pastur law
+    plot_figure_15()
+    plot_figure_16()
+    plot_figure_17()
 
-    # # Manova Spectrum distr.
-    # plot_figure_18()
-    # plot_figure_19()
-    # plot_figure_20()
-
+    # Manova Spectrum distr.
+    plot_figure_18()
+    plot_figure_19()
+    plot_figure_20()
 
 
 if __name__ == "__main__":

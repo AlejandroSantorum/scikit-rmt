@@ -1,13 +1,13 @@
 '''Base Ensemble Test module
 
-Testing _Ensemble abstract class
+Testing BaseEnsemble abstract class
 '''
 
 import os
 import shutil
 import pytest
 
-from skrmt.ensemble.base_ensemble import _Ensemble
+from skrmt.ensemble.base_ensemble import BaseEnsemble
 from skrmt.ensemble.gaussian_ensemble import GaussianEnsemble
 
 
@@ -43,7 +43,7 @@ def test_init_exception():
     """Testing the abstract class cannot be instantiated
     """
     with pytest.raises(TypeError):
-        _ = _Ensemble()  # pylint: disable=abstract-class-instantiated
+        _ = BaseEnsemble()  # pylint: disable=abstract-class-instantiated
 
 
 def test_base_set_eigval_norm_const():

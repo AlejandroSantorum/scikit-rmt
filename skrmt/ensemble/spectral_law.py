@@ -17,7 +17,7 @@ from scipy.integrate import quad
 from scipy.stats import rv_continuous
 from scipy import interpolate
 
-from .base_ensemble import _Ensemble
+from .base_ensemble import BaseEnsemble
 from .tracy_widom_approximator import TW_Approximator
 from .misc import relu, indicator, plot_func, get_bins_centers_and_contour, get_logger
 
@@ -908,7 +908,7 @@ class TracyWidomDistribution(rv_continuous):
 
     def plot_ensemble_max_eigvals(
         self,
-        ensemble: _Ensemble,
+        ensemble: BaseEnsemble,
         n_eigvals: int = 1,
         bins: Union[int, Sequence] = 100,
         random_state: int = None,
@@ -925,7 +925,7 @@ class TracyWidomDistribution(rv_continuous):
         eigenvalue of any type of random ensemble.
 
         Args:
-            ensemble (_Ensemble): a random matrix ensemble instance.
+            ensemble (BaseEnsemble): a random matrix ensemble instance.
             n_eigvals (int, default=1): number of maximum eigenvalues to compute. This is the
                 number of times the random matrix is re-sampled in order to get several
                 samples of the maximum eigenvalue.

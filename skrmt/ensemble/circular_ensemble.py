@@ -12,7 +12,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy import special
 
-from .base_ensemble import _Ensemble
+from .base_ensemble import BaseEnsemble
 
 
 
@@ -39,7 +39,7 @@ def _sample_haar_mtx(size: int) -> np.ndarray:
 #########################################################################
 ### Circular Ensemble
 
-class CircularEnsemble(_Ensemble):
+class CircularEnsemble(BaseEnsemble):
     """General Circular Ensemble class.
 
     This class contains common attributes and methods for all the

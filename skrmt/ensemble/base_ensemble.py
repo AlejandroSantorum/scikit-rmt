@@ -15,9 +15,9 @@ import matplotlib.pyplot as plt
 
 
 #########################################################################
-### ABSTRACT CLASS: ENSEMBLE
+### ABSTRACT CLASS BaseEnsemble
 
-class _Ensemble(metaclass=ABCMeta):
+class BaseEnsemble(metaclass=ABCMeta):
     """General abstract ensemble class.
 
     This class contains common attributes and methods for all the

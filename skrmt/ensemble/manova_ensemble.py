@@ -11,14 +11,14 @@ from typing import Union, Sequence, Tuple
 import numpy as np
 from scipy import special
 
-from .base_ensemble import _Ensemble
+from .base_ensemble import BaseEnsemble
 from .spectral_law import ManovaSpectrumDistribution
 
 
 #########################################################################
 ### Manova Ensemble = Jacobi Ensemble
 
-class ManovaEnsemble(_Ensemble):
+class ManovaEnsemble(BaseEnsemble):
     """General Manova Ensemble class.
 
     This class contains common attributes and methods for all the
