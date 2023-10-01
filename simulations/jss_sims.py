@@ -6,6 +6,16 @@ import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
 
+# This will add the directory of the script to the Python path
+sys.path.append(os.path.dirname(__file__))
+
+try:
+    sys.path.append("./scikit-rmt")
+    sys.path.append("../")
+    sys.path.append("../scikit-rmt")
+except BaseException:
+    pass
+
 from skrmt.ensemble.gaussian_ensemble import GaussianEnsemble
 from skrmt.ensemble.wishart_ensemble import WishartEnsemble
 from skrmt.ensemble.manova_ensemble import ManovaEnsemble
@@ -22,8 +32,6 @@ from skrmt.ensemble.utils import (
 
 IMGS_DIRNAME = "skrmt_sim_imgs"
 SCRIPT_PATH = os.path.dirname(__file__)
-# This will add the directory of the script to the Python path
-sys.path.append(SCRIPT_PATH)
 
 BOLD_CHAR = '\033[1m'
 END_CHAR = '\033[0m'
