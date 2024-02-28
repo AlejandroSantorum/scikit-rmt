@@ -3,6 +3,7 @@ venv_skrmt
 .ipynb_checkpoints
 *.DS_Store
 __pycache__/
+.vscode
 *.png
 
 # pytest & pytest-cov
