@@ -254,7 +254,7 @@ def average_psnr(ref_img: np.ndarray, test_imgs: List[np.ndarray]) -> float:
     return np.mean(psnrs)
 
 def average_ssim(ref_img: np.ndarray, test_imgs: List[np.ndarray]) -> float:
-    ssims = [ssim(ref_img=ref_img, test_img=t_img) for t_img in test_imgs]
+    ssims = [ssim(im1=ref_img, im2=t_img, data_range=255) for t_img in test_imgs]
     return np.mean(ssims)
 
 class ImgNoiseCorruptor:
