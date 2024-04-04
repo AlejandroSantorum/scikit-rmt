@@ -34,28 +34,28 @@ def denoise_local_mppca(X: np.ndarray, sigma: float) -> np.ndarray:
     denoising algorithm.
 
     Args:
-        X (np.dnarray): M times N matrix representing a local region to denoise.
-            M is the number of different measurements, and N the number of pixels
+        X (np.dnarray): `p` times `n` matrix representing a local region to denoise.
+            `p` is the number of different measurements, and `n` the number of pixels
             in the region to denoise.
         sigma (float): Marchenko-Pastur parameter, that approximates the level of noise.
 
     Returns:
         np.ndarray: denoised matrix X.
     """
-    # M := number of measurements
-    # N := number of pixels
-    (M, N) = X.shape
-    wre = WishartEnsemble(beta=1, p=M, n=N, sigma=sigma)
+    # p := number of measurements
+    # n := number of pixels
+    (p, n) = X.shape
+    wre = WishartEnsemble(beta=1, p=p, n=n, sigma=sigma)
     wre.matrix = X
 
     # Principal Component Analysis (PCA) via SVD
-    U, S, Vh = np.linalg.svd((1/np.sqrt(N)) * wre.matrix, full_matrices=False)
+    U, S, Vh = np.linalg.svd((1/np.sqrt(n)) * wre.matrix, full_matrices=False)
 
     # nullifying noisy eigenvalues
     denoised_S = np.where(S <= np.sqrt(wre.lambda_plus), 0, S)
 
     # reconstructing denoised X
-    denoised_X = np.sqrt(N) * np.dot(U * denoised_S, Vh)
+    denoised_X = np.sqrt(n) * np.dot(U * denoised_S, Vh)
 
     return denoised_X
 
@@ -191,6 +191,8 @@ def plot_local_mppca(X: np.ndarray, sigma: float) -> None:
     plt.bar(bin_edges[:-1], observed, width=width, align='edge')
     # pdf
     plt.plot(centers, height, color='red', linewidth=2)
+
+    plt.title("Eigenvalue histogram and Marchenko-Pastur law", fontweight="bold")
     plt.show()
 
 
