@@ -75,6 +75,7 @@ Modifications by Alejandro Santorum under the following license:
     OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
+import warnings
 from typing import Union
 import numpy as np
 from scipy.interpolate import interp1d
@@ -159,6 +160,8 @@ class TW_Approximator:
         Returns:
             A TW_Approximator class instance with methods cdf, pdf, and cdfinv.
         """
+        self.__supress_derivative_warnings()
+
         b = int(beta)
         if b == 1:
             digits = _digits_1
@@ -197,6 +200,18 @@ class TW_Approximator:
         y = self.cdf(x)
 
 
+    def __supress_derivative_warnings(self):
+        """
+        Suppress deprecation warnings from scipy.misc.derivative,
+        which is not actually deprecated in v1.12.0.
+        """
+        warnings.filterwarnings(
+            "ignore",
+            category=DeprecationWarning,
+            message="scipy.misc.derivative is deprecated in SciPy v1.10.0; and will be completely removed in SciPy v1.12.0.",
+        )
+
+
     def cdf(self, x: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
         r"""Return the cumulative distribution function at x.
         :math:`cdf(x) = \mathbb{P}(TW < x)`.
@@ -207,6 +222,7 @@ class TW_Approximator:
         Returns:
             y (float or array-like): result of y = cdf(x).
         """
+        self.__supress_derivative_warnings()
         xa = np.asanyarray(x)
         scalar = xa.ndim==0
         if scalar:
