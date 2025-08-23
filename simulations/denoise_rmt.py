@@ -91,23 +91,26 @@ def denoise_mppca_by_rows(snapshots: np.ndarray, sigma: float) -> np.ndarray:
 def denoise_mppca(snapshots: np.ndarray, sigma: float, window_size: int = 16) -> np.ndarray:
     """Performns PCA-based image denoising using the Marchenko-Pastur law.
     Denoises a set of images (snapshots) which are all noisy measurements
-    of the same region of interest. For example, a set of MRI images focused on
-    the same brain region.
+    of the same region of interest. For example, a set of MRI images
+    focused on the same brain region.
     This function iterates over patches or windows of the image of size
-    `window_size x window_size`. The denoised pixels contained in several windows
-    are averaged.
+    `window_size x window_size`. The denoised pixels contained in several
+    windows are averaged.
 
     Args:
         snapshots (np.ndarray): set of images which are all noisy measurements
             of the same region of interest. 3D dimensional numpy array of size
             (N images, height, width).
-        sigma (float): Marchenko-Pastur parameter, that approximates the level of noise.
+        sigma (float): Marchenko-Pastur parameter, that approximates the
+            level of noise.
 
     Returns:
         np.ndarray: denoised snapshots.
     """
     n_snapshots, img_height, img_width = snapshots.shape
-    print(f"Denoising {n_snapshots} snapshots of size {img_height}x{img_width} (sigma = {sigma}).")
+    print(
+        f"Denoising {n_snapshots} snapshots of size {img_height}x{img_width} (sigma = {sigma})."
+    )
 
     denoised_snapshots = np.zeros_like(snapshots)
 
@@ -247,17 +250,17 @@ def psnr(ref_img: np.ndarray, test_img: np.ndarray) -> float:
     return 20 * np.log10(255.0 / np.sqrt(mse))
 
 
-def average_snr(ref_img: np.ndarray, test_imgs: List[np.ndarray]) -> float:
+def average_snr(ref_img: np.ndarray, test_imgs: List[np.ndarray]) -> Tuple[float, float]:
     snrs = [snr(ref_img=ref_img, test_img=t_img) for t_img in test_imgs]
-    return np.mean(snrs)
+    return np.mean(snrs), np.std(snrs)
 
-def average_psnr(ref_img: np.ndarray, test_imgs: List[np.ndarray]) -> float:
+def average_psnr(ref_img: np.ndarray, test_imgs: List[np.ndarray]) -> Tuple[float, float]:
     psnrs = [psnr(ref_img=ref_img, test_img=t_img) for t_img in test_imgs]
-    return np.mean(psnrs)
+    return np.mean(psnrs), np.std(psnrs)
 
-def average_ssim(ref_img: np.ndarray, test_imgs: List[np.ndarray]) -> float:
+def average_ssim(ref_img: np.ndarray, test_imgs: List[np.ndarray]) -> Tuple[float, float]:
     ssims = [ssim(im1=ref_img, im2=t_img, data_range=255) for t_img in test_imgs]
-    return np.mean(ssims)
+    return np.mean(ssims), np.std(ssims)
 
 class ImgNoiseCorruptor:
     """Generates corrupted images from a given original image by
