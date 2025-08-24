@@ -423,7 +423,7 @@ The package is licensed under the BSD 3-Clause License. A copy of the [license](
 ## Attribution
 This project has been developed by Alejandro Santorum Varela (2021) as part of the final degree project
 in Computer Science (Autonomous University of Madrid), supervised by Alberto Suárez González.
-It was later revised and improved in 2025 to  has been revised and improved in 2025 to support up to Python 3.12.
+It has been revised and improved in 2025 to support Python versions from 3.8 to 3.12.
 
 If you happen to use `scikit-rmt` in your work or research, please cite its GitHub repository:
 
