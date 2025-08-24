@@ -3,6 +3,7 @@ import sys
 import time
 from importlib import reload
 import numpy as np
+from scipy.stats import rice
 import matplotlib
 import matplotlib.pyplot as plt
 
@@ -683,6 +684,94 @@ def plot_figure_20():
     print(f"{BOLD_CHAR}[DONE]{END_CHAR} - Images Figure 20")
 
 
+def plot_figure_22():
+    print(f"Generating images of Figure 22. This may take {BOLD_CHAR}some minutes (~10 mins.){END_CHAR} ...")
+
+    # Get original simulation MRI image
+    current_filepath = os.path.dirname(__file__)
+    tumor_slice = np.load(f"{current_filepath}/sim_data/sample_tumor_img.npy")
+    tumor_slice = np.pad(tumor_slice, pad_width=5, mode="constant", constant_values=0)
+
+    # Number of measurements (snapshots)
+    n_snapshots = 100
+    # RNG seed
+    seed = 1
+    # Noise parameters
+    sigma = 35  # Marchenko-Pastur sigma ~ noise standard deviation
+    rice_b = 2  # Rice distribution parameter
+    # Denoising parameters
+    window_size = 16  # 16x16 MPPCA window size
+
+    noise_corruptor = ImgNoiseCorruptor(original_img=tumor_slice)
+    snapshots, fg_masks = noise_corruptor.generate_rician_noisy_displaced_imgs(
+        n_snapshots=n_snapshots,
+        rice_b=rice_b,
+        sigma=sigma,
+        seed=seed,
+    )
+
+    # Sample of corrupted snapshot
+    corrupted_slice = snapshots[0]
+
+    # Apply MP-PCA
+    denoised_snapshots = denoise_mppca(snapshots, sigma=sigma, window_size=window_size)
+    # Adjust background and normalize denoised images in [0, 255]
+    denoised_snapshots = apply_foreground_masks(snapshots=denoised_snapshots, fg_masks=fg_masks)
+    denoised_snapshots = normalize_imgs_0_255(snapshots=denoised_snapshots)
+
+    # Sample of denoised snapshot
+    denoised_slice = denoised_snapshots[0]
+
+    # Denoising by averaging
+    denoised_by_avg_slice = (tumor_slice > 0.0) * np.mean(snapshots, axis=0)
+
+    # Average SNR and PSNR of simulated corrupted snapshots
+    ss_avg_snr, ss_std_snr = average_snr(ref_img=tumor_slice, test_imgs=snapshots)
+    ss_avg_psnr, ss_std_psnr = average_psnr(ref_img=tumor_slice, test_imgs=snapshots)
+
+    # SNR and PSNR of denoised images by averaging
+    den_means_snr = snr(ref_img=tumor_slice, test_img=denoised_by_avg_slice)
+    den_means_psnr = psnr(ref_img=tumor_slice, test_img=denoised_by_avg_slice)
+
+    # Average SNR and PSNR of denoised images using MP-PCA
+    den_ss_avg_snr, den_ss_std_snr = average_snr(ref_img=tumor_slice, test_imgs=denoised_snapshots)
+    den_ss_avg_psnr, den_ss_std_psnr = average_psnr(ref_img=tumor_slice, test_imgs=denoised_snapshots)
+
+    print(f"\tAverage SNR of simulated snapshots: {ss_avg_snr} ± {ss_std_snr}.")
+    print(f"\tAverage PSNR of simulated snapshots: {ss_avg_psnr} ± {ss_std_psnr}.")
+
+    print(f"\tSNR of image denoised by averaging: {den_means_snr}.")
+    print(f"\tPSNR of image denoised by averaging: {den_means_psnr}.")
+
+    print(f"\tAverage SNR of snapshots using MP-PCA: {den_ss_avg_snr} ± {den_ss_std_snr}.")
+    print(f"\tAverage PSNR of snapshots using MP-PCA: {den_ss_avg_psnr} ± {den_ss_std_psnr}.")
+
+    img_figpath = os.path.join(SCRIPT_PATH, IMGS_DIRNAME, "fig22_a_noisy.png")
+    plt.imshow(corrupted_slice, cmap="gray", origin="lower")
+    plt.savefig(img_figpath)
+    __restore_plt()
+
+    img_figpath = os.path.join(SCRIPT_PATH, IMGS_DIRNAME, "fig22_b_denoised_avg.png")
+    plt.imshow(denoised_by_avg_slice, cmap="gray", origin="lower")
+    plt.savefig(img_figpath)
+    __restore_plt()
+
+    img_figpath = os.path.join(SCRIPT_PATH, IMGS_DIRNAME, "fig22_c_denoised_mppca.png")
+    plt.imshow(denoised_slice, cmap="gray", origin="lower")
+    plt.savefig(img_figpath)
+    __restore_plt()
+
+    img_figpath = os.path.join(SCRIPT_PATH, IMGS_DIRNAME, "fig22_d_denoised_original.png")
+    plt.imshow(tumor_slice, cmap="gray", origin="lower")
+    plt.savefig(img_figpath)
+    __restore_plt()
+
+    print(f"{BOLD_CHAR}[DONE]{END_CHAR} - Images Figure 22")
+
+
+####################################################################################
+# FUNCTIONS FOR TRIDIAGONAL MATRICES SIMULATIONS
+###
 
 def __build_m_labels(M):
     """Auxiliary function to build plot labels
@@ -802,49 +891,346 @@ def _wishart_tridiagonal_sim(N_list, bins_list, savefig_path, nreps=10):
     __plot_times(N_list, bins_list, times_naive, times_tridiag, savefig_path)
 
 
+####################################################################################
+# FUNCTIONS FOR MRI IMAGE DENOISING PRACTICAL ILLUSTRATION
+###
+
+def norm_img_0_255(img: np.ndarray):
+    min_val = np.min(img)
+    max_val = np.max(img)
+    return 255 * (img - min_val) / (max_val - min_val)
+
+
+def normalize_imgs_0_255(snapshots: np.ndarray) -> np.ndarray:
+    norm_snapshots = []
+    for ss in snapshots:
+        norm_snapshots.append(norm_img_0_255(img=ss))
+    return np.asarray(norm_snapshots)
+
+
+def apply_foreground_masks(snapshots: np.ndarray, fg_masks: np.ndarray) -> np.ndarray:
+    assert snapshots.shape == fg_masks.shape
+
+    mask_snapshots = []
+    for idx, den_ss in enumerate(snapshots):
+        fg_m = fg_masks[idx]
+        mask_snapshots.append(fg_m * den_ss)
+    mask_snapshots = np.asarray(mask_snapshots)
+
+    assert mask_snapshots.shape == snapshots.shape
+    return mask_snapshots
+
+
+def denoise_local_mppca(X: np.ndarray, sigma: float) -> np.ndarray:
+    """Denoises local region represented by X using Marchenko-Pastur PCA
+    denoising algorithm.
+
+    Args:
+        X (np.dnarray): `p` times `n` matrix representing a local region to denoise.
+            `p` is the number of different measurements, and `n` the number of pixels
+            in the region to denoise.
+        sigma (float): Marchenko-Pastur parameter, that approximates the level of noise.
+
+    Returns:
+        np.ndarray: denoised matrix X.
+    """
+    # p := number of measurements
+    # n := number of pixels
+    (p, n) = X.shape
+    wre = WishartEnsemble(beta=1, p=p, n=n, sigma=sigma)
+    wre.matrix = X
+
+    # Principal Component Analysis (PCA) via SVD
+    U, S, Vh = np.linalg.svd((1/np.sqrt(n)) * wre.matrix, full_matrices=False)
+
+    # nullifying noisy eigenvalues
+    denoised_S = np.where(S <= np.sqrt(wre.lambda_plus), 0, S)
+
+    # reconstructing denoised X
+    denoised_X = np.sqrt(n) * np.dot(U * denoised_S, Vh)
+
+    return denoised_X
+
+
+def denoise_mppca(snapshots: np.ndarray, sigma: float, window_size: int = 16) -> np.ndarray:
+    """Performns PCA-based image denoising using the Marchenko-Pastur law.
+    Denoises a set of images (snapshots) which are all noisy measurements
+    of the same region of interest. For example, a set of MRI images
+    focused on the same brain region.
+    This function iterates over patches or windows of the image of size
+    `window_size x window_size`. The denoised pixels contained in several
+    windows are averaged.
+
+    Args:
+        snapshots (np.ndarray): set of images which are all noisy measurements
+            of the same region of interest. 3D dimensional numpy array of size
+            (N images, height, width).
+        sigma (float): Marchenko-Pastur parameter, that approximates the
+            level of noise.
+
+    Returns:
+        np.ndarray: denoised snapshots.
+    """
+    n_snapshots, img_height, img_width = snapshots.shape
+    print(
+        f"Denoising {n_snapshots} snapshots of size {img_height}x{img_width} (sigma = {sigma})."
+    )
+
+    denoised_snapshots = np.zeros_like(snapshots)
+
+    for i in range(img_height - window_size + 1):
+        for j in range(img_width - window_size + 1):
+            locally_denoised_sss = np.zeros_like(snapshots)
+            local_window = snapshots[:,i:i+window_size,j:j+window_size]
+            local_X = np.reshape(local_window, (n_snapshots, window_size**2))
+
+            denoised_local_X = denoise_local_mppca(X=local_X, sigma=sigma)
+
+            denoised_local_window = np.reshape(denoised_local_X, (n_snapshots, window_size, window_size))
+            locally_denoised_sss[:,i:i+window_size,j:j+window_size] = denoised_local_window
+
+            denoised_snapshots += locally_denoised_sss
+
+    for i in range(img_height):
+        for j in range(img_width):
+            # average by the number of times a pixel has been denoised
+            average_by = min(i+1, img_height-i, window_size) * min(j+1, img_width-j, window_size)
+            denoised_snapshots[:,i,j] /= average_by
+
+    return denoised_snapshots
+
+
+def snr(ref_img: np.ndarray, test_img: np.ndarray) -> float:
+    """
+    Computes Signal-to-Noise ratio measured in dB
+
+    Input:
+        - ref_img (np.ndarray): 2D numpy array.
+        - test_img (np.ndarray): 2D numpy array.
+    
+    Returns:
+        float: signal-to-noise ratio.
+    
+    Reference:
+        - "SNR, PSNR, RMSE, MAE". Daniel Sage at the Biomedical Image Group, EPFL, Switzerland.
+            http://bigwww.epfl.ch/sage/soft/snr/
+        - D. Sage, M. Unser, "Teaching Image-Processing Programming in Java".
+            IEEE Signal Processing Magazine, vol. 20, no. 6, pp. 43-52, November 2003.
+            http://bigwww.epfl.ch/publications/sage0303.html
+    """
+    # checking they are 2D images
+    assert len(ref_img.shape) == 2
+    # checking both images have the same size
+    assert ref_img.shape == test_img.shape
+
+    numerator = np.sum(ref_img**2)
+    denominator = np.sum((ref_img - test_img)**2)
+    return 10 * np.log10(numerator/denominator)
+
+
+def psnr(ref_img: np.ndarray, test_img: np.ndarray) -> float:
+    """
+    Computes Peak Signal-to-Noise ratio measured in dB
+
+    Input:
+        - ref_img (np.ndarray): 2D numpy array.
+        - test_img (np.ndarray): 2D numpy array.
+    
+    Returns:
+        float: peak signal-to-noise ratio.
+    
+    Reference:
+        - https://en.wikipedia.org/wiki/Peak_signal-to-noise_ratio
+    """
+    # checking they are 2D images
+    assert len(ref_img.shape) == 2
+    # checking both images have the same size
+    assert ref_img.shape == test_img.shape
+
+    mse = 1/(np.prod(ref_img.shape)) * np.sum((ref_img - test_img)**2)
+    return 20 * np.log10(255.0 / np.sqrt(mse))
+
+
+def average_snr(ref_img, test_imgs):
+    snrs = [snr(ref_img=ref_img, test_img=t_img) for t_img in test_imgs]
+    return np.mean(snrs), np.std(snrs)
+
+def average_psnr(ref_img, test_imgs):
+    psnrs = [psnr(ref_img=ref_img, test_img=t_img) for t_img in test_imgs]
+    return np.mean(psnrs), np.std(psnrs)
+
+
+
+class ImgNoiseCorruptor:
+    """Generates corrupted images from a given original image by
+    injecting different types of noise.
+    
+    Attributes:
+        original_img (np.ndarray): 2d numpy array representing the original image
+                of size (n_rows, n_cols) = (height, width).
+    """
+    DEFAULT_MAX_PIXEL_DISPLACEMENT = 4
+    
+    def __init__(
+        self,
+        original_img: np.ndarray,
+        max_pixel_displacement: int = DEFAULT_MAX_PIXEL_DISPLACEMENT
+    ):
+        self.original_img = original_img
+        self.max_pixel_displacement = max_pixel_displacement
+
+    def _set_seed(self, seed: int = None) -> None:
+        if seed is not None:
+            np.random.seed(seed)
+
+    def displace_img_horizontally(
+        self, img: np.ndarray = None, max_displacement: int = None, seed: int = None
+    ) -> np.ndarray:
+        self._set_seed(seed)
+        if img is None:
+            img = self.original_img
+        if max_displacement is None:
+            max_displacement = self.max_pixel_displacement
+
+        n_pixels_to_move = np.random.choice(np.arange(max_displacement+1), size=1)[0]
+        if n_pixels_to_move == 0:
+            return img
+
+        zero_img = np.zeros(img.shape)
+        move_to_right = np.random.choice([True, False], size=1)[0]
+        if move_to_right:
+            return np.hstack((zero_img[:,:(2*n_pixels_to_move)], img[:,n_pixels_to_move:-n_pixels_to_move]))
+        else:
+            return np.hstack((img[:,n_pixels_to_move:-n_pixels_to_move], zero_img[:,-(2*n_pixels_to_move):]))
+
+    def displace_img_vertically(
+        self, img: np.ndarray = None, max_displacement: int = None, seed: int = None
+    ) -> np.ndarray:
+        self._set_seed(seed)
+        if img is None:
+            img = self.original_img
+        if max_displacement is None:
+            max_displacement = self.max_pixel_displacement
+
+        n_pixels_to_move = np.random.choice(np.arange(max_displacement+1), size=1)[0]
+        if n_pixels_to_move == 0:
+            return img
+
+        zero_img = np.zeros(img.shape)
+        move_up = np.random.choice([True, False], size=1)[0]
+        if move_up:
+            return np.vstack((zero_img[:(2*n_pixels_to_move),:], img[n_pixels_to_move:-n_pixels_to_move,:]))
+        else:
+            return np.vstack((img[n_pixels_to_move:-n_pixels_to_move,:], zero_img[:(2*n_pixels_to_move),:]))
+        
+    def generate_displaced_imgs(
+        self, n_snapshots: int,  max_displacement: int = None, seed: int = None
+    ) -> np.ndarray:
+        self._set_seed(seed)
+        if max_displacement is None:
+            max_displacement = self.max_pixel_displacement
+
+        snapshots = []
+        for _ in range(n_snapshots):
+            snapsht = np.copy(self.original_img)
+            vdispl_snapsht = self.displace_img_vertically(img=snapsht)
+            displ_snapsht = self.displace_img_horizontally(img=vdispl_snapsht)
+            snapshots.append(displ_snapsht)
+
+        return snapshots
+
+    def add_rician_noise_fg(self, rice_b, sigma, img = None, center_dist = False, seed = None):
+        """Adds Rician noise to the foreground part of the image.
+        
+        Returns: tuple with the corrupted img and the used foreground mask.
+        """
+        self._set_seed(seed)
+        if img is None:
+            img = self.original_img
+
+        fg_mask = img > 0.0    
+        n_rician_samples = np.prod(img.shape)
+        rician_samples = rice.rvs(b=rice_b, scale=sigma, size=n_rician_samples)
+        if center_dist:
+            rice_dist_mean = rice.mean(b=rice_b, scale=sigma)
+            rician_samples -= rice_dist_mean
+        rician_noise_mtx = np.reshape(rician_samples, img.shape)
+        rician_noisy_img = img + rician_noise_mtx
+        # Returning the image corrupted just in the foreground (ignoring the background)
+        return fg_mask * rician_noisy_img, fg_mask
+
+    def generate_rician_noisy_displaced_imgs(
+        self,
+        n_snapshots: int,
+        sigma: float,
+        rice_b: float,
+        max_displacement: int = None,
+        center_noise_dist: bool = False,
+        seed: int = None,
+    ) -> np.ndarray:
+        if seed is not None: np.random.seed(seed)
+
+        displaced_snapshots = self.generate_displaced_imgs(
+            n_snapshots=n_snapshots, max_displacement=max_displacement
+        )
+
+        fg_masks = []
+        corrupted_snapshots = []
+        for displ_snapsh in displaced_snapshots:
+            rician_noised_ss, fg_m = self.add_rician_noise_fg(
+                img=displ_snapsh, rice_b=rice_b, sigma=sigma, center_dist=center_noise_dist
+            )
+            corrupted_snapshots.append(rician_noised_ss)
+            fg_masks.append(fg_m)
+
+        return np.stack(corrupted_snapshots, axis=0), np.stack(fg_masks, axis=0)
+
 
 def main():
     """MAIN FUNCTION"""
     _setup_img_dir()
 
-    # Gaussian ensemble
-    plot_figure_1()
-    # Wishart ensemble
-    plot_figure_2()
-    # Manova ensemble
-    plot_figure_3()
-    # Circular ensemble
-    plot_figure_4()
+    # # Gaussian ensemble
+    # plot_figure_1()
+    # # Wishart ensemble
+    # plot_figure_2()
+    # # Manova ensemble
+    # plot_figure_3()
+    # # Circular ensemble
+    # plot_figure_4()
 
-    # Standard vs tridiagonal histograms 
-    plot_figure_5()
+    # # Standard vs tridiagonal histograms 
+    # plot_figure_5()
 
-    # Tridiagonal optimization
-    plot_figure_6()
-    plot_figure_7()
+    # # Tridiagonal optimization
+    # plot_figure_6()
+    # plot_figure_7()
 
-    # Joint eigenvalue PDF
-    plot_figure_8()
+    # # Joint eigenvalue PDF
+    # plot_figure_8()
 
-    # Wigner Semicircle law
-    plot_figure_9()
-    plot_figure_10()
-    plot_figure_11()
+    # # Wigner Semicircle law
+    # plot_figure_9()
+    # plot_figure_10()
+    # plot_figure_11()
 
-    # Tracy-Widom law
-    plot_figure_12()
-    plot_figure_13()
-    plot_figure_14()
+    # # Tracy-Widom law
+    # plot_figure_12()
+    # plot_figure_13()
+    # plot_figure_14()
 
-    # Marchenko-Pastur law
-    plot_figure_15()
-    plot_figure_16()
-    plot_figure_17()
+    # # Marchenko-Pastur law
+    # plot_figure_15()
+    # plot_figure_16()
+    # plot_figure_17()
 
-    # Manova Spectrum distr.
-    plot_figure_18()
-    plot_figure_19()
-    plot_figure_20()
+    # # Manova Spectrum distr.
+    # plot_figure_18()
+    # plot_figure_19()
+    # plot_figure_20()
+
+    # MRI image denoising
+    plot_figure_22()
 
 
 if __name__ == "__main__":
