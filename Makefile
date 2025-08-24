@@ -77,7 +77,8 @@ clean_deploy:
 ### Minimal makefile for Sphinx documentation ###
 .PHONY: apidoc
 apidoc:
-	sphinx-apidoc -o docs skrmt **/tests/*
+	rm -rf docs/*.rst
+	python3 -m sphinx.ext.apidoc -o docs skrmt **/tests/*
 
 # You can set these variables from the command line, and also
 # from the environment for the first two.
