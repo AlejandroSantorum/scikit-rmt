@@ -1190,44 +1190,44 @@ def main():
     """MAIN FUNCTION"""
     _setup_img_dir()
 
-    # # Gaussian ensemble
-    # plot_figure_1()
-    # # Wishart ensemble
-    # plot_figure_2()
-    # # Manova ensemble
-    # plot_figure_3()
-    # # Circular ensemble
-    # plot_figure_4()
+    # Gaussian ensemble
+    plot_figure_1()
+    # Wishart ensemble
+    plot_figure_2()
+    # Manova ensemble
+    plot_figure_3()
+    # Circular ensemble
+    plot_figure_4()
 
-    # # Standard vs tridiagonal histograms 
-    # plot_figure_5()
+    # Standard vs tridiagonal histograms 
+    plot_figure_5()
 
-    # # Tridiagonal optimization
-    # plot_figure_6()
-    # plot_figure_7()
+    # Tridiagonal optimization
+    plot_figure_6()
+    plot_figure_7()
 
-    # # Joint eigenvalue PDF
-    # plot_figure_8()
+    # Joint eigenvalue PDF
+    plot_figure_8()
 
-    # # Wigner Semicircle law
-    # plot_figure_9()
-    # plot_figure_10()
-    # plot_figure_11()
+    # Wigner Semicircle law
+    plot_figure_9()
+    plot_figure_10()
+    plot_figure_11()
 
-    # # Tracy-Widom law
-    # plot_figure_12()
-    # plot_figure_13()
-    # plot_figure_14()
+    # Tracy-Widom law
+    plot_figure_12()
+    plot_figure_13()
+    plot_figure_14()
 
-    # # Marchenko-Pastur law
-    # plot_figure_15()
-    # plot_figure_16()
-    # plot_figure_17()
+    # Marchenko-Pastur law
+    plot_figure_15()
+    plot_figure_16()
+    plot_figure_17()
 
-    # # Manova Spectrum distr.
-    # plot_figure_18()
-    # plot_figure_19()
-    # plot_figure_20()
+    # Manova Spectrum distr.
+    plot_figure_18()
+    plot_figure_19()
+    plot_figure_20()
 
     # MRI image denoising
     plot_figure_22()
