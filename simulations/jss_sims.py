@@ -63,17 +63,17 @@ def plot_figure_1():
     print(f"Generating images of Figure 1. This may take {BOLD_CHAR}some seconds{END_CHAR}...")
 
     ens = GaussianEnsemble(beta=1, n=1000, random_state=1)
-    ens_figpath = os.path.join(SCRIPT_PATH, IMGS_DIRNAME, "fig1_goe_1000.png")
+    ens_figpath = os.path.join(SCRIPT_PATH, IMGS_DIRNAME, "fig1_goe_n1000.png")
     ens.plot_eigval_hist(bins=80, density=True, savefig_path=ens_figpath)
     __restore_plt()
 
     ens = GaussianEnsemble(beta=2, n=1000, random_state=1)
-    ens_figpath = os.path.join(SCRIPT_PATH, IMGS_DIRNAME, "fig1_gue_1000.png")
+    ens_figpath = os.path.join(SCRIPT_PATH, IMGS_DIRNAME, "fig1_gue_n1000.png")
     ens.plot_eigval_hist(bins=80, density=True, savefig_path=ens_figpath)
     __restore_plt()
 
     ens = GaussianEnsemble(beta=4, n=1000, random_state=1)
-    ens_figpath = os.path.join(SCRIPT_PATH, IMGS_DIRNAME, "fig1_gse_1000.png")
+    ens_figpath = os.path.join(SCRIPT_PATH, IMGS_DIRNAME, "fig1_gse_n1000.png")
     ens.plot_eigval_hist(bins=80, density=True, savefig_path=ens_figpath)
     __restore_plt()
 
@@ -84,17 +84,17 @@ def plot_figure_2():
     print(f"Generating images of Figure 2. This may take {BOLD_CHAR}some seconds{END_CHAR}...")
 
     ens = WishartEnsemble(beta=1, p=1000, n=5000, random_state=1)
-    ens_figpath = os.path.join(SCRIPT_PATH, IMGS_DIRNAME, "fig2_wre_1000.png")
+    ens_figpath = os.path.join(SCRIPT_PATH, IMGS_DIRNAME, "fig2_wre_p1000.png")
     ens.plot_eigval_hist(bins=80, density=True, savefig_path=ens_figpath)
     __restore_plt()
 
     ens = WishartEnsemble(beta=2, p=1000, n=5000, random_state=1)
-    ens_figpath = os.path.join(SCRIPT_PATH, IMGS_DIRNAME, "fig2_wce_1000.png")
+    ens_figpath = os.path.join(SCRIPT_PATH, IMGS_DIRNAME, "fig2_wce_p1000.png")
     ens.plot_eigval_hist(bins=80, density=True, savefig_path=ens_figpath)
     __restore_plt()
 
     ens = WishartEnsemble(beta=4, p=1000, n=5000, random_state=1)
-    ens_figpath = os.path.join(SCRIPT_PATH, IMGS_DIRNAME, "fig2_wqe_1000.png")
+    ens_figpath = os.path.join(SCRIPT_PATH, IMGS_DIRNAME, "fig2_wqe_p1000.png")
     ens.plot_eigval_hist(bins=80, density=True, savefig_path=ens_figpath)
     __restore_plt()
 
@@ -105,17 +105,17 @@ def plot_figure_3():
     print(f"Generating images of Figure 3. This may take {BOLD_CHAR}some seconds{END_CHAR}...")
 
     ens = ManovaEnsemble(beta=1, m=1000, n1=2000, n2=2000, random_state=1)
-    ens_figpath = os.path.join(SCRIPT_PATH, IMGS_DIRNAME, "fig3_mre_1000.png")
+    ens_figpath = os.path.join(SCRIPT_PATH, IMGS_DIRNAME, "fig3_mre_m1000.png")
     ens.plot_eigval_hist(bins=80, density=True, savefig_path=ens_figpath)
     __restore_plt()
 
     ens = ManovaEnsemble(beta=2, m=1000, n1=2000, n2=2000, random_state=1)
-    ens_figpath = os.path.join(SCRIPT_PATH, IMGS_DIRNAME, "fig3_mce_1000.png")
+    ens_figpath = os.path.join(SCRIPT_PATH, IMGS_DIRNAME, "fig3_mce_m1000.png")
     ens.plot_eigval_hist(bins=80, density=True, savefig_path=ens_figpath)
     __restore_plt()
 
     ens = ManovaEnsemble(beta=4, m=1000, n1=2000, n2=2000, random_state=1)
-    ens_figpath = os.path.join(SCRIPT_PATH, IMGS_DIRNAME, "fig3_mqe_1000.png")
+    ens_figpath = os.path.join(SCRIPT_PATH, IMGS_DIRNAME, "fig3_mqe_m1000.png")
     ens.plot_eigval_hist(bins=80, density=True, savefig_path=ens_figpath)
     __restore_plt()
 
@@ -126,17 +126,17 @@ def plot_figure_4():
     print(f"Generating images of Figure 4. This may take {BOLD_CHAR}some seconds{END_CHAR}...")
 
     ens = CircularEnsemble(beta=1, n=1000, random_state=1)
-    ens_figpath = os.path.join(SCRIPT_PATH, IMGS_DIRNAME, "fig4_coe_1000.png")
+    ens_figpath = os.path.join(SCRIPT_PATH, IMGS_DIRNAME, "fig4_coe_n1000.png")
     ens.plot_eigval_hist(bins=80, density=True, savefig_path=ens_figpath)
     __restore_plt()
 
     ens = CircularEnsemble(beta=2, n=1000, random_state=1)
-    ens_figpath = os.path.join(SCRIPT_PATH, IMGS_DIRNAME, "fig4_cue_1000.png")
+    ens_figpath = os.path.join(SCRIPT_PATH, IMGS_DIRNAME, "fig4_cue_n1000.png")
     ens.plot_eigval_hist(bins=80, density=True, savefig_path=ens_figpath)
     __restore_plt()
 
     ens = CircularEnsemble(beta=4, n=1000, random_state=1)
-    ens_figpath = os.path.join(SCRIPT_PATH, IMGS_DIRNAME, "fig4_cse_1000.png")
+    ens_figpath = os.path.join(SCRIPT_PATH, IMGS_DIRNAME, "fig4_cse_n1000.png")
     ens.plot_eigval_hist(bins=80, density=True, savefig_path=ens_figpath)
     __restore_plt()
 
@@ -146,7 +146,7 @@ def plot_figure_4():
 def plot_figure_5():
     print(f"Generating images of Figure 5. This may take {BOLD_CHAR}some seconds{END_CHAR}...")
 
-    ens_figpath = os.path.join(SCRIPT_PATH, IMGS_DIRNAME, "fig5_goe_1000.png")
+    ens_figpath = os.path.join(SCRIPT_PATH, IMGS_DIRNAME, "fig5_goe_n1000.png")
     ens = GaussianEnsemble(beta=1, n=1000)
     standard_vs_tridiag_hist(ensemble=ens, bins=60, random_state=10, savefig_path=ens_figpath)
     __restore_plt()
@@ -354,17 +354,17 @@ def plot_figure_11():
     print(f"Generating images of Figure 11. This may take {BOLD_CHAR}some seconds{END_CHAR}...")
 
     goe = GaussianEnsemble(beta=1, n=100, tridiagonal_form=True, random_state=1)
-    ens_figpath = os.path.join(SCRIPT_PATH, IMGS_DIRNAME, "fig11_goe_100.png")
+    ens_figpath = os.path.join(SCRIPT_PATH, IMGS_DIRNAME, "fig11_goe_n100.png")
     plot_spectral_hist_and_law(ensemble=goe, bins=60, savefig_path=ens_figpath)
     __restore_plt()
 
     goe = GaussianEnsemble(beta=1, n=1000, tridiagonal_form=True, random_state=1)
-    ens_figpath = os.path.join(SCRIPT_PATH, IMGS_DIRNAME, "fig11_goe_1000.png")
+    ens_figpath = os.path.join(SCRIPT_PATH, IMGS_DIRNAME, "fig11_goe_n1000.png")
     plot_spectral_hist_and_law(ensemble=goe, bins=60, savefig_path=ens_figpath)
     __restore_plt()
 
     goe = GaussianEnsemble(beta=1, n=10000, tridiagonal_form=True, random_state=1)
-    ens_figpath = os.path.join(SCRIPT_PATH, IMGS_DIRNAME, "fig11_goe_10000.png")
+    ens_figpath = os.path.join(SCRIPT_PATH, IMGS_DIRNAME, "fig11_goe_n10000.png")
     plot_spectral_hist_and_law(ensemble=goe, bins=60, savefig_path=ens_figpath)
     __restore_plt()
 
@@ -564,17 +564,17 @@ def plot_figure_17():
     print(f"Generating images of Figure 17. This may take {BOLD_CHAR}some seconds{END_CHAR}...")
 
     wre = WishartEnsemble(beta=1, p=100, n=500, tridiagonal_form=True, random_state=1)
-    ens_figpath = os.path.join(SCRIPT_PATH, IMGS_DIRNAME, "fig17_wre_100.png")
+    ens_figpath = os.path.join(SCRIPT_PATH, IMGS_DIRNAME, "fig17_wre_p100.png")
     plot_spectral_hist_and_law(ensemble=wre, bins=60, savefig_path=ens_figpath)
     __restore_plt()
 
     wre = WishartEnsemble(beta=1, p=1000, n=5000, tridiagonal_form=True, random_state=1)
-    ens_figpath = os.path.join(SCRIPT_PATH, IMGS_DIRNAME, "fig17_wre_1000.png")
+    ens_figpath = os.path.join(SCRIPT_PATH, IMGS_DIRNAME, "fig17_wre_p1000.png")
     plot_spectral_hist_and_law(ensemble=wre, bins=60, savefig_path=ens_figpath)
     __restore_plt()
 
     wre = WishartEnsemble(beta=1, p=10000, n=50000, tridiagonal_form=True, random_state=1)
-    ens_figpath = os.path.join(SCRIPT_PATH, IMGS_DIRNAME, "fig17_wre_10000.png")
+    ens_figpath = os.path.join(SCRIPT_PATH, IMGS_DIRNAME, "fig17_wre_p10000.png")
     plot_spectral_hist_and_law(ensemble=wre, bins=60, savefig_path=ens_figpath)
     __restore_plt()
 
@@ -667,17 +667,17 @@ def plot_figure_20():
     print(f"Generating images of Figure 20. This may take {BOLD_CHAR}some minutes (~5 mins.){END_CHAR} ...")
 
     mre = ManovaEnsemble(beta=1, m=100, n1=200, n2=200, random_state=1)
-    ens_figpath = os.path.join(SCRIPT_PATH, IMGS_DIRNAME, "fig20_mre_100.png")
+    ens_figpath = os.path.join(SCRIPT_PATH, IMGS_DIRNAME, "fig20_mre_m100.png")
     plot_spectral_hist_and_law(ensemble=mre, bins=60, savefig_path=ens_figpath)
     __restore_plt()
 
     mre = ManovaEnsemble(beta=1, m=1000, n1=2000, n2=2000, random_state=1)
-    ens_figpath = os.path.join(SCRIPT_PATH, IMGS_DIRNAME, "fig20_mre_1000.png")
+    ens_figpath = os.path.join(SCRIPT_PATH, IMGS_DIRNAME, "fig20_mre_m1000.png")
     plot_spectral_hist_and_law(ensemble=mre, bins=60, savefig_path=ens_figpath)
     __restore_plt()
 
     mre = ManovaEnsemble(beta=1, m=10000, n1=20000, n2=20000, random_state=1)
-    ens_figpath = os.path.join(SCRIPT_PATH, IMGS_DIRNAME, "fig20_mre_10000.png")
+    ens_figpath = os.path.join(SCRIPT_PATH, IMGS_DIRNAME, "fig20_mre_m10000.png")
     plot_spectral_hist_and_law(ensemble=mre, bins=60, savefig_path=ens_figpath)
     __restore_plt()
 
