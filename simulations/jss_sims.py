@@ -495,8 +495,8 @@ def plot_figure_15():
         y1 = mpl.pdf(x1)
         y2 = mpl.pdf(x2)
 
-        ax1.plot(x1, y1, label=f"$\lambda$ = {ratio} ")
-        ax2.plot(x2, y2, label=f"$\lambda$ = {ratio} ")
+        ax1.plot(x1, y1, label=f"$\\lambda$ = {ratio} ")
+        ax2.plot(x2, y2, label=f"$\\lambda$ = {ratio} ")
 
     ax1.legend()
     ax1.set_ylim(0, 1.4)
