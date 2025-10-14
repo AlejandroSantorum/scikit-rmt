@@ -46,6 +46,13 @@ class BaseEnsemble(metaclass=ABCMeta):
         # default eigenvalue normalization constant
         self.eigval_norm_const = 1.0
 
+    def __str__(self) -> str:
+        """
+        String representation of the ensemble instance.
+        """
+        matrix_shape = self.matrix.shape if self.matrix is not None else (None, None)
+        return f"<{self.__class__.__name__} shape={matrix_shape}>"
+
     @abstractmethod
     def sample(self, random_state: int = None) -> np.ndarray:
         """Samples new random matrix.

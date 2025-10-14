@@ -90,13 +90,6 @@ Check the pinned versions in the [requirements.txt](requirements.txt) file.
    * **Tracy-Widom law**: describes the limiting distribution of the largest eigenvalue of Wigner matrices (in particular, random matrices from the Gaussian Ensemble). Implemented by class `TracyWidomDistribution`.
    * **Marchenko-Pastur law**: describes the limiting distribution of the eigenvalues of Wishart matrices (random matrices from the Wishart Ensemble). Implemented by class `MarchenkoPasturDistribution`.
    * **Manova Spectrum law**: introduced and proved by K. W. Wachter (1980), it describes the limiting distribution of the eigenvalues of Manova matrices (random matrices from the Manova Ensemble). Implemented by class `ManovaSpectrumDistribution`.
-* **Covariance matrix estimation** using different matrix smoothing and estimation methods (`covariance` module).
-   * Estimation of sample covariance matrix using `sample_estimator` function.
-   * Finite-sample Optimal (FSOpt) estimator by `fsopt_estimator` function.
-   * Empirical Bayesian estimator by `empirical_bayesian_estimator` function. Haff in *"Estimation of a covariance matrix under Stein’s loss"* (1985).
-   * Minimax estimator by `minimax_estimator` function 
-   * Linear shrinkage estimator by `linear_shrinkage_estimator` function. Ledoit and Wolf in *"A well-conditioned estimator for large-dimensional covariance matrices"* (2004).
-   * Analytical shrinkage estimator by `analytical_shrinkage_estimator` function. Ledoit and Wolf in *"Analytical nonlinear shrinkage of large-dimensional covariance matrices"* (2020).
 
 
 -----------------
@@ -296,8 +289,8 @@ for ratio in [0.2, 0.4, 0.6, 1.0, 1.4]:
     y1 = mpl.pdf(x1)
     y2 = mpl.pdf(x2)
 
-    ax1.plot(x1, y1, label=f"$\lambda$ = {ratio} ")
-    ax2.plot(x2, y2, label=f"$\lambda$ = {ratio} ")
+    ax1.plot(x1, y1, label=f"$\\lambda$ = {ratio} ")
+    ax2.plot(x2, y2, label=f"$\\lambda$ = {ratio} ")
 
 ax1.legend()
 ax1.set_ylim(0, 1.4)
@@ -354,31 +347,6 @@ plt.show()
 <!---
 <img src="imgs/twl_pdf_cdf.png" width=450 height=320 alt="Tracy-Widom Law PDF and CDF(Analytical)">
 -->
-
-
-The other module of this library implements **several covariance matrix estimators**:
-* Sample estimator.
-* Finite-sample optimal estimator (FSOpt estimator).
-* Non-linear shrinkage analytical estimator (Ledoit & Wolf, 2020).
-* Linear shrinkage estimator (Ledoit & Wolf, 2004).
-* Empirical Bayesian estimator (Haff, 1980).
-* Minimax estimator (Stain, 1982).
-
-For certain problems, sample covariance matrix is not the best estimation for the
-population covariance matrix.
-
-The following code illustrates the usage of the estimators.
-```python
-from skrmt.covariance import analytical_shrinkage_estimator
-
-# load dataset with your own/favorite function (such as pandas.read_csv)
-X = load_dataset('dataset_file.data')
-
-# get estimation
-Sigma = analytical_shrinkage_estimator(X)
-
-# ... Do something with Sigma. For example, PCA.
-```
 
 For more information or insight about the usage of the library, you can visit the official **documentation** 
 <https://scikit-rmt.readthedocs.io/en/latest/> or the directory [notebooks](notebooks), that contains several

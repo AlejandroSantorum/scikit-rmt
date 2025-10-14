@@ -46,6 +46,18 @@ def test_init_exception():
         _ = BaseEnsemble()  # pylint: disable=abstract-class-instantiated
 
 
+def test_str_method():
+    """Testing the __str__ method of BaseEnsemble
+    """
+    goe = GaussianEnsemble(beta=1, n=10, tridiagonal_form=False)
+    str_repr = str(goe)
+    assert str_repr == "<GaussianEnsemble shape=(10, 10)>"
+
+    goe.matrix = None
+    str_repr = str(goe)
+    assert str_repr == "<GaussianEnsemble shape=(None, None)>"
+
+
 def test_base_set_eigval_norm_const():
     """Testing setting a custom eigenvalue normalization constant
     """
