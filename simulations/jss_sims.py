@@ -59,6 +59,62 @@ def __restore_plt():
     matplotlib.rcdefaults()
 
 
+def run_code_snippet_1():
+    print(f"Running code snippet 1: Gaussian ensemble sampling...")
+
+    goe = GaussianEnsemble(beta=1, n=1000)
+    gue = GaussianEnsemble(beta=2, n=1000)
+    gse = GaussianEnsemble(beta=4, n=1000)
+
+    print(f"Created and sampled: {goe}")
+    print(f"Created and sampled: {gue}")
+    print(f"Created and sampled: {gse}")
+
+    print(f"{BOLD_CHAR}[DONE]{END_CHAR} - Code snippet 1")
+
+
+def run_code_snippet_2():
+    print(f"Running code snippet 2: Wishart ensemble sampling...")
+
+    wre = WishartEnsemble(beta=1, p=300, n=1000)
+    wce = WishartEnsemble(beta=2, p=300, n=1000)
+    wqe = WishartEnsemble(beta=4, p=300, n=1000)
+
+    print(f"Created and sampled: {wre}")
+    print(f"Created and sampled: {wce}")
+    print(f"Created and sampled: {wqe}")
+
+    print(f"{BOLD_CHAR}[DONE]{END_CHAR} - Code snippet 2")
+
+
+def run_code_snippet_3():
+    print(f"Running code snippet 3: Manova ensemble sampling...")
+
+    mre = ManovaEnsemble(beta=1, m=300, n1=1000, n2=1000)
+    mce = ManovaEnsemble(beta=2, m=300, n1=1000, n2=1000)
+    mqe = ManovaEnsemble(beta=4, m=300, n1=1000, n2=1000)
+
+    print(f"Created and sampled: {mre}")
+    print(f"Created and sampled: {mce}")
+    print(f"Created and sampled: {mqe}")
+
+    print(f"{BOLD_CHAR}[DONE]{END_CHAR} - Code snippet 3")
+
+
+def run_code_snippet_4():
+    print(f"Running code snippet 4: Circular ensemble sampling...")
+
+    coe = CircularEnsemble(beta=1, n=1000)
+    cue = CircularEnsemble(beta=2, n=1000)
+    cse = CircularEnsemble(beta=4, n=1000)
+
+    print(f"Created and sampled: {coe}")
+    print(f"Created and sampled: {cue}")
+    print(f"Created and sampled: {cse}")
+
+    print(f"{BOLD_CHAR}[DONE]{END_CHAR} - Code snippet 4")
+
+
 def plot_figure_1():
     print(f"Generating images of Figure 1. This may take {BOLD_CHAR}some seconds{END_CHAR}...")
 
@@ -1189,6 +1245,15 @@ class ImgNoiseCorruptor:
 def main():
     """MAIN FUNCTION"""
     _setup_img_dir()
+
+    # Gaussian ensemble sampling
+    run_code_snippet_1()
+    # Wishart ensemble sampling
+    run_code_snippet_2()
+    # Manova ensemble sampling
+    run_code_snippet_3()
+    # Circular ensemble sampling
+    run_code_snippet_4()
 
     # Gaussian ensemble
     plot_figure_1()
