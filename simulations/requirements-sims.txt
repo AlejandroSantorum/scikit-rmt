@@ -1,1 +1,4 @@
+# JSS denoise simulations
 scikit-image==0.22.0
+# SoftwareX denoise simulations
+scikit-learn==1.6.1
