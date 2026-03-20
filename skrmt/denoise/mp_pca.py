@@ -16,6 +16,7 @@ from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils.validation import check_is_fitted
 
 from skrmt.ensemble import WishartEnsemble
+from skrmt.denoise.utils import norm_img_0_255, normalize_imgs_0_255
 
 
 def _fit_mp_bulk(eigenvals: np.ndarray, gamma: float) -> float:
@@ -110,6 +111,7 @@ class MarchenkoPasturPCADenoiser(BaseEstimator, TransformerMixin):
         sigma: float = None,
         sigma_estimator: str = "median",
         window_size: int = 16,
+        normalize_output: bool = True,
     ) -> None:
         """Constructor for MarchenkoPasturPCADenoiser class.
 
@@ -131,11 +133,19 @@ class MarchenkoPasturPCADenoiser(BaseEstimator, TransformerMixin):
             window_size (int, default=16): side length in pixels of each square
                 patch. Larger windows improve eigenvalue statistics but reduce
                 spatial adaptivity.
+            normalize_output (bool, default=True): whether to normalize the
+                denoised output images to the 0-255 range. If False, the output
+                images will be returned in the same scale as the input; this may be
+                desirable if the input images are already in a standard range (e.g. 0-1)
+                or if the user wants to preserve the original intensity scale for
+                downstream analysis. If True, the output images will be normalized to
+                the 0-255 range.
 
         """
         self.sigma = sigma
         self.sigma_estimator = sigma_estimator
         self.window_size = window_size
+        self.normalize_output = normalize_output
 
     def fit(self, X: np.ndarray, y=None) -> "MarchenkoPasturPCADenoiser":
         """Learn the noise level from the image stack X.
@@ -189,6 +199,7 @@ class MarchenkoPasturPCADenoiser(BaseEstimator, TransformerMixin):
         sigma_ learned during fit. Every window_size x window_size patch is
         denoised independently; overlapping patches are averaged to suppress
         block artefacts and reduce residual variance.
+        If normalize_output is True, the final denoised images are normalized to the 0-255 range.
 
         Args:
             X (numpy array): noisy image stack of shape (p, height, width).
@@ -204,7 +215,10 @@ class MarchenkoPasturPCADenoiser(BaseEstimator, TransformerMixin):
         """
         check_is_fitted(self)
         X = self._check_input(X, expected_shape=self.image_shape_)
-        return self._sliding_window_denoise(X)
+        X_denoised = self._sliding_window_denoise(X)
+        if self.normalize_output:
+            X_denoised = normalize_imgs_0_255(X_denoised)
+        return X_denoised
 
     # fit_transform is inherited from TransformerMixin: it calls fit(X) then
     # transform(X), which is correct and avoids redundant computation.
