@@ -1,6 +1,7 @@
-"""Utils functions
+"""Ensemble Utils functions
 
-This sub-module contains several useful functions to run and manage various simulations.
+This sub-module contains several useful functions to run and manage various
+simulations related to random matrix ensembles.
 """
 
 from typing import Union, Sequence
