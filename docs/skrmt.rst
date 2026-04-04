@@ -7,6 +7,7 @@ Subpackages
 .. toctree::
    :maxdepth: 4
 
+   skrmt.denoise
    skrmt.ensemble
 
 Module contents

@@ -5,6 +5,7 @@ venv_skrmt
 __pycache__/
 .vscode
 *.png
+!imgs/*.png
 
 # pytest & pytest-cov
 *.pytest_cache

@@ -9,6 +9,7 @@ help:
 	@echo "\tmake apidoc - executes sphinx docs generation"
 	@echo "\tmake pytest - executes pytest in the scikit-rmt library"
 	@echo "\tmake coverage - executes pytest-cov in the scikit-rmt library"
+	@echo "\tmake lint - executes pylint in the scikit-rmt library"
 	@echo "\tmake cov_html - executes pytest-cov in the scikit-rmt library and generates html report files"
 	@echo "\tmake build - builds the library in the 'dist' directory"
 	@echo "\tmake deploy_pypi - uploads the built package to PyPi"
@@ -55,6 +56,12 @@ coverage:
 .PHONY: cov_html
 cov_html:
 	pytest --cov-report html --cov=skrmt
+
+
+### linting ###
+.PHONY: lint
+lint:
+	pylint skrmt
 
 ####################################
 

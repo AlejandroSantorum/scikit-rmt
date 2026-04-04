@@ -76,6 +76,8 @@ Check the pinned versions in the [requirements.txt](requirements.txt) file.
 ----------------
 ## Main features
 *scikit-rmt* provides support to analyze, study and simulate Random Matrix Theory properties and results:
+
+### `skrmt.ensemble` — Random Matrix Ensembles
 * **Sampling** of the following random matrix ensembles:
    * Gaussian Ensemble (GOE, GUE and GSE; for beta=1, 2 and 4 respectively): class `GaussianEnsemble`.
    * Wishart Ensemble (WRE, WCE and WQE; for beta=1, 2 and 4 respectively): class `WishartEnsemble`.
@@ -91,11 +93,25 @@ Check the pinned versions in the [requirements.txt](requirements.txt) file.
    * **Marchenko-Pastur law**: describes the limiting distribution of the eigenvalues of Wishart matrices (random matrices from the Wishart Ensemble). Implemented by class `MarchenkoPasturDistribution`.
    * **Manova Spectrum law**: introduced and proved by K. W. Wachter (1980), it describes the limiting distribution of the eigenvalues of Manova matrices (random matrices from the Manova Ensemble). Implemented by class `ManovaSpectrumDistribution`.
 
+### `skrmt.denoise` — RMT-based Image Denoising
+* **Patch-based MP-PCA denoising** of image stacks via `MarchenkoPasturPCADenoiser`: denoises a set of p noisy acquisitions of the same scene (e.g. repeated MRI scans) by thresholding singular values against the Marchenko-Pastur upper spectral edge. Follows the scikit-learn `BaseEstimator` / `TransformerMixin` interface, making it composable in `Pipeline` objects and compatible with `GridSearchCV`.
+* **Automatic noise estimation**: when the noise level σ is not known, it can be estimated from the data using one of three built-in strategies selected via `sigma_estimator`:
+   * `"median"` *(default)* — fast and robust bulk-median estimator.
+   * `"min_eigen"` — lower MP-edge estimator; accurate for small aspect ratios.
+   * `"mp_fit"` — least-squares fit of the MP bulk median via SciPy; most accurate.
+* **Image quality metrics** (`skrmt.denoise.metrics`): standard metrics to evaluate denoising performance, each available in single-image, per-image batch, and stack-average flavours:
+   * **SNR** — Signal-to-Noise Ratio in dB.
+   * **PSNR** — Peak Signal-to-Noise Ratio in dB.
+   * **MAE** — Mean Absolute Error (via `scikit-learn`).
+   * **RMSE** — Root Mean Squared Error (via `scikit-learn`).
+
 
 -----------------
 ## A brief tutorial
 
-First of all, several random matrix ensembles can be sampled: **Gaussian Ensembles**, **Wishart Ensembles**,
+
+### 1. Random Matrix Ensembles (`skrmt.ensemble`)
+Several random matrix ensembles can be sampled: **Gaussian Ensembles**, **Wishart Ensembles**,
 **Manova Ensembles** and **Circular Ensembles**. As an example, the following code shows how to sample
 a **Gaussian Orthogonal Ensemble (GOE)** random matrix.
 
@@ -352,6 +368,62 @@ For more information or insight about the usage of the library, you can visit th
 <https://scikit-rmt.readthedocs.io/en/latest/> or the directory [notebooks](notebooks), that contains several
 *Python notebooks* with **tutorials** and plenty of **examples**.
 
+### 2. RMT-based Image Denoising (`skrmt.denoise`)
+
+`MarchenkoPasturPCADenoiser` denoises a stack of p noisy images of the same scene by applying
+SVD hard-thresholding on overlapping spatial patches. For each patch, singular values whose square
+falls inside the Marchenko-Pastur noise bulk (at or below λ₊ = σ²(1 + √γ)², where γ = p/n) are
+zeroed out; the remaining singular values carry true signal and are kept. Overlapping patch
+reconstructions are averaged to suppress block artefacts.
+
+The class follows the scikit-learn `fit` / `transform` interface:
+
+```python
+from skrmt.denoise import MarchenkoPasturPCADenoiser
+
+# snapshots: numpy array of shape (p, height, width)
+# p independent noisy acquisitions of the same scene
+
+# Option 1 – supply the noise standard deviation directly
+denoiser = MarchenkoPasturPCADenoiser(sigma=35)
+denoised = denoiser.fit_transform(snapshots)
+
+# Option 2 – estimate sigma automatically from the eigenvalue bulk
+denoiser = MarchenkoPasturPCADenoiser(sigma_estimator="median")
+denoised = denoiser.fit_transform(snapshots)
+```
+
+Three automatic sigma estimators are available via `sigma_estimator`:
+* `"median"` *(default)* — estimates σ² ≈ median(eigenvalues) / (1 + γ); fast and robust.
+* `"min_eigen"` — anchors on the lower MP edge λ₋ = σ²(1 − √γ)²; accurate for small γ.
+* `"mp_fit"` — least-squares fit of the MP bulk median via SciPy; slowest but most accurate.
+
+Denoising quality can be measured with the metrics available in `skrmt.denoise.metrics`. Each
+metric exists in a single-image, batch (one value per image) and average (scalar mean) flavour.
+The average functions accept either a 3-D stack or a single 2-D reference image, which is
+automatically broadcast across the stack. The table below shows results on a brain MRI slice
+corrupted by Rician noise (100 acquisitions, σ = 35; see
+[simulations/denoise_mri_rmt_softwarex.ipynb](simulations/denoise_mri_rmt_softwarex.ipynb)):
+
+| Method | SNR (dB) ↑ | PSNR (dB) ↑ | MAE ↓ | RMSE ↓ |
+|---|---:|---:|---:|---:|
+| Noisy snapshots | 4.357 | 9.995 | 60.333 | 80.839 |
+| Naive average | 6.367 | 12.005 | 51.417 | 64.019 |
+| MP-PCA `"median"` σ | 11.097 | 16.734 | 27.226 | 37.815 |
+| MP-PCA `"min_eigen"` σ | 11.350 | 16.988 | 25.916 | 36.818 |
+| MP-PCA `"mp_fit"` σ | 11.399 | 17.037 | 25.686 | 36.632 |
+| MP-PCA true σ | 10.529 | 16.167 | 30.566 | 40.232 |
+
+The figure below shows an MRI brain slice corrupted by Rician noise (100 acquisitions, σ = 35)
+denoised with each available estimator. From left to right: noisy sample, naive average of all
+acquisitions, MP-PCA with `"median"` σ, `"min_eigen"` σ, `"mp_fit"` σ, and the true σ.
+
+![MRI denoising with MP-PCA](https://raw.githubusercontent.com/AlejandroSantorum/scikit-rmt/main/imgs/mri_denoising.png)
+<!---
+<img src="imgs/mri_denoising.png" width=900 height=200 alt="MRI denoising with MP-PCA">
+-->
+
+
 -----------------
 ## License
 The package is licensed under the BSD 3-Clause License. A copy of the [license](LICENSE) can be found along with the code.
@@ -391,7 +463,9 @@ The package is licensed under the BSD 3-Clause License. A copy of the [license](
 ## Attribution
 This project has been developed by Alejandro Santorum Varela (2021) as part of the final degree project
 in Computer Science (Autonomous University of Madrid), supervised by Alberto Suárez González.
-It has been revised and improved in 2025 to support Python versions from 3.8 to 3.12.
+
+- It has been revised and improved in 2025 to support Python versions from 3.8 to 3.12.
+- It has been further extended in 2026 to incorporate RMT-based image denoising utilities, with applications to medical imaging.
 
 If you happen to use `scikit-rmt` in your work or research, please cite its GitHub repository:
 
