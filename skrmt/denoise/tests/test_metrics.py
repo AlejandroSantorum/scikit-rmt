@@ -2,6 +2,8 @@
 
 Tests for skrmt.denoise.metrics, targeting 100% line coverage.
 """
+# pylint: disable=redefined-outer-name  # pytest fixture parameters must match the fixture name
+# pylint: disable=missing-function-docstring  # test method names are self-describing
 
 import pytest
 import numpy as np

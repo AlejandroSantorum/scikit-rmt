@@ -146,7 +146,17 @@ class MarchenkoPasturPCADenoiser(BaseEstimator, TransformerMixin):
         self.window_size = window_size
         self.normalize_output = normalize_output
 
-    def fit(self, X: np.ndarray, y=None) -> "MarchenkoPasturPCADenoiser":
+        # Fitted attributes — set to None until fit() is called.
+        self.sigma_ = None
+        self.lambda_plus_ = None
+        self.n_snapshots_ = None
+        self.image_shape_ = None
+
+    def __sklearn_is_fitted__(self) -> bool:
+        """Tell sklearn whether this estimator has been fitted."""
+        return self.sigma_ is not None
+
+    def fit(self, X: np.ndarray, _y=None) -> "MarchenkoPasturPCADenoiser":
         """Learn the noise level from the image stack X.
 
         If sigma was provided at construction time it is stored directly as
@@ -156,7 +166,7 @@ class MarchenkoPasturPCADenoiser(BaseEstimator, TransformerMixin):
 
         Args:
             X (numpy array): noisy image stack of shape (p, height, width).
-            y: ignored; present only for scikit-learn API compatibility.
+            _y: ignored; present only for scikit-learn API compatibility.
 
         Returns:
             (MarchenkoPasturPCADenoiser) self

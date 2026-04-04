@@ -111,7 +111,10 @@ def _broadcast_ref_to_stack(ref_imgs: np.ndarray, p: int) -> np.ndarray:
         (numpy array) 3-D array of shape (p, height, width).
     """
     if ref_imgs.ndim == 2:
-        return np.broadcast_to(ref_imgs[np.newaxis, :, :], (p, ref_imgs.shape[0], ref_imgs.shape[1]))
+        return np.broadcast_to(
+            ref_imgs[np.newaxis, :, :],
+            (p, ref_imgs.shape[0], ref_imgs.shape[1])
+        )
     return ref_imgs
 
 

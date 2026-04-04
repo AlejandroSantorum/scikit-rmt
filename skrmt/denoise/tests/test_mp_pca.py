@@ -2,10 +2,14 @@
 
 Tests for skrmt.denoise.mp_pca, targeting 100% line coverage.
 """
+# pylint: disable=redefined-outer-name  # pytest fixture parameters must match the fixture name
+# pylint: disable=missing-function-docstring  # test method names are self-describing
+# pylint: disable=protected-access  # unit tests legitimately exercise private static methods
+
+from unittest.mock import patch
 
 import pytest
 import numpy as np
-from unittest.mock import patch
 from scipy.optimize import OptimizeResult
 from numpy.testing import assert_almost_equal
 
@@ -66,7 +70,7 @@ class TestFitMpBulk:
         gamma = 0.5
         loss_values = []
 
-        def mock_minimize(fn, x0, bounds):
+        def mock_minimize(fn, x0, **_kwargs):
             # Evaluate with sigma2 = 1e-30: lambda_max ~ 3e-30 << 1.0 → empty bulk
             loss_values.append(fn(np.array([1e-30])))
             # Evaluate at x0 to exercise the normal (non-empty) path
@@ -103,7 +107,9 @@ class TestEstimateSigma:
         """When gamma ~ 1, (1-sqrt(gamma))^2 < 1e-10 → fallback to median."""
         eigenvals, _ = pure_noise_eigenvals
         # gamma so close to 1 that (1 - sqrt(gamma))^2 < 1e-10
-        sigma = MarchenkoPasturPCADenoiser._estimate_sigma(eigenvals, gamma=0.9999999999, method="min_eigen")
+        sigma = MarchenkoPasturPCADenoiser._estimate_sigma(
+            eigenvals, gamma=0.9999999999, method="min_eigen"
+        )
         assert isinstance(sigma, float)
         assert sigma > 0.0
 
@@ -306,7 +312,13 @@ class TestBaseEstimatorAPI:
     def test_get_params(self):
         d = MarchenkoPasturPCADenoiser(sigma=1.0, sigma_estimator="min_eigen", window_size=8)
         params = d.get_params()
-        assert params == {"sigma": 1.0, "sigma_estimator": "min_eigen", "window_size": 8, "normalize_output": True}
+        expected = {
+            "sigma": 1.0,
+            "sigma_estimator": "min_eigen",
+            "window_size": 8,
+            "normalize_output": True
+        }
+        assert params == expected
 
     def test_set_params(self):
         d = MarchenkoPasturPCADenoiser(sigma=1.0, window_size=8)
