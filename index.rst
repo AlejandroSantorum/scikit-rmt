@@ -34,7 +34,7 @@ hosted by Github for further information on the features included in the package
 
    docs/skrmt
    docs/skrmt.ensemble
-   docs/skrmt.covariance
+   docs/skrmt.denoise
 
 Indices and tables
 ==================
