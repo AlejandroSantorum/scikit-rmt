@@ -92,12 +92,6 @@ class TestEstimateSigma:
         assert isinstance(sigma, float)
         assert sigma > 0.0
 
-    def test_bulk_mean(self, pure_noise_eigenvals):
-        eigenvals, gamma = pure_noise_eigenvals
-        sigma = MarchenkoPasturPCADenoiser._estimate_sigma(eigenvals, gamma, "bulk_mean")
-        assert isinstance(sigma, float)
-        assert sigma > 0.0
-
     def test_min_eigen_normal(self, pure_noise_eigenvals):
         """Normal min_eigen path when gamma is well below 1."""
         eigenvals, gamma = pure_noise_eigenvals
@@ -106,7 +100,7 @@ class TestEstimateSigma:
         assert sigma > 0.0
 
     def test_min_eigen_fallback_near_gamma_one(self, pure_noise_eigenvals):
-        """When gamma ~ 1, (1-sqrt(gamma))^2 < 1e-10 → fallback to bulk_mean."""
+        """When gamma ~ 1, (1-sqrt(gamma))^2 < 1e-10 → fallback to median."""
         eigenvals, _ = pure_noise_eigenvals
         # gamma so close to 1 that (1 - sqrt(gamma))^2 < 1e-10
         sigma = MarchenkoPasturPCADenoiser._estimate_sigma(eigenvals, gamma=0.9999999999, method="min_eigen")
@@ -124,10 +118,16 @@ class TestEstimateSigma:
         with pytest.raises(ValueError, match="Unknown sigma_estimator"):
             MarchenkoPasturPCADenoiser._estimate_sigma(eigenvals, gamma, "nonexistent_method")
 
+    def test_bulk_mean_raises(self, pure_noise_eigenvals):
+        """'bulk_mean' was removed; it must now raise ValueError."""
+        eigenvals, gamma = pure_noise_eigenvals
+        with pytest.raises(ValueError, match="Unknown sigma_estimator"):
+            MarchenkoPasturPCADenoiser._estimate_sigma(eigenvals, gamma, "bulk_mean")
+
     def test_degenerate_near_zero_eigenvals(self):
         """Guard against sigma2 <= 0: should return sqrt(1e-12)."""
         eigenvals = np.array([1e-30, 1e-30])
-        sigma = MarchenkoPasturPCADenoiser._estimate_sigma(eigenvals, gamma=0.5, method="bulk_mean")
+        sigma = MarchenkoPasturPCADenoiser._estimate_sigma(eigenvals, gamma=0.5, method="median")
         assert sigma > 0.0
         assert_almost_equal(sigma, np.sqrt(1e-12), decimal=14)
 
@@ -193,11 +193,6 @@ class TestFit:
 
     def test_fit_sigma_none_median(self, small_stack):
         d = MarchenkoPasturPCADenoiser(sigma_estimator="median", window_size=4)
-        d.fit(small_stack)
-        assert d.sigma_ > 0.0
-
-    def test_fit_sigma_none_bulk_mean(self, small_stack):
-        d = MarchenkoPasturPCADenoiser(sigma_estimator="bulk_mean", window_size=4)
         d.fit(small_stack)
         assert d.sigma_ > 0.0
 
@@ -309,9 +304,9 @@ class TestBaseEstimatorAPI:
     """Tests for get_params / set_params inherited from BaseEstimator."""
 
     def test_get_params(self):
-        d = MarchenkoPasturPCADenoiser(sigma=1.0, sigma_estimator="bulk_mean", window_size=8)
+        d = MarchenkoPasturPCADenoiser(sigma=1.0, sigma_estimator="min_eigen", window_size=8)
         params = d.get_params()
-        assert params == {"sigma": 1.0, "sigma_estimator": "bulk_mean", "window_size": 8, "normalize_output": True}
+        assert params == {"sigma": 1.0, "sigma_estimator": "min_eigen", "window_size": 8, "normalize_output": True}
 
     def test_set_params(self):
         d = MarchenkoPasturPCADenoiser(sigma=1.0, window_size=8)

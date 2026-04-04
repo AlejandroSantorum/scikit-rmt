@@ -124,8 +124,7 @@ class MarchenkoPasturPCADenoiser(BaseEstimator, TransformerMixin):
                 using the method selected by sigma_estimator.
             sigma_estimator (str, default="median"): method used to estimate sigma
                 when it is not provided. One of "median" (bulk median divided by
-                1 + gamma; fast and robust), "bulk_mean" (mean eigenvalue; unbiased
-                but sensitive to signal spikes), "min_eigen" (smallest eigenvalue
+                1 + gamma; fast and robust), "min_eigen" (smallest eigenvalue
                 divided by (1 - sqrt(gamma)) squared; accurate for small gamma but
                 unstable near gamma = 1), or "mp_fit" (least-squares fit of the MP
                 bulk median via SciPy; slowest but most accurate). Ignored when
@@ -243,19 +242,15 @@ class MarchenkoPasturPCADenoiser(BaseEstimator, TransformerMixin):
                     The midpoint of the MP support is sigma squared times (1 + gamma).
                     Using the empirical median as a proxy for that midpoint gives
                     sigma squared approximately equal to median(eigenvals) / (1 + gamma).
-                    Fast, robust, and works well in the typical regime gamma < 1.
-
-                ``"bulk_mean"``
-                    The mean eigenvalue of the MP distribution equals sigma squared
-                    (the population variance), so sigma squared is approximately
-                    mean(eigenvals). Simple but sensitive to outlier spikes above the bulk.
+                    Fast, robust to signal eigenvalue outliers, and works well in the
+                    typical regime gamma < 1.
 
                 ``"min_eigen"``
                     The lower MP edge is lambda_minus = sigma^2 * (1 - sqrt(gamma))^2,
                     so sigma squared is approximately min(eigenvals) / (1 - sqrt(gamma))^2.
                     Accurate when the smallest eigenvalue sits close to lambda_minus,
                     but numerically unstable when gamma is close to 1 (lower edge
-                    approaches 0); falls back to ``"bulk_mean"`` in that case.
+                    approaches 0); falls back to ``"median"`` in that case.
 
                 ``"mp_fit"``
                     Numerically minimises the discrepancy between the observed bulk
@@ -272,17 +267,13 @@ class MarchenkoPasturPCADenoiser(BaseEstimator, TransformerMixin):
             # Bulk median ~ sigma^2 * (1 + gamma)  ->  sigma^2 ~ median / (1 + gamma)
             sigma2 = float(np.median(eigenvals)) / (1.0 + gamma)
 
-        elif method == "bulk_mean":
-            # E[lambda] = sigma^2 under the MP law
-            sigma2 = float(np.mean(eigenvals))
-
         elif method == "min_eigen":
             # Lower MP edge: lambda_minus = sigma^2 * (1 - sqrt(gamma))^2
             denom = (1.0 - np.sqrt(gamma)) ** 2
             if denom < 1e-10:
                 # gamma ~ 1: lower edge collapses to 0, estimator is ill-defined;
-                # fall back to the mean estimator which remains well-behaved.
-                sigma2 = float(np.mean(eigenvals))
+                # fall back to the median estimator which remains well-behaved.
+                sigma2 = float(np.median(eigenvals)) / (1.0 + gamma)
             else:
                 sigma2 = float(np.min(eigenvals)) / denom
 
@@ -292,7 +283,7 @@ class MarchenkoPasturPCADenoiser(BaseEstimator, TransformerMixin):
         else:
             raise ValueError(
                 f"Unknown sigma_estimator: '{method}'. "
-                "Valid options are: 'median', 'bulk_mean', 'min_eigen', 'mp_fit'."
+                "Valid options are: 'median', 'min_eigen', 'mp_fit'."
             )
 
         # Guard against non-positive values caused by degenerate inputs.
