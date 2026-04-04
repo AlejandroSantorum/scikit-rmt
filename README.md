@@ -104,7 +104,6 @@ Check the pinned versions in the [requirements.txt](requirements.txt) file.
    * **PSNR** — Peak Signal-to-Noise Ratio in dB.
    * **MAE** — Mean Absolute Error (via `scikit-learn`).
    * **RMSE** — Root Mean Squared Error (via `scikit-learn`).
-   * **SSIM** — Structural Similarity Index (via `scikit-image`).
 
 
 -----------------

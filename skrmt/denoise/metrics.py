@@ -31,7 +31,6 @@ References
 
 import numpy as np
 from sklearn.metrics import mean_absolute_error, mean_squared_error
-from skimage.metrics import structural_similarity as _skimage_ssim
 
 
 #
@@ -234,44 +233,6 @@ def rmse(ref_img: np.ndarray, test_img: np.ndarray) -> float:
     return float(np.sqrt(mean_squared_error(ref_img.ravel(), test_img.ravel())))
 
 
-def ssim(
-    ref_img: np.ndarray,
-    test_img: np.ndarray,
-    data_range: float = 255.0,
-) -> float:
-    """Compute the Structural Similarity Index (SSIM) between two 2-D images.
-
-    SSIM is a perceptual metric that quantifies image quality degradation caused
-    by denoising or compression. Unlike pixel-level metrics (SNR, PSNR, MAE,
-    RMSE), SSIM captures structural information, luminance, and contrast
-    similarity, making it a valuable complementary measure for evaluating
-    denoising performance.
-
-    SSIM values range from -1 to 1, where 1 indicates perfect structural
-    similarity. The metric is computed via ``skimage.metrics.structural_similarity``.
-
-    Args:
-        ref_img (numpy array): 2-D reference (ground-truth) image.
-        test_img (numpy array): 2-D test (denoised) image to evaluate.
-        data_range (float, default=255.0): the dynamic range of the images
-            (i.e. ``max_value - min_value``). Use ``255.0`` for standard 8-bit
-            images and ``1.0`` for images normalised to [0, 1].
-
-    Returns:
-        (float) SSIM value in [-1, 1]. Higher is better.
-
-    Raises:
-        ValueError: if the inputs are not 2-D arrays of the same shape.
-
-    References:
-        - Wang, Z. et al.
-            "Image quality assessment: from error visibility to structural similarity".
-            IEEE Transactions on Image Processing. 13.4 (2004): 600-612.
-    """
-    _check_image_pair(ref_img, test_img)
-    return float(_skimage_ssim(ref_img, test_img, data_range=data_range))
-
-
 #
 # Batch metrics (image stacks)
 #
@@ -362,32 +323,6 @@ def batch_rmse(ref_imgs: np.ndarray, test_imgs: np.ndarray) -> np.ndarray:
     ])
 
 
-def batch_ssim(
-    ref_imgs: np.ndarray,
-    test_imgs: np.ndarray,
-    data_range: float = 255.0,
-) -> np.ndarray:
-    """Compute SSIM for each pair of images in two aligned stacks.
-
-    Args:
-        ref_imgs (numpy array): reference image stack of shape (p, height, width).
-        test_imgs (numpy array): denoised image stack of shape (p, height, width).
-        data_range (float, default=255.0): the dynamic range of the images.
-
-    Returns:
-        (numpy array) 1-D array of shape (p,) containing the SSIM in [-1, 1]
-        for each image pair. Higher is better.
-
-    Raises:
-        ValueError: if the stacks are not 3-D arrays of the same shape.
-    """
-    _check_image_stack_pair(ref_imgs, test_imgs)
-    return np.array([
-        ssim(ref_imgs[i], test_imgs[i], data_range=data_range)
-        for i in range(ref_imgs.shape[0])
-    ])
-
-
 #
 # Average metrics (mean across an image stack)
 #
@@ -471,27 +406,3 @@ def average_rmse(ref_imgs: np.ndarray, test_imgs: np.ndarray) -> float:
     """
     ref_imgs = _broadcast_ref_to_stack(np.asarray(ref_imgs), test_imgs.shape[0])
     return float(np.mean(batch_rmse(ref_imgs, test_imgs)))
-
-
-def average_ssim(
-    ref_imgs: np.ndarray,
-    test_imgs: np.ndarray,
-    data_range: float = 255.0,
-) -> float:
-    """Compute the mean SSIM across all image pairs in two aligned stacks.
-
-    Args:
-        ref_imgs (numpy array): reference image of shape (height, width) or
-            reference image stack of shape (p, height, width). If 2-D, the
-            single image is used as the reference for every test image.
-        test_imgs (numpy array): denoised image stack of shape (p, height, width).
-        data_range (float, default=255.0): the dynamic range of the images.
-
-    Returns:
-        (float) Mean SSIM in [-1, 1] across all p image pairs. Higher is better.
-
-    Raises:
-        ValueError: if the stacks are not 3-D arrays of the same shape.
-    """
-    ref_imgs = _broadcast_ref_to_stack(np.asarray(ref_imgs), test_imgs.shape[0])
-    return float(np.mean(batch_ssim(ref_imgs, test_imgs, data_range=data_range)))

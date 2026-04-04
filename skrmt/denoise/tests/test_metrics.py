@@ -18,19 +18,16 @@ from skrmt.denoise.metrics import (
     psnr,
     mae,
     rmse,
-    ssim,
     # batch
     batch_snr,
     batch_psnr,
     batch_mae,
     batch_rmse,
-    batch_ssim,
     # average
     average_snr,
     average_psnr,
     average_mae,
     average_rmse,
-    average_ssim,
 )
 
 
@@ -257,41 +254,6 @@ class TestRMSE:
 
 
 ##########################################
-### ssim
-
-class TestSSIM:
-    """Tests for the single-image ssim function."""
-
-    def test_returns_float(self, image_pair):
-        ref, test = image_pair
-        assert isinstance(ssim(ref, test), float)
-
-    def test_perfect_reconstruction_returns_one(self, perfect_pair):
-        ref, test = perfect_pair
-        assert_almost_equal(ssim(ref, test), 1.0, decimal=10)
-
-    def test_in_valid_range(self, image_pair):
-        ref, test = image_pair
-        val = ssim(ref, test)
-        assert -1.0 <= val <= 1.0
-
-    def test_close_to_one_for_small_noise(self, image_pair):
-        ref, test = image_pair
-        assert ssim(ref, test) > 0.9
-
-    def test_custom_data_range(self, image_pair):
-        """ssim with data_range=1.0 on [0,1]-normalised images must match."""
-        ref, test = image_pair
-        val_255 = ssim(ref, test, data_range=255.0)
-        val_1 = ssim(ref / 255.0, test / 255.0, data_range=1.0)
-        assert_almost_equal(val_255, val_1, decimal=10)
-
-    def test_invalid_input_raises(self):
-        with pytest.raises(ValueError):
-            ssim(np.ones((4, 4)), np.ones((8, 8)))
-
-
-##########################################
 ### batch functions
 
 class TestBatchMetrics:
@@ -315,11 +277,6 @@ class TestBatchMetrics:
     def test_batch_rmse_shape(self, image_stack_pair):
         refs, tests = image_stack_pair
         result = batch_rmse(refs, tests)
-        assert result.shape == (refs.shape[0],)
-
-    def test_batch_ssim_shape(self, image_stack_pair):
-        refs, tests = image_stack_pair
-        result = batch_ssim(refs, tests)
         assert result.shape == (refs.shape[0],)
 
     def test_batch_snr_values_match_single(self, image_stack_pair):
@@ -346,12 +303,6 @@ class TestBatchMetrics:
         for i in range(refs.shape[0]):
             assert_almost_equal(result[i], rmse(refs[i], tests[i]))
 
-    def test_batch_ssim_values_match_single(self, image_stack_pair):
-        refs, tests = image_stack_pair
-        result = batch_ssim(refs, tests)
-        for i in range(refs.shape[0]):
-            assert_almost_equal(result[i], ssim(refs[i], tests[i]))
-
     def test_batch_snr_invalid_raises(self):
         with pytest.raises(ValueError):
             batch_snr(np.ones((2, 4, 4)), np.ones((2, 8, 8)))
@@ -368,21 +319,11 @@ class TestBatchMetrics:
         with pytest.raises(ValueError):
             batch_rmse(np.ones((2, 4, 4)), np.ones((2, 8, 8)))
 
-    def test_batch_ssim_invalid_raises(self):
-        with pytest.raises(ValueError):
-            batch_ssim(np.ones((2, 4, 4)), np.ones((2, 8, 8)))
-
     def test_batch_psnr_custom_max_pixel_value(self, image_stack_pair):
         refs, tests = image_stack_pair
         result = batch_psnr(refs, tests, max_pixel_value=128.0)
         for i in range(refs.shape[0]):
             assert_almost_equal(result[i], psnr(refs[i], tests[i], max_pixel_value=128.0))
-
-    def test_batch_ssim_custom_data_range(self, image_stack_pair):
-        refs, tests = image_stack_pair
-        result = batch_ssim(refs, tests, data_range=128.0)
-        for i in range(refs.shape[0]):
-            assert_almost_equal(result[i], ssim(refs[i], tests[i], data_range=128.0))
 
 
 ##########################################
@@ -407,10 +348,6 @@ class TestAverageMetrics:
         refs, tests = image_stack_pair
         assert isinstance(average_rmse(refs, tests), float)
 
-    def test_average_ssim_returns_float(self, image_stack_pair):
-        refs, tests = image_stack_pair
-        assert isinstance(average_ssim(refs, tests), float)
-
     def test_average_snr_equals_mean_of_batch(self, image_stack_pair):
         refs, tests = image_stack_pair
         assert_almost_equal(average_snr(refs, tests), float(np.mean(batch_snr(refs, tests))))
@@ -427,10 +364,6 @@ class TestAverageMetrics:
         refs, tests = image_stack_pair
         assert_almost_equal(average_rmse(refs, tests), float(np.mean(batch_rmse(refs, tests))))
 
-    def test_average_ssim_equals_mean_of_batch(self, image_stack_pair):
-        refs, tests = image_stack_pair
-        assert_almost_equal(average_ssim(refs, tests), float(np.mean(batch_ssim(refs, tests))))
-
     def test_average_snr_perfect_stack_returns_inf(self):
         """A perfect (zero-error) stack yields average SNR of inf."""
         refs = np.random.default_rng(0).random((3, 16, 16)) * 255.0
@@ -444,19 +377,10 @@ class TestAverageMetrics:
         refs = np.random.default_rng(0).random((3, 16, 16)) * 255.0
         assert average_rmse(refs, refs.copy()) == 0.0
 
-    def test_average_ssim_one_for_identical_stack(self):
-        refs = np.random.default_rng(0).random((3, 16, 16)) * 255.0
-        assert_almost_equal(average_ssim(refs, refs.copy()), 1.0, decimal=10)
-
     def test_average_psnr_custom_max_pixel_value(self, image_stack_pair):
         refs, tests = image_stack_pair
         expected = float(np.mean(batch_psnr(refs, tests, max_pixel_value=128.0)))
         assert_almost_equal(average_psnr(refs, tests, max_pixel_value=128.0), expected)
-
-    def test_average_ssim_custom_data_range(self, image_stack_pair):
-        refs, tests = image_stack_pair
-        expected = float(np.mean(batch_ssim(refs, tests, data_range=128.0)))
-        assert_almost_equal(average_ssim(refs, tests, data_range=128.0), expected)
 
     def test_average_snr_invalid_raises(self):
         with pytest.raises(ValueError):
@@ -495,12 +419,6 @@ class TestAverageMetrics:
         ref_3d = np.broadcast_to(ref_2d[np.newaxis], tests.shape).copy()
         assert_almost_equal(average_rmse(ref_2d, tests), average_rmse(ref_3d, tests))
 
-    def test_average_ssim_2d_ref_matches_broadcast_stack(self, image_stack_pair):
-        refs, tests = image_stack_pair
-        ref_2d = refs[0]
-        ref_3d = np.broadcast_to(ref_2d[np.newaxis], tests.shape).copy()
-        assert_almost_equal(average_ssim(ref_2d, tests), average_ssim(ref_3d, tests))
-
     def test_average_snr_2d_ref_returns_float(self, image_stack_pair):
         refs, tests = image_stack_pair
         assert isinstance(average_snr(refs[0], tests), float)
@@ -518,13 +436,4 @@ class TestAverageMetrics:
         assert_almost_equal(
             average_psnr(ref_2d, tests, max_pixel_value=128.0),
             average_psnr(ref_3d, tests, max_pixel_value=128.0),
-        )
-
-    def test_average_ssim_2d_ref_custom_data_range(self, image_stack_pair):
-        refs, tests = image_stack_pair
-        ref_2d = refs[0]
-        ref_3d = np.broadcast_to(ref_2d[np.newaxis], tests.shape).copy()
-        assert_almost_equal(
-            average_ssim(ref_2d, tests, data_range=128.0),
-            average_ssim(ref_3d, tests, data_range=128.0),
         )
