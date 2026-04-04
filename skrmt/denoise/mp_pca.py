@@ -16,7 +16,7 @@ from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils.validation import check_is_fitted
 
 from skrmt.ensemble import WishartEnsemble
-from skrmt.denoise.utils import norm_img_0_255, normalize_imgs_0_255
+from skrmt.denoise.utils import normalize_imgs_0_255
 
 
 def _fit_mp_bulk(eigenvals: np.ndarray, gamma: float) -> float:

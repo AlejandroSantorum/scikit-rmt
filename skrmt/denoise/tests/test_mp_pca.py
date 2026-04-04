@@ -286,7 +286,7 @@ class TestTransform:
         """Denoising a pure-noise stack should reduce its variance."""
         rng = np.random.default_rng(0)
         X = rng.standard_normal((8, 16, 16)) * 2.0
-        d = MarchenkoPasturPCADenoiser(sigma=2.0, window_size=8)
+        d = MarchenkoPasturPCADenoiser(sigma=2.0, window_size=8, normalize_output=False)
         out = d.fit_transform(X)
         assert np.var(out) < np.var(X)
 
@@ -311,7 +311,7 @@ class TestBaseEstimatorAPI:
     def test_get_params(self):
         d = MarchenkoPasturPCADenoiser(sigma=1.0, sigma_estimator="bulk_mean", window_size=8)
         params = d.get_params()
-        assert params == {"sigma": 1.0, "sigma_estimator": "bulk_mean", "window_size": 8}
+        assert params == {"sigma": 1.0, "sigma_estimator": "bulk_mean", "window_size": 8, "normalize_output": True}
 
     def test_set_params(self):
         d = MarchenkoPasturPCADenoiser(sigma=1.0, window_size=8)
@@ -352,7 +352,7 @@ class TestAccuracy:
         X_noisy = signal[np.newaxis, :, :] + noise
         X_clean = np.broadcast_to(signal, (6, 16, 16))
 
-        d = MarchenkoPasturPCADenoiser(sigma=sigma_true, window_size=8)
+        d = MarchenkoPasturPCADenoiser(sigma=sigma_true, window_size=8, normalize_output=False)
         X_denoised = d.fit_transform(X_noisy)
 
         mse_noisy = np.mean((X_noisy - X_clean) ** 2)
