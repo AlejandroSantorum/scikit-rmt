@@ -36,7 +36,7 @@ with open(
 DOWNLOAD_URL = f'https://github.com/AlejandroSantorum/scikit-rmt/archive/refs/tags/v{VERSION}.tar.gz'
 
 setup(
-    name='scikit-rmt',
+    name='scikit_rmt',
     author='Alejandro Santorum Varela',
     author_email='alejandro.santorum@gmail.com',
     #packages = ['scikit-rmt'],
