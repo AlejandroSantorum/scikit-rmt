@@ -888,16 +888,11 @@ class TracyWidomDistribution(rv_continuous):
             (ndarray) numpy array containing the scaled and normalized eigenvalues.
 
         """
-        if other_beta is None:
-            _beta = self.beta
-        else:
-            _beta = other_beta
+        _beta = self.beta if other_beta is None else other_beta
 
         # Tracy-Widom eigenvalue normalization constants
         eigval_scale = 1.0/np.sqrt(_beta)
-        size_scale = 1.0
-        if _beta == 4:
-            size_scale = 1/np.sqrt(2)
+        size_scale = 1.0 if _beta in (1, 2) else 1.0/np.sqrt(2)
 
         max_eigvals = (
             size_scale
