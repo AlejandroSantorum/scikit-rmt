@@ -196,6 +196,15 @@ class CircularEnsemble(BaseEnsemble):
         Returns:
             numpy array containing J matrix.
 
+        Example:
+            For n=3, the resulting J matrix is:
+                [[ 0. -1.  0.  0.  0.  0.]
+                [ 1.  0.  0.  0.  0.  0.]
+                [ 0.  0.  0. -1.  0.  0.]
+                [ 0.  0.  1.  0.  0.  0.]
+                [ 0.  0.  0.  0.  0. -1.]
+                [ 0.  0.  0.  0.  1.  0.]]
+
         References:
             - Killip, R. and Zozhan, R.
                 Matrix Models and Eigenvalue Statistics for Truncations of
