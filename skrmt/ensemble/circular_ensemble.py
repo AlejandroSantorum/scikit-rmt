@@ -206,8 +206,8 @@ class CircularEnsemble(BaseEnsemble):
         """
         size = 2*self.n
         j_mtx = np.zeros((size,size))
-        # selecting indices
-        inds = np.arange(size-1)
+        # selecting indices: step by 2 to create independent 2x2 blocks: [0, 2, 4, ...]
+        inds = np.arange(0, size, 2)
         # selecting upper-diagonal indices
         j_mtx[inds, inds+1] = -1
         # selecting lower-diagonal indices
