@@ -43,14 +43,15 @@ def test_coe_symmetric():
 
 
 def test_coe_eigvals():
-    '''Testing all eigenvalues of a COE matrix are real
+    '''Testing all eigenvalues of a COE matrix have module 1
     '''
     n_size = 5
     coe = CircularEnsemble(beta=1, n=n_size)
 
     vals = coe.eigvals()
 
-    assert_array_equal(vals.imag, 0.0)
+    mods = np.absolute(vals)
+    assert_almost_equal(mods, 1.0, decimal=12)
 
 
 def test_beta1_joint_eigval_pdf():
@@ -129,16 +130,32 @@ def test_cse_init():
 
     assert cse.matrix.shape == (2*n_size,2*n_size)
 
-    mtx_sol = [[4.43078888e-01-8.29771592e-01j, -6.00429653e-17+1.43650461e-17j,\
-                9.66935997e-02+7.40605433e-01j, 3.43966100e-01-3.01198149e-02j],
-               [4.56225923e-01+3.23872465e-02j, 3.46385288e-01-1.57037703e+00j, \
-                4.56225923e-01+3.23872465e-02j, -1.22164739e+00-7.84199458e-01j],
-               [-9.56297276e-01+7.17094554e-01j, -3.43966100e-01+3.01198149e-02j, \
-                6.11735400e-01-6.90830132e-02j, -3.43966100e-01+3.01198149e-02j],
-               [-4.56225923e-01-3.23872465e-02j, 9.66935997e-02+7.40605433e-01j, \
-                1.94983679e-17+3.89651615e-18j, 7.08429000e-01+6.71522420e-01j]]
+    mtx_sol = np.array(
+        [
+            [ 6.45393580e-01-4.76777901e-01j, -7.32722934e-18-2.77555756e-17j,
+              3.28888045e-01+2.22882248e-01j,  2.17002314e-01-3.88865161e-01j],
+            [ 1.20088950e-17-5.55111512e-17j,  6.45393580e-01-4.76777901e-01j,
+              1.77812336e-01+4.08275508e-01j, -3.49164384e-01+1.89547027e-01j],
+            [-3.49164384e-01+1.89547027e-01j, -2.17002314e-01+3.88865161e-01j,
+             5.95514436e-01+5.37784898e-01j,  6.02588126e-18+0.00000000e+00j],
+            [-1.77812336e-01-4.08275508e-01j,  3.28888045e-01+2.22882248e-01j,
+             1.08100510e-17+0.00000000e+00j,  5.95514436e-01+5.37784898e-01j]
+        ]
+    )
 
     assert_almost_equal(cse.matrix, np.array(mtx_sol), decimal=7)
+
+
+def test_cse_eigvals():
+    '''Testing all eigenvalues of a CSE matrix have module 1
+    '''
+    n_size = 5
+    cse = CircularEnsemble(beta=4, n=n_size)
+
+    vals = cse.eigvals()
+
+    mods = np.absolute(vals)
+    assert_almost_equal(mods, 1.0, decimal=12)
 
 
 def test_beta4_joint_eigval_pdf():
