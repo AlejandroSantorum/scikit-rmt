@@ -1,4 +1,4 @@
-![scikit-rmt logo](https://raw.githubusercontent.com/AlejandroSantorum/scikit-rmt/main/imgs/scikit-rmt_logo_bigger.png)
+![scikit-rmt logo](imgs/scikit-rmt_logo_bigger.png)
 
 
 [![PyPI](https://img.shields.io/pypi/v/scikit-rmt?color=g)](https://pypi.org/project/scikit-rmt/)
@@ -118,22 +118,22 @@ a **Gaussian Orthogonal Ensemble (GOE)** random matrix.
 ```python
 from skrmt.ensemble.gaussian_ensemble import GaussianEnsemble
 # sampling a GOE (beta=1) matrix of size 3x3
-goe = GaussianEnsemble(beta=1, n=3)
+goe = GaussianEnsemble(beta=1, n=3, random_state=42)
 print(goe.matrix)
 ```
 ```bash
-[[ 0.34574696 -0.10802385  0.38245343]
- [-0.10802385 -0.60113963  0.28624612]
- [ 0.38245343  0.28624612 -0.96503739]]
+[[ 0.70245989  0.97917711  1.57465705]
+ [ 0.97917711 -0.33114288  0.37709847]
+ [ 1.57465705  0.37709847 -0.66393704]]
 ```
 Its spectral density can be easily plotted:
 ```python
 # sampling a GOE matrix of size 1000x1000
 goe = GaussianEnsemble(beta=1, n=1000)
-# plotting its spectral distribution in the interval (-2,2)
-goe.plot_eigval_hist(bins=80, interval=(-2,2), density=True)
+# plotting its spectral distribution
+goe.plot_eigval_hist(bins=80, density=True)
 ```
-![GOE density plot](https://raw.githubusercontent.com/AlejandroSantorum/scikit-rmt/main/imgs/hist_goe.png)
+![GOE density plot](imgs/hist_goe.png)
 <!---
 <img src="imgs/hist_goe.png" width=450 height=320 alt="GOE density plot">
 -->
@@ -147,9 +147,9 @@ from skrmt.ensemble.circular_ensemble import CircularEnsemble
 
 # sampling a CSE (beta=4) matrix of size 2000x2000
 cse = CircularEnsemble(beta=4, n=1000)
-cse.plot_eigval_hist(bins=80)
+cse.plot_eigval_hist()
 ```
-![CSE density plot](https://raw.githubusercontent.com/AlejandroSantorum/scikit-rmt/main/imgs/hist_cse_smooth.png)
+![CSE density plot](imgs/hist_cse.png)
 <!---
 <img src="imgs/hist_cse_smooth.png" width=650 height=320 alt="CSE density plot">
 -->
@@ -160,13 +160,13 @@ in *Matrix Models for Beta Ensembles* and by J. Albrecht, C. Chan, and A. Edelma
 random matrices (**Gaussian Ensemble** and **Wishart Ensemble** matrices) in its **tridiagonal form**
 we can speed up histogramming procedure. The following graphical simulation using GOE matrices
 tries to illustrate it.
-![Speed up by tridigonal forms](https://raw.githubusercontent.com/AlejandroSantorum/scikit-rmt/main/imgs/gauss_tridiag_sim.png)
+![Speed up by tridigonal forms](imgs/gauss_tridiag_sim.png)
 <!---
 <img src="imgs/gauss_tridiag_sim.png" width=820 height=370 alt="Speed up by tridigonal forms">
 -->
 
 On the other hand, for all the supported ensembles, the **joint eigenvalue probability density function** can be computed by using the class method `joint_eigval_pdf(eigvals=None)`. By default, the method computes the joint eigenvalue PDF of the eigenvalues of the sampled random matrix. However, the method can be called using a pre-computed array of eigenvalues, and the joint eigenvalue PDF of these eigenvalues is returned. AS an example, we can simulate sampling and histogramming many eigenvalues of GOE random matrices of size 2x2, as well as illustrating the joint eigenvalue PDF for GOE matrices 2x2. This simulation is shown in the figure below.
-![Joint Eigenvalue PDF for GOE](https://raw.githubusercontent.com/AlejandroSantorum/scikit-rmt/main/imgs/goe_joint_eigval_pdf.png)
+![Joint Eigenvalue PDF for GOE](imgs/goe_joint_eigval_pdf.png)
 <!---
 <img src="imgs/goe_joint_eigval_pdf.png" width=820 height=370 alt="Joint Eigenvalue PDF for GOE">
 -->
@@ -182,7 +182,7 @@ from skrmt.ensemble.spectral_law import WignerSemicircleDistribution
 wsd = WignerSemicircleDistribution(beta=1)
 wsd.plot_empirical_pdf(sample_size=100000, bins=80, density=True)
 ```
-![Wigner Semicircle Law](https://raw.githubusercontent.com/AlejandroSantorum/scikit-rmt/main/imgs/scl_goe.png)
+![Wigner Semicircle Law](imgs/scl_goe.png)
 <!---
 <img src="imgs/scl_goe.png" width=450 height=320 alt="Wigner Semicircle Law">
 -->
@@ -193,7 +193,7 @@ from skrmt.ensemble.spectral_law import WignerSemicircleDistribution
 wsd = WignerSemicircleDistribution(beta=1)
 wsd.plot_empirical_pdf(sample_size=100000, bins=80, density=True, plot_law_pdf=True)
 ```
-![Wigner Semicircle Law PDF](https://raw.githubusercontent.com/AlejandroSantorum/scikit-rmt/main/imgs/scl_goe_pdf.png)
+![Wigner Semicircle Law PDF](imgs/scl_goe_pdf.png)
 <!---
 <img src="imgs/scl_goe_pdf.png" width=450 height=320 alt="Wigner Semicircle Law PDF">
 -->
@@ -205,7 +205,7 @@ from skrmt.ensemble.spectral_law import MarchenkoPasturDistribution
 mpd = MarchenkoPasturDistribution(beta=1, ratio=1/3)
 mpd.plot_empirical_pdf(sample_size=100000, bins=80, density=True)
 ```
-![Marchenko-Pastur Law](https://raw.githubusercontent.com/AlejandroSantorum/scikit-rmt/main/imgs/mpl_wre.png)
+![Marchenko-Pastur Law](imgs/mpl_wre.png)
 <!---
 <img src="imgs/mpl_wre.png" width=450 height=320 alt="Marchenko-Pastur Law">
 -->
@@ -216,7 +216,7 @@ from skrmt.ensemble.spectral_law import MarchenkoPasturDistribution
 mpd = MarchenkoPasturDistribution(beta=1, ratio=1/3)
 mpd.plot_empirical_pdf(sample_size=100000, bins=80, density=True, plot_law_pdf=True)
 ```
-![Marchenko-Pastur Law PDF](https://raw.githubusercontent.com/AlejandroSantorum/scikit-rmt/main/imgs/mpl_wre_pdf.png)
+![Marchenko-Pastur Law PDF](imgs/mpl_wre_pdf.png)
 <!---
 <img src="imgs/mpl_wre_pdf.png" width=450 height=320 alt="Marchenko-Pastur Law PDF">
 -->
@@ -228,7 +228,7 @@ from skrmt.ensemble.spectral_law import TracyWidomDistribution
 twd = TracyWidomDistribution(beta=1)
 twd.plot_empirical_pdf(sample_size=30000, bins=80, density=True)
 ```
-![Tracy-Widom Law](https://raw.githubusercontent.com/AlejandroSantorum/scikit-rmt/main/imgs/twl_goe.png)
+![Tracy-Widom Law](imgs/twl_goe.png)
 <!---
 <img src="imgs/twl_goe.png" width=450 height=320 alt="Tracy-Widom Law">
 -->
@@ -239,7 +239,7 @@ from skrmt.ensemble.spectral_law import TracyWidomDistribution
 twd = TracyWidomDistribution(beta=1)
 twd.plot_empirical_pdf(sample_size=30000, bins=80, density=True, plot_law_pdf=True)
 ```
-![Tracy-Widom Law PDF](https://raw.githubusercontent.com/AlejandroSantorum/scikit-rmt/main/imgs/twl_goe_pdf.png)
+![Tracy-Widom Law PDF](imgs/twl_goe_pdf.png)
 <!---
 <img src="imgs/twl_goe_pdf.png" width=450 height=320 alt="Tracy-Widom Law PDF">
 -->
@@ -283,7 +283,7 @@ ax2.set_ylabel("density", fontweight="bold")
 fig.suptitle("Wigner Semicircle probability density function (PDF)", fontweight="bold")
 plt.show()
 ```
-![Wigner Semicircle Law PDF (Analytical)](https://raw.githubusercontent.com/AlejandroSantorum/scikit-rmt/main/imgs/wigner_scl_pdf.png)
+![Wigner Semicircle Law PDF (Analytical)](imgs/wigner_scl_pdf.png)
 <!---
 <img src="imgs/wigner_scl_pdf.png" width=450 height=320 alt="Wigner Semicircle Law PDF (Analytical)">
 -->
@@ -322,7 +322,7 @@ ax2.set_ylabel("density", fontweight="bold")
 fig.suptitle("Marchenko-Pastur probability density function (PDF)", fontweight="bold")
 plt.show()
 ```
-![Marchenko-Pastur Law PDF (Analytical)](https://raw.githubusercontent.com/AlejandroSantorum/scikit-rmt/main/imgs/mpl_pdf.png)
+![Marchenko-Pastur Law PDF (Analytical)](imgs/mpl_pdf.png)
 <!---
 <img src="imgs/mpl_pdf.png" width=450 height=320 alt="Marchenko-Pastur Law PDF (Analytical)">
 -->
@@ -359,7 +359,7 @@ ax2.set_title("Cumulative distribution function")
 fig.suptitle("Tracy Widom Law", fontweight="bold")
 plt.show()
 ```
-![Tracy-Widom Law PDF and CDF(Analytical)](https://raw.githubusercontent.com/AlejandroSantorum/scikit-rmt/main/imgs/twl_pdf_cdf.png)
+![Tracy-Widom Law PDF and CDF(Analytical)](imgs/twl_pdf_cdf.png)
 <!---
 <img src="imgs/twl_pdf_cdf.png" width=450 height=320 alt="Tracy-Widom Law PDF and CDF(Analytical)">
 -->
@@ -418,7 +418,7 @@ The figure below shows an MRI brain slice corrupted by Rician noise (100 acquisi
 denoised with each available estimator. From left to right: noisy sample, naive average of all
 acquisitions, MP-PCA with `"median"` σ, `"min_eigen"` σ, `"mp_fit"` σ, and the true σ.
 
-![MRI denoising with MP-PCA](https://raw.githubusercontent.com/AlejandroSantorum/scikit-rmt/main/imgs/mri_denoising.png)
+![MRI denoising with MP-PCA](imgs/mri_denoising.png)
 <!---
 <img src="imgs/mri_denoising.png" width=900 height=200 alt="MRI denoising with MP-PCA">
 -->
