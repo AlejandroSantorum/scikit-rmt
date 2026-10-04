@@ -245,7 +245,9 @@ class CircularEnsemble(BaseEnsemble):
 
     def plot_eigval_hist(
         self,
+        bins: Union[int, Sequence] = None,
         interval: Tuple = None,
+        density: bool = False,
         normalize: bool = False,
         savefig_path: str = None,
     ) -> None:  # pragma: no cover
@@ -257,8 +259,14 @@ class CircularEnsemble(BaseEnsemble):
         complex plane next to a heap map to study eigenvalue density.
 
         Args:
+            bins (int or sequence): Only applicable for real eigenvalues.
+                This argument has no effect for the complex eigenvalues of this class.
+                It is kept for compatibility with the base class.
             interval (tuple, default=None): Delimiters (xmin, xmax) of the histogram.
                 The lower and upper range of the bins. Lower and upper outliers are ignored.
+            density (bool, default=False): Only applicable for real eigenvalues.
+                This argument has no effect for the complex eigenvalues of this class.
+                It is kept for compatibility with the base class.
             normalize (bool, default=False): Whether to normalize the computed eigenvalues
                 by the default normalization constant (see references). Defaults to False,
                 i.e., the eigenvalues are not normalized. Normalization makes the eigenvalues
