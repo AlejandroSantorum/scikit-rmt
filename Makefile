@@ -41,21 +41,21 @@ requirements:
 
 .PHONY: install_requirements
 install_requirements:
-	pip3 install -r requirements.txt
+	python3 -m pip install .
 
 
 ### pytest & coverage ###
 .PHONY: pytest
 pytest:
-	python3 -m pytest skrmt
+	python3 -m pytest
 
 .PHONY: coverage
 coverage:
-	pytest --cov=skrmt
+	python3 -m pytest --cov=skrmt
 
 .PHONY: cov_html
 cov_html:
-	pytest --cov-report html --cov=skrmt
+	python3 -m pytest --cov-report html --cov=skrmt
 
 
 ### linting ###
@@ -68,7 +68,8 @@ lint:
 ### build and upload library to PyPI ###
 .PHONY: build
 build:
-	python3 setup.py sdist
+	python3 -m build
+	python3 -m twine check dist/*
 
 .PHONY: deploy_pypi
 deploy_pypi:
@@ -85,7 +86,7 @@ clean_deploy:
 .PHONY: apidoc
 apidoc:
 	rm -rf docs/*.rst
-	python3 -m sphinx.ext.apidoc -o docs skrmt **/tests/*
+	python3 -m sphinx.ext.apidoc -o docs skrmt
 
 # You can set these variables from the command line, and also
 # from the environment for the first two.

@@ -66,12 +66,35 @@ pip install scikit-rmt
 ```
 
 ### Requirements
+*scikit-rmt* supports Python 3.8 through 3.12.
+
 *scikit-rmt* depends on the following packages:
 * [numpy](https://github.com/numpy/numpy) - The fundamental package for scientific computing with Python
 * [matplotlib](https://github.com/matplotlib/matplotlib) - Plotting with Python
 * [scipy](https://github.com/scipy/scipy) - Scientific computation in Python
+* [scikit-learn](https://github.com/scikit-learn/scikit-learn) - Estimator interfaces and image quality metrics
 
-Check the pinned versions in the [requirements.txt](requirements.txt) file.
+Dependency bounds and package metadata are defined in [pyproject.toml](pyproject.toml).
+
+### Development
+From the repository root, install the package and development tools in a virtual environment:
+
+```bash
+python -m pip install -e ".[dev]"
+python -m pytest
+```
+
+Unit tests live in the top-level `tests/` directory, grouped by subpackage.
+Pytest uses importlib mode, so the package must be installed before running tests.
+
+Build source and wheel distributions with:
+
+```bash
+python -m build
+python -m twine check dist/*
+```
+
+For documentation builds, install the `docs` extra with `python -m pip install -e ".[docs]"`.
 
 ----------------
 ## Main features

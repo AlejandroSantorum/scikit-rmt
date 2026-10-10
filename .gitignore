@@ -23,4 +23,5 @@ imgs/slides
 
 # dist
 dist
-scikit_rmt.egg-info
+build/
+*.egg-info/
