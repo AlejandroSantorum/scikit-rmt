@@ -2,10 +2,12 @@
 
 Testing utils sub-module
 '''
+import logging
 import os
 import pytest
 
 from skrmt.ensemble.gaussian_ensemble import GaussianEnsemble
+from skrmt.ensemble.misc import get_logger
 from skrmt.ensemble.utils import (
     plot_spectral_hist_and_law,
     standard_vs_tridiag_hist,
@@ -20,6 +22,21 @@ def _setup_tmp_dir(tmp_path_factory):
     '''Create a pytest-managed directory for this module's plot files.'''
     global TMP_DIR_PATH
     TMP_DIR_PATH = str(tmp_path_factory.mktemp("ensemble_utils"))
+
+
+def test_get_logger_preserves_configuration(monkeypatch):
+    """Repeated calls must preserve application handlers and levels."""
+    logger = logging.getLogger("skrmt.test_logging")
+    handlers = [logging.NullHandler()]
+    monkeypatch.setattr(logger, "handlers", handlers)
+    monkeypatch.setattr(logger, "level", logging.DEBUG)
+    monkeypatch.setattr(logger, "propagate", False)
+
+    assert get_logger(logger.name) is logger
+    assert get_logger(logger.name) is logger
+    assert logger.handlers == handlers
+    assert logger.level == logging.DEBUG
+    assert logger.propagate is False
 
 
 class TestUtils:

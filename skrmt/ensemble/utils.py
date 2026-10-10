@@ -4,7 +4,7 @@ This sub-module contains several useful functions to run and manage various
 simulations related to random matrix ensembles.
 """
 
-from typing import Union, Sequence
+from typing import Union, Sequence, Optional
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -17,7 +17,7 @@ from .misc import get_bins_centers_and_contour
 def plot_spectral_hist_and_law(
     ensemble: BaseEnsemble,
     bins: Union[int, Sequence] = 100,
-    savefig_path: str = None,
+    savefig_path: Optional[str] = None,
 ) -> None:
     """Plots the spectrum histogram of a random matrix ensemble alongside the
     PDF of the corresponding spectral law.
@@ -64,8 +64,8 @@ def plot_spectral_hist_and_law(
 def standard_vs_tridiag_hist(
     ensemble: Union[GaussianEnsemble, WishartEnsemble],
     bins: Union[int, Sequence] = 100,
-    savefig_path: str = None,
-    random_state: int = None,
+    savefig_path: Optional[str] = None,
+    random_state: Optional[int] = None,
 ) -> None:
     """Plots and compares the spectral histogram of a random matrix using its
     standard form vs using the corresponding tridiagonal form.

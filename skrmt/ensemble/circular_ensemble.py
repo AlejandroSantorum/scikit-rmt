@@ -7,7 +7,7 @@ and Circular Symplectic Ensemble (CSE).
 
 """
 
-from typing import Union, Sequence, Tuple
+from typing import Union, Sequence, Tuple, Optional
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy import special
@@ -76,7 +76,7 @@ class CircularEnsemble(BaseEnsemble):
 
     """
 
-    def __init__(self, beta: int, n: int, random_state: int = None) -> None:
+    def __init__(self, beta: int, n: int, random_state: Optional[int] = None) -> None:
         """Constructor for CircularEnsemble class.
 
         Initializes an instance of this class with the given parameters.
@@ -100,7 +100,7 @@ class CircularEnsemble(BaseEnsemble):
         self._eigvals = None
         self.matrix = self.sample(random_state=random_state)
 
-    def resample(self, random_state: int = None) -> np.ndarray:
+    def resample(self, random_state: Optional[int] = None) -> np.ndarray:
         """Re-samples new Circular Ensemble random matrix.
 
         It re-samples a new random matrix from the Circular ensemble. This is an alias
@@ -121,7 +121,7 @@ class CircularEnsemble(BaseEnsemble):
         return self.sample(random_state=random_state)
 
     # pylint: disable=inconsistent-return-statements
-    def sample(self, random_state: int = None) -> np.ndarray:
+    def sample(self, random_state: Optional[int] = None) -> np.ndarray:
         """Samples new Circular Ensemble random matrix.
 
         The sampling algorithm depends on the specification of
@@ -245,11 +245,11 @@ class CircularEnsemble(BaseEnsemble):
 
     def plot_eigval_hist(
         self,
-        bins: Union[int, Sequence] = None,
-        interval: Tuple = None,
+        bins: Optional[Union[int, Sequence]] = None,
+        interval: Optional[Tuple] = None,
         density: bool = False,
         normalize: bool = False,
-        savefig_path: str = None,
+        savefig_path: Optional[str] = None,
     ) -> None:  # pragma: no cover
         """Computes and plots the histogram of the matrix eigenvalues.
 
@@ -325,7 +325,7 @@ class CircularEnsemble(BaseEnsemble):
             plt.show()
 
 
-    def joint_eigval_pdf(self, eigvals: np.ndarray = None) -> float:
+    def joint_eigval_pdf(self, eigvals: Optional[np.ndarray] = None) -> float:
         '''Computes joint eigenvalue pdf.
 
         Calculates joint eigenvalue probability density function given an array of

@@ -9,8 +9,9 @@ spectrum of the Manova Ensemble.
 
 """
 
-from typing import Union, Sequence, Tuple
+from typing import Union, Sequence, Tuple, Optional
 import collections.abc
+import logging
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.integrate import quad
@@ -19,10 +20,10 @@ from scipy import interpolate
 
 from .base_ensemble import BaseEnsemble
 from .tracy_widom_approximator import TW_Approximator
-from .misc import relu, indicator, plot_func, get_bins_centers_and_contour, get_logger
+from .misc import relu, indicator, plot_func, get_bins_centers_and_contour
 
 
-_logger = get_logger(__name__)
+_logger = logging.getLogger(__name__)
 
 
 class WignerSemicircleDistribution:
@@ -81,8 +82,8 @@ class WignerSemicircleDistribution:
 
     def rvs(
         self,
-        size: Union[int, Tuple[int]] = None,
-        random_state: int = None
+        size: Optional[Union[int, Tuple[int]]] = None,
+        random_state: Optional[int] = None
     ) -> np.ndarray:
         """Samples ranfom variates following this distribution.
         This uses the relationship between Wigner Semicircle law and Beta distribution.
@@ -142,9 +143,9 @@ class WignerSemicircleDistribution:
 
     def plot_pdf(
         self,
-        interval: Tuple = None,
+        interval: Optional[Tuple] = None,
         num_x_vals: int = 1000,
-        savefig_path: str = None,
+        savefig_path: Optional[str] = None,
     ) -> None:
         """Plots the PDF of the Wigner Semicircle Law.
 
@@ -168,9 +169,9 @@ class WignerSemicircleDistribution:
 
     def plot_cdf(
         self,
-        interval: Tuple = None,
+        interval: Optional[Tuple] = None,
         num_x_vals: int = 1000,
-        savefig_path: str = None,
+        savefig_path: Optional[str] = None,
     ) -> None:
         """Plots the CDF of the Wigner Semicircle Law.
 
@@ -196,11 +197,11 @@ class WignerSemicircleDistribution:
         self,
         sample_size: int = 10000,
         bins: Union[int, Sequence] = 100,
-        interval: Tuple = None,
+        interval: Optional[Tuple] = None,
         density: bool = False,
         plot_law_pdf: bool = False,
-        savefig_path: str = None,
-        random_state: int = None,
+        savefig_path: Optional[str] = None,
+        random_state: Optional[int] = None,
     ) -> None:
         r"""Computes and plots Wigner's semicircle empirical law.
 
@@ -387,7 +388,7 @@ class MarchenkoPasturDistribution(rv_continuous):
         self,
         size: Union[int, Tuple[int]],
         random_state: int,
-        _random_state: int = None,
+        _random_state: Optional[int] = None,
     ) -> np.ndarray:
         # pylint: disable=arguments-differ
         if _random_state is not None:
@@ -476,9 +477,9 @@ class MarchenkoPasturDistribution(rv_continuous):
 
     def plot_pdf(
         self,
-        interval: Tuple = None,
+        interval: Optional[Tuple] = None,
         num_x_vals: int = 1000,
-        savefig_path: str = None,
+        savefig_path: Optional[str] = None,
     ) -> None:
         """Plots the PDF of the Marchenko-Pastur Law.
 
@@ -501,9 +502,9 @@ class MarchenkoPasturDistribution(rv_continuous):
 
     def plot_cdf(
         self,
-        interval: Tuple = None,
+        interval: Optional[Tuple] = None,
         num_x_vals: int = 1000,
-        savefig_path: str = None,
+        savefig_path: Optional[str] = None,
     ) -> None:
         """Plots the CDF of the Marchenko-Pastur Law.
 
@@ -528,11 +529,11 @@ class MarchenkoPasturDistribution(rv_continuous):
         self,
         sample_size: int = 1000,
         bins: Union[int, Sequence] = 100,
-        interval: Tuple = None,
+        interval: Optional[Tuple] = None,
         density: bool = False,
         plot_law_pdf: bool = False,
-        savefig_path: str = None,
-        random_state: int = None,
+        savefig_path: Optional[str] = None,
+        random_state: Optional[int] = None,
     ) -> None:
         """Computes and plots Marchenko-Pastur empirical PDF.
 
@@ -721,9 +722,9 @@ class TracyWidomDistribution(rv_continuous):
 
     def plot_pdf(
         self,
-        interval: Tuple = None,
+        interval: Optional[Tuple] = None,
         num_x_vals: int = 1000,
-        savefig_path: str = None,
+        savefig_path: Optional[str] = None,
     ) -> None:
         """Plots the PDF of the Tracy-Widom Law.
 
@@ -746,9 +747,9 @@ class TracyWidomDistribution(rv_continuous):
 
     def plot_cdf(
         self,
-        interval: Tuple = None,
+        interval: Optional[Tuple] = None,
         num_x_vals: int = 1000,
-        savefig_path: str = None,
+        savefig_path: Optional[str] = None,
     ) -> None:
         """Plots the PDF of the Tracy-Widom Law.
 
@@ -773,11 +774,11 @@ class TracyWidomDistribution(rv_continuous):
         self,
         sample_size: int = 1000,
         bins: Union[int, Sequence] = 100,
-        interval: Tuple = None,
+        interval: Optional[Tuple] = None,
         density: bool = False,
         plot_law_pdf: bool = False,
-        savefig_path: str = None,
-        random_state: int = None,
+        savefig_path: Optional[str] = None,
+        random_state: Optional[int] = None,
     ) -> None:
         """Computes and plots Tracy-Widom empirical law.
 
@@ -870,7 +871,7 @@ class TracyWidomDistribution(rv_continuous):
         self,
         max_eigvals: np.ndarray,
         matrix_size: int,
-        other_beta: int = None
+        other_beta: Optional[int] = None
     ) -> np.ndarray:
         """Normalizes set of eigenvalues using Tracy-Widom scale and normalization constants.
 
@@ -906,8 +907,8 @@ class TracyWidomDistribution(rv_continuous):
         ensemble: BaseEnsemble,
         n_eigvals: int = 1,
         bins: Union[int, Sequence] = 100,
-        random_state: int = None,
-        savefig_path: str = None,
+        random_state: Optional[int] = None,
+        savefig_path: Optional[str] = None,
     ) -> None:
         """Plots the histogram of the maximum eigenvalues of a random ensemble with the
         Tracy-Widom PDF.
@@ -1078,7 +1079,7 @@ class ManovaSpectrumDistribution(rv_continuous):
         self,
         size: Union[int, Tuple[int]],
         random_state: int,
-        _random_state: int = None,
+        _random_state: Optional[int] = None,
     ) -> np.ndarray:
         # pylint: disable=arguments-differ
         if _random_state is not None:
@@ -1152,9 +1153,9 @@ class ManovaSpectrumDistribution(rv_continuous):
 
     def plot_pdf(
         self,
-        interval: Tuple = None,
+        interval: Optional[Tuple] = None,
         num_x_vals: int = 1000,
-        savefig_path: str = None,
+        savefig_path: Optional[str] = None,
     ) -> None:
         """Plots the PDF of the Manova Spectrum distribution.
 
@@ -1177,9 +1178,9 @@ class ManovaSpectrumDistribution(rv_continuous):
 
     def plot_cdf(
         self,
-        interval: Tuple = None,
+        interval: Optional[Tuple] = None,
         num_x_vals: int = 1000,
-        savefig_path: str = None,
+        savefig_path: Optional[str] = None,
     ) -> None:
         """Plots the CDF of the Manova Spectrum distribution.
 
@@ -1204,11 +1205,11 @@ class ManovaSpectrumDistribution(rv_continuous):
         self,
         sample_size: int = 1000,
         bins: Union[int, Sequence] = 100,
-        interval: Tuple = None,
+        interval: Optional[Tuple] = None,
         density: bool = False,
         plot_law_pdf: bool = False,
-        savefig_path: str = None,
-        random_state: int = None,
+        savefig_path: Optional[str] = None,
+        random_state: Optional[int] = None,
     ) -> None:
         """Computes and plots Manova spectrum empirical pdf.
 

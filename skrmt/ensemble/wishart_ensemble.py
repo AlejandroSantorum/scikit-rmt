@@ -7,7 +7,7 @@ and Wishart Quaternion Ensemble.
 
 """
 
-from typing import Union, Sequence, Tuple
+from typing import Union, Sequence, Tuple, Optional
 import numpy as np
 from scipy import sparse, special
 
@@ -75,7 +75,7 @@ class WishartEnsemble(BaseEnsemble):
         n: int,
         tridiagonal_form: bool = False,
         sigma: float = 1.0,
-        random_state: int = None
+        random_state: Optional[int] = None
     ) -> None:
         """Constructor for WishartEnsemble class.
 
@@ -125,7 +125,11 @@ class WishartEnsemble(BaseEnsemble):
         self.lambda_plus = self.beta * self.sigma**2 * (1 + np.sqrt(self.ratio))**2
         self.lambda_minus = self.beta * self.sigma**2 * (1 - np.sqrt(self.ratio))**2
 
-    def resample(self, tridiagonal_form: bool = None, random_state: int = None) -> np.ndarray:
+    def resample(
+        self,
+        tridiagonal_form: Optional[bool] = None,
+        random_state: Optional[int] = None,
+    ) -> np.ndarray:
         """Re-samples a random matrix from the Wishart ensemble with the specified form.
 
         It re-samples a random matrix from the Wishart ensemble with the specified form.
@@ -157,7 +161,7 @@ class WishartEnsemble(BaseEnsemble):
         return self.sample(random_state=random_state)
 
     # pylint: disable=inconsistent-return-statements
-    def sample(self, random_state: int = None) -> np.ndarray:
+    def sample(self, random_state: Optional[int] = None) -> np.ndarray:
         """Samples new Wishart Ensemble random matrix.
 
         The sampling algorithm depends on the specification of
@@ -309,7 +313,7 @@ class WishartEnsemble(BaseEnsemble):
     def eigval_hist(
         self,
         bins: Union[int, Sequence],
-        interval: Tuple = None,
+        interval: Optional[Tuple] = None,
         density: bool = False,
         normalize: bool = False,
         avoid_img: bool = False,
@@ -338,10 +342,10 @@ class WishartEnsemble(BaseEnsemble):
     def plot_eigval_hist(
         self,
         bins: Union[int, Sequence] = 100,
-        interval: Tuple = None,
+        interval: Optional[Tuple] = None,
         density: bool = False,
         normalize: bool = False,
-        savefig_path: str = None,
+        savefig_path: Optional[str] = None,
     ) -> None:
         """Computes and plots the histogram of the matrix eigenvalues.
 
@@ -389,7 +393,7 @@ class WishartEnsemble(BaseEnsemble):
             savefig_path=savefig_path,
         )
 
-    def joint_eigval_pdf(self, eigvals: np.ndarray = None) -> float:
+    def joint_eigval_pdf(self, eigvals: Optional[np.ndarray] = None) -> float:
         '''Computes joint eigenvalue pdf.
 
         Calculates joint eigenvalue probability density function given an array of

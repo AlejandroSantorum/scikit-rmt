@@ -1352,6 +1352,17 @@ def test_indicator_func():
     assert indicator(2.0, stop=2.0, inclusive="right") == 1.0
     assert indicator(2.0, stop=2.0, inclusive="neither") == 0.0
 
+
+@pytest.mark.parametrize("inclusive", ["both", "left", "right", "neither"])
+def test_indicator_zero_upper_bound(inclusive):
+    """A zero upper bound must work without a lower bound."""
+    expected = [1.0, float(inclusive in ["both", "right"]), 0.0]
+    np.testing.assert_array_equal(
+        indicator(np.array([-1.0, 0.0, 1.0]), stop=0, inclusive=inclusive),
+        expected,
+    )
+
+
 def test_indicator_func_except():
     """Testing indicator function raising exception
     """

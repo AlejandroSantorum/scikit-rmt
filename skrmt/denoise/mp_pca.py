@@ -7,7 +7,9 @@ to distinguish true signal singular values from noise in the SVD of local image 
 
 """
 
-from typing import Union
+import logging
+from numbers import Integral, Real
+from typing import Union, Optional
 
 import numpy as np
 from scipy.optimize import minimize
@@ -17,6 +19,9 @@ from sklearn.utils.validation import check_is_fitted
 
 from skrmt.ensemble import WishartEnsemble
 from skrmt.denoise.utils import normalize_imgs_0_255
+
+
+_logger = logging.getLogger(__name__)
 
 
 def _fit_mp_bulk(eigenvals: np.ndarray, gamma: float) -> float:
@@ -108,7 +113,7 @@ class MarchenkoPasturPCADenoiser(BaseEstimator, TransformerMixin):
 
     def __init__(
         self,
-        sigma: float = None,
+        sigma: Optional[float] = None,
         sigma_estimator: str = "median",
         window_size: int = 16,
         normalize_output: bool = True,
@@ -156,7 +161,7 @@ class MarchenkoPasturPCADenoiser(BaseEstimator, TransformerMixin):
         """Tell sklearn whether this estimator has been fitted."""
         return self.sigma_ is not None
 
-    def fit(self, X: np.ndarray, _y=None) -> "MarchenkoPasturPCADenoiser":
+    def fit(self, X: np.ndarray, y=None) -> "MarchenkoPasturPCADenoiser":
         """Learn the noise level from the image stack X.
 
         If sigma was provided at construction time it is stored directly as
@@ -166,11 +171,13 @@ class MarchenkoPasturPCADenoiser(BaseEstimator, TransformerMixin):
 
         Args:
             X (numpy array): noisy image stack of shape (p, height, width).
-            _y: ignored; present only for scikit-learn API compatibility.
+            y: ignored; present only for scikit-learn API compatibility.
 
         Returns:
             (MarchenkoPasturPCADenoiser) self
         """
+        del y
+        self._validate_parameters()
         X = self._check_input(X)
         p, h, w = X.shape
 
@@ -223,6 +230,7 @@ class MarchenkoPasturPCADenoiser(BaseEstimator, TransformerMixin):
                 during fit, or if window_size exceeds the image dimensions.
         """
         check_is_fitted(self)
+        self._validate_parameters()
         X = self._check_input(X, expected_shape=self.image_shape_)
         X_denoised = self._sliding_window_denoise(X)
         if self.normalize_output:
@@ -299,6 +307,22 @@ class MarchenkoPasturPCADenoiser(BaseEstimator, TransformerMixin):
         # Guard against non-positive values caused by degenerate inputs.
         return float(np.sqrt(max(sigma2, 1e-12)))
 
+    def _validate_parameters(self) -> None:
+        """Validate parameters before fitting or transforming."""
+        if (
+            isinstance(self.window_size, (bool, np.bool_))
+            or not isinstance(self.window_size, Integral)
+            or self.window_size <= 0
+        ):
+            raise ValueError("window_size must be a positive integer.")
+        if self.sigma is not None and (
+            isinstance(self.sigma, (bool, np.bool_))
+            or not isinstance(self.sigma, Real)
+            or not np.isfinite(self.sigma)
+            or self.sigma < 0
+        ):
+            raise ValueError("sigma must be a nonnegative finite number or None.")
+
     @staticmethod
     def _check_input(
         X: np.ndarray,
@@ -315,13 +339,18 @@ class MarchenkoPasturPCADenoiser(BaseEstimator, TransformerMixin):
             (numpy array) X cast to float64.
 
         Raises:
-            ValueError: on wrong number of dimensions or mismatched spatial shape.
+            ValueError: on wrong dimensions, empty or nonfinite input, or
+                mismatched spatial shape.
         """
         X = np.asarray(X, dtype=float)
         if X.ndim != 3:
             raise ValueError(
                 f"X must be a 3-D array (p, height, width), got shape {X.shape}."
             )
+        if X.size == 0:
+            raise ValueError("X must be nonempty in every dimension.")
+        if not np.isfinite(X).all():
+            raise ValueError("X must contain only finite values.")
         if expected_shape is not None:
             _, h, w = X.shape
             if (h, w) != expected_shape:
@@ -393,9 +422,9 @@ class MarchenkoPasturPCADenoiser(BaseEstimator, TransformerMixin):
             f"sigma = {self.sigma:.6g}" if self.sigma is not None
             else f"sigma_estimator = '{self.sigma_estimator}' -> sigma_ = {self.sigma_:.6g}"
         )
-        print(
-            f"Denoising {p} snapshots of size {img_height}x{img_width} "
-            f"({sigma_info}, window_size = {ws})."
+        _logger.info(
+            "Denoising %s snapshots of size %sx%s (%s, window_size = %s).",
+            p, img_height, img_width, sigma_info, ws,
         )
 
         # Running sum of all denoised patch contributions for each pixel.

@@ -1,7 +1,7 @@
 """
     Miscellaneous - useful functions
 """
-from typing import Tuple, Union, List, Callable
+from typing import Tuple, Union, List, Callable, Optional
 import logging
 import numpy as np
 import matplotlib.pyplot as plt
@@ -11,9 +11,9 @@ def plot_func(
     interval: Tuple,
     func: Callable,
     num_x_vals: int = 1000,
-    plot_title: str = None,
-    plot_ylabel: str = None,
-    savefig_path: str = None,
+    plot_title: Optional[str] = None,
+    plot_ylabel: Optional[str] = None,
+    savefig_path: Optional[str] = None,
 ) -> None:
     """Plots a given 1D function (callable) within the provided interval.
 
@@ -68,8 +68,8 @@ def relu(x: Union[float,np.ndarray]):
 
 def indicator(
     x: float,
-    start: float = None,
-    stop: float = None,
+    start: Optional[float] = None,
+    stop: Optional[float] = None,
     inclusive: str = "both"
 ) -> np.ndarray:
     r"""Element-wise indicator function within a real interval.
@@ -108,7 +108,7 @@ def indicator(
             condition = np.logical_and(condition, (x <= stop))
         elif inclusive in ["neither", "left"]:
             condition = np.logical_and(condition, (x < stop))
-    elif stop:
+    elif stop is not None:
         if inclusive in ["both", "right"]:
             condition = x <= stop
         elif inclusive in ["neither", "left"]:
@@ -139,19 +139,5 @@ def get_bins_centers_and_contour(bin_edges: List[float]) -> List[float]:
 
 
 def get_logger(logger_name: str) -> logging.Logger:
-    """Get a pre-configured logger
-    """
-    log_formatter = logging.Formatter(
-        "[{levelname: <7} - {module: >10}]: {message}", style='{'
-    )
-    log_level = logging.INFO
-
-    handler = logging.StreamHandler()
-    handler.setFormatter(log_formatter)
-    handler.setLevel(log_level)
-
-    logger = logging.getLogger(logger_name)
-    logger.setLevel(log_level)
-    logger.addHandler(handler)
-
-    return logger
+    """Get a logger without changing application logging configuration."""
+    return logging.getLogger(logger_name)

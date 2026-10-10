@@ -7,7 +7,7 @@ and Manova Quaternion Ensemble.
 
 """
 
-from typing import Union, Sequence, Tuple
+from typing import Union, Sequence, Tuple, Optional
 import numpy as np
 from scipy import special
 
@@ -69,7 +69,14 @@ class ManovaEnsemble(BaseEnsemble):
 
     """
 
-    def __init__(self, beta: int, m: int, n1: int, n2: int, random_state: int = None) -> None:
+    def __init__(
+        self,
+        beta: int,
+        m: int,
+        n1: int,
+        n2: int,
+        random_state: Optional[int] = None,
+    ) -> None:
         """Constructor for ManovaEnsemble class.
 
         Initializes an instance of this class with the given parameters.
@@ -102,7 +109,7 @@ class ManovaEnsemble(BaseEnsemble):
             beta=self.beta, ratio_a=self.n1/self.m, ratio_b=self.n2/self.m
         )
 
-    def resample(self, random_state: int = None) -> np.ndarray:
+    def resample(self, random_state: Optional[int] = None) -> np.ndarray:
         """Re-samples new Manova Ensemble random matrix.
 
         It re-samples a new random matrix from the Manova ensemble. This is an alias
@@ -123,7 +130,7 @@ class ManovaEnsemble(BaseEnsemble):
         return self.sample(random_state=random_state)
 
     # pylint: disable=inconsistent-return-statements
-    def sample(self, random_state: int = None) -> np.ndarray:
+    def sample(self, random_state: Optional[int] = None) -> np.ndarray:
         """Samples new Manova Ensemble random matrix.
 
         The sampling algorithm depends on the specification of
@@ -259,7 +266,7 @@ class ManovaEnsemble(BaseEnsemble):
         interval: Tuple = (0,1),
         density: bool = False,
         normalize: bool = False,
-        savefig_path: str = None,
+        savefig_path: Optional[str] = None,
     ) -> None:
         """Computes and plots the histogram of the matrix eigenvalues
 
@@ -304,7 +311,7 @@ class ManovaEnsemble(BaseEnsemble):
             avoid_img=True,
         )
 
-    def joint_eigval_pdf(self, eigvals: np.ndarray = None) -> float:
+    def joint_eigval_pdf(self, eigvals: Optional[np.ndarray] = None) -> float:
         '''Computes joint eigenvalue pdf.
 
         Calculates joint eigenvalue probability density function given an array of
