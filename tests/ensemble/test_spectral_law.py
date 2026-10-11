@@ -1373,31 +1373,6 @@ def test_indicator_func_except():
         _ = indicator(2.0, start=2.0, inclusive="foo")
 
 
-def test_empirical_plot_show_and_warning_path(law_name, monkeypatch):
-    """Test empirical plots without saving and the warning path."""
-    monkeypatch.setattr("matplotlib.pyplot.show", lambda: None)
-
-    if law_name == "wigner":
-        law = WignerSemicircleDistribution(beta=1)
-    elif law_name == "marchenko":
-        law = MarchenkoPasturDistribution(beta=1, ratio=2)
-    elif law_name == "tracy_widom":
-        law = TracyWidomDistribution(beta=1)
-    else:
-        # Exercises the ratio_a > 1, ratio_b <= 1 branch.
-        law = ManovaSpectrumDistribution(beta=1, ratio_a=2, ratio_b=0.5)
-
-    law.plot_empirical_pdf(
-        sample_size=10,
-        bins=5,
-        interval=(-10, 10),
-        density=False,
-        plot_law_pdf=True,
-        savefig_path=None,
-        random_state=None,
-    )
-
-
 @pytest.mark.parametrize(
     "law_name",
     ["wigner", "marchenko", "tracy_widom", "manova"],
