@@ -1371,3 +1371,187 @@ def test_indicator_func_except():
 
     with pytest.raises(ValueError):
         _ = indicator(2.0, start=2.0, inclusive="foo")
+
+
+def test_empirical_plot_show_and_warning_path(law_name, monkeypatch):
+    """Test empirical plots without saving and the warning path."""
+    monkeypatch.setattr("matplotlib.pyplot.show", lambda: None)
+
+    if law_name == "wigner":
+        law = WignerSemicircleDistribution(beta=1)
+    elif law_name == "marchenko":
+        law = MarchenkoPasturDistribution(beta=1, ratio=2)
+    elif law_name == "tracy_widom":
+        law = TracyWidomDistribution(beta=1)
+    else:
+        # Exercises the ratio_a > 1, ratio_b <= 1 branch.
+        law = ManovaSpectrumDistribution(beta=1, ratio_a=2, ratio_b=0.5)
+
+    law.plot_empirical_pdf(
+        sample_size=10,
+        bins=5,
+        interval=(-10, 10),
+        density=False,
+        plot_law_pdf=True,
+        savefig_path=None,
+        random_state=None,
+    )
+
+
+@pytest.mark.parametrize(
+    "law_name",
+    ["wigner", "marchenko", "tracy_widom", "manova"],
+)
+def test_empirical_plot_show_and_warning_path_parameterized(law_name, monkeypatch):
+    """Test empirical plotting branches for all spectral distributions."""
+    monkeypatch.setattr("matplotlib.pyplot.show", lambda: None)
+
+    if law_name == "wigner":
+        law = WignerSemicircleDistribution(beta=1)
+    elif law_name == "marchenko":
+        law = MarchenkoPasturDistribution(beta=1, ratio=2)
+    elif law_name == "tracy_widom":
+        law = TracyWidomDistribution(beta=1)
+    else:
+        law = ManovaSpectrumDistribution(
+            beta=1, ratio_a=2, ratio_b=0.5
+        )
+
+    law.plot_empirical_pdf(
+        sample_size=10,
+        bins=5,
+        interval=(-10, 10),
+        density=False,
+        plot_law_pdf=True,
+        savefig_path=None,
+        random_state=None,
+    )
+
+
+def test_msd_init_rejects_nonpositive_second_ratio():
+    """Test the invalid ratio_b branch independently."""
+    with pytest.raises(ValueError):
+        ManovaSpectrumDistribution(
+            ratio_a=1, ratio_b=0, beta=1
+        )
+
+
+def test_msd_internal_pdf_cdf_scalar_and_array_paths():
+    """Test scalar and array inputs to the Manova PDF and CDF."""
+    msd = ManovaSpectrumDistribution(
+        beta=1, ratio_a=3, ratio_b=3
+    )
+
+    middle = (msd.lambda_minus + msd.lambda_plus) / 2
+    values = np.array([
+        msd.lambda_minus,
+        middle,
+        msd.lambda_plus,
+    ])
+
+    # Scalar input paths.
+    assert msd._pdf(middle) > 0
+    assert msd._cdf(middle) > 0
+
+    # Array input paths, including both support boundaries.
+    pdf_values = msd._pdf(values)
+    cdf_values = msd._cdf(values)
+
+    assert pdf_values[0] == 0.0
+    assert pdf_values[1] > 0.0
+    assert pdf_values[2] == 0.0
+
+    assert cdf_values[0] == 0.0
+    assert cdf_values[1] > 0.0
+    assert cdf_values[2] == 1.0
+
+
+def test_twd_normalize_eigvals_beta_paths():
+    """Test the normalization formulas for each beta value."""
+    twd = TracyWidomDistribution(beta=2)
+    eigvals = np.array([3.0, 4.0])
+    matrix_size = 9
+
+    for other_beta in (None, 1, 2, 4):
+        beta = twd.beta if other_beta is None else other_beta
+        eigval_scale = 1.0 / np.sqrt(beta)
+        size_scale = 1.0 if beta in (1, 2) else 1.0 / np.sqrt(2)
+
+        expected = (
+            size_scale
+            * matrix_size**(1 / 6)
+            * (eigval_scale * eigvals - 2.0 * np.sqrt(matrix_size))
+        )
+
+        actual = twd._normalize_eigvals(
+            max_eigvals=eigvals,
+            matrix_size=matrix_size,
+            other_beta=other_beta,
+        )
+
+        np.testing.assert_allclose(actual, expected)
+
+
+def test_twd_plot_ensemble_max_eigvals_show(monkeypatch):
+    """Test maximum eigenvalue plotting without saving a figure."""
+    monkeypatch.setattr("matplotlib.pyplot.show", lambda: None)
+
+    twd = TracyWidomDistribution(beta=2)
+    ensemble = GaussianEnsemble(beta=2, n=8)
+
+    twd.plot_ensemble_max_eigvals(
+        ensemble=ensemble,
+        n_eigvals=2,
+        bins=5,
+        random_state=None,
+        savefig_path=None,
+    )
+
+
+@pytest.mark.parametrize("law_name", ["marchenko", "manova"])
+def test_empirical_plot_ylim_fallback(law_name, monkeypatch):
+    """Exercise the ValueError fallback in empirical plot y-axis limits."""
+    import skrmt.ensemble.spectral_law as spectral_law
+
+    if law_name == "marchenko":
+        law = MarchenkoPasturDistribution(beta=1, ratio=2)
+    else:
+        law = ManovaSpectrumDistribution(
+            beta=1, ratio_a=2, ratio_b=0.5
+        )
+
+    monkeypatch.setattr(
+        spectral_law.plt, "bar", lambda *args, **kwargs: None
+    )
+    monkeypatch.setattr(
+        spectral_law.plt, "show", lambda: None
+    )
+
+    original_histogram = np.histogram
+    original_max = np.max
+
+    def force_max_error_once(*args, **kwargs):
+        # Restore np.max before raising so the fallback can run normally.
+        monkeypatch.setattr(spectral_law.np, "max", original_max)
+        raise ValueError("Exercise the fallback branch")
+
+    def histogram_then_force_error(*args, **kwargs):
+        result = original_histogram(*args, **kwargs)
+        # Force the exception specifically when calculating the y-axis limit.
+        monkeypatch.setattr(
+            spectral_law.np, "max", force_max_error_once
+        )
+        return result
+
+    monkeypatch.setattr(
+        spectral_law.np, "histogram", histogram_then_force_error
+    )
+
+    law.plot_empirical_pdf(
+        sample_size=10,
+        bins=10,
+        density=False,
+        plot_law_pdf=False,
+        savefig_path=None,
+        random_state=1,
+    )

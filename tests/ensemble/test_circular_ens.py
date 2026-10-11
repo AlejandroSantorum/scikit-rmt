@@ -172,3 +172,73 @@ def test_beta4_joint_eigval_pdf():
 
     cse.matrix = 10*np.eye(n_size)
     assert cse.joint_eigval_pdf() == 0.0
+
+
+##########################################
+### General tests for CircularEnsemble
+
+def test_resample_random_state_and_cache_reset():
+    """Test resampling with a random seed and clearing cached eigenvalues."""
+    cue = CircularEnsemble(beta=2, n=3, random_state=42)
+
+    cue.eigvals()
+    assert cue._eigvals is not None
+
+    sampled_matrix = cue.resample(random_state=10)
+    expected = CircularEnsemble(beta=2, n=3, random_state=10)
+
+    assert_array_equal(sampled_matrix, expected.matrix)
+    assert cue._eigvals is None
+
+
+def test_eigvals_cache_and_normalization():
+    """Test cached eigenvalues and normalized eigenvalues."""
+    cue = CircularEnsemble(beta=2, n=4, random_state=42)
+
+    vals = cue.eigvals()
+
+    # Use cached eigenvalues.
+    assert_array_equal(cue.eigvals(), vals)
+
+    # Test normalization.
+    normalized_vals = cue.eigvals(normalize=True)
+    assert_almost_equal(
+        normalized_vals,
+        vals * cue.eigval_norm_const,
+    )
+
+
+def test_invalid_beta():
+    """Test sampling with an unsupported beta value."""
+    ensemble = CircularEnsemble(beta=3, n=2)
+
+    # sample() returns None when beta is not 1, 2, or 4.
+    assert ensemble.matrix is None
+
+
+def test_build_j_mtx():
+    """Test construction of the matrix used to sample CSE matrices."""
+    cse = CircularEnsemble(beta=4, n=3)
+
+    expected = np.array([
+        [0, -1,  0,  0,  0,  0],
+        [1,  0,  0,  0,  0,  0],
+        [0,  0,  0, -1,  0,  0],
+        [0,  0,  1,  0,  0,  0],
+        [0,  0,  0,  0,  0, -1],
+        [0,  0,  0,  0,  1,  0],
+    ])
+
+    assert_array_equal(cse._build_j_mtx(), expected)
+
+
+def test_joint_eigval_pdf_with_supplied_eigenvalues():
+    """Test the joint PDF using explicitly supplied distinct eigenvalues."""
+    cue = CircularEnsemble(beta=2, n=3, random_state=42)
+
+    vals = np.array([0.0, 0.4, 1.1])
+    pdf = cue.joint_eigval_pdf(eigvals=vals)
+
+    # Distinct values produce a nonzero product in the PDF calculation.
+    assert pdf > 0.0
+    assert np.isfinite(pdf)

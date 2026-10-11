@@ -45,6 +45,112 @@ def test_beta1_joint_eigval_pdf():
     assert mre.joint_eigval_pdf() == 0.0
 
 
+def test_manova_resample_random_state_and_cache():
+    """Test reproducible resampling and resetting cached eigenvalues."""
+    mre = ManovaEnsemble(
+        beta=1, m=3, n1=5, n2=8, random_state=123
+    )
+
+    mre.eigvals()
+    assert mre._eigvals is not None
+
+    sampled_matrix = mre.resample(random_state=42)
+
+    expected = ManovaEnsemble(
+        beta=1, m=3, n1=5, n2=8, random_state=42
+    )
+
+    assert_almost_equal(sampled_matrix, expected.matrix)
+    assert mre._eigvals is None
+
+
+def test_manova_eigvals_cache_and_normalization():
+    """Test cached eigenvalues and normalized eigenvalues."""
+    mre = ManovaEnsemble(
+        beta=1, m=3, n1=5, n2=8, random_state=123
+    )
+
+    vals = mre.eigvals()
+
+    # Exercise the cached eigenvalue path.
+    assert_almost_equal(mre.eigvals(), vals)
+
+    # Exercise the normalized eigenvalue path.
+    normalized_vals = mre.eigvals(normalize=True)
+    assert_almost_equal(
+        normalized_vals,
+        vals * mre.eigval_norm_const,
+    )
+
+
+def test_manova_invalid_beta():
+    """Test sampling with an unsupported beta."""
+    mre = ManovaEnsemble(
+        beta=1, m=3, n1=5, n2=8, random_state=123
+    )
+
+    mre.beta = 3
+
+    # No sampling method matches beta=3, so sample returns None.
+    assert mre.sample(random_state=42) is None
+
+
+def test_manova_plot_eigval_hist_delegation(monkeypatch):
+    """Test delegation to the base class plotting methods."""
+    mre = ManovaEnsemble(
+        beta=1, m=3, n1=5, n2=8, random_state=123
+    )
+
+    base_class = ManovaEnsemble.__mro__[1]
+    hist_calls = {}
+    plot_calls = {}
+
+    def fake_hist(self, **kwargs):
+        hist_calls.update(kwargs)
+
+    def fake_plot(self, **kwargs):
+        plot_calls.update(kwargs)
+
+    # Test the protected plotting wrapper.
+    monkeypatch.setattr(base_class, "_plot_eigval_hist", fake_hist)
+
+    mre._plot_eigval_hist(
+        bins=10,
+        interval=(0, 1),
+        density=True,
+        normalize=True,
+        avoid_img=False,
+    )
+
+    assert hist_calls == {
+        "bins": 10,
+        "interval": (0, 1),
+        "density": True,
+        "normalize": True,
+        "avoid_img": False,
+    }
+
+    # Test the public plotting wrapper.
+    monkeypatch.setattr(base_class, "plot_eigval_hist", fake_plot)
+
+    mre.plot_eigval_hist(
+        bins=10,
+        interval=(0, 1),
+        density=True,
+        normalize=True,
+        savefig_path="test_manova.png",
+    )
+
+    assert plot_calls == {
+        "bins": 10,
+        "interval": (0, 1),
+        "density": True,
+        "normalize": True,
+        "savefig_path": "test_manova.png",
+        "avoid_img": True,
+    }
+
+
 ##########################################
 ### Manova Complex Ensemble = MCE
 
@@ -90,3 +196,22 @@ def test_manova_quatern_init():
                 0.05675906-0.06962803j, 0.30129103+0.01333821j]]
 
     assert_almost_equal(mqe.matrix, np.array(mtx_sol), decimal=7)
+
+
+def test_manova_joint_eigval_pdf_all_betas():
+    """Test the joint PDF using explicitly supplied eigenvalues."""
+    eigvals = np.array([0.2, 0.45, 0.8])
+
+    for beta in (1, 2, 4):
+        ensemble = ManovaEnsemble(
+            beta=beta,
+            m=3,
+            n1=6,
+            n2=7,
+            random_state=123,
+        )
+
+        pdf = ensemble.joint_eigval_pdf(eigvals=eigvals)
+
+        assert np.isfinite(pdf)
+        assert pdf > 0.0
