@@ -4,6 +4,7 @@ Testing BaseEnsemble abstract class
 '''
 
 import os
+from unittest.mock import patch
 import pytest
 
 from skrmt.ensemble.base_ensemble import BaseEnsemble
@@ -76,3 +77,21 @@ def test_base_ens_plot_eigval_hist_raises():
     goe = GaussianEnsemble(beta=1, n=10, tridiagonal_form=False)
     with pytest.raises(ValueError):
         goe.plot_eigval_hist(bins=10, interval="invalid interval type")
+
+
+def test_base_ens_eigval_hist_valid_interval_and_avoid_img():
+    """Testing eigval_hist with a valid tuple interval and avoid_img=True.
+    """
+    goe = GaussianEnsemble(beta=1, n=5, tridiagonal_form=False)
+    observed, bin_edges = goe.eigval_hist(bins=5, interval=(-3.0, 3.0), avoid_img=True)
+    assert len(observed) == 5
+    assert len(bin_edges) == 6
+
+
+@patch("skrmt.ensemble.base_ensemble.plt.show")
+def test_base_ens_plot_eigval_hist_density_and_show(mock_show):
+    """Testing plot_eigval_hist with density=True and savefig_path=None (plt.show).
+    """
+    goe = GaussianEnsemble(beta=1, n=5, tridiagonal_form=False)
+    goe.plot_eigval_hist(bins=5, density=True, savefig_path=None)
+    mock_show.assert_called_once()

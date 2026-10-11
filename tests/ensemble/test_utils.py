@@ -4,9 +4,11 @@ Testing utils sub-module
 '''
 import logging
 import os
+from unittest.mock import patch
 import pytest
 
 from skrmt.ensemble.gaussian_ensemble import GaussianEnsemble
+from skrmt.ensemble.wishart_ensemble import WishartEnsemble
 from skrmt.ensemble.misc import get_logger
 from skrmt.ensemble.utils import (
     plot_spectral_hist_and_law,
@@ -57,6 +59,17 @@ class TestUtils:
         )
         assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name))
 
+    @patch("skrmt.ensemble.utils.plt.show")
+    def test_plot_spectral_hist_and_law_show(self, mock_show):
+        """Testing plot_spectral_hist_and_law branch where savefig_path is None (plt.show)."""
+        wre = WishartEnsemble(beta=1, p=5, n=10, random_state=1)
+        plot_spectral_hist_and_law(
+            ensemble=wre,
+            bins=10,
+            savefig_path=None,
+        )
+        mock_show.assert_called_once()
+
     def test_standard_vs_tridiag_hist(self):
         """Testing plotting the spectral histogram of a random matrix ensemble
         in its standard form vs its corresponding tridiagonal form.
@@ -71,3 +84,15 @@ class TestUtils:
             savefig_path=TMP_DIR_PATH+"/"+fig_name
         )
         assert os.path.isfile(os.path.join(TMP_DIR_PATH, fig_name))
+
+    @patch("skrmt.ensemble.utils.plt.show")
+    def test_standard_vs_tridiag_hist_show(self, mock_show):
+        """Testing standard_vs_tridiag_hist branch where savefig_path is None using WishartEnsemble."""
+        wre = WishartEnsemble(beta=2, p=4, n=8, random_state=1)
+        standard_vs_tridiag_hist(
+            ensemble=wre,
+            bins=10,
+            random_state=1,
+            savefig_path=None
+        )
+        mock_show.assert_called_once()
