@@ -240,12 +240,12 @@ class BaseEnsemble(metaclass=ABCMeta):
                 by the default normalization constant (see references). Defaults to False,
                 i.e., the eigenvalues are normalized. Normalization makes the eigenvalues
                 to be in the same support independently of the sample size.
+            savefig_path (string, default=None): path to save the created figure. If it is not
+                provided, the plot is shown at the end of the routine.
             avoid_img (bool, default=False): If True, eigenvalue imaginary part is ignored.
                 This should be used when the eigenvalue compatation is expected to generate
                 complex eigenvalues with really small imaginary part because of computing
                 rounding errors. E.g.: MANOVA Ensemble eigenvalues.
-            savefig_path (string, default=None): path to save the created figure. If it is not
-                provided, the plot is shown at the end of the routine.
 
         References:
             - Albrecht, J. and Chan, C.P. and Edelman, A.

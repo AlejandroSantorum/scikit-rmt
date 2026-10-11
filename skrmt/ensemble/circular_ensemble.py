@@ -250,6 +250,7 @@ class CircularEnsemble(BaseEnsemble):
         density: bool = False,
         normalize: bool = False,
         savefig_path: Optional[str] = None,
+        avoid_img: bool = False,
     ) -> None:  # pragma: no cover
         """Computes and plots the histogram of the matrix eigenvalues.
 
