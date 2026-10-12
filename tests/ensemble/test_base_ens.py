@@ -4,39 +4,21 @@ Testing BaseEnsemble abstract class
 '''
 
 import os
-import shutil
+from unittest.mock import patch
 import pytest
 
 from skrmt.ensemble.base_ensemble import BaseEnsemble
 from skrmt.ensemble.gaussian_ensemble import GaussianEnsemble
 
 
-TMP_DIR_PATH = os.path.join(os.getcwd(), "skrmt/ensemble/tests/tmp")
+TMP_DIR_PATH = None
 
 
 @pytest.fixture(scope="module", autouse=True)
-def _setup_tmp_dir(request):
-    '''Function that is run before all tests in this script.
-
-    It creates a temporary folder in order to store useful files
-    for the following tests.
-    '''
-    # if the directory already exists, it is deleted
-    if os.path.exists(TMP_DIR_PATH):
-        shutil.rmtree(TMP_DIR_PATH)
-    # creating temporary directory
-    os.mkdir(TMP_DIR_PATH)
-
-    # specifying a function that will be run after all tests are completed
-    request.addfinalizer(_remove_tmp_dir)
-
-
-def _remove_tmp_dir():
-    '''Function that removes the created temporary directory.
-
-    The function is run when all tests in this module are completed.
-    '''
-    shutil.rmtree(TMP_DIR_PATH)
+def _setup_tmp_dir(tmp_path_factory):
+    '''Create a pytest-managed directory for this module's plot files.'''
+    global TMP_DIR_PATH
+    TMP_DIR_PATH = str(tmp_path_factory.mktemp("base_ensemble"))
 
 
 def test_init_exception():
@@ -95,3 +77,21 @@ def test_base_ens_plot_eigval_hist_raises():
     goe = GaussianEnsemble(beta=1, n=10, tridiagonal_form=False)
     with pytest.raises(ValueError):
         goe.plot_eigval_hist(bins=10, interval="invalid interval type")
+
+
+def test_base_ens_eigval_hist_valid_interval_and_avoid_img():
+    """Testing eigval_hist with a valid tuple interval and avoid_img=True.
+    """
+    goe = GaussianEnsemble(beta=1, n=5, tridiagonal_form=False)
+    observed, bin_edges = goe.eigval_hist(bins=5, interval=(-3.0, 3.0), avoid_img=True)
+    assert len(observed) == 5
+    assert len(bin_edges) == 6
+
+
+@patch("skrmt.ensemble.base_ensemble.plt.show")
+def test_base_ens_plot_eigval_hist_density_and_show(mock_show):
+    """Testing plot_eigval_hist with density=True and savefig_path=None (plt.show).
+    """
+    goe = GaussianEnsemble(beta=1, n=5, tridiagonal_form=False)
+    goe.plot_eigval_hist(bins=5, density=True, savefig_path=None)
+    mock_show.assert_called_once()

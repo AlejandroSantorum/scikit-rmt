@@ -6,6 +6,7 @@ Tests for skrmt.denoise.mp_pca, targeting 100% line coverage.
 # pylint: disable=missing-function-docstring  # test method names are self-describing
 # pylint: disable=protected-access  # unit tests legitimately exercise private static methods
 
+import logging
 from unittest.mock import patch
 
 import pytest
@@ -172,6 +173,18 @@ class TestCheckInput:
         out = MarchenkoPasturPCADenoiser._check_input(X, expected_shape=(8, 8))
         assert out.shape == (3, 8, 8)
 
+    @pytest.mark.parametrize("shape", [(0, 8, 8), (3, 0, 8), (3, 8, 0)])
+    def test_empty_input_raises(self, shape):
+        with pytest.raises(ValueError, match="nonempty"):
+            MarchenkoPasturPCADenoiser._check_input(np.empty(shape))
+
+    @pytest.mark.parametrize("value", [np.nan, np.inf, -np.inf])
+    def test_nonfinite_input_raises(self, value):
+        X = np.ones((3, 8, 8))
+        X[0, 0, 0] = value
+        with pytest.raises(ValueError, match="finite"):
+            MarchenkoPasturPCADenoiser._check_input(X)
+
 
 ##########################################
 ### MarchenkoPasturPCADenoiser fit()
@@ -182,6 +195,59 @@ class TestFit:
     def test_fit_returns_self(self, small_stack):
         d = MarchenkoPasturPCADenoiser(sigma=2.0, window_size=4)
         assert d.fit(small_stack) is d
+
+    def test_fit_accepts_y_keyword(self, small_stack):
+        d = MarchenkoPasturPCADenoiser(sigma=2.0, window_size=4)
+        assert d.fit(small_stack, y=np.zeros(4)) is d
+
+    def test_fit_accepts_zero_sigma(self, small_stack):
+        d = MarchenkoPasturPCADenoiser(sigma=0, window_size=4)
+        d.fit(small_stack)
+        assert d.sigma_ == 0.0
+        assert d.lambda_plus_ == 0.0
+
+    def test_fit_accepts_numpy_numeric_parameters(self, small_stack):
+        d = MarchenkoPasturPCADenoiser(sigma=np.float32(2), window_size=np.int64(4))
+        assert d.fit(small_stack) is d
+
+    @pytest.mark.parametrize("parameter, value", [
+        ("window_size", 0),
+        ("window_size", -1),
+        ("window_size", 1.5),
+        ("window_size", True),
+        ("window_size", np.bool_(True)),
+        ("window_size", "4"),
+        ("window_size", None),
+        ("sigma", -1.0),
+        ("sigma", np.nan),
+        ("sigma", np.inf),
+        ("sigma", -np.inf),
+        ("sigma", True),
+        ("sigma", "2.0"),
+        ("sigma", 1 + 0j),
+    ])
+    def test_invalid_parameters_fail_before_numerical_work(self, small_stack, parameter, value):
+        d = MarchenkoPasturPCADenoiser(sigma=2.0, window_size=4)
+        d.set_params(**{parameter: value})
+        with patch("skrmt.denoise.mp_pca.np.linalg.svd") as svd:
+            with patch("skrmt.denoise.mp_pca.WishartEnsemble") as ensemble:
+                with pytest.raises(ValueError, match=parameter):
+                    d.fit(small_stack)
+                svd.assert_not_called()
+                ensemble.assert_not_called()
+
+    @pytest.mark.parametrize("X, message", [
+        (np.empty((0, 8, 8)), "nonempty"),
+        (np.full((3, 8, 8), np.nan), "finite"),
+    ])
+    def test_invalid_input_fails_before_numerical_work(self, X, message):
+        d = MarchenkoPasturPCADenoiser(window_size=4)
+        with patch("skrmt.denoise.mp_pca.np.linalg.svd") as svd:
+            with patch("skrmt.denoise.mp_pca.WishartEnsemble") as ensemble:
+                with pytest.raises(ValueError, match=message):
+                    d.fit(X)
+                svd.assert_not_called()
+                ensemble.assert_not_called()
 
     def test_fit_sets_fitted_attributes(self, small_stack):
         d = MarchenkoPasturPCADenoiser(sigma=2.0, window_size=4)
@@ -253,6 +319,25 @@ class TestTransform:
         with pytest.raises(ValueError, match="Spatial dimensions"):
             d.transform(X_wrong)
 
+    def test_transform_validates_updated_parameters(self, small_stack):
+        d = MarchenkoPasturPCADenoiser(sigma=2.0, window_size=4).fit(small_stack)
+        d.set_params(window_size=0)
+        with patch.object(d, "_denoise_patch") as denoise_patch:
+            with pytest.raises(ValueError, match="window_size"):
+                d.transform(small_stack)
+            denoise_patch.assert_not_called()
+
+    @pytest.mark.parametrize("X, message", [
+        (np.empty((0, 8, 8)), "nonempty"),
+        (np.full((4, 8, 8), np.inf), "finite"),
+    ])
+    def test_transform_rejects_invalid_input(self, small_stack, X, message):
+        d = MarchenkoPasturPCADenoiser(sigma=2.0, window_size=4).fit(small_stack)
+        with patch.object(d, "_denoise_patch") as denoise_patch:
+            with pytest.raises(ValueError, match=message):
+                d.transform(X)
+            denoise_patch.assert_not_called()
+
     def test_window_exceeds_img_height_raises(self, small_stack):
         """window_size > img_height triggers the guard in _sliding_window_denoise."""
         d = MarchenkoPasturPCADenoiser(sigma=2.0, window_size=100)
@@ -269,19 +354,21 @@ class TestTransform:
         with pytest.raises(ValueError, match="window_size"):
             d.transform(X)
 
-    def test_sigma_info_branch_explicit_sigma(self, small_stack, capsys):
-        """When sigma is provided explicitly, _sliding_window_denoise prints 'sigma = ...'."""
+    def test_sigma_info_branch_explicit_sigma(self, small_stack, caplog, capsys):
+        """Explicit sigma is logged without printing to stdout."""
+        caplog.set_level(logging.INFO, logger="skrmt.denoise.mp_pca")
         d = MarchenkoPasturPCADenoiser(sigma=2.0, window_size=4)
         d.fit_transform(small_stack)
-        captured = capsys.readouterr()
-        assert "sigma = 2" in captured.out
+        assert "sigma = 2" in caplog.text
+        assert capsys.readouterr().out == ""
 
-    def test_sigma_info_branch_estimated_sigma(self, small_stack, capsys):
-        """When sigma=None, _sliding_window_denoise prints 'sigma_estimator = ...'."""
+    def test_sigma_info_branch_estimated_sigma(self, small_stack, caplog, capsys):
+        """Estimated sigma is logged without printing to stdout."""
+        caplog.set_level(logging.INFO, logger="skrmt.denoise.mp_pca")
         d = MarchenkoPasturPCADenoiser(sigma_estimator="median", window_size=4)
         d.fit_transform(small_stack)
-        captured = capsys.readouterr()
-        assert "sigma_estimator" in captured.out
+        assert "sigma_estimator" in caplog.text
+        assert capsys.readouterr().out == ""
 
     def test_pure_noise_is_suppressed(self):
         """Denoising a pure-noise stack should reduce its variance."""

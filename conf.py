@@ -11,10 +11,10 @@
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
 import os
-import re
 import sys
 sys.path.insert(0, os.path.abspath('.'))
-sys.path.append('skrmt')
+
+from skrmt import __version__
 
 
 # -- Project information -----------------------------------------------------
@@ -24,18 +24,7 @@ copyright = '2021, Alejandro Santorum Varela'
 author = 'Alejandro Santorum Varela'
 
 # The full version, including alpha/beta/rc tags
-VERSION_FILEPATH = "skrmt/_version.py"
-with open(
-    os.path.join(os.path.dirname(__file__), VERSION_FILEPATH),
-    "r",
-) as version_file:
-    version_file_text = version_file.read()
-    VSRE = r"^__version__ = ['\"]([^'\"]*)['\"]"
-    match = re.search(VSRE, version_file_text, re.M)
-    if match:
-        release = match.group(1)
-    else:
-        raise RuntimeError(f"Unable to find version in {VERSION_FILEPATH}.")
+release = __version__
 
 # -- General configuration ---------------------------------------------------
 

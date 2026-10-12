@@ -7,7 +7,7 @@ Gaussian Unitary Ensemble (GUE) and Gaussian Symplectic Ensemble (GSE).
 
 """
 
-from typing import Union, Sequence, Tuple
+from typing import Union, Sequence, Tuple, Optional
 import numpy as np
 from scipy import sparse, special
 
@@ -66,7 +66,7 @@ class GaussianEnsemble(BaseEnsemble):
         n: int,
         tridiagonal_form: bool = False,
         sigma: float = 1.0,
-        random_state: int = None,
+        random_state: Optional[int] = None,
     ) -> None:
         """Constructor for GaussianEnsemble class.
 
@@ -116,7 +116,11 @@ class GaussianEnsemble(BaseEnsemble):
         # scikit-rmt class implementing the corresponding spectral law
         self._law_class = WignerSemicircleDistribution(beta=self.beta, center=0.0, sigma=self.sigma)
 
-    def resample(self, tridiagonal_form: bool = None, random_state: int = None) -> np.ndarray:
+    def resample(
+        self,
+        tridiagonal_form: Optional[bool] = None,
+        random_state: Optional[int] = None,
+    ) -> np.ndarray:
         """Re-samples a random matrix from the Gaussian ensemble with the specified form.
 
         It re-samples a random matrix from the Gaussian ensemble with the specified form.
@@ -148,7 +152,7 @@ class GaussianEnsemble(BaseEnsemble):
         return self.sample(random_state=random_state)
 
     # pylint: disable=inconsistent-return-statements
-    def sample(self, random_state: int = None) -> np.ndarray:
+    def sample(self, random_state: Optional[int] = None) -> np.ndarray:
         """Samples new Gaussian Ensemble random matrix.
 
         The sampling algorithm depends on the specification of
@@ -284,7 +288,7 @@ class GaussianEnsemble(BaseEnsemble):
     def eigval_hist(
         self,
         bins: Union[int, Sequence],
-        interval: Tuple = None,
+        interval: Optional[Tuple] = None,
         density: bool = False,
         normalize: bool = False,
         avoid_img: bool = False,
@@ -313,10 +317,10 @@ class GaussianEnsemble(BaseEnsemble):
     def plot_eigval_hist(
         self,
         bins: Union[int, Sequence] = 100,
-        interval: Tuple = None,
+        interval: Optional[Tuple] = None,
         density: bool = False,
         normalize: bool = False,
-        savefig_path: str = None,
+        savefig_path: Optional[str] = None,
     ) -> None:
         """Computes and plots the histogram of the matrix eigenvalues.
 
@@ -363,7 +367,7 @@ class GaussianEnsemble(BaseEnsemble):
             savefig_path=savefig_path,
         )
 
-    def joint_eigval_pdf(self, eigvals: np.ndarray = None) -> float:
+    def joint_eigval_pdf(self, eigvals: Optional[np.ndarray] = None) -> float:
         '''Computes joint eigenvalue pdf.
 
         Calculates joint eigenvalue probability density function given an array of

@@ -7,7 +7,7 @@ supported by inherited classes.
 
 """
 
-from typing import Union, Sequence, Tuple
+from typing import Union, Sequence, Tuple, Optional
 from abc import ABCMeta, abstractmethod
 
 import numpy as np
@@ -54,7 +54,7 @@ class BaseEnsemble(metaclass=ABCMeta):
         return f"<{self.__class__.__name__} shape={matrix_shape}>"
 
     @abstractmethod
-    def sample(self, random_state: int = None) -> np.ndarray:
+    def sample(self, random_state: Optional[int] = None) -> np.ndarray:
         """Samples new random matrix.
 
         The sampling algorithm depends on the inherited classes, so it should be
@@ -72,7 +72,7 @@ class BaseEnsemble(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def resample(self, random_state: int = None) -> np.ndarray:
+    def resample(self, random_state: Optional[int] = None) -> np.ndarray:
         """This is an alias for the method ``sample``. It samples new random matrix.
 
         The sampling algorithm depends on the inherited classes, so it should be
@@ -110,7 +110,7 @@ class BaseEnsemble(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def joint_eigval_pdf(self, eigvals: np.ndarray = None) -> float:
+    def joint_eigval_pdf(self, eigvals: Optional[np.ndarray] = None) -> float:
         # pylint: disable=unnecessary-pass
         # pylint: disable=missing-function-docstring
         # this will be commented at inherited classes
@@ -119,7 +119,7 @@ class BaseEnsemble(metaclass=ABCMeta):
     def eigval_hist(
         self,
         bins: Union[int, Sequence] = 100,
-        interval: Tuple = None,
+        interval: Optional[Tuple] = None,
         density: bool = False,
         normalize: bool = False,
         avoid_img: bool = False,
@@ -208,10 +208,10 @@ class BaseEnsemble(metaclass=ABCMeta):
     def plot_eigval_hist(
         self,
         bins: Union[int, Sequence],
-        interval: Tuple = None,
+        interval: Optional[Tuple] = None,
         density: bool = False,
         normalize: bool = False,
-        savefig_path: str = None,
+        savefig_path: Optional[str] = None,
         avoid_img: bool = False,
     ) -> None:
         """Computes and plots the histogram of the matrix eigenvalues.
@@ -240,12 +240,12 @@ class BaseEnsemble(metaclass=ABCMeta):
                 by the default normalization constant (see references). Defaults to False,
                 i.e., the eigenvalues are normalized. Normalization makes the eigenvalues
                 to be in the same support independently of the sample size.
+            savefig_path (string, default=None): path to save the created figure. If it is not
+                provided, the plot is shown at the end of the routine.
             avoid_img (bool, default=False): If True, eigenvalue imaginary part is ignored.
                 This should be used when the eigenvalue compatation is expected to generate
                 complex eigenvalues with really small imaginary part because of computing
                 rounding errors. E.g.: MANOVA Ensemble eigenvalues.
-            savefig_path (string, default=None): path to save the created figure. If it is not
-                provided, the plot is shown at the end of the routine.
 
         References:
             - Albrecht, J. and Chan, C.P. and Edelman, A.

@@ -6,12 +6,15 @@ include Makefile
 include *.yml
 include *.rst
 include conf.py
-include requirements.txt
+include requirements*.txt
 include .coveragerc
+include pyproject.toml
 recursive-include docs *
 recursive-include examples *
 recursive-include tutorial *
-ecursive-include imgs *
+recursive-include imgs *
+recursive-include tests *.py
 
-recursive-exclude notebooks *
+recursive-exclude simulations *
 recursive-exclude htmlcov *
+global-exclude __pycache__ *.py[cod]

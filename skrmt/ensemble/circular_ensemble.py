@@ -7,7 +7,7 @@ and Circular Symplectic Ensemble (CSE).
 
 """
 
-from typing import Union, Sequence, Tuple
+from typing import Union, Sequence, Tuple, Optional
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy import special
@@ -76,7 +76,7 @@ class CircularEnsemble(BaseEnsemble):
 
     """
 
-    def __init__(self, beta: int, n: int, random_state: int = None) -> None:
+    def __init__(self, beta: int, n: int, random_state: Optional[int] = None) -> None:
         """Constructor for CircularEnsemble class.
 
         Initializes an instance of this class with the given parameters.
@@ -100,7 +100,7 @@ class CircularEnsemble(BaseEnsemble):
         self._eigvals = None
         self.matrix = self.sample(random_state=random_state)
 
-    def resample(self, random_state: int = None) -> np.ndarray:
+    def resample(self, random_state: Optional[int] = None) -> np.ndarray:
         """Re-samples new Circular Ensemble random matrix.
 
         It re-samples a new random matrix from the Circular ensemble. This is an alias
@@ -121,7 +121,7 @@ class CircularEnsemble(BaseEnsemble):
         return self.sample(random_state=random_state)
 
     # pylint: disable=inconsistent-return-statements
-    def sample(self, random_state: int = None) -> np.ndarray:
+    def sample(self, random_state: Optional[int] = None) -> np.ndarray:
         """Samples new Circular Ensemble random matrix.
 
         The sampling algorithm depends on the specification of
@@ -196,6 +196,15 @@ class CircularEnsemble(BaseEnsemble):
         Returns:
             numpy array containing J matrix.
 
+        Example:
+            For n=3, the resulting J matrix is:
+                [[ 0. -1.  0.  0.  0.  0.]
+                [ 1.  0.  0.  0.  0.  0.]
+                [ 0.  0.  0. -1.  0.  0.]
+                [ 0.  0.  1.  0.  0.  0.]
+                [ 0.  0.  0.  0.  0. -1.]
+                [ 0.  0.  0.  0.  1.  0.]]
+
         References:
             - Killip, R. and Zozhan, R.
                 Matrix Models and Eigenvalue Statistics for Truncations of
@@ -206,8 +215,8 @@ class CircularEnsemble(BaseEnsemble):
         """
         size = 2*self.n
         j_mtx = np.zeros((size,size))
-        # selecting indices
-        inds = np.arange(size-1)
+        # selecting indices: step by 2 to create independent 2x2 blocks: [0, 2, 4, ...]
+        inds = np.arange(0, size, 2)
         # selecting upper-diagonal indices
         j_mtx[inds, inds+1] = -1
         # selecting lower-diagonal indices
@@ -228,22 +237,20 @@ class CircularEnsemble(BaseEnsemble):
         if self._eigvals is not None:
             return norm_const * self._eigvals
 
-        if self.beta == 1:
-            # using eigvalsh because it's known all eigenvalues are real
-            self._eigvals = np.linalg.eigvalsh(self.matrix)
-        else:
-            # using eigvals since some eigenvalues could be imaginary
-            self._eigvals = np.linalg.eigvals(self.matrix)
+        # all Circular Ensembles (COE, CUE, CSE) have complex eigenvalues on the unit circle
+        # must use standard eigvals function instead of eigvalsh (which is for Hermitian matrices)
+        self._eigvals = np.linalg.eigvals(self.matrix)
 
         return norm_const * self._eigvals
 
     def plot_eigval_hist(
         self,
-        bins: Union[int, Sequence] = 100,
-        interval: Tuple = None,
+        bins: Optional[Union[int, Sequence]] = None,
+        interval: Optional[Tuple] = None,
         density: bool = False,
         normalize: bool = False,
-        savefig_path: str = None,
+        savefig_path: Optional[str] = None,
+        avoid_img: bool = False,
     ) -> None:  # pragma: no cover
         """Computes and plots the histogram of the matrix eigenvalues.
 
@@ -253,20 +260,17 @@ class CircularEnsemble(BaseEnsemble):
         complex plane next to a heap map to study eigenvalue density.
 
         Args:
-            bins (int or sequence, default=100): If bins is an integer, it defines the number of
-                equal-width bins in the range. If bins is a sequence, it defines the
-                bin edges, including the left edge of the first bin and the right
-                edge of the last bin; in this case, bins may be unequally spaced.
+            bins (int or sequence): Only applicable for real eigenvalues.
+                This argument has no effect for the complex eigenvalues of this class.
+                It is kept for compatibility with the base class.
             interval (tuple, default=None): Delimiters (xmin, xmax) of the histogram.
                 The lower and upper range of the bins. Lower and upper outliers are ignored.
-            density (bool, default=False): If True, draw and return a probability
-                density: each bin will display the bin's raw count divided by the total
-                number of counts and the bin width, so that the area under the histogram
-                integrates to 1. If set to False, the absolute frequencies of the eigenvalues
-                are returned.
+            density (bool, default=False): Only applicable for real eigenvalues.
+                This argument has no effect for the complex eigenvalues of this class.
+                It is kept for compatibility with the base class.
             normalize (bool, default=False): Whether to normalize the computed eigenvalues
                 by the default normalization constant (see references). Defaults to False,
-                i.e., the eigenvalues are normalized. Normalization makes the eigenvalues
+                i.e., the eigenvalues are not normalized. Normalization makes the eigenvalues
                 to be in the same support independently of the sample size.
             savefig_path (string, default=None): path to save the created figure. If it is not
                 provided, the plot is shown at the end of the routine.
@@ -278,36 +282,22 @@ class CircularEnsemble(BaseEnsemble):
                 Communications in Mathematical Physics. 349 (2017): 991-1027.
 
         """
-        # pylint: disable=arguments-differ
-        if self.beta == 1:
-            return super().plot_eigval_hist(
-                bins=bins,
-                interval=interval,
-                density=density,
-                normalize=normalize,
-                savefig_path=savefig_path,
-            )
-
         if (interval is not None) and not isinstance(interval, tuple):
             raise ValueError("interval argument must be a tuple (or None)")
 
-        eigvals = self.eigvals()
+        eigvals = self.eigvals(normalize=normalize)
         xvals = eigvals.real
         yvals = eigvals.imag
 
         if interval is None:
-            rang_val = self.beta/2
-            rang_val += 0.1*rang_val
+            rang_val = 1.1
             rang = ((-rang_val, rang_val), (-rang_val, rang_val))
             extent = [-rang_val, rang_val, -rang_val, rang_val]
         else:
             rang = (interval, interval)
             extent = [interval[0], interval[1], interval[0], interval[1]]
 
-        fig, axes = plt.subplots(nrows=1, ncols=2)
-        fig.set_figheight(5)
-        fig.set_figwidth(13)
-        fig.subplots_adjust(hspace=.5)
+        fig, axes = plt.subplots(nrows=1, ncols=2, figsize=(11, 5), constrained_layout=True)
 
         axes[0].set_xlim(rang[0][0], rang[0][1])
         axes[0].set_ylim(rang[1][0], rang[1][1])
@@ -317,8 +307,9 @@ class CircularEnsemble(BaseEnsemble):
         axes[0].set_xlabel('real')
         axes[0].set_ylabel('imaginary')
 
-        h2d,_,_,img = axes[1].hist2d(xvals, yvals, range=rang,
-                                   cmap=plt.cm.get_cmap('nipy_spectral'))
+        h2d,_,_,img = axes[1].hist2d(
+            xvals, yvals, range=rang, cmap=plt.cm.get_cmap('nipy_spectral'),
+        )
         fig.colorbar(img, ax=axes[1])
         axes[1].cla()
         axes[1].imshow(h2d.transpose(), origin='lower', interpolation="bilinear", extent=extent)
@@ -335,7 +326,7 @@ class CircularEnsemble(BaseEnsemble):
             plt.show()
 
 
-    def joint_eigval_pdf(self, eigvals: np.ndarray = None) -> float:
+    def joint_eigval_pdf(self, eigvals: Optional[np.ndarray] = None) -> float:
         '''Computes joint eigenvalue pdf.
 
         Calculates joint eigenvalue probability density function given an array of
