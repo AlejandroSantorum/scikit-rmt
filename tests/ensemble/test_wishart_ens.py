@@ -33,6 +33,15 @@ def test_tridiagonal_sigma_exception():
     with pytest.raises(ValueError):
         _ = WishartEnsemble(beta=1, p=100, n=300, sigma=2.0, tridiagonal_form=True)
 
+def test_tridiagonal_eigvals():
+    """Test tridiagonal eigvals match dense eigvalsh of the same matrix
+    """
+    for beta in [1, 2, 4]:
+        ens = WishartEnsemble(beta=beta, p=20, n=40, tridiagonal_form=True, random_state=1)
+        ref = np.linalg.eigvalsh(ens.matrix)
+        assert_almost_equal(ens.eigvals(), ref, decimal=7)
+        assert_almost_equal(ens.eigvals(normalize=True), ref*ens.eigval_norm_const, decimal=7)
+
 
 ##########################################
 ### Wishart Real Ensemble = WRE

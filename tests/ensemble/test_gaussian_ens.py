@@ -26,6 +26,15 @@ def test_build_tridiagonal_exception():
     with pytest.raises(ValueError):
         _ = GaussianEnsemble(beta=1, n=100, sigma=2.0, tridiagonal_form=True)
 
+def test_tridiagonal_eigvals():
+    """Test tridiagonal eigvals match dense eigvalsh of the same matrix
+    """
+    for beta in [1, 2, 4]:
+        ens = GaussianEnsemble(beta=beta, n=20, tridiagonal_form=True, random_state=1)
+        ref = np.linalg.eigvalsh(ens.matrix)
+        assert_almost_equal(ens.eigvals(), ref, decimal=7)
+        assert_almost_equal(ens.eigvals(normalize=True), ref*ens.eigval_norm_const, decimal=7)
+
 
 ##########################################
 ### Gaussian Orthogonal Ensemble = GOE

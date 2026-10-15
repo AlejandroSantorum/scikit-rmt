@@ -10,6 +10,7 @@ and Wishart Quaternion Ensemble.
 from typing import Union, Sequence, Tuple, Optional
 import numpy as np
 from scipy import sparse, special
+from scipy.linalg import eigvalsh_tridiagonal
 
 from .base_ensemble import BaseEnsemble
 from .tridiagonal_utils import tridiag_eigval_hist
@@ -295,7 +296,8 @@ class WishartEnsemble(BaseEnsemble):
         """Computes the random matrix eigenvalues.
 
         Calculates the random matrix eigenvalues using numpy standard procedure.
-        If the matrix ensemble is symmetric, a faster algorithm is used.
+        If the matrix is tridiagonal (``tridiagonal_form=True``), scipy's
+        ``eigvalsh_tridiagonal`` is used, skipping the tridiagonal reduction.
 
         Returns:
             numpy array with the calculated eigenvalues.
@@ -307,7 +309,11 @@ class WishartEnsemble(BaseEnsemble):
             return norm_const * self._eigvals
 
         # always storing non-normalized eigenvalues
-        self._eigvals = np.linalg.eigvalsh(self.matrix)
+        if self.tridiagonal_form:
+            # leveraging the tridiagonal form for faster eigenvalue computation
+            self._eigvals = eigvalsh_tridiagonal(np.diag(self.matrix), np.diag(self.matrix, 1))
+        else:
+            self._eigvals = np.linalg.eigvalsh(self.matrix)
         return norm_const * self._eigvals
 
     def eigval_hist(
