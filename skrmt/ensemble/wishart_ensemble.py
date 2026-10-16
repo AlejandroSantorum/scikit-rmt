@@ -125,6 +125,12 @@ class WishartEnsemble(BaseEnsemble):
         self.ratio = self.p/self.n
         self.lambda_plus = self.beta * self.sigma**2 * (1 + np.sqrt(self.ratio))**2
         self.lambda_minus = self.beta * self.sigma**2 * (1 - np.sqrt(self.ratio))**2
+        # non-normalized spectrum interval (keys are betas)
+        self._non_normalized_interval = {  # same convention as guassian ensemble
+            1: (self.n * self.lambda_minus, self.n * self.lambda_plus),
+            2: (self.n * self.lambda_minus, self.n * self.lambda_plus),
+            4: (self.n * self.lambda_minus, self.n * self.lambda_plus),
+        }
 
     def resample(
         self,
@@ -329,7 +335,7 @@ class WishartEnsemble(BaseEnsemble):
             if normalize:
                 interval = (self.lambda_minus, self.lambda_plus)
             else:
-                interval = (self.n*self.lambda_minus, self.n*self.lambda_plus)
+                interval = self._non_normalized_interval[self.beta]
 
         if self.tridiagonal_form:
             if normalize:

@@ -9,14 +9,15 @@ from typing import Tuple, Union, Sequence
 import numpy as np
 
 
-def tridiag_eigval_neg(tridiag_mtx: np.ndarray) -> int:
+def tridiag_eigval_neg(diag: np.ndarray, offdiag: np.ndarray) -> int:
     """Calculates number of negative eigenvalues.
 
     Given a tridiagonal matrix, this function calculates the
     number of negative eigenvalues using Sturm sequences.
 
     Args:
-        tridiag_mtx (numpy array): tridiagonal matrix
+        diag (numpy array): Main diagonal of length n.
+        offdiag (numpy array): First upper diagonal of length n-1.
 
     Returns:
         integer representing the number of negative eigenvalues.
@@ -29,16 +30,22 @@ def tridiag_eigval_neg(tridiag_mtx: np.ndarray) -> int:
             Journal of Mathematical Physics. 43.11 (2002): 5830-5847.
 
     """
-    n_size = len(tridiag_mtx) # number of rows = number of columns
-    sturm_seq = np.zeros(n_size)
+    n_size = len(diag)  # number of rows = number of columns
+    if n_size == 0:
+        return 0
 
-    sturm_seq[0] = tridiag_mtx[n_size-1][n_size-1] # R[0] = a_1 by default
-    for i in range(1, n_size): # O(n)
-        sturm_seq[i] = tridiag_mtx[n_size-i-1][n_size-i-1] - \
-                        ((tridiag_mtx[n_size-i-1][n_size-i]**2)/sturm_seq[i-1])
+    # start at the bottom-right corner
+    # R[0] = a_1 by default
+    pivot = diag[-1]
+    n_negative = int(pivot < 0)
+
+    # apply the Sturm recurrence in reverse order.
+    for i in range(n_size - 2, -1, -1):  # O(n)
+        pivot = diag[i] - offdiag[i] ** 2 / pivot
+        n_negative += int(pivot < 0)
 
     # number of negative values in R sequence
-    return (sturm_seq<0).sum()
+    return n_negative
 
 
 def tridiag_eigval_hist(
@@ -93,35 +100,45 @@ def tridiag_eigval_hist(
         bin_delimiters = np.linspace(interval[0], interval[1], num=bins+1) # O(m)
     elif isinstance(bins, (tuple, list)):
         # bin delimiters directly introduced
-        bin_delimiters = np.array(bins)
+        bin_delimiters = np.asarray(bins)
     else:
         raise ValueError("bins argument must be a tuple, list or integer")
+
+    # extract the diagonals once: O(n) storage and work.
+    diag = np.diag(tridiag_mtx).copy()
+    offdiag = np.diag(tridiag_mtx, k=1).copy()
 
     n_size = int(len(tridiag_mtx)) # number of rows = number of columns
     # + 2 because of (-inf, interval[0]) and (interval[1], inf) intervals
     histogram = np.zeros(len(bin_delimiters))
 
-    # Building matrix A (aux_mtx) in linear time
-    diag = np.arange(n_size)
-    diag_1 = diag[:-1] # = np.arange(n-1)
-    aux_mtx = np.zeros((n_size,n_size))
-    aux_mtx[diag_1, diag_1+1] = tridiag_mtx[diag_1, diag_1+1]
-    aux_mtx[diag_1+1, diag_1] = tridiag_mtx[diag_1+1, diag_1]
+    # reuse this buffer instead of allocating a new shifted
+    # diagonal for every bin edge.
+    shifted_diag = np.empty(
+        n_size,
+        dtype=np.result_type(diag, bin_delimiters, np.float64),
+    )
 
     prev = 0
-    #for i in range(bins+1): # O(m)
-    for i in range(len(bin_delimiters)): # O(m)
-        aux_mtx[diag, diag] = tridiag_mtx[diag, diag] - bin_delimiters[i]
-        current = tridiag_eigval_neg(aux_mtx) # O(n)
+    for i, edge in enumerate(bin_delimiters):
+        # compute diag - edge without allocating another array
+        np.subtract(diag, edge, out=shifted_diag)
+        # compute the number of negative eigenvalues of the shifted matrix
+        current = tridiag_eigval_neg(shifted_diag, offdiag)  # O(n)
+
         histogram[i] = current - prev
         prev = current
 
+    # exclude eigenvalues below the first bin edge
+    histogram = histogram[1:]
+
     if density:
         # dont need (-inf, interval[0]) interval
-        histogram[1:] = histogram[1:] / (sum(histogram[1:]) * np.diff(bin_delimiters))
+        histogram = histogram / (
+            np.sum(histogram) * np.diff(bin_delimiters)
+        )
 
-    # dont want (-inf, interval[0]) interval
-    return histogram[1:], bin_delimiters
+    return histogram, bin_delimiters
 
 
 def householder_reduction(

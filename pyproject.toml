@@ -45,6 +45,7 @@ Repository = "https://github.com/AlejandroSantorum/scikit-rmt"
 dev = [
     "pytest~=8.0.0",
     "pytest-cov~=5.0.0",
+    "tqdm>=4.66.5,<5.0",
     "pylint~=3.0.0",
     "build>=1.0,<2",
     "twine~=5.0.0",
