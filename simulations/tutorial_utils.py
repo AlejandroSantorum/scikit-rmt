@@ -63,7 +63,7 @@ def _plot_times(N_list, bins_list, times):
 
         ax.legend(lines, labels)
         ax.set_title(
-            f"{title}\n(Dashed: degree-{degree} polynomial fits)"
+            f"{title}\n(Dashed: degree-{degree} polynomial fit)"
         )
         ax.set_xlabel("n (matrix size)")
         ax.set_ylabel("Time (ms)")
