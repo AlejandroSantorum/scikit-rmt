@@ -10,6 +10,7 @@ and Wishart Quaternion Ensemble.
 from typing import Union, Sequence, Tuple, Optional
 import numpy as np
 from scipy import sparse, special
+from scipy.linalg import eigvalsh_tridiagonal
 
 from .base_ensemble import BaseEnsemble
 from .tridiagonal_utils import tridiag_eigval_hist
@@ -124,6 +125,12 @@ class WishartEnsemble(BaseEnsemble):
         self.ratio = self.p/self.n
         self.lambda_plus = self.beta * self.sigma**2 * (1 + np.sqrt(self.ratio))**2
         self.lambda_minus = self.beta * self.sigma**2 * (1 - np.sqrt(self.ratio))**2
+        # non-normalized spectrum interval (keys are betas)
+        self._non_normalized_interval = {  # same convention as guassian ensemble
+            1: (self.n * self.lambda_minus, self.n * self.lambda_plus),
+            2: (self.n * self.lambda_minus, self.n * self.lambda_plus),
+            4: (self.n * self.lambda_minus, self.n * self.lambda_plus),
+        }
 
     def resample(
         self,
@@ -295,7 +302,8 @@ class WishartEnsemble(BaseEnsemble):
         """Computes the random matrix eigenvalues.
 
         Calculates the random matrix eigenvalues using numpy standard procedure.
-        If the matrix ensemble is symmetric, a faster algorithm is used.
+        If the matrix is tridiagonal (``tridiagonal_form=True``), scipy's
+        ``eigvalsh_tridiagonal`` is used, skipping the tridiagonal reduction.
 
         Returns:
             numpy array with the calculated eigenvalues.
@@ -307,7 +315,11 @@ class WishartEnsemble(BaseEnsemble):
             return norm_const * self._eigvals
 
         # always storing non-normalized eigenvalues
-        self._eigvals = np.linalg.eigvalsh(self.matrix)
+        if self.tridiagonal_form:
+            # leveraging the tridiagonal form for faster eigenvalue computation
+            self._eigvals = eigvalsh_tridiagonal(np.diag(self.matrix), np.diag(self.matrix, 1))
+        else:
+            self._eigvals = np.linalg.eigvalsh(self.matrix)
         return norm_const * self._eigvals
 
     def eigval_hist(
@@ -323,7 +335,7 @@ class WishartEnsemble(BaseEnsemble):
             if normalize:
                 interval = (self.lambda_minus, self.lambda_plus)
             else:
-                interval = (self.n*self.lambda_minus, self.n*self.lambda_plus)
+                interval = self._non_normalized_interval[self.beta]
 
         if self.tridiagonal_form:
             if normalize:
