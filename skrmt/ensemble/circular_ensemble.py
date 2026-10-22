@@ -10,7 +10,9 @@ and Circular Symplectic Ensemble (CSE).
 from typing import Union, Sequence, Tuple, Optional
 import numpy as np
 import matplotlib.pyplot as plt
-from scipy import special
+import matplotlib.colors as mcolors
+from scipy.ndimage import gaussian_filter
+from scipy.special import gamma
 
 from .base_ensemble import BaseEnsemble
 from .misc import get_logger
@@ -287,9 +289,6 @@ class CircularEnsemble(BaseEnsemble):
         if (interval is not None) and not isinstance(interval, tuple):
             raise ValueError("interval argument must be a tuple (or None)")
 
-        import matplotlib.colors as mcolors
-        from scipy.ndimage import gaussian_filter
-
         eigvals = self.eigvals(normalize=normalize)
         xvals = eigvals.real
         yvals = eigvals.imag
@@ -328,20 +327,22 @@ class CircularEnsemble(BaseEnsemble):
         h2d = gaussian_filter(h2d, sigma=0.6)  # increase sigma (e.g., 1.5) for a thicker line
 
         # modify colormap so that values near 0 map to white and update colorbar accordingly
-        original_cmap = plt.colormaps['nipy_spectral'] if hasattr(plt, 'colormaps') else plt.cm.nipy_spectral
+        original_cmap = plt.colormaps['nipy_spectral']
         colors = original_cmap(np.linspace(0, 1, 256))
         colors[:4] = [1.0, 1.0, 1.0, 1.0]  # set the lowest values to pure white
-        white_spectral_cmap = mcolors.LinearSegmentedColormap.from_list("white_nipy_spectral", colors)
+        white_spectral_cmap = mcolors.LinearSegmentedColormap.from_list(
+            "white_nipy_spectral", colors
+        )
 
         im = axes[1].imshow(
-            h2d.transpose(), 
-            origin='lower', 
-            interpolation='bilinear', 
-            extent=extent, 
-            cmap=white_spectral_cmap
+            h2d.transpose(),
+            origin='lower',
+            interpolation='bilinear',
+            extent=extent,
+            cmap=white_spectral_cmap,
         )
         fig.colorbar(im, ax=axes[1])
-        
+
         # ensure the right plot maintains an equal aspect ratio (circular support)
         axes[1].set_aspect('equal', adjustable='box')
         axes[1].set_title('Complex eigenvalues histogram')
@@ -388,7 +389,7 @@ class CircularEnsemble(BaseEnsemble):
 
         # calculating Circular eigval pdf constant depeding on beta
         const_beta = (2*np.pi)**self.n * \
-                     special.gamma(1 + self.n*self.beta/2)/(special.gamma(1 + self.beta/2)**self.n)
+                     gamma(1 + self.n*self.beta/2)/(gamma(1 + self.beta/2)**self.n)
 
         # calculating prod
         pdf = 1
