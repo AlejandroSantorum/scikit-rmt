@@ -13,7 +13,9 @@ import matplotlib.pyplot as plt
 from scipy import special
 
 from .base_ensemble import BaseEnsemble
+from .misc import get_logger
 
+_logger = get_logger(__name__)
 
 
 def _sample_haar_mtx(size: int) -> np.ndarray:
@@ -285,6 +287,9 @@ class CircularEnsemble(BaseEnsemble):
         if (interval is not None) and not isinstance(interval, tuple):
             raise ValueError("interval argument must be a tuple (or None)")
 
+        import matplotlib.colors as mcolors
+        from scipy.ndimage import gaussian_filter
+
         eigvals = self.eigvals(normalize=normalize)
         xvals = eigvals.real
         yvals = eigvals.imag
@@ -299,27 +304,53 @@ class CircularEnsemble(BaseEnsemble):
 
         fig, axes = plt.subplots(nrows=1, ncols=2, figsize=(11, 5), constrained_layout=True)
 
+        # left plot: Complex plane scatter
         axes[0].set_xlim(rang[0][0], rang[0][1])
         axes[0].set_ylim(rang[1][0], rang[1][1])
         axes[0].plot(xvals, yvals, 'o')
         axes[0].set_aspect('equal', adjustable='box')
-        axes[0].set_title('Complex plane')
+        axes[0].set_title('Complex eigenvalues scatter')
         axes[0].set_xlabel('real')
         axes[0].set_ylabel('imaginary')
 
-        h2d,_,_,img = axes[1].hist2d(
-            xvals, yvals, range=rang, cmap=plt.cm.get_cmap('nipy_spectral'),
+        # right plot: eigenvalue density histogram (heatmap)
+        if bins is None:
+            bins = 128  # default value for the spectral histogram (heatmap)
+            _logger.warning(
+                f"bins argument is None. Using default value of {bins} bins for the histogram."
+            )
+        h2d, _, _, _ = axes[1].hist2d(
+            xvals, yvals, bins=bins, range=rang, cmap='nipy_spectral'
         )
-        fig.colorbar(img, ax=axes[1])
         axes[1].cla()
-        axes[1].imshow(h2d.transpose(), origin='lower', interpolation="bilinear", extent=extent)
-        axes[1].set_title('Eigenvalue heatmap')
+
+        # thicken the heatmap line by applying a slight Gaussian smoothing filter
+        h2d = gaussian_filter(h2d, sigma=0.6)  # increase sigma (e.g., 1.5) for a thicker line
+
+        # modify colormap so that values near 0 map to white and update colorbar accordingly
+        original_cmap = plt.colormaps['nipy_spectral'] if hasattr(plt, 'colormaps') else plt.cm.nipy_spectral
+        colors = original_cmap(np.linspace(0, 1, 256))
+        colors[:4] = [1.0, 1.0, 1.0, 1.0]  # set the lowest values to pure white
+        white_spectral_cmap = mcolors.LinearSegmentedColormap.from_list("white_nipy_spectral", colors)
+
+        im = axes[1].imshow(
+            h2d.transpose(), 
+            origin='lower', 
+            interpolation='bilinear', 
+            extent=extent, 
+            cmap=white_spectral_cmap
+        )
+        fig.colorbar(im, ax=axes[1])
+        
+        # ensure the right plot maintains an equal aspect ratio (circular support)
+        axes[1].set_aspect('equal', adjustable='box')
+        axes[1].set_title('Complex eigenvalues histogram')
         axes[1].set_xlabel('real')
         axes[1].set_ylabel('imaginary')
 
         plt.suptitle("Complex eigenvalues histogram", fontweight="bold")
 
-        # Saving plot or showing it
+        # saving plot or showing it
         if savefig_path:
             plt.savefig(savefig_path, dpi=600)
         else:
