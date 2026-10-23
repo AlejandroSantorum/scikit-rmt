@@ -174,7 +174,7 @@ cse.plot_eigval_hist()
 ```
 ![CSE density plot](imgs/hist_cse.png)
 <!---
-<img src="imgs/hist_cse_smooth.png" width=650 height=320 alt="CSE density plot">
+<img src="imgs/hist_cse.png" width=650 height=320 alt="CSE density plot">
 -->
 
 We can **boost histogram representation** using the results described by A. Edelman and I. Dumitriu

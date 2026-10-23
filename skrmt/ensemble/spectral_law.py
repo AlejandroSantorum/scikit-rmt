@@ -11,7 +11,6 @@ spectrum of the Manova Ensemble.
 
 from typing import Union, Sequence, Tuple, Optional
 import collections.abc
-import logging
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.integrate import quad
@@ -20,10 +19,10 @@ from scipy import interpolate
 
 from .base_ensemble import BaseEnsemble
 from .tracy_widom_approximator import TW_Approximator
-from .misc import relu, indicator, plot_func, get_bins_centers_and_contour
+from .misc import relu, indicator, plot_func, get_bins_centers_and_contour, get_logger
 
 
-_logger = logging.getLogger(__name__)
+_logger = get_logger(__name__)
 
 
 class WignerSemicircleDistribution:
