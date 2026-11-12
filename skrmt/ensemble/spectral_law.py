@@ -991,12 +991,12 @@ class ManovaSpectrumDistribution(rv_continuous):
 
     Attributes:
         a (float): first random matrix size ratio. This is the ratio between the
-            number of degrees of freedom 'p' and the first sample size 'n1'. The value
-            of a = p/n1. Remember a Manova randon matrix is considered a double-Wishart
+            number of degrees of freedom 'm' and the first sample size 'n1'. The value
+            of a = n1/m. Remember a Manova randon matrix is considered a double-Wishart
             matrix, that's why there are two sample sizes 'n1' and 'n2' (see below).
         b (float): second random matrix size ratio. This is the ratio between the
-            number of degrees of freedom 'p' and the second sample size 'n2'. The value
-            of b = p/n2. Remember a Manova randon matrix is considered a double-Wishart
+            number of degrees of freedom 'm' and the second sample size 'n2'. The value
+            of b = n2/m. Remember a Manova randon matrix is considered a double-Wishart
             matrix, that's why there are two sample sizes 'n1' and 'n2'.
         beta (int, default=1): descriptive integer of the Manova ensemble type.
             For MRE beta=1, for WME beta=2, for MQE beta=4.
@@ -1021,12 +1021,12 @@ class ManovaSpectrumDistribution(rv_continuous):
 
         Args:
             ratio_a (float): first random matrix size ratio. This is the ratio between the
-                number of degrees of freedom 'p' and the first sample size 'n1'. The value
-                of a = p/n1. Remember a Manova randon matrix is considered a double-Wishart
+                number of degrees of freedom 'm' and the first sample size 'n1'. The value
+                of a = n1/m. Remember a Manova randon matrix is considered a double-Wishart
                 matrix, that's why there are two sample sizes 'n1' and 'n2' (see below).
             ratio_b (float): second random matrix size ratio. This is the ratio between the
-                number of degrees of freedom 'p' and the second sample size 'n2'. The value
-                of b = p/n2. Remember a Manova randon matrix is considered a double-Wishart
+                number of degrees of freedom 'm' and the second sample size 'n2'. The value
+                of b = n2/m. Remember a Manova randon matrix is considered a double-Wishart
                 matrix, that's why there are two sample sizes 'n1' and 'n2'.
             beta (int, default=1): descriptive integer of the Manova ensemble type.
                 For MRE beta=1, for WME beta=2, for MQE beta=4.
