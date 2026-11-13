@@ -22,20 +22,29 @@ def _sample_haar_mtx(size: int) -> np.ndarray:
     """Samples Haar-distributed matrices.
 
     Samples Haar-distributed matrices that are useful to generate
-    random matrices for COE, CUE and CSE ensembles.
+    random matrices for COE, CUE and CSE ensembles. The QR factorization
+    of a complex Ginibre matrix is not unique, and LAPACK returns the factor R
+    with a real diagonal, which makes Q not Haar-distributed. The phases of
+    the diagonal of R are therefore absorbed into Q.
 
     Args:
-        n (int): matrix size.
+        size (int): matrix size.
 
     Returns:
         numpy array containing Haar-distributed random matrix.
+
+    References:
+        - Mezzadri, F. "How to generate random matrices from the classical
+            compact groups". Notices of the AMS. 54.5 (2007): 592-604.
     """
-    # n by n random complex matrix
+    # n by n random complex matrix (Ginibre ensemble)
     x_mtx = np.random.randn(size,size) + (0+1j)*np.random.randn(size,size)
     # orthonormalizing matrix using QR algorithm
-    q_mtx, _ = np.linalg.qr(x_mtx)
-    # the resulting Q is Haar-distributed
-    return q_mtx
+    q_mtx, r_mtx = np.linalg.qr(x_mtx)
+    # phase correction Lambda = diag(r_ii/|r_ii|), so that Q*Lambda is Haar-distributed
+    diag_r = np.diag(r_mtx)
+    phases = diag_r / np.abs(diag_r)
+    return q_mtx * phases
 
 
 #########################################################################
